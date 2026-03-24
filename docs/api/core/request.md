@@ -47,8 +47,8 @@ interface UploadFile {
 ```ts
 // GET /api/users?page=1&limit=10
 k.api.get(() => {
-    const page = k.request.queryString.page   // "1"
-    const limit = k.request.queryString.limit  // "10"
+    const page = k.request.queryString.get("page")   // "1"
+    const limit = k.request.queryString.get("limit")  // "10"
     return { page, limit }
 })
 // 返回: { "page": "1", "limit": "10" }
@@ -59,7 +59,7 @@ k.api.get(() => {
 获取 POST/PUT 请求的表单数据。
 
 ```ts
-k.api.post(async (ctx) => {
+k.api.post(() => {
     const data = k.request.form
     return { received: data }
 })
@@ -71,13 +71,13 @@ k.api.post(async (ctx) => {
 
 ```ts
 k.api.post(() => {
-    if (k.request.files.count > 0) {
+    if (k.request.files.length > 0) {
         k.request.files.forEach((item) => {
             // 保存到 Kfile
             item.save(item.fileName)
         })
     }
-    return { uploaded: k.request.files.count }
+    return { uploaded: k.request.files.length }
 })
 ```
 
@@ -89,9 +89,9 @@ k.api.post(() => {
 k.api.get(() => {
     const headers = k.request.headers
     return {
-        accept: headers.Accept,
-        userAgent: headers.UserAgent,
-        cookie: headers.Cookie
+        accept: headers.get("Accept"),
+        userAgent: headers.get("UserAgent"),
+        cookie: headers.get("Cookie")
     }
 })
 ```
