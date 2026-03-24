@@ -24,7 +24,6 @@ interface Response {
   unauthorized(): void;               // 401 未授权
   notFound(): void;                  // 404 未找到
   execute(url: string): void;        // 执行其他 URL
-  stop(): void;                      // 停止响应
 }
 ```
 
@@ -174,18 +173,6 @@ k.api.get("wrapper", () => {
     k.response.write(" appended")
 })
 // 输出: { "base": "data" } appended
-```
-
-### stop()
-
-停止后续处理。
-
-```ts
-k.api.get(() => {
-    k.response.write("stop before")
-    k.response.stop()
-    // 后续代码不会执行
-})
 ```
 
 ## 常见用法
