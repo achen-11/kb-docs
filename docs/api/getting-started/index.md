@@ -52,7 +52,6 @@ k.DB.
 
 ## 下一步
 
-- [文档验证流程](./verification.md) - 如何验证文档中的示例代码
 - [k.DB 数据库操作](./data/database.md) - 了解数据库 CRUD
 - [k.request](./core/request.md) - 处理 HTTP 请求
 - [k.site](./site/site.md) - 站点管理
