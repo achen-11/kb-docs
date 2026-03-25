@@ -4,7 +4,10 @@
 
 ## 概述
 
-每个 API 文档中的示例代码都应通过 `kb-doc` 测试站点验证后，才能正式发布。
+每个 API 文档中的**所有示例**都应通过 `kb-doc` 测试站点验证后，才能正式发布。包括：
+- 方法签名示例
+- 单独方法示例
+- **完整示例（必须全量验证）**
 
 ## 测试环境
 
@@ -14,6 +17,29 @@
 | 本地项目 | `old-source/kb-doc/` |
 | 测试目录 | `src/api/ai-check/` |
 | kooboo-cli | `kb` 命令 |
+
+## Kooboo 语法规范
+
+**必须遵守：**
+- `k.api.post()` 不支持 `async` 和 `ctx` 参数
+- 获取表单数据用 `k.request.form`
+- 获取请求体（JSON）用 `k.request.body`（登录等场景通常用 body）
+- 获取查询参数用 `k.request.queryString.get("key")`
+
+**错误示例：**
+```ts
+// 错误 ❌
+k.api.post(async (ctx) => {
+    const { name } = await ctx.request.json()
+})
+
+// 正确 ✅
+k.api.post(() => {
+    const { name } = k.request.form
+    // 或
+    const body = k.request.body
+})
+```
 
 ## 验证流程
 

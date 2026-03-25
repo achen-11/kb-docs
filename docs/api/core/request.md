@@ -111,12 +111,27 @@ k.api.get(() => {
 
 获取请求体文本内容（通常用于 POST/PUT）。
 
+::: tip 注意
+`k.request.body` 返回的是**原始字符串**，需要手动解析：
+```ts
+const data = JSON.parse(k.request.body)
+```
+:::
+
 ```ts
 k.api.post(() => {
     const body = k.request.body
     return { body }
 })
 // 返回请求体的原始文本
+```
+
+**解析 JSON 数据：**
+```ts
+k.api.post(() => {
+    const { username, password } = JSON.parse(k.request.body || '{}')
+    return { username }
+})
 ```
 
 ### method

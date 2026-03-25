@@ -84,12 +84,6 @@ k.api.get(() => {
     const username = k.cookie.get("username")
     return { username }
 })
-
-// 也可通过属性访问
-k.api.get(() => {
-    const username = k.cookie.username
-    return { username }
-})
 ```
 
 ### containsKey()
@@ -155,8 +149,8 @@ k.api.get(() => {
 
 ```ts
 // 登录 API
-k.api.post(async (ctx) => {
-    const { username, password, remember } = await ctx.request.json()
+k.api.post(() => {
+    const { username, password, remember } = JSON.parse(k.request.body || '{}')
 
     // 验证用户...
     const user = { id: "123", name: username }
@@ -193,24 +187,6 @@ k.api.get(() => {
     k.cookie.remove("remember_user")
     k.cookie.remove("current_user")
     return { success: true }
-})
-```
-
-### 设置语言偏好
-
-```ts
-// 设置语言
-k.api.post(async (ctx) => {
-    const { culture } = await ctx.request.json()
-    // 保存 1 年
-    k.cookie.set("_site_culture", culture, 365)
-    return { success: true }
-})
-
-// 获取语言
-k.api.get(() => {
-    const culture = k.cookie.get("_site_culture") || "en-US"
-    return { culture }
 })
 ```
 
