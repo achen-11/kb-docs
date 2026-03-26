@@ -41,27 +41,51 @@ export default defineConfig({
                 { text: 'sqlite', link: '/api/data/sqlite/' }
               ]
             },
+            // TODO
             { text: 'k.content', link: '/api/data/content.md' },
-            { text: 'k.storage', link: '/api/data/storage.md' }
           ]
         },
         {
-          text: '业务',
+          text: '电商',
           items: [
-            { text: 'k.commerce', link: '/api/business/commerce.md' },
-            { text: 'k.payment', link: '/api/business/payment.md' },
-            { text: 'k.emailMarketing', link: '/api/business/email-marketing.md' },
-            { text: 'k.mail', link: '/api/business/mail.md' }
+            {
+              text: 'k.commerce',
+              collapsed: false,
+              items: [
+                { text: '概述', link: '/api/business/commerce.md' },
+                { text: 'product', link: '/api/business/product.md' },
+                { text: 'category', link: '/api/business/category.md' },
+                { text: 'cart', link: '/api/business/cart.md' },
+                { text: 'order', link: '/api/business/order.md' },
+                { text: 'customer', link: '/api/business/customer.md' },
+                { text: 'discount', link: '/api/business/discount.md' },
+                { text: 'address', link: '/api/business/address.md' },
+                { text: 'loyalty', link: '/api/business/loyalty.md' },
+                { text: 'membership', link: '/api/business/membership.md' },
+                { text: 'shipping', link: '/api/business/shipping.md' },
+                { text: 'wishlist', link: '/api/business/wishlist.md' },
+                { text: 'settings', link: '/api/business/settings.md' },
+              ]
+            }
           ]
         },
         {
           text: '站点',
           items: [
             { text: 'k.site', link: '/api/site/site.md' },
-            { text: 'k.page', link: '/api/site/page.md' },
             { text: 'k.label', link: '/api/site/label.md' },
             { text: 'k.file', link: '/api/site/file.md' },
             { text: 'k.module', link: '/api/site/module.md' }
+          ]
+        },
+        {
+          text: '开发',
+          items: [
+            { text:"layout", link: '/api/site/layout.md' },
+            { text:"page", link: '/api/site/page.md' },
+            { text:"view", link: '/api/site/view.md' },
+            { text:"css", link: '/api/site/css.md' },
+            { text:"js", link: '/api/site/js.md' },
           ]
         },
         {
@@ -69,7 +93,6 @@ export default defineConfig({
           items: [
             { text: 'k.net.httpClient', link: '/api/network/httpclient.md' },
             { text: 'k.net.webSocket', link: '/api/network/websocket.md' },
-            { text: 'k.net.DNS', link: '/api/network/dns.md' }
           ]
         }
       ]
