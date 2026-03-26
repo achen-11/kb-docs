@@ -1,4 +1,15 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(pnpm --version)",
+      "Bash(find old-source:*)",
+      "Bash(python3 ./.trellis/scripts/task.py create \"重构 API 文档结构\" --slug api-docs-refactor)",
+      "Bash(kb config:*)",
+      "Bash(curl -s \"https://kb-doc.redev.cn/api/ai-check/*\")",
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {

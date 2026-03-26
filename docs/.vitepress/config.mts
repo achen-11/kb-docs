@@ -4,6 +4,7 @@ export default defineConfig({
   title: 'Kooboo',
   description: 'Kooboo Documentation',
   lang: 'zh-CN',
+  ignoreDeadLinks: true,
   themeConfig: {
     siteTitle: 'Kooboo',
     nav: [
@@ -32,7 +33,14 @@ export default defineConfig({
         {
           text: '数据',
           items: [
-            { text: 'k.DB', link: '/api/data/database.md' },
+            {
+              text: 'k.DB',
+              collapsed: false,
+              items: [
+                { text: '概述', link: '/api/data/database.md' },
+                { text: 'sqlite', link: '/api/data/sqlite/' }
+              ]
+            },
             { text: 'k.content', link: '/api/data/content.md' },
             { text: 'k.storage', link: '/api/data/storage.md' }
           ]
