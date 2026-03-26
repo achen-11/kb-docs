@@ -23,6 +23,7 @@ export default defineConfig({
         {
           text: '核心',
           items: [
+            { text: 'k.api', link: '/api/core/api.md' },
             { text: 'k.request', link: '/api/core/request.md' },
             { text: 'k.response', link: '/api/core/response.md' },
             { text: 'k.session', link: '/api/core/session.md' },

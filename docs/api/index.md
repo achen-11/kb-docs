@@ -8,6 +8,7 @@ KScript API 完整参考文档。
 - [快速开始](./getting-started/) - API 基础与快速上手
 
 ### 核心
+- [k.api](./core/api.md) - API 路由创建
 - [k.request](./core/request.md) - HTTP 请求处理
 - [k.response](./core/response.md) - HTTP 响应处理
 - [k.session](./core/session.md) - 会话状态
