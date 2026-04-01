@@ -22,6 +22,7 @@
 | [membership](./membership.md) | 会员等级 |
 | [shipping](./shipping.md) | 配送方式 |
 | [wishlist](./wishlist.md) | 心愿单 |
+| [currency](./currency.md) | 货币管理 |
 | [settings](./settings.md) | 电商设置 |
 
 ## TypeScript 定义

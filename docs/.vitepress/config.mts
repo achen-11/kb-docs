@@ -65,6 +65,7 @@ export default defineConfig({
                 { text: 'membership', link: '/api/commerce/membership.md' },
                 { text: 'shipping', link: '/api/commerce/shipping.md' },
                 { text: 'wishlist', link: '/api/commerce/wishlist.md' },
+                { text: 'currency', link: '/api/commerce/currency.md' },
                 { text: 'settings', link: '/api/commerce/settings.md' },
               ]
             }
