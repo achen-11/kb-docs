@@ -81,10 +81,15 @@ export default defineConfig({
           ]
         },
         {
+          text: '多语言',
+          items: [
+            { text: 'k.label & k.t', link: '/api/site/label.md' }
+          ]
+        },
+        {
           text: '站点',
           items: [
             { text: 'k.site', link: '/api/site/site.md' },
-            { text: 'k.label', link: '/api/site/label.md' },
             { text: 'k.module', link: '/api/site/module.md' }
           ]
         },

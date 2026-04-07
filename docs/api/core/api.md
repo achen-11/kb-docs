@@ -53,6 +53,7 @@ k.api.get("list", (id) => {
 `k.api.get(()=>{})` 是通配路由，当通配路由和子级路由同时存在时，**通配路由必须声明在子级路由下方**。
 
 错误示例（子级路由不会被匹配）：
+
 ```ts
 k.api.get(() => {
     return "通配"
@@ -63,6 +64,7 @@ k.api.get("list", () => {
 ```
 
 正确示例：
+
 ```ts
 k.api.get("list", () => {
     return "子级list"
@@ -71,6 +73,7 @@ k.api.get(() => {
     return "通配"
 })
 ```
+
 :::
 
 ---
@@ -246,3 +249,4 @@ k.api.get((id) => {
     return item
 })
 ```
+
