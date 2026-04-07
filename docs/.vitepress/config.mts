@@ -42,8 +42,17 @@ export default defineConfig({
                 { text: 'sqlite', link: '/api/data/sqlite/' }
               ]
             },
-            // TODO
             { text: 'k.content', link: '/api/data/content.md' },
+          ]
+        },
+        {
+          text: '文件',
+          collapsed: false,
+          items: [
+            { text: '概述', link: '/api/file/file.md' },
+            { text: 'folder', link: '/api/file/file-folder.md' },
+            { text: 'resumable', link: '/api/file/file-resumable.md' },
+            { text: '数据结构', link: '/api/file/file-info.md' },
           ]
         },
         {
@@ -76,18 +85,17 @@ export default defineConfig({
           items: [
             { text: 'k.site', link: '/api/site/site.md' },
             { text: 'k.label', link: '/api/site/label.md' },
-            { text: 'k.file', link: '/api/site/file.md' },
             { text: 'k.module', link: '/api/site/module.md' }
           ]
         },
         {
           text: '开发',
           items: [
-            { text:"layout", link: '/api/site/layout.md' },
-            { text:"page", link: '/api/site/page.md' },
-            { text:"view", link: '/api/site/view.md' },
-            { text:"css", link: '/api/site/css.md' },
-            { text:"js", link: '/api/site/js.md' },
+            { text: "layout", link: '/api/site/layout.md' },
+            { text: "page", link: '/api/site/page.md' },
+            { text: "view", link: '/api/site/view.md' },
+            { text: "css", link: '/api/site/css.md' },
+            { text: "js", link: '/api/site/js.md' },
           ]
         },
         {

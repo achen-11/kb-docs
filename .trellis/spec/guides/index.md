@@ -24,6 +24,7 @@ These guides help you **ask the right questions before coding**.
 | [Code Reuse Thinking Guide](./code-reuse-thinking-guide.md) | Identify patterns and reduce duplication | When you notice repeated patterns |
 | [Cross-Layer Thinking Guide](./cross-layer-thinking-guide.md) | Think through data flow across layers | Features spanning multiple layers |
 | [API Documentation Verification](./api-verification.md) | Verify API doc examples with real tests | Before publishing API documentation |
+| [API Documentation Workflow](./api-documentation-workflow.md) | Complete workflow for refactoring API docs | When creating or updating API documentation |
 
 ---
 
