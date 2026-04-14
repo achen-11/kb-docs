@@ -104,6 +104,12 @@ export default defineConfig({
           ]
         },
         {
+          text: '日志',
+          items: [
+            { text: 'k.logger', link: '/api/logger/k-logger.md' },
+          ]
+        },
+        {
           text: '网络',
           items: [
             { text: 'k.net.httpClient', link: '/api/network/httpclient.md' },
