@@ -218,6 +218,7 @@ k.api.get(() => {
 `decode()` 返回的是**字符串**，需要 `JSON.parse()` 解析。返回格式为 `"{ code: 0, value: {...} }"` 或 `"{ code: 1, value: \"错误信息\" }"`
 
 **不同错误类型返回不同的 HTTP 状态码：**
+
 - 格式错误（不是3段）：返回 HTTP 400
 - 签名错误：返回 HTTP 200
 :::
@@ -246,7 +247,9 @@ k.api.get(() => {
     }
 })
 ```
+
 ::: tip 最佳实践：try-catch + code 判断
+
 ```ts
 k.api.post(() => {
     try {
@@ -262,8 +265,9 @@ k.api.post(() => {
     }
 })
 ```
+
 :::
-```
+
 
 ## 加密解密
 
@@ -354,3 +358,4 @@ k.api.get(() => {
 - [k.request](./request.md) - HTTP 请求信息
 - [k.response](./response.md) - HTTP 响应处理
 - [k.cookie](./cookie.md) - Cookie 管理
+
