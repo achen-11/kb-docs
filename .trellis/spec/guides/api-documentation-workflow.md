@@ -51,12 +51,15 @@
 ## Step 1: 阅读源码
 
 ### 旧文档
+
 路径: `old-source/api/` 目录下对应的 md 文件
 
 ### TypeScript 定义
+
 路径: `old-source/kooboo.d.ts`
 
 查找方法:
+
 ```bash
 # 查找接口定义
 grep -n "interface KXxx" old-source/kooboo.d.ts
@@ -68,14 +71,17 @@ grep -n "k\.commerce\." old-source/kooboo.d.ts
 ## Step 2: 确认文档状态
 
 ### 检查文档是否存在
+
 ```bash
 ls docs/api/{category}/
 ```
 
 ### 检查 vitepress 侧边栏配置
+
 文件: `docs/.vitepress/config.mts`
 
 如果新增模块，需要添加侧边栏配置:
+
 ```ts
 {
   text: 'module-name',
@@ -114,20 +120,22 @@ ls docs/api/{category}/
 
 ### 易漏内容检查清单
 
-- [ ] 方法重载版本（如 `write(content)` 和 `write(content, withAuthor)`）
-- [ ] 子模块（如 `resumableUpload.create()`）
-- [ ] `options` 可选参数的结构
-- [ ] `folderExists()` 等工具方法
+- 方法重载版本（如 `write(content)` 和 `write(content, withAuthor)`）
+- 子模块（如 `resumableUpload.create()`）
+- `options` 可选参数的结构
+- `folderExists()` 等工具方法
 
 ## Step 4: 撰写测试 API
 
 ### 文件命名
+
 ```
 ai-check/k-{module}-test.ts
 // 例如: k-commerce-wishlist-test.ts, k-file-test.ts
 ```
 
 ### URL 路径规范
+
 ```ts
 // @k-url /api/ai-check/k-{module}/{action}
 ```
@@ -137,6 +145,7 @@ ai-check/k-{module}-test.ts
 **⚠️ 严禁只依赖方法返回值判断成功**
 
 ❌ 错误示例：
+
 ```ts
 // 错误 - 仅返回 success 无法证明操作成功
 k.api.post("rename", () => {
@@ -152,6 +161,7 @@ k.api.post("delete", () => {
 ```
 
 ✅ 正确示例：
+
 ```ts
 // 正确 - 通过其他 API 验证操作确实生效
 k.api.post("rename", () => {
@@ -172,19 +182,21 @@ k.api.post("write", () => {
 
 ### 验证方法对照表
 
-| 操作类型 | 必须验证方式 |
-|---------|-------------|
-| `write` | write 后用 `read()` 读取内容确认 |
-| `writeBinary` | writeBinary 后用 `readBinary()` 读取确认 |
-| `append` | append 后用 `read()` 读取确认内容已追加 |
-| `rename` | rename 后用 `exists()` 验证新文件存在、旧文件不存在 |
-| `copy` | copy 后用 `exists()` 验证目标文件存在 |
-| `delete` | delete 后用 `exists()` 验证文件不存在 |
-| `createFolder` | createFolder 后用 `subFolders()` 或 `folderExists()` 验证 |
-| `renameFolder` | renameFolder 后用 `subFolders()` 验证新名称存在、旧名称不存在 |
-| `deleteFolder` | deleteFolder 后用 `folderExists()` 验证文件夹不存在 |
-| `resumableUpload.create` | 验证返回的 task 对象结构完整 |
-| `resumableUpload.remove` | remove 后用 `get()` 验证返回 null/undefined |
+
+| 操作类型                     | 必须验证方式                                               |
+| ------------------------ | ---------------------------------------------------- |
+| `write`                  | write 后用 `read()` 读取内容确认                             |
+| `writeBinary`            | writeBinary 后用 `readBinary()` 读取确认                   |
+| `append`                 | append 后用 `read()` 读取确认内容已追加                         |
+| `rename`                 | rename 后用 `exists()` 验证新文件存在、旧文件不存在                  |
+| `copy`                   | copy 后用 `exists()` 验证目标文件存在                          |
+| `delete`                 | delete 后用 `exists()` 验证文件不存在                         |
+| `createFolder`           | createFolder 后用 `subFolders()` 或 `folderExists()` 验证 |
+| `renameFolder`           | renameFolder 后用 `subFolders()` 验证新名称存在、旧名称不存在        |
+| `deleteFolder`           | deleteFolder 后用 `folderExists()` 验证文件夹不存在            |
+| `resumableUpload.create` | 验证返回的 task 对象结构完整                                    |
+| `resumableUpload.remove` | remove 后用 `get()` 验证返回 null/undefined                |
+
 
 ### 测试示例
 
@@ -254,11 +266,13 @@ kb push api ai-check/k-{module}-test.ts
 ## Step 6: curl 验证
 
 ### GET 请求
+
 ```bash
 curl "https://kb-doc.redev.cn/api/ai-check/k-{module}/{action}"
 ```
 
 ### POST 请求
+
 ```bash
 curl -X POST "https://kb-doc.redev.cn/api/ai-check/k-{module}/{action}"
 ```
@@ -268,6 +282,7 @@ curl -X POST "https://kb-doc.redev.cn/api/ai-check/k-{module}/{action}"
 返回的 JSON 必须包含验证结果，而非仅返回 "success"：
 
 ✅ 通过：
+
 ```json
 {
   "before": 0,
@@ -277,6 +292,7 @@ curl -X POST "https://kb-doc.redev.cn/api/ai-check/k-{module}/{action}"
 ```
 
 ❌ 不通过：
+
 ```json
 "add success"
 ```
@@ -284,6 +300,7 @@ curl -X POST "https://kb-doc.redev.cn/api/ai-check/k-{module}/{action}"
 ### 验证记录
 
 每次验证需要记录:
+
 - API 路径
 - 执行的验证逻辑
 - 实际结果
@@ -292,28 +309,33 @@ curl -X POST "https://kb-doc.redev.cn/api/ai-check/k-{module}/{action}"
 ## Step 7: 完成
 
 验证通过后:
+
 1. 文档已更新
 2. 测试文件保留在 ai-check 目录
 3. 如需更新 vitepress 配置，已更新
 
 ## 测试环境
 
-| 配置 | 值 |
-|------|-----|
-| 测试站点 | https://kb-doc.redev.cn |
-| 本地项目 | `old-source/kb-doc/` |
-| 测试目录 | `src/api/ai-check/` |
-| kooboo-cli | `kb` 命令 |
+
+| 配置         | 值                                                  |
+| ---------- | -------------------------------------------------- |
+| 测试站点       | [https://kb-doc.redev.cn](https://kb-doc.redev.cn) |
+| 本地项目       | `old-source/kb-doc/`                               |
+| 测试目录       | `src/api/ai-check/`                                |
+| kooboo-cli | `kb` 命令                                            |
+
 
 ## Kooboo 语法规范
 
 **必须遵守：**
+
 - `k.api.post()` 不支持 `async` 和 `ctx` 参数
 - 获取表单数据用 `k.request.form`
 - 获取请求体（JSON）用 `k.request.body`
 - 获取查询参数用 `k.request.queryString.get("key")`
 
 **错误示例：**
+
 ```ts
 // 错误 ❌
 k.api.post(async (ctx) => {
@@ -332,3 +354,4 @@ k.api.post(() => {
 
 - [kooboo-cli 使用文档](https://github.com/kooboo/kooboo-cli)
 - [kb-doc 测试站点](https://kb-doc.redev.cn)
+

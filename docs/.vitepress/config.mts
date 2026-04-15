@@ -9,9 +9,18 @@ export default defineConfig({
     siteTitle: 'Kooboo',
     nav: [
       { text: '最佳实践', link: '/guide/' },
+      { text: '模板引擎', link: '/templateEngine/' },
       { text: 'API 详情', link: '/api/' }
     ],
     sidebar: {
+      '/templateEngine/': [
+        {
+          text: '模板引擎',
+          items: [
+            { text: 'k-query', link: '/templateEngine/k-query.md' }
+          ]
+        }
+      ],
       '/api/': [
         {
           text: '入门',

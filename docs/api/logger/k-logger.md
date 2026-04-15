@@ -38,7 +38,7 @@ k.logger.error('Store.Order', JSON.stringify({ id: 1, message: 'Order not found'
 **参数：**
 
 | 参数 | 类型 | 必填 | 说明 |
-|------|------|------|------|------|
+|------|------|------|------|
 | category | `string` | 否 | 日志分类 |
 | message | `string` | 是 | 日志信息（对象需转换为字符串） |
 
