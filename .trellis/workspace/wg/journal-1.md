@@ -70,3 +70,33 @@
 ### Next Steps
 
 - None - task complete
+
+
+## Session 2: 补全 k.DB.sqlite API 文档并通过 curl 验证
+
+**Date**: 2026-04-16
+**Task**: 补全 k.DB.sqlite API 文档并通过 curl 验证
+
+### Summary
+
+根据 Kooboo 源码（SqliteDatabase.cs / RelationalDatabase.cs / kooboo.d.ts）补全了 k.DB.sqlite 文档，新增 getTables / getTable / operators / transaction 四个方法说明，移除了不适用的 procedure。同步更新了 k.DB 总览页的 SQLiteDB 类型定义。编写并推送了 ai-check 测试接口（k-db-test.ts），通过 curl 验证全部 9 个 action 均正常返回。
+
+### Main Changes
+
+
+
+### Git Commits
+
+(No commits - planning session)
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
