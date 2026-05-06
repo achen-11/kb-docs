@@ -100,3 +100,65 @@
 ### Next Steps
 
 - None - task complete
+
+
+## Session 3: 补全 k.DB.sqlite API 文档并通过 curl 验证
+
+**Date**: 2026-04-16
+**Task**: 补全 k.DB.sqlite API 文档并通过 curl 验证
+
+### Summary
+
+根据 Kooboo 源码补全 k.DB.sqlite 文档，新增 getTables / getTable / operators / transaction，移除 procedure。同步更新 k.DB 总览页。推送并通过 curl 验证全部 9 个 action。
+
+### Main Changes
+
+
+
+### Git Commits
+
+(No commits - planning session)
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 4: 补全 k.DB.sqlite API 文档并通过 curl 验证
+
+**Date**: 2026-04-16
+**Task**: 补全 k.DB.sqlite API 文档并通过 curl 验证
+
+### Summary
+
+根据 Kooboo 源码补全 k.DB.sqlite 文档，新增 getTables/getTable/operators/transaction，移除 procedure。同步更新 k.DB 总览页。推送并通过 curl 验证全部 9 个 action。
+
+### Main Changes
+
+- docs/api/data/sqlite/index.md
+- docs/api/data/database.md
+- old-source/kb-doc/src/api/ai-check/k-db-test.ts
+
+### Git Commits
+
+(No commits - planning session)
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

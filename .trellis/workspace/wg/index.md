@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 2
+- **Total Sessions**: 4
 - **Last Active**: 2026-04-16
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~102 | Active |
+| `journal-1.md` | ~164 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,8 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits |
 |---|------|-------|---------|
+| 4 | 2026-04-16 | 补全 k.DB.sqlite API 文档并通过 curl 验证 | - |
+| 3 | 2026-04-16 | 补全 k.DB.sqlite API 文档并通过 curl 验证 | - |
 | 2 | 2026-04-16 | 补全 k.DB.sqlite API 文档并通过 curl 验证 | - |
 | 1 | 2026-04-15 | k-query 文档重构 & k.logger 文档更新 | `d4de740`, `2d4da97` |
 <!-- @@@/auto:session-history -->

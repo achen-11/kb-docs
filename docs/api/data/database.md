@@ -5,6 +5,7 @@
 ## 概述
 
 `k.DB` 提供对 Kooboo 内置数据库的访问，支持：
+
 - **SQLite** - 开箱即用，无需配置
 - **MySQL / SQL Server / MongoDB** - 需在系统配置中设置连接字符串
 
@@ -12,9 +13,11 @@
 
 ## 子模块
 
-| 模块 | 说明 |
-|------|------|
+
+| 模块                       | 说明              |
+| ------------------------ | --------------- |
 | [k.DB.sqlite](./sqlite/) | SQLite 数据库，无需配置 |
+
 
 ## TypeScript 定义
 
@@ -27,10 +30,18 @@ interface KDB {
 }
 
 interface SQLiteDB {
+    /** 获取数据库内所有表名 */
+    getTables(): string[];
+    /** 获取指定表对象 */
+    getTable(name: string): ITable;
     /** 查询数据，返回数组 */
     query(sql: string, params?: object): any[];
     /** 执行写操作，返回数字（1=成功） */
     execute(sql: string, params?: object): number;
+    /** 获取查询操作符集合 */
+    operators(): Operators;
+    /** 在事务中执行多个操作 */
+    transaction(action: Function): void;
 }
 ```
 
@@ -42,3 +53,4 @@ interface SQLiteDB {
 
 - [k.DB.sqlite](./sqlite/) - SQLite 数据库操作
 - [k.content](./content.md) - 内容管理
+
