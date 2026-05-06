@@ -3,3 +3,5 @@ node_modules
 /docs/.vitepress/dist
 /docs/.vitepress/cache
 old-source/*
+kb-remote-site/*
+/docs/superpowers/*
