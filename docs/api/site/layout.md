@@ -7,7 +7,7 @@
 布局是页面的 HTML 骨架，通过 `k-placeholder` 定义占位区域；页面在 `body` 里用 `<layout id="布局名">` 引用。`k.site.layouts` 管理布局仓库中的 Layout 对象。
 
 ::: tip 与 pages 的区别
-`k.site.layouts` 继承 **TextRepository**，**没有** `getByUrl` / `getUrl` / `getAbsUrl`（页面 `k.site.pages` 才有路由相关 API）。
+`k.site.layouts` 提供 `add` / `all` / `get` / `update` / `updateBody` / `delete` 及版本日志等 API，**没有** `getByUrl` / `getUrl` / `getAbsUrl`（仅 [k.site.pages](./page.md) 支持按 URL 查找与生成链接）。
 :::
 
 ## TypeScript 定义（节选）

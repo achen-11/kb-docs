@@ -4,7 +4,7 @@
 
 ## 概述
 
-侧边栏中的「js」对应运行时 `k.site.scripts`（`ScriptRepository`）。
+侧边栏中的「js」对应 API **`k.site.scripts`**，用于管理站点 JavaScript 资源。
 
 ```ts
 k.api.get("scripts", () => {

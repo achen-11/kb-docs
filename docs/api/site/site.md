@@ -4,7 +4,7 @@
 
 ## 概述
 
-`k.site` 对应运行时类型 `kSiteDb`，是 Kooboo 站点内容的统一入口。通过各子仓库（`pages`、`layouts`、`views` 等）进行 CRUD，并支持创建站点、导入导出等管理操作。
+`k.site` 是 Kooboo **当前站点**内容的统一入口。通过 `pages`、`layouts`、`views`、`scripts`、`styles` 等子 API 进行 CRUD，并支持创建站点、导入导出等管理操作。
 
 ::: warning 与 k.file 的区别
 - **k.site**：站点结构化资源（页面、布局、代码块等），带版本与路由。
@@ -32,7 +32,7 @@
 
 ### createSite() / Get()
 
-创建或按名称获取站点数据库实例。详见 Kooboo 源码 `kSiteDb.cs`。
+创建或按名称获取站点数据库实例（多站点管理场景；日常业务通常直接使用当前站点的 `k.site`）。
 
 ### diskSpace
 

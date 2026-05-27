@@ -39,6 +39,19 @@ Backlog 清单：`.trellis/spec/kscript-api-backlog.md`。
 
 **文档中的代码示例** 应表达「在 Kooboo API / CodeBlock 里怎么写」，与 ai-check 文件里的部署注释分离。可从测试逻辑 **提炼** 验证过的 `k.api.get/post` 片段，但去掉 CLI 专用行。
 
+### 发布文档不得暴露 Kooboo 源码实现（重要）
+
+编写时可对照 Kooboo C# 源码核对行为，但 **`docs/api/**` 正文面向站点开发者**，不得写入实现细节：
+
+| 允许 | 禁止（勿出现在 `docs/api/*.md` 正文） |
+|------|--------------------------------------|
+| `k.site.views`、`k.api.post` 等 **KScript API** | C# 仓库路径，如 `Kooboo.Sites/Scripting/...` |
+| 用户概念：页面、布局、视图、路由 | `.cs` 文件名、`*Repository.cs` |
+| `kooboo.d.ts` 中的 **TypeScript** `interface`（放在代码块内） | 正文中的 C# 类型名，如 `ViewRepository`、`kSiteDb`、`TextRepository`（除非与 d.ts 公开名一致且必要，优先用 `k.*` 描述） |
+| workflow / backlog 中的本地源码路径 | `[CodeDescription]`、命名空间、`Kooboo.Sites.*` 程序集说明 |
+
+**写法**：用「`k.site.views` 管理站点中的视图资源」替代「对应 `ViewRepository.cs`」。能力差异用 API 列表说明（例如「没有 `getByUrl`」），不要引用源码类名或文件路径。
+
 ### Agent 执行原则
 
 1. **不确定时**：按下方「数据源优先级」逐级核对

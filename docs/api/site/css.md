@@ -4,7 +4,7 @@
 
 ## 概述
 
-侧边栏中的「css」对应运行时 `k.site.styles`（`StyleRepository`）。
+侧边栏中的「css」对应 API **`k.site.styles`**，用于管理站点 CSS 资源。
 
 ```ts
 k.api.get("styles", () => {

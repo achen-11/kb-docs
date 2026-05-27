@@ -4,7 +4,11 @@
 
 ## 概述
 
-View 是可在页面或布局中通过 `<view id="视图名">` 引用的 HTML 片段，适合拆分 Header、卡片、列表等复用块。`k.site.views` 对应运行时 `ViewRepository`（`Kooboo.Sites/Scripting/Global/SiteItem/ViewRepository.cs`），继承 **TextRepository**，与 [k.site.layouts](./layout.md) 相同，**没有** `getByUrl` / `getUrl` 等路由 API。
+View 是可在页面或布局中通过 `<view id="视图名">` 引用的 HTML 片段，适合拆分 Header、卡片、列表等复用块。`k.site.views` 用于管理站点中的视图资源。
+
+::: tip 与 pages 的区别
+与 [k.site.layouts](./layout.md) 相同，`k.site.views` 提供 `add` / `all` / `get` / `update` / `updateBody` / `delete` 及版本日志等 API，**没有** `getByUrl` / `getUrl` / `getAbsUrl`（仅 [k.site.pages](./page.md) 支持按 URL 查找页面）。
+:::
 
 ## TypeScript 定义（节选）
 
