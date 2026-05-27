@@ -186,8 +186,8 @@ k.xxx.yyy
 | `k.site.pages` | `site/page.md` | k-site/pages.md | ✅ ai-check 已 push |
 | `k.site.layouts` | `site/layout.md` | k-site/layouts.md | ✅ ai-check 已 push |
 | `k.site.views` | `site/view.md` | k-site/views.md | ✅ |
-| `k.site.scripts` | `site/js.md` | k-site/scripts.md | 🔴 |
-| `k.site.styles` | `site/css.md` | k-site/styles.md | 🔴 |
+| `k.site.scripts` | `site/js.md` | k-site/scripts.md | ✅ |
+| `k.site.styles` | `site/css.md` | k-site/styles.md | ✅ |
 | `k.site.codes` | `site/code.md` | k-site/codes.md | 🔴 |
 | `k.site.files` | 与 `k.file` 交叉说明 | k-site/files.md | 🔴 |
 | `k.site.formValues` | `site/form-values.md` | k-site/formValues.md | 🔴 |
