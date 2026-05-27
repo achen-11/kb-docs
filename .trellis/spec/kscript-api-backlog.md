@@ -23,6 +23,7 @@ Agent 在本仓库工作时：创建/更新任务只用 **KB-Docs**；查平台�
 | P0 | 修正 getting-started 错误示例 | 1004 |
 | P0 | 对齐 api/index.md 与导航结构 | 1005 |
 | P1 | k.site.pages 完整文档 + ai-check | 1006 |
+| P1 | k.site.layouts 完整文档 + ai-check | 1007 |
 
 ### 任务命名建议
 
@@ -183,7 +184,7 @@ k.xxx.yyy
 |-------------|----------|--------|------|
 | `k.site` 概述 + List/Get/CreateSite | `site/site.md` | k-site/index.md | 🔴 侧边栏 |
 | `k.site.pages` | `site/page.md` | k-site/pages.md | ✅ ai-check 已 push |
-| `k.site.layouts` | `site/layout.md` | k-site/layouts.md | 🔴 |
+| `k.site.layouts` | `site/layout.md` | k-site/layouts.md | ✅ ai-check 已 push |
 | `k.site.views` | `site/view.md` | k-site/views.md | 🔴 |
 | `k.site.scripts` | `site/js.md` | k-site/scripts.md | 🔴 |
 | `k.site.styles` | `site/css.md` | k-site/styles.md | 🔴 |
