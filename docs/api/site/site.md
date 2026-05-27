@@ -20,7 +20,7 @@
 | `k.site.views` | [view.md](./view.md) |
 | `k.site.scripts` | [js.md](./js.md) |
 | `k.site.styles` | [css.md](./css.md) |
-| `k.site.codes` | 代码块仓库（文档待补充） |
+| `k.site.codes` | [code.md](./code.md) — API 与 CodeBlock（`codeType`） |
 | `k.site.files` | 站点文件仓库（与 k.file 配合说明待补充） |
 | `k.site.event` | 事件任务（文档待补充） |
 

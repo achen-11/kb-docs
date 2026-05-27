@@ -131,6 +131,7 @@ export default defineConfig({
             { text: "view", link: '/api/site/view.md' },
             { text: "css", link: '/api/site/css.md' },
             { text: "js", link: '/api/site/js.md' },
+            { text: "codes", link: '/api/site/code.md' },
           ]
         },
         {
