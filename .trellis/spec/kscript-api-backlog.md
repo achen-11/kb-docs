@@ -22,6 +22,7 @@ Agent 在本仓库工作时：创建/更新任务只用 **KB-Docs**；查平台�
 | P0 | payment 文档收尾并清理 @k-url | 1003 |
 | P0 | 修正 getting-started 错误示例 | 1004 |
 | P0 | 对齐 api/index.md 与导航结构 | 1005 |
+| P1 | k.site.pages 完整文档 + ai-check | 1006 |
 
 ### 任务命名建议
 
@@ -181,7 +182,7 @@ k.xxx.yyy
 | 子模块 (JS) | 建议文档 | 旧文档 | 状态 |
 |-------------|----------|--------|------|
 | `k.site` 概述 + List/Get/CreateSite | `site/site.md` | k-site/index.md | 🔴 侧边栏 |
-| `k.site.pages` | `site/page.md` | k-site/pages.md | 🔴 |
+| `k.site.pages` | `site/page.md` | k-site/pages.md | ✅ ai-check 已 push |
 | `k.site.layouts` | `site/layout.md` | k-site/layouts.md | 🔴 |
 | `k.site.views` | `site/view.md` | k-site/views.md | 🔴 |
 | `k.site.scripts` | `site/js.md` | k-site/scripts.md | 🔴 |
