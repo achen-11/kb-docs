@@ -41,27 +41,40 @@ Backlog 清单：`.trellis/spec/kscript-api-backlog.md`。
 
 ### Agent 执行原则
 
-1. **不确定时**：先查 `old-source/kooboo.d.ts`、旧文档、`old-source/api/`，必要时查 **Kooboo 服务端源码**
+1. **不确定时**：按下方「数据源优先级」逐级核对
 2. **仍无法确认行为或签名**：**停下来向维护者提问**，不要猜测、不要反复试错
 3. **不钻牛角尖**：同一问题尝试有限次后应升级为人机对齐，而非在 loop 里硬推
+
+### 数据源优先级（编写文档时）
+
+| 优先级 | 来源 | 路径 / 说明 |
+|--------|------|-------------|
+| **1（真相）** | **Kooboo 服务端源码** | 本机如 `../Kooboo/`（`Kooboo.Sites/Scripting/`、`Payment/` 等）。以 C# 实现为准：`k.cs`、`*Repository.cs`、`[CodeDescription]` |
+| 2 | TypeScript 定义 | `old-source/kooboo.d.ts`（可能滞后或与运行时命名不一致） |
+| 3 | 旧版迁移文档 | `old-source/api/`（表述与示例，需与源码交叉验证） |
+| 4 | kooboo-coding skill | `Kooboo.Sites/AI/Skills/packages/kooboo-coding/references/K-Script/`（已验证的业务写法） |
+
+**编写顺序建议**：先打开对应 `*Repository.cs` / `k.cs` 列出公开 API → 再对照 d.ts 补类型 → 最后参考旧文档与 skill 的示例措辞。
 
 ### 源码与本地资源
 
 | 资源 | 路径 |
 | ---- | ---- |
+| **Kooboo 源码（首选）** | `Kooboo/Kooboo.Sites/Scripting/`（如 `k.cs`、`Global/SiteItem/*Repository.cs`） |
 | 类型定义 | `old-source/kooboo.d.ts` |
 | 旧文档 | `old-source/api/` |
-| 测试站点 | `old-source/kb-doc/`（`kb push` + https://kb-doc.redev.cn） |
+| 测试站点 | `old-source/kb-doc/`（`kb push`，默认 `.env` → `kb_doc.localkooboo.com`） |
 
-`old-source/` 在 `.gitignore` 中，但开发者本地应保留完整目录。
+`old-source/` 在 `.gitignore` 中，但开发者本地应保留完整目录。Kooboo 源码仓库需单独 clone，与 `kb-docs` 并列。
 
 ## 流程概述
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Step 1: 阅读源码                                                │
+│  Step 1: 阅读源码（按优先级）                                      │
+│  · Kooboo C# 源码（Kooboo.Sites/Scripting/…）← 首选              │
+│  · kooboo.d.ts                                                   │
 │  · 旧文档 (old-source/api/)                                      │
-│  · kooboo.d.ts TypeScript 定义                                     │
 └─────────────────────────────┬───────────────────────────────────┘
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐

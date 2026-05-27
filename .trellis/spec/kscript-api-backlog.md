@@ -1,7 +1,7 @@
 # KScript API 文档 Backlog
 
 > 生成日期：2026-05-27  
-> **权威来源（优先级）**：Kooboo 源码 `Kooboo.Sites/Scripting/k.cs` 及子模块 C# → `old-source/kooboo.d.ts` → `old-source/api/` 旧文档  
+> **权威来源（优先级）**：**Kooboo 服务端 C# 源码**（如 `Kooboo.Sites/Scripting/k.cs`、`*Repository.cs`）→ `old-source/kooboo.d.ts` → `old-source/api/` → kooboo-coding skill。详见 `.trellis/spec/api-documentation-workflow.md`「数据源优先级」。  
 > **范围**：仅服务端 `k.*` API（不含模板引擎）
 
 ## TaskBanner 项目划分
@@ -185,7 +185,7 @@ k.xxx.yyy
 | `k.site` 概述 + List/Get/CreateSite | `site/site.md` | k-site/index.md | 🔴 侧边栏 |
 | `k.site.pages` | `site/page.md` | k-site/pages.md | ✅ ai-check 已 push |
 | `k.site.layouts` | `site/layout.md` | k-site/layouts.md | ✅ ai-check 已 push |
-| `k.site.views` | `site/view.md` | k-site/views.md | 🔴 |
+| `k.site.views` | `site/view.md` | k-site/views.md | ✅ |
 | `k.site.scripts` | `site/js.md` | k-site/scripts.md | 🔴 |
 | `k.site.styles` | `site/css.md` | k-site/styles.md | 🔴 |
 | `k.site.codes` | `site/code.md` | k-site/codes.md | 🔴 |
