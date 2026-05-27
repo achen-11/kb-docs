@@ -160,6 +160,10 @@ k.api.post(() => {
 
 按名称或 Id 删除页面。
 
+::: warning
+删除后请用 `get(nameOrId)` 确认；对已删页面调用 `getByUrl` 在部分站点上可能因路由残留触发运行时错误。
+:::
+
 ```ts
 k.api.post(() => {
     const stamp = Date.now().toString()
@@ -170,7 +174,7 @@ k.api.post(() => {
     const before = k.site.pages.getByUrl(url)
 
     k.site.pages.delete(name)
-    const after = k.site.pages.getByUrl(url)
+    const after = k.site.pages.get(name)
 
     return {
         hadPage: !!before,
