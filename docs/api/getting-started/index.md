@@ -14,10 +14,11 @@ k.api.get(() => {
     return { message: "Hello Kooboo" }
 })
 
-// 创建一个 POST API
-k.api.post(async (ctx) => {
-    const body = await ctx.request.json()
-    return { received: body }
+// 创建一个 POST API（表单或 JSON 请求体）
+k.api.post(() => {
+    const form = k.request.form
+    const body = k.request.body // JSON 字符串时需自行 parse
+    return { received: form, body }
 })
 ```
 
@@ -52,6 +53,7 @@ k.DB.
 
 ## 下一步
 
-- [k.DB 数据库操作](./data/database.md) - 了解数据库 CRUD
+- [k.api](./core/api.md) - 创建 GET/POST 路由
 - [k.request](./core/request.md) - 处理 HTTP 请求
-- [k.site](./site/site.md) - 站点管理
+- [k.DB 数据库操作](./data/database.md) - 数据库 CRUD
+- [认证与授权](./auth.md) - 登录与会话相关 API

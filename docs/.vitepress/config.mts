@@ -90,6 +90,27 @@ export default defineConfig({
           ]
         },
         {
+          text: '支付',
+          items: [
+            {
+              text: 'k.payment',
+              collapsed: false,
+              items: [
+                { text: '概述', link: '/api/payment/' },
+                { text: 'Alipay', link: '/api/payment/alipay.md' },
+                { text: 'Wechat', link: '/api/payment/wechat.md' },
+                { text: 'Wechat H5 Flow', link: '/api/payment/wechat-h5-flow.md' },
+                { text: 'PayPal', link: '/api/payment/paypal.md' },
+                { text: 'Stripe', link: '/api/payment/stripe.md' },
+                { text: 'Square', link: '/api/payment/square.md' },
+                { text: 'Pay.NL', link: '/api/payment/paynl.md' },
+                { text: 'TwoCheckout', link: '/api/payment/two-checkout.md' },
+                { text: 'MoneyBoxs', link: '/api/payment/moneyboxs.md' },
+              ]
+            }
+          ]
+        },
+        {
           text: '多语言',
           items: [
             { text: 'k.label & k.t', link: '/api/site/label.md' }
