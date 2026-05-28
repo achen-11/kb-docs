@@ -13,20 +13,15 @@
 | **`k.commerce.membership`** | 电商会员等级（店铺顾客），不是 `k.account.membership` |
 | **`k.cookie` / `k.session`** | 当前请求的 Cookie 与临时会话数据，不是平台账号体系 |
 
-::: warning 文档范围（本期）
-本期文档包含：**登录**、**用户**、**组织**、**OAuth**。  
-暂不文档化：`subscription`、`membership`、`server` 及 `creditCard` / `ideal` / `weChatPay` 等平台扣费 API。  
-已废弃或仅兼容保留、不应再使用的成员（如顶层 `k.user`、`k.account.user.login`）不会出现在正文中。
-:::
 
 ## 子模块
 
 | 成员 | 文档 | 说明 |
 |------|------|------|
 | （根） | [login.md](./login.md) | `isLogin`、`login`、`logout`、令牌等 |
-| `user` | [user.md](./user.md)（待写） | 当前用户与用户名/邮箱查询 |
-| `organization` | [organization.md](./organization.md)（待写） | 当前站点所属组织、`current.users` 等 |
-| `oAuth` | [oauth.md](./oauth.md)（待写） | 微信/Google 等第三方登录 |
+| `user` | [user.md](./user.md) | 当前用户与用户名/邮箱查询 |
+| `organization` | [organization.md](./organization.md) | 当前站点所属组织、`current.users` 等 |
+| `oAuth` | [oauth.md](./oauth.md) | 微信/Google 等第三方登录 |
 
 ## 快速示例
 

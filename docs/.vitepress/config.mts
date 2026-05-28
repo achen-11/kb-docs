@@ -115,6 +115,9 @@ export default defineConfig({
           items: [
             { text: 'k.account', link: '/api/account/' },
             { text: '登录', link: '/api/account/login.md' },
+            { text: '用户', link: '/api/account/user.md' },
+            { text: '组织', link: '/api/account/organization.md' },
+            { text: 'OAuth', link: '/api/account/oauth.md' },
           ]
         },
         {

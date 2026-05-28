@@ -179,5 +179,5 @@ k.api.get(() => {
 ## 相关文档
 
 - [k.account 概述](./index.md)
-- [k.account.user](./user.md)（待写）
-- [k.account.oAuth](./oauth.md)（待写）
+- [k.account.user](./user.md)
+- [k.account.oAuth](./oauth.md)
