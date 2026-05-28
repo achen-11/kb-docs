@@ -33,6 +33,7 @@ KScript API 完整参考文档（服务端 `k.*`）。
 
 - [k.commerce](./commerce/commerce.md) — 电商模块
 - [k.payment](./payment/) — 支付集成
+- [k.account](./account/) — 平台账户（登录、用户、组织、OAuth）
 
 ### 站点
 
@@ -53,4 +54,4 @@ KScript API 完整参考文档（服务端 `k.*`）。
 
 ### 计划中文档
 
-以下模块在 backlog 中，尚未发布独立页面：`k.storage`、`k.mail`、`k.emailMarketing`、`k.account`（详见 [auth](./getting-started/auth.md) 节选）、`k.net.DNS`、`k.utils` 等。清单见仓库 `.trellis/spec/kscript-api-backlog.md`。
+以下模块在 backlog 中，尚未发布独立页面：`k.storage`、`k.mail`、`k.emailMarketing`、`k.net.DNS`、`k.utils` 等。清单见仓库 `.trellis/spec/kscript-api-backlog.md`。

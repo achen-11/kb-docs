@@ -52,6 +52,12 @@ Backlog 清单：`.trellis/spec/kscript-api-backlog.md`。
 
 **写法**：用「`k.site.views` 管理站点中的视图资源」替代「对应 `ViewRepository.cs`」。能力差异用 API 列表说明（例如「没有 `getByUrl`」），不要引用源码类名或文件路径。
 
+### 废弃与兼容 API（不写进用户文档）
+
+- 源码带 **`[Obsolete]`**，或 d.ts 注释 **Obsolete please use …** 的成员：正文与示例均不文档化（如 `k.account.user.login` → 应写 `k.account.login`）。
+- 仅运行时兼容、**智能提示中已移除** 的顶层入口（如历史上的 `k.sms`、`k.task`）：不写。
+- 完成一批文档后，维护者可对照 **方法清单** 在 IDE 中逐项确认是否仍有智能提示；无提示的从文档移除。
+
 ### Agent 执行原则
 
 1. **不确定时**：按下方「数据源优先级」逐级核对

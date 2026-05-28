@@ -239,7 +239,7 @@ d.ts `KUtils` 子属性 → 每项可独立一篇或合并为 3–4 组：
 |------|----------|--------|--------|
 | `k.mail` | `business/mail.md` | k-mail.md | P2 |
 | `k.emailMarketing` | `business/email-marketing.md` | k-emailMarketing.md | P2 |
-| `k.account` | `account/index.md` + 子页 | k-account.md | P2 |
+| `k.account` | `account/index.md` + login/user/org/oauth | k-account.md | 🟡 进行中 |
 | `k.storage` | `data/storage.md` | k-storage.md | P2 |
 | `k.cache` | `core/cache.md` | k-cache.md | P3 |
 | `k.template` (商店) | `store/template.md` | k-template.md | P3 |

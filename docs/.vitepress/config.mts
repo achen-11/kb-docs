@@ -111,6 +111,13 @@ export default defineConfig({
           ]
         },
         {
+          text: '账户',
+          items: [
+            { text: 'k.account', link: '/api/account/' },
+            { text: '登录', link: '/api/account/login.md' },
+          ]
+        },
+        {
           text: '多语言',
           items: [
             { text: 'k.label & k.t', link: '/api/site/label.md' }
