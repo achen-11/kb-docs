@@ -21,13 +21,26 @@
 interface KCache {
   set(key: string, value: any, seconds: number): void;
   set(key: string, value: any): void;
+  set(key: string, value: any, options: CacheOptions): void;
   get(key: string): any;
   getOrCreate(key: string, factory: () => any, seconds: number): any;
+  getOrCreate(key: string, factory: () => any, options?: CacheOptions): any;
   remove(key: string): void;
   removeAll(): void;
   containsKey(key: string): boolean;
   localCache(externalUrl: string, hours: number): string;
   getOrSet(key: string, scriptOrFunctionName: string, timeOutMinutes: number): any;
+}
+
+interface CacheOptions {
+  absoluteExpiration?: TimeSpan;
+  slidingExpiration?: TimeSpan;
+  cascades: CacheCascade[];
+}
+
+interface CacheCascade {
+  key: string;
+  removeChangeToken: boolean;
 }
 ```
 
@@ -39,8 +52,25 @@ interface KCache {
 |------|------|
 | `set(key, value, seconds)` | `seconds` 为绝对过期时间（秒） |
 | `set(key, value)` | 默认约 **120 分钟** 过期 |
+| `set(key, value, options)` | 使用 `CacheOptions` 控制过期与级联失效（见下节） |
 
-键名最长 **1024** 字符；过期秒数受服务端 `Cache:MaxExpireSeconds` 配置上限（默认约 2 小时）。
+键名最长 **1024** 字符；`set(key, value, seconds)` 的秒数受服务端 `Cache:MaxExpireSeconds` 配置上限（默认约 2 小时）。
+
+## Options 重载（`set` / `getOrCreate`）
+
+第三参数传入 **`options`** 时，可分别设置绝对过期、滑动过期，以及 **级联键（`cascades`）**：当某级联键被 `remove` / `CascadeRemove` 触发时，关联缓存项一并失效。`removeAll()` 即对当前站点 Id 做级联清理。
+
+| 字段 | 说明 |
+|------|------|
+| `absoluteExpiration` | 自写入起经过该时长后过期（类型为 **`TimeSpan`**，非裸数字秒） |
+| `slidingExpiration` | 滑动过期：该时长内无访问则过期（`TimeSpan`） |
+| `cascades` | `{ key, removeChangeToken }[]`；`key` 为级联分组名，`removeChangeToken` 控制项被淘汰时是否移除 token |
+
+日常过期用 **`set(key, value, seconds)`** 即可；`set(key, value, seconds)` 在内部等价于带 `absoluteExpiration` 且 `cascades` 含当前站点 Id 的简化写法。
+
+需要**滑动过期**或**自定义级联键**时使用 `options`。`absoluteExpiration` / `slidingExpiration` 须按智能提示传入 **`TimeSpan`**（不能写成 `set(key, value, 120)` 这种裸数字）。
+
+`cascades` 项为 `CacheCascade` 结构（`key`、`removeChangeToken`），具体对象写法以编辑器类型为准。若在脚本中配置不便，可继续使用 **`set` / `getOrCreate` 的秒数重载**（已自动绑定当前站点的级联键）。
 
 ```ts
 k.api.post(() => {
@@ -67,6 +97,11 @@ k.api.get(() => {
 ## getOrCreate()
 
 不存在时执行 `factory` 写入缓存并返回值。
+
+| 调用 | 说明 |
+|------|------|
+| `getOrCreate(key, factory, seconds)` | 秒数过期（常用） |
+| `getOrCreate(key, factory, options?)` | 使用 `CacheOptions` |
 
 ```ts
 k.api.get(() => {
