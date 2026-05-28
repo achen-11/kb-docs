@@ -132,7 +132,6 @@ export default defineConfig({
             { text: "css", link: '/api/site/css.md' },
             { text: "js", link: '/api/site/js.md' },
             { text: "codes", link: '/api/site/code.md' },
-            { text: "event", link: '/api/site/event.md' },
           ]
         },
         {

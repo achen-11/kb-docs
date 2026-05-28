@@ -30,8 +30,6 @@ k.api.get(() => {
 
 模块 **Task 脚本**中的定时任务 API（`k.task.day().hour().run(...)`），通过 `k.module.task` 访问。
 
-同一段 Task 脚本里也可写 **`k.site.event.onXxx`** 注册前台渲染钩子，见 [k.site.event](./event.md)。
-
 ## 相关文档
 
 - [k.site](./site.md)
