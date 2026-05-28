@@ -192,7 +192,7 @@ k.xxx.yyy
 | `k.site.files` | 与 `k.file` 交叉说明 | k-site/files.md | 🔴 |
 | `k.site.formValues` | `site/form-values.md` | k-site/formValues.md | 🔴 |
 | `k.site.editLog` | `site/edit-log.md` | k-site/editLog.md | 🔴 |
-| `k.site.event` | `site/event.md` | k-site/event.md | 🔴 |
+| `k.site.event` | `site/event.md` | k-site/event.md | ✅ |
 | `k.site.labels` | 与 `k.label` 合并或互链 | — | 🔴 |
 | `k.site.images` / `htmlBlocks` / `textContent` | 按需拆分 | — | 🔴 P3 |
 | `k.site.menus` / `multilingual` / `user` | 按需 | — | 🔴 P3 |
