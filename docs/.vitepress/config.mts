@@ -112,6 +112,12 @@ export default defineConfig({
           ]
         },
         {
+          text: '业务',
+          items: [
+            { text: 'k.mail', link: '/api/business/mail.md' },
+          ]
+        },
+        {
           text: '账户',
           items: [
             { text: 'k.account', link: '/api/account/' },

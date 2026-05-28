@@ -110,7 +110,7 @@ k.xxx.yyy
 | `k.page` | `KPage` | 🔴 侧边栏 | k-page.md | | 与 `k.site.pages` 区分 |
 | `k.module` | `KModule` | 🔴 侧边栏 | k-module.md | | 仅模块上下文部分 API |
 | `k.net` | `KNET` | 🔴 | k-net/* | | 见子表 |
-| `k.mail` | `Mail` | 🔴 | k-mail.md | | |
+| `k.mail` | `Mail` | ✅ | business/mail.md | | |
 | `k.emailMarketing` | `KEmailMarketing` | 🔴 | k-emailMarketing.md | | |
 | `k.account` | `KAccount` | ✅ | k-account.md | | login/user/org/oauth |
 | `k.storage` | `KStorage` | 🔴 | k-storage.md | | index 已链，无页 |
@@ -237,7 +237,7 @@ d.ts `KUtils` 子属性 → 每项可独立一篇或合并为 3–4 组：
 
 | 模块 | 建议路径 | 旧文档 | 优先级 |
 |------|----------|--------|--------|
-| `k.mail` | `business/mail.md` | k-mail.md | P2 |
+| `k.mail` | `business/mail.md` | k-mail.md | ✅ |
 | `k.emailMarketing` | `business/email-marketing.md` | k-emailMarketing.md | P2 |
 | `k.account` | `account/index.md` + login/user/org/oauth | k-account.md | ✅ |
 | `k.storage` | `data/storage.md` | k-storage.md | P2 |
