@@ -114,7 +114,7 @@ k.xxx.yyy
 | `k.emailMarketing` | `KEmailMarketing` | 🔴 | k-emailMarketing.md | | |
 | `k.account` | `KAccount` | ✅ | k-account.md | | login/user/org/oauth |
 | `k.storage` | `KStorage` | 🔴 | k-storage.md | | index 已链，无页 |
-| `k.cache` | `KCache` | 🔴 | k-cache.md | | |
+| `k.cache` | `KCache` | ✅ | core/cache.md | | |
 | `k.template` | `KTemplate` | 🔴 | k-template.md | | 模板市场，非页面模板 |
 | `k.market` | `KMarket` | 🔴 | k-market.md | | |
 | `k.state` | `kState` | 🔴 | k-state.md | | |
@@ -241,7 +241,7 @@ d.ts `KUtils` 子属性 → 每项可独立一篇或合并为 3–4 组：
 | `k.emailMarketing` | `business/email-marketing.md` | k-emailMarketing.md | P2 |
 | `k.account` | `account/index.md` + login/user/org/oauth | k-account.md | ✅ |
 | `k.storage` | `data/storage.md` | k-storage.md | P2 |
-| `k.cache` | `core/cache.md` | k-cache.md | P3 |
+| `k.cache` | `core/cache.md` | k-cache.md | ✅ |
 | `k.template` (商店) | `store/template.md` | k-template.md | P3 |
 | `k.market` | `store/market.md` | k-market.md | P3 |
 | `k.state` | `core/state.md` | k-state.md | P3 |

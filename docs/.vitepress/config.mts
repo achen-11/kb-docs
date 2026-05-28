@@ -37,7 +37,8 @@ export default defineConfig({
             { text: 'k.response', link: '/api/core/response.md' },
             { text: 'k.session', link: '/api/core/session.md' },
             { text: 'k.cookie', link: '/api/core/cookie.md' },
-            { text: 'k.security', link: '/api/core/security.md' }
+            { text: 'k.security', link: '/api/core/security.md' },
+            { text: 'k.cache', link: '/api/core/cache.md' }
           ]
         },
         {
