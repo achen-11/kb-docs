@@ -42,7 +42,7 @@ server.password = "your-password"
 
 | 字段 | 说明 |
 |------|------|
-| `from` / `to` / `cc` / `bcc` | 地址（`to` 可为字符串） |
+| `from` / `to` / `cc` / `bcc` / `replyTo` | 单个字符串；多个地址用英文逗号分隔（见下） |
 | `subject` | 主题 |
 | `htmlBody` / `textBody` / `body` | 正文 |
 | `replyTo` | 回复地址 |
@@ -54,6 +54,18 @@ server.password = "your-password"
 | `addAttachment(filename, bytes)` | 二进制附件 |
 | `attachObject(filename, obj)` | 附加对象 |
 | `toEml()` | 导出 EML 字符串 |
+
+### 多个收件人
+
+`to`、`cc`、`bcc`、`from`、`replyTo` 在服务端会解析为多个邮箱。同一字段可写在一个字符串里，用**英文逗号**分隔多个地址，也支持带显示名的 RFC 5322 写法：
+
+```ts
+msg.to = "alice@example.com,bob@example.com"
+msg.to = "Alice <alice@example.com>, Bob <bob@example.com>"
+msg.cc = "carol@example.com; dave@example.com" // 「; 」会被规范为逗号
+```
+
+使用站点默认通道 `k.mail.smtp.send(msg)` 时，组织邮件额度按解析出的**收件人个数**扣减（`to` 中每个有效地址计一次）。外部 SMTP 的 `k.mail.smtp.send(server, msg)` 由 MailKit 按 MIME 中的 To/Cc/Bcc 一并投递。
 
 ## smtp.send()
 
