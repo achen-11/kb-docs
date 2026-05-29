@@ -50,6 +50,10 @@ Layout 正文中至少要有一个占位元素，用于接收 Page 注入的内�
 - **`<body>` 固定结构**：顶栏、侧栏壳、页脚
 - **`k-placeholder`**：留给各 Page 的差异内容
 
+::: warning head 中引用 View
+`<head>` 内**不要**写 `<view id="...">`（例如在 head 里挂 Tailwind View）。请用 `k.response.renderView("<view id='...'></view>")` 或 `<script env="server" view="视图名"></script>`，详见 [View — 在 head 中引用](../view/#在-head-中引用-view)。
+:::
+
 Layout 里也可以写 **`env="server"`** 与 `k-content` 等，用于全站共享的服务端变量（例如站点名），详见 [模板绑定语法](../binding/)。
 
 ## 与 Page 的配合

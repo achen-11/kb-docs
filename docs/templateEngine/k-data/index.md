@@ -6,6 +6,8 @@
 
 **k-data** 用纯 HTML 标签（`<k-data>`、`<let>`、`<query>` 等）描述「读参数 → 查数据 → 整形 → 导出变量」，在**服务端**执行，结果通过 `<export>` 交给模板层的 `k-for`、`k-content`、`k-attribute` 使用。
 
+语法以 Kooboo **`kooboo-coding`** 技能包中 `references/Frontend/k-data/` 为准，本文档与其保持一致。
+
 与历史 **`k-query`** 单行属性相比，k-data：
 
 - 结构固定，便于 AI 生成与代码审查

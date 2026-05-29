@@ -12,6 +12,44 @@
 
 渲染时替换为名为 `hero` 的 View 资源内容，并继续解析其中的 `env="server"`、嵌套 `<view>` 等。
 
+## 在 `<head>` 中引用 View
+
+在 **`<head>`** 里不能再写 `<view id="...">`（例如把 Tailwind 片段 View 直接放进 head）。此类写法**已不再支持**。
+
+**错误：**
+
+```html
+<head>
+    <meta charset="UTF-8">
+    <view id="tailwind"></view>
+</head>
+```
+
+**兼容写法（当前）：** 在 `<head>` 内用服务端脚本输出 View：
+
+```html
+<head>
+    <meta charset="UTF-8">
+    <script env="server">
+        k.response.renderView("<view id='tailwind'></view>")
+    </script>
+</head>
+```
+
+`renderView` 接收 View 标记字符串（与 body 中 `<view id="...">` 等价），在 head 上下文中渲染并写入输出。
+
+**简略写法（推荐）：** 在支持的环境中可直接写 View 名：
+
+```html
+<script env="server" view="tailwind"></script>
+```
+
+`view` 为站点 **View 资源名称**（与 `<view id="tailwind">` 的 id 一致）。无脚本体时仅渲染该 View。
+
+`<body>`、`<placeholder>` 内仍可直接使用 `<view id="...">`，无需 `renderView`。
+
+服务端 API 见 [k.response.renderView](/api/response/#renderview)。
+
 ## 适用场景
 
 | 适合放进 View | 留在 Page |

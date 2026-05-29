@@ -19,7 +19,7 @@
 
 | 优先级 | 主题 | 参考 |
 |--------|------|------|
-| P1 | k-data 示例页 / ai-check | 站点实测 |
+| — | k-data 实测 | 不需要；以 Kooboo `kooboo-coding` Frontend/k-data 参考为准 |
 | P1 | k-label 模板侧 | `references/Frontend/k-label.md` + `/api/label/` |
 | P2 | 前端 code-style | `references/Frontend/code-style.md` |
 | P3 | CDN-Vue 专题 | `references/Frontend/cdn-vue/` |

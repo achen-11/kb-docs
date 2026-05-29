@@ -14,6 +14,8 @@
 
 不引用 Layout，Page 自身包含完整 `<!DOCTYPE html>` 结构，适合落地页或极简页。
 
+若在 **`<head>`** 中需要输出 View（如全局 Tailwind 片段），不能写 `<view id="...">`，应使用 [View — 在 head 中引用](../view/#在-head-中引用-view)。
+
 ```html
 <!DOCTYPE html>
 <html lang="zh-CN">

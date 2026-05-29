@@ -157,6 +157,21 @@ k.api.get(() => {
 })
 ```
 
+### renderView()
+
+在**当前输出位置**渲染一段包含 `<view>` 的 HTML 字符串。常用于 **Layout / Page 的 `<head>`** 中输出 View（head 内不能直接写 `<view id="...">`）。
+
+```ts
+// 在 <script env="server"> 中（模板内，非 API 路由）
+k.response.renderView("<view id='tailwind'></view>")
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `ViewBody` | `string` | 含 `<view id="视图名">` 的标记字符串 |
+
+模板中也可用简略写法：`<script env="server" view="tailwind"></script>`（`view` 为 View 资源名）。详见 [模板引擎 — 在 head 中引用 View](/templateEngine/view/#在-head-中引用-view)。
+
 ### execute()
 
 在当前上下文中执行另一个 URL，并将结果写入响应。
