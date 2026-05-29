@@ -45,6 +45,6 @@ k.api.get("siteSize", () => {
 
 ## 相关文档
 
-- [k.page](./page.md) — 当前渲染页的元数据（`k.page.setTitle` 等）
+- [k.page](./k-page.md) — 当前渲染页的元数据（`k.page.setTitle` 等）
 - [k.module](./module.md) — 脚本模块上下文
 - [k.label](./label.md) — 多语言 `k.t` / `k.label`

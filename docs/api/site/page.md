@@ -4,7 +4,7 @@
 
 ## 概述
 
-`k.site.pages` 管理 Kooboo **Page** 资源（页面 HTML/布局占位、路由、版本）。与全局 [k.page](./page-meta.md) 不同：后者只改**当前请求**正在渲染页的 Meta，不负责站点页面仓库。
+`k.site.pages` 管理 Kooboo **Page** 资源（页面 HTML/布局占位、路由、版本）。与全局 [k.page](./k-page.md) 不同：后者只改**当前请求**正在渲染页的 Meta，不负责站点页面仓库。
 
 ::: tip 与 k.page 的区别
 | API | 用途 |
@@ -260,4 +260,4 @@ k.api.post(() => {
 
 - [k.site](./site.md) — 站点资源总览
 - [k.site.layouts](./layout.md) — 布局
-- [k.page](./page-meta.md) — 当前页 Meta
+- [k.page](./k-page.md) — 当前页 Meta
