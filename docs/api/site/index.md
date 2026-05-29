@@ -45,6 +45,7 @@ k.api.get("siteSize", () => {
 
 ## 相关文档
 
+- [模板引擎：Layout / Page / View](/templateEngine/) — HTML 侧如何引用布局与视图
 - [k.page](../page/) — 当前渲染页的元数据（`k.page.setTitle` 等）
 - [k.module](../module/) — 脚本模块上下文
 - [k.label](../label/) — 多语言 `k.t` / `k.label`

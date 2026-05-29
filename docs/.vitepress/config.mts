@@ -25,6 +25,7 @@ export default defineConfig({
     'api/site/label.md': 'api/label/index.md',
     'api/site/media.md': 'api/media/index.md',
     'api/site/module.md': 'api/module/index.md',
+    'templateEngine/k-query.md': 'templateEngine/k-data.md',
   },
   themeConfig: {
     siteTitle: 'Kooboo',
@@ -38,7 +39,14 @@ export default defineConfig({
         {
           text: '模板引擎',
           items: [
-            { text: 'k-query', link: '/templateEngine/k-query.md' }
+            { text: '概述', link: '/templateEngine/' },
+            { text: 'Layout', link: '/templateEngine/layout.md' },
+            { text: 'Page', link: '/templateEngine/page.md' },
+            { text: 'View', link: '/templateEngine/view.md' },
+            { text: 'Script', link: '/templateEngine/js.md' },
+            { text: 'Style', link: '/templateEngine/css.md' },
+            { text: '模板绑定语法', link: '/templateEngine/template-binding-syntax.md' },
+            { text: 'k-data', link: '/templateEngine/k-data.md' },
           ]
         }
       ],
