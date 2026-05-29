@@ -123,7 +123,7 @@ k.xxx.yyy
 | `k.analytics` | `kAnalytics` | 🔴 | — | | |
 | `k.google` | `KGoogle` | 🔴 | — | | |
 | `k.ai` | `KAI` | 🔴 | — | | |
-| `k.media` | `KMedia` | 🔴 | — | | **d.ts 顶层缺失** |
+| `k.media` | `KMedia` | ✅ | site/media.md | | |
 | `k.utils` | `KUtils` | 🔴 | k-utils/ (空) | | **宜按子工具拆分** |
 | `k.inlineEditor` | `KInline` | 🔴 | k-inlineEditor.md | | |
 | `k.starter` | `KKoobox` | 🔴 | — | | koobox |
@@ -250,7 +250,7 @@ d.ts `KUtils` 子属性 → 每项可独立一篇或合并为 3–4 组：
 | `k.analytics` | `analytics/index.md` | — | P3 |
 | `k.google` | `integration/google.md` | — | P3 |
 | `k.ai` | `ai/index.md` | — | P3 |
-| `k.media` | `media/index.md` | — | P3 |
+| `k.media` | `site/media.md` | — | ✅ |
 | `k.inlineEditor` | `editor/inline.md` | k-inlineEditor.md | P3 |
 | `k.starter` | `koobox/starter.md` | — | P3 |
 
