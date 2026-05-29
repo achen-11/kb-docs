@@ -1,6 +1,32 @@
 import { defineConfig } from 'vitepress'
 import { diagramPlugin } from 'vitepress-plugin-mermaid-diagram'
 
+/** VitePress 左侧栏：路径前缀须匹配 `cms/**` 下的页面 */
+const cmsSidebar = [
+  {
+    text: '后台 CMS',
+    items: [
+      { text: '概述', link: '/cms/' },
+      {
+        text: '入门',
+        collapsed: false,
+        items: [
+          { text: '登录与站点列表', link: '/cms/getting-started/login-and-site-list' },
+          { text: '新建站点', link: '/cms/getting-started/create-site' },
+        ],
+      },
+      { text: '站点后台菜单总览', link: '/cms/navigation' },
+      {
+        text: '内容',
+        collapsed: false,
+        items: [
+          { text: '数据类型与内容夹', link: '/cms/content/data-types' },
+        ],
+      },
+    ],
+  },
+]
+
 export default defineConfig({
   title: 'Kooboo',
   description: 'Kooboo Documentation',
@@ -44,10 +70,13 @@ export default defineConfig({
     siteTitle: 'Kooboo',
     nav: [
       { text: '最佳实践', link: '/guide/' },
+      { text: '后台 CMS', link: '/cms/' },
       { text: '模板引擎', link: '/templateEngine/' },
       { text: 'API 详情', link: '/api/' }
     ],
     sidebar: {
+      '/cms/': cmsSidebar,
+      '/cms': cmsSidebar,
       '/templateEngine/': [
         {
           text: '模板引擎',

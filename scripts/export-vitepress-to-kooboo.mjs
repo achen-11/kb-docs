@@ -1,6 +1,10 @@
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import {
+  isDocImagePath,
+  syncPublicImagesToKooboo
+} from './sync-doc-images-to-kooboo.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '..')
@@ -37,17 +41,12 @@ function removeLeadingRouteComment(content, type) {
   return content
 }
 
+/**
+ * Kooboo 页面路由：保留 dist 相对路径（含 index.html）。
+ * 勿将 cms/index.html 映射为 /cms/ —— 否则 Page/post 易 400（Object reference not set）。
+ */
 export function toKoobooPageRoute(distRelativePath) {
   const normalized = normalizeRelativePath(distRelativePath)
-
-  if (normalized === 'index.html') {
-    return '/'
-  }
-
-  if (normalized.endsWith('/index.html')) {
-    return `/${normalized.slice(0, -'index.html'.length)}`
-  }
-
   return `/${normalized}`
 }
 
@@ -138,6 +137,11 @@ function getDistFileTarget(distRelativePath) {
     return null
   }
 
+  // 文档配图走 kb-remote-site/images（由 docs/public 同步），不写入 content-file
+  if (isDocImagePath(normalized)) {
+    return null
+  }
+
   if (normalized.endsWith('.html')) {
     return {
       type: 'page',
@@ -208,6 +212,8 @@ export async function exportVitePressToKooboo() {
   for (const filePath of files) {
     await exportFile(filePath)
   }
+
+  await syncPublicImagesToKooboo()
 }
 
 const isDirectRun =

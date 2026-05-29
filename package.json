@@ -8,6 +8,7 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "docs:build:kooboo": "vitepress build docs && node scripts/export-vitepress-to-kooboo.mjs",
+    "docs:sync-images": "node scripts/sync-doc-images-to-kooboo.mjs",
     "test:export:kooboo": "node --test scripts/export-vitepress-to-kooboo.test.mjs",
     "check:dead-links": "node scripts/check-dead-links.mjs"
   },

@@ -7,13 +7,12 @@ import {
   injectPageRouteComment,
   toKoobooPageRoute
 } from './export-vitepress-to-kooboo.mjs'
+import { isDocImagePath } from './sync-doc-images-to-kooboo.mjs'
 
-test('toKoobooPageRoute maps root index to slash', () => {
-  assert.equal(toKoobooPageRoute('index.html'), '/')
-})
-
-test('toKoobooPageRoute maps directory index to trailing slash route', () => {
-  assert.equal(toKoobooPageRoute('guide/index.html'), '/guide/')
+test('toKoobooPageRoute keeps index.html in path for Kooboo Page API', () => {
+  assert.equal(toKoobooPageRoute('index.html'), '/index.html')
+  assert.equal(toKoobooPageRoute('guide/index.html'), '/guide/index.html')
+  assert.equal(toKoobooPageRoute('cms/index.html'), '/cms/index.html')
 })
 
 test('toKoobooPageRoute keeps html extension for non-index pages', () => {
@@ -29,6 +28,12 @@ test('injectPageRouteComment replaces existing page route comment', () => {
 test('injectJsRouteComment replaces existing js route comment', () => {
   const result = injectJsRouteComment('// @k-url /old.js\nconsole.log("ok")\n', '/assets/app.js')
   assert.equal(result, '// @k-url /assets/app.js\nconsole.log("ok")\n')
+})
+
+test('isDocImagePath matches cms images only', () => {
+  assert.equal(isDocImagePath('cms/getting-started/01.png'), true)
+  assert.equal(isDocImagePath('assets/style.abc.css'), false)
+  assert.equal(isDocImagePath('cms/readme.txt'), false)
 })
 
 test('injectCssRouteComment replaces existing css route comment', () => {

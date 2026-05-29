@@ -1,0 +1,167 @@
+# 后台菜单总览
+
+> 归纳自 Kooboo Frontend `src/router/site.ts` 与 `locales/zh.yml`（`common.*`）。界面文案以你登录后的中文界面为准。
+
+::: tip 先完成外层步骤
+若你仍在 **我的站点** 列表（`/_Admin/`），请先阅读 [登录与站点列表](./getting-started/login-and-site-list.md)，点击某一站点的 **管理** 后再使用下文菜单。
+:::
+
+## 账户级（无 SiteId）
+
+| 页面 | 路径 |
+|------|------|
+| 我的站点 | `/` |
+| 登录 | `/login` |
+| 新建站点 | `/create` |
+| 导入站点 | `/create/import` |
+| 克隆站点 | `/create/clone` |
+| 文件夹内列表 | `/?currentFolder={文件夹名}` |
+
+说明见 [登录与站点列表](./getting-started/login-and-site-list.md)、[新建站点](./getting-started/create-site.md)。
+
+## 站点级深链格式
+
+```text
+/_Admin{路由路径}?SiteId={站点GUID}
+```
+
+将 `{站点GUID}` 换成地址栏中的 `SiteId`。下表「路径」均相对于 `/_Admin`（且需带 `SiteId`）。
+
+## 顶栏与常用入口
+
+| 入口 | 路径 | 说明 |
+|------|------|------|
+| 控制面板（首页） | `/site` | 站点概览，左侧顶栏「主页」进入 |
+| 媒体库 | `/site/media` | 图片与媒体资源 |
+| 页面 | `/site/pages` | 页面树与页面设计 |
+
+## 内容
+
+左侧分组：**内容**（部分子项需在「高级菜单」中开启）
+
+| 菜单 | 路径 | 说明 |
+|------|------|------|
+| 内容 | `/content/contents` | 内容夹与条目，对应 `k.content.{文件夹名}` |
+| 数据类型 | `/content/contentTypes` | 字段模型，须先于内容夹创建 |
+| Labels | `/content/labels` | 多语言文案，对应 `k.label` |
+| HTML 片段 | `/content/htmlblocks` | 可复用 HTML 块 |
+| 文件 | `/content/files` | 站点文件（高级） |
+| 标签属性 | `/content/text` | 标签属性（高级） |
+| 参数配置 | `/content/useroptions` | 用户可编辑参数（高级） |
+
+相关文档：[数据类型与内容夹](./content/data-types.md)
+
+## 电商
+
+左侧分组：**电商**（`advanced`）
+
+| 菜单 | 路径 |
+|------|------|
+| 商品管理 | `/commerce/product-management` |
+| 商品类型 | `/commerce/product-types` |
+| 商品分类 | `/commerce/product-categories` |
+| 购物车 | `/commerce/carts` |
+| 顾客管理 | `/commerce/customers` |
+| 订单 | `/commerce/orders` |
+| 销售统计 | `/commerce/sale-stats` |
+| 优惠折扣 | `/commerce/discounts` |
+| 货币 | `/commerce/currencies` |
+| 配送 | `/commerce/shippings` |
+| 会员 | `/commerce/loyalty` |
+| 税 | `/commerce/taxes` |
+| 通知 | `/commerce/notification` |
+| 设置 | `/commerce/settings` |
+
+开发参考：[k.commerce](/api/commerce/commerce.md)
+
+## 运维中心
+
+左侧分组：**运维中心**（路由前缀 `/system`，与「站点设置」不同分组）
+
+| 菜单 | 路径 |
+|------|------|
+| 访问统计 | `/system/visitor-logs` |
+| 行为分析 | `/system/user-behavior-analysis` |
+| 资源守护 | `/system/resource-guardian` |
+| 页面交互 | `/system/page-interaction` |
+| AB测试 | `/system/ab-testing` |
+| 错误监控 | `/system/error-monitoring` |
+| 站点日志 | `/system/site-logs` |
+| 协作同步 | `/system/sync` |
+| 搜索 | `/system/search` |
+| 自动化 | `/system/automation` |
+| AI 服务 | `/system/ai-service` |
+
+## 开发
+
+左侧分组：**开发**
+
+| 菜单 | 路径 | 模板引擎 / API |
+|------|------|----------------|
+| 组件（Views） | `/development/views` | [View](/templateEngine/view/) · `k.site.views` |
+| 布局（Layouts） | `/development/layouts` | [Layout](/templateEngine/layout/) |
+| 脚本 | `/development/scripts` | [Script](/templateEngine/js/) |
+| 样式 | `/development/styles` | [Style](/templateEngine/css/) |
+| 代码 | `/development/code` | `k.site.codes` |
+| 代码日志 | `/development/code-log` | |
+| 代码搜索 | `/development/code-search` | |
+| URL | `/development/urls` | |
+| 表单 | `/development/forms` | |
+| 菜单 | `/development/menus` | |
+| 身份验证 | `/development/authentication` | |
+| Open API | `/development/openapis` | |
+| SPA 多语言 | `/development/spamultilingual` | |
+| 模块 | `/development/modules` | `k.module` |
+| 任务 | `/development/jobs` | |
+
+页面设计器路由（无左侧菜单项）：`/page/edit`、`/page/design` 等，从页面列表进入。
+
+## 数据库
+
+左侧分组：**数据库**
+
+| 菜单 | 路径 |
+|------|------|
+| IndexedDB 表 | `/database/table` |
+| IndexedDB 表关系 | `/database/table-relation` |
+| 键值存储 | `/database/key-value` |
+| SQLite 表 | `/database/sqlite-table` |
+| MySQL 表 | `/database/mysql-table` |
+| SQL Server 表 | `/database/sqlserver-table` |
+| SQL 日志 | `/database/sql-logs` |
+
+开发参考：[k.DB](/api/database/)
+
+## 站点设置
+
+左侧分组：**站点设置**（同为 `/system` 前缀，菜单名与「运维中心」不同）
+
+| 菜单 | 路径 | 说明 |
+|------|------|------|
+| 基础设置 | `/system/settings` | 站点名、多语言、预览等 |
+| 域名管理 | `/system/domains` | 绑定域名 |
+| 服务集成 | `/system/config` | 支付、短信、邮件、JWT 等 |
+| 站点用户 | `/system/siteuser` | |
+| 角色权限 | `/system/roles` | |
+| 请求 Hook | `/system/front-events` | 拦截 HTTP 请求 |
+| 操作 Hook | `/system/backend-events` | 拦截后台操作 |
+| Cookie | `/system/cookie` | |
+| AI 服务 | `/system/ai-service` | 与运维分组中同名入口同一功能页 |
+
+支付、JWT 等集成配置示例：`/_Admin/system/config?SiteId=...`
+
+## 独立功能（非左侧主菜单）
+
+| 功能 | 路径 |
+|------|------|
+| AI App Builder | `/ai-app-builder` |
+| AI Chat | `/ai-chat/overview` |
+
+## 权限与高级菜单
+
+- 子菜单是否可见取决于站点角色与功能权限（`meta.menu.permission`）。
+- 标有 `advanced: true` 的项可能默认折叠，需在后台打开「高级菜单」后才显示。
+
+## 维护说明
+
+菜单变更时请同步更新本文与 `.trellis/spec/cms-documentation-backlog.md`。权威路由文件：`Kooboo/Frontend/src/router/site.ts`。
