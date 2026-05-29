@@ -1,10 +1,16 @@
 import { defineConfig } from 'vitepress'
+import { diagramPlugin } from 'vitepress-plugin-mermaid-diagram'
 
 export default defineConfig({
   title: 'Kooboo',
   description: 'Kooboo Documentation',
   lang: 'zh-CN',
   ignoreDeadLinks: true,
+  markdown: {
+    config(md) {
+      md.use(diagramPlugin, { preview: true })
+    },
+  },
   rewrites: {
     'api/core/api.md': 'api/api/index.md',
     'api/core/cache.md': 'api/cache/index.md',

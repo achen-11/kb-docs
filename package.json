@@ -1,6 +1,7 @@
 {
   "name": "kb-docs",
   "version": "1.0.0",
+  "packageManager": "pnpm@10.17.1",
   "type": "module",
   "scripts": {
     "docs:dev": "vitepress dev docs",
@@ -11,6 +12,7 @@
     "check:dead-links": "node scripts/check-dead-links.mjs"
   },
   "devDependencies": {
-    "vitepress": "^1.6.4"
+    "vitepress": "^1.6.4",
+    "vitepress-plugin-mermaid-diagram": "^0.3.2"
   }
 }

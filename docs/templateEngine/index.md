@@ -10,23 +10,28 @@
 
 ## 资源关系
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  Layout（布局）— 无独立 URL                                  │
-│  <head>：CDN、importmap、全局 Style                          │
-│  <body>：k-placeholder="Main" / "Sider" …                    │
-└───────────────────────────┬─────────────────────────────────┘
-                            │ Page 的 <placeholder> 注入内容
-┌───────────────────────────▼─────────────────────────────────┐
-│  Page（页面）— 有 URL                                        │
-│  <layout id="…"> + <placeholder id="Main"> …                 │
-│  可含 <view id="…">、内联 script                              │
-└───────────────────────────┬─────────────────────────────────┘
-                            │ <view id> 引用
-        ┌───────────────────┼───────────────────┐
-        ▼                   ▼                   ▼
-   View 片段          Script (.js)        Style (.css)
-   无 URL              有路由 URL           有路由 URL
+```mermaid
+flowchart TB
+  subgraph layout_res [Layout]
+    L_head["head: CDN / importmap / 全局 Style"]
+    L_ph["k-placeholder 占位区"]
+  end
+  subgraph page_res [Page]
+    P_layout["layout id 引用 Layout"]
+    P_ph["placeholder 注入各占位区"]
+    P_view["view id 引用 View"]
+    P_inline["内联 script / 页面级逻辑"]
+  end
+  subgraph assets [站点资源]
+    V[View 片段]
+    S[Script .js 路由]
+    C[Style .css 路由]
+  end
+  L_ph --> P_ph
+  P_view --> V
+  L_head --> S
+  L_head --> C
+  P_inline --> S
 ```
 
 | 资源 | 典型职责 | 是否有 URL 路由 |
