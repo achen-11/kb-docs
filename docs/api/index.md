@@ -49,6 +49,10 @@ KScript API 完整参考文档（服务端 `k.*`）。
 - [k.module](./site/module.md) — 脚本模块
 - [k.label & k.t](./site/label.md) — 多语言
 
+### k.utils
+
+- [k.utils](./utils/) — 工具集概述（子模块按字母分列于侧边栏）
+
 ### k.net
 
 - [k.net](./net/) — 概述与选型
@@ -61,4 +65,4 @@ KScript API 完整参考文档（服务端 `k.*`）。
 
 ### 计划中文档
 
-以下模块在 backlog 中，尚未发布独立页面：`k.emailMarketing`、`k.utils` 等。清单见仓库 `.trellis/spec/kscript-api-backlog.md`。
+以下模块在 backlog 中，尚未发布独立页面：`k.emailMarketing` 等。清单见仓库 `.trellis/spec/kscript-api-backlog.md`。

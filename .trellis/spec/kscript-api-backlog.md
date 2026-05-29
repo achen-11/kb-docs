@@ -124,7 +124,7 @@ k.xxx.yyy
 | `k.google` | `KGoogle` | 🔴 | — | | |
 | `k.ai` | `KAI` | 🔴 | — | | |
 | `k.media` | `KMedia` | ✅ | site/media.md | | |
-| `k.utils` | `KUtils` | 🔴 | k-utils/ (空) | | **宜按子工具拆分** |
+| `k.utils` | `KUtils` | ✅ | utils/* | | 按子模块单文件 |
 | `k.inlineEditor` | `KInline` | 🔴 | k-inlineEditor.md | | |
 | `k.starter` | `KKoobox` | 🔴 | — | | koobox |
 | `fromSite` | 方法 | 🔴 | k-fromSite.md | | |
@@ -219,19 +219,12 @@ k.xxx.yyy
 | `k.net.DNS` | `net/dns.md` | k-net/DNS.md | ✅ |
 | `k.net.IP` | `net/ip.md` | k-net/IP.md | ✅ |
 
-### 工具 `k.utils`（**建议按子目录多次提交**）
+### 工具 `k.utils`（按子模块单文件，`docs/api/utils/`）
 
-d.ts `KUtils` 子属性 → 每项可独立一篇或合并为 3–4 组：
-
-| 子模块 | 分组建议 | 优先级 |
-|--------|----------|--------|
-| `xml`, `uri`, `string`/`date`, `compression` | utils/基础 | P2 |
-| `clientJS`, `dom`, `inlineHtml`, `image`, `screenShot` | utils/Web | P2 |
-| `sms`, `office`, `sitemap` | utils/集成 | P3 |
-| `community`, `CRM`, `CDN` | utils/业务 | P3 |
-| `sshClient`, `sftpClient`, `telnetClient`, `puppeteer` | utils/远程 | P3 |
-| `google`, `template`, `ninjible`, `IP` | utils/第三方 | P3 |
-| `sleep`, `ping`, `bytesToString`… | 合入 utils 根文档 | P2 |
+| 子模块 | 文档 | 状态 |
+|--------|------|------|
+| 根方法 + 索引 | `utils/index.md` | ✅ |
+| `CDN` … `xml`（26 个子模块） | `utils/{name}.md` | ✅ |
 
 ### 业务 / 运营类
 
