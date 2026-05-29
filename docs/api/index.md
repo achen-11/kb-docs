@@ -18,12 +18,14 @@ KScript API 完整参考文档（服务端 `k.*`）。
 - [k.cookie](./core/cookie.md) — Cookie 管理
 - [k.security](./core/security.md) — 安全加密
 - [k.cache](./core/cache.md) — 站点内存缓存
+- [k.state](./core/state.md) — 当前请求视图数据
 
 ### 数据
 
 - [k.DB](./data/database.md) — 数据库操作
 - [k.DB.sqlite](./data/sqlite/) — SQLite
 - [k.content](./data/content.md) — 内容管理
+- [k.storage](./data/storage.md) — 云对象存储（OSS / S3 / Azure）
 
 ### 文件
 
@@ -59,4 +61,4 @@ KScript API 完整参考文档（服务端 `k.*`）。
 
 ### 计划中文档
 
-以下模块在 backlog 中，尚未发布独立页面：`k.storage`、`k.emailMarketing`、`k.utils`、`k.state` 等。清单见仓库 `.trellis/spec/kscript-api-backlog.md`。
+以下模块在 backlog 中，尚未发布独立页面：`k.emailMarketing`、`k.utils` 等。清单见仓库 `.trellis/spec/kscript-api-backlog.md`。

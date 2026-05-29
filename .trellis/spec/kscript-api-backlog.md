@@ -113,11 +113,11 @@ k.xxx.yyy
 | `k.mail` | `Mail` | ✅ | business/mail.md | | |
 | `k.emailMarketing` | `KEmailMarketing` | 🔴 | k-emailMarketing.md | | |
 | `k.account` | `KAccount` | ✅ | k-account.md | | login/user/org/oauth |
-| `k.storage` | `KStorage` | 🔴 | k-storage.md | | index 已链，无页 |
+| `k.storage` | `KStorage` | ✅ | data/storage.md | | |
 | `k.cache` | `KCache` | ✅ | core/cache.md | | |
 | `k.template` | `KTemplate` | 🔴 | k-template.md | | 模板市场，非页面模板 |
 | `k.market` | `KMarket` | 🔴 | k-market.md | | |
-| `k.state` | `kState` | 🔴 | k-state.md | | |
+| `k.state` | `kState` | ✅ | core/state.md | | |
 | `k.integration` | `KIntegration` | 🔴 | — | | |
 | `k.privacy` | `KPrivacy` | 🔴 | — | | cookieConsent |
 | `k.analytics` | `kAnalytics` | 🔴 | — | | |
@@ -240,11 +240,11 @@ d.ts `KUtils` 子属性 → 每项可独立一篇或合并为 3–4 组：
 | `k.mail` | `business/mail.md` | k-mail.md | ✅ |
 | `k.emailMarketing` | `business/email-marketing.md` | k-emailMarketing.md | P2 |
 | `k.account` | `account/index.md` + login/user/org/oauth | k-account.md | ✅ |
-| `k.storage` | `data/storage.md` | k-storage.md | P2 |
+| `k.storage` | `data/storage.md` | k-storage.md | ✅ |
 | `k.cache` | `core/cache.md` | k-cache.md | ✅ |
 | `k.template` (商店) | `store/template.md` | k-template.md | P3 |
 | `k.market` | `store/market.md` | k-market.md | P3 |
-| `k.state` | `core/state.md` | k-state.md | P3 |
+| `k.state` | `core/state.md` | k-state.md | ✅ |
 | `k.integration` | `integration/index.md` | — | P3 |
 | `k.privacy` | `privacy/index.md` | — | P3 |
 | `k.analytics` | `analytics/index.md` | — | P3 |
