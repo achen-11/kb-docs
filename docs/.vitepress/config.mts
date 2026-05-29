@@ -17,6 +17,15 @@ const cmsSidebar = [
       },
       { text: '站点后台菜单总览', link: '/cms/navigation' },
       {
+        text: '站点',
+        collapsed: false,
+        items: [
+          { text: '控制面板', link: '/cms/site/dashboard' },
+          { text: '媒体库', link: '/cms/site/media' },
+          { text: '页面', link: '/cms/site/pages' },
+        ],
+      },
+      {
         text: '内容',
         collapsed: false,
         items: [

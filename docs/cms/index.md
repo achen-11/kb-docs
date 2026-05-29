@@ -28,10 +28,11 @@ flowchart LR
 | 0 | [登录与站点列表](./getting-started/login-and-site-list.md) | 登录、文件夹、进入「管理」 |
 | 1 | [新建站点](./getting-started/create-site.md) | 空白 / 导入 / 克隆（不含 AI 制作） |
 | 2 | [站点后台菜单总览](./navigation.md) | 知道 `SiteId` 下功能在哪一栏 |
-| 3 | 页面、媒体（待写） | 创建可访问的页面 |
-| 4 | [数据类型与内容](./content/data-types.md) | 为 `k.content` 准备数据 |
-| 5 | 开发菜单（待写） | Layout、View、Script，见 [模板引擎](/templateEngine/) |
-| 6 | 服务集成（待写） | 支付、短信、JWT 等 |
+| 3 | [控制面板](./site/dashboard.md) · [媒体库](./site/media.md) | 站点概览与图片资源 |
+| 4 | [页面](./site/pages.md) | 创建可访问的页面 |
+| 5 | [数据类型与内容](./content/data-types.md) | 为 `k.content` 准备数据 |
+| 6 | 开发菜单（待写） | Layout、View、Script，见 [模板引擎](/templateEngine/) |
+| 7 | 服务集成（待写） | 支付、短信、JWT 等 |
 
 ## 与开发文档的关系
 

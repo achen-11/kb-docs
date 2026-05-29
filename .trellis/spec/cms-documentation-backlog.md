@@ -11,20 +11,26 @@
 | ✅ | `cms/getting-started/login-and-site-list.md` | 登录、站点列表、文件夹、进入管理 |
 | ✅ | `cms/getting-started/create-site.md` | 空白 / 导入 / 克隆（不含 AI） |
 
+## P1 — 站点顶栏（菜单自上而下）
+
+| 状态 | 文档 | Frontend 路由 |
+|------|------|----------------|
+| ✅ | `cms/site/dashboard.md` | `/site` |
+| ✅ | `cms/site/media.md` | `/site/media` |
+| 🟡 | `cms/site/pages.md` | `/site/pages` — 正文完成，待配图 |
+
 ## P1 — 内容与数据（对齐 k.content）
 
 | 状态 | 文档 | Frontend 路由 |
 |------|------|----------------|
-| ⬜ | `cms/content/data-types.md` | `/content/contentTypes` |
+| ✅ | `cms/content/data-types.md` | `/content/contentTypes` |
 | ⬜ | `cms/content/folders.md` | `/content/contents` |
 | ⬜ | `cms/content/labels.md` | `/content/labels` |
-| ⬜ | `cms/content/media.md` | `/site/media` |
 
 ## P1 — 页面与开发资源（对齐 templateEngine）
 
 | 状态 | 文档 | Frontend 路由 |
 |------|------|----------------|
-| ⬜ | `cms/pages/page-list.md` | `/site/pages` |
 | ⬜ | `cms/development/layouts.md` | `/development/layouts` |
 | ⬜ | `cms/development/views.md` | `/development/views` |
 | ⬜ | `cms/development/scripts-styles.md` | `/development/scripts`, `styles` |
