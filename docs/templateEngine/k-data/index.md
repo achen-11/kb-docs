@@ -10,9 +10,9 @@
 
 ## 与 k-query 的关系
 
-历史 **`k-query`** 属性已不再推荐使用；新页面请使用 **k-data** 系列语法，并与 `env="server"`、本目录 [模板绑定语法](./template-binding-syntax.md) 配合。
+历史 **`k-query`** 属性已不再推荐使用；新页面请使用 **k-data** 系列语法，并与 `env="server"`、本目录 [模板绑定语法](../binding/) 配合。
 
 ## 相关文档
 
-- [模板绑定语法](./template-binding-syntax.md)
-- [Page](./page.md)
+- [模板绑定语法](../binding/)
+- [Page](../page/)

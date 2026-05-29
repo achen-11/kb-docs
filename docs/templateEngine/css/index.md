@@ -40,6 +40,6 @@
 
 ## 相关文档
 
-- [Layout](./layout.md)
-- [Script](./js.md)
+- [Layout](../layout/)
+- [Script](../js/)
 - [k.site.styles](/api/site/css.md)

@@ -75,7 +75,7 @@ createApp({ /* ... */ }).mount('#app')
 
 ## 相关文档
 
-- [Layout](./layout.md) — 常放 importmap
-- [Page](./page.md)
-- [Style](./css.md)
+- [Layout](../layout/) — 常放 importmap
+- [Page](../page/)
+- [Style](../css/)
 - [k.site.scripts](/api/site/js.md)

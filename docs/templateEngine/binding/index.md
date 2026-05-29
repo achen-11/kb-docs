@@ -2,7 +2,7 @@
 
 > 服务端 `k-*` 指令：在 Layout / Page / View 中绑定数据与属性
 
-Kooboo 模板绑定在**服务器端**求值，需配合 **`env="server"`**（见下文）。用于 [Page](./page.md)、[View](./view.md) 等 HTML 资源，与浏览器中的 Vue/React 无关。
+Kooboo 模板绑定在**服务器端**求值，需配合 **`env="server"`**（见下文）。用于 [Page](../page/)、[View](../view/) 等 HTML 资源，与浏览器中的 Vue/React 无关。
 
 ## env="server"
 
@@ -141,5 +141,5 @@ Kooboo 模板绑定在**服务器端**求值，需配合 **`env="server"`**（�
 
 ## 相关文档
 
-- [Page](./page.md) · [View](./view.md)
-- [k-data](./k-data.md) — 声明式数据（替代 k-query）
+- [Page](../page/) · [View](../view/)
+- [k-data](../k-data/) — 声明式数据（替代 k-query）

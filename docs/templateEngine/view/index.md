@@ -38,7 +38,7 @@
 
 1. `<script env="server">` — 准备本区块数据  
 2. HTML 结构 + `k-content` / `k-for` 等  
-3. 前端交互 — 底部 `<script>` 或引用 [Script](./js.md)
+3. 前端交互 — 底部 `<script>` 或引用 [Script](../js/)
 
 ## 命名
 
@@ -68,6 +68,6 @@ View 内可再引用其他 View：
 
 ## 相关文档
 
-- [Page](./page.md)
-- [模板绑定语法](./template-binding-syntax.md)
-- [Script](./js.md)
+- [Page](../page/)
+- [模板绑定语法](../binding/)
+- [Script](../js/)

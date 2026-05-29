@@ -6,52 +6,48 @@
 
 在 Kooboo 中，**可访问的 HTML 页面**由 **Page** 定义；**Layout** 提供整站共用的 HTML 骨架（`<head>`、导航、占位区）；**View** 是可复用的 HTML 片段；**Script** / **Style** 是带路由的独立 `.js` / `.css` 资源，供布局或页面引用。
 
-服务端数据与 DOM 绑定使用 **`env="server"`** 与 `k-content`、`k-for` 等指令（见 [模板绑定语法](./template-binding-syntax.md)）。声明式数据查询推荐 **[k-data](./k-data.md)**（`k-query` 已弃用，文档见下）。
+服务端数据与 DOM 绑定使用 **`env="server"`** 与 `k-content`、`k-for` 等指令（见 [模板绑定语法](./binding/)）。声明式数据查询推荐 **[k-data](./k-data/)**（`k-query` 已弃用）。
 
 ## 资源关系
 
-```mermaid
-flowchart TB
-  subgraph layout_res [Layout]
-    L_head["head: CDN / importmap / 全局 Style"]
-    L_ph["k-placeholder 占位区"]
-  end
-  subgraph page_res [Page]
-    P_layout["layout id 引用 Layout"]
-    P_ph["placeholder 注入各占位区"]
-    P_view["view id 引用 View"]
-    P_inline["内联 script / 页面级逻辑"]
-  end
-  subgraph assets [站点资源]
-    V[View 片段]
-    S[Script .js 路由]
-    C[Style .css 路由]
-  end
-  L_ph --> P_ph
-  P_view --> V
-  L_head --> S
-  L_head --> C
-  P_inline --> S
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Layout（布局）— 无独立 URL                                  │
+│  <head>：CDN、importmap、全局 Style                          │
+│  <body>：k-placeholder="Main" / "Sider" …                    │
+└───────────────────────────┬─────────────────────────────────┘
+                            │ Page 的 <placeholder> 注入内容
+┌───────────────────────────▼─────────────────────────────────┐
+│  Page（页面）— 有 URL                                        │
+│  <layout id="…"> + <placeholder id="Main"> …                 │
+│  可含 <view id="…">、内联 script                              │
+└───────────────────────────┬─────────────────────────────────┘
+                            │ <view id> 引用
+        ┌───────────────────┼───────────────────┐
+        ▼                   ▼                   ▼
+   View 片段          Script (.js)        Style (.css)
+   无 URL              有路由 URL           有路由 URL
 ```
 
 | 资源 | 典型职责 | 是否有 URL 路由 |
 |------|----------|-----------------|
-| [Layout](./layout.md) | 整页骨架、`k-placeholder` | 否 |
-| [Page](./page.md) | 路由页面、选择布局、填占位 | 是 |
-| [View](./view.md) | Header、卡片、列表等复用块 | 否 |
-| [Script](./js.md) | 可 `import` 的 JS、前端交互 | 是 |
-| [Style](./css.md) | 全局或页面样式表 | 是 |
+| [Layout](./layout/) | 整页骨架、`k-placeholder` | 否 |
+| [Page](./page/) | 路由页面、选择布局、填占位 | 是 |
+| [View](./view/) | Header、卡片、列表等复用块 | 否 |
+| [Script](./js/) | 可 `import` 的 JS、前端交互 | 是 |
+| [Style](./css/) | 全局或页面样式表 | 是 |
 
 ## 文档导航
 
 | 主题 | 说明 |
 |------|------|
-| [Layout](./layout.md) | `k-placeholder`、多栏布局 |
-| [Page](./page.md) | 独立页 vs `<layout>` + `<placeholder>` |
-| [View](./view.md) | `<view id="...">`、拆分原则 |
-| [Script](./js.md) | 站点 JS 资源、`type="module"` |
-| [Style](./css.md) | 站点 CSS、与 Tailwind 等配合 |
-| [模板绑定语法](./template-binding-syntax.md) | `env="server"`、`k-content`、`k-for` 等 |
+| [Layout](./layout/) | `k-placeholder`、多栏布局 |
+| [Page](./page/) | 独立页 vs `<layout>` + `<placeholder>` |
+| [View](./view/) | `<view id="...">`、拆分原则 |
+| [Script](./js/) | 站点 JS 资源、`type="module"` |
+| [Style](./css/) | 站点 CSS、与 Tailwind 等配合 |
+| [模板绑定语法](./binding/) | `env="server"`、`k-content`、`k-for` 等 |
+| [k-data](./k-data/) | 声明式数据（编写中） |
 
 ## 与 KScript API 的分工
 
@@ -63,5 +59,5 @@ flowchart TB
 
 ## 数据查询
 
-- **推荐**：[k-data](./k-data.md)（下一步补充）
-- **已弃用**：`k-query` 不再维护；请改用 [k-data](./k-data.md)
+- **推荐**：[k-data](./k-data/)（下一步补充）
+- **已弃用**：`k-query` 不再维护；旧链接会重定向到 k-data 说明页

@@ -25,7 +25,14 @@ export default defineConfig({
     'api/site/label.md': 'api/label/index.md',
     'api/site/media.md': 'api/media/index.md',
     'api/site/module.md': 'api/module/index.md',
-    'templateEngine/k-query.md': 'templateEngine/k-data.md',
+    'templateEngine/k-query.md': 'templateEngine/k-data/index.md',
+    'templateEngine/layout.md': 'templateEngine/layout/index.md',
+    'templateEngine/page.md': 'templateEngine/page/index.md',
+    'templateEngine/view.md': 'templateEngine/view/index.md',
+    'templateEngine/js.md': 'templateEngine/js/index.md',
+    'templateEngine/css.md': 'templateEngine/css/index.md',
+    'templateEngine/k-data.md': 'templateEngine/k-data/index.md',
+    'templateEngine/template-binding-syntax.md': 'templateEngine/binding/index.md',
   },
   themeConfig: {
     siteTitle: 'Kooboo',
@@ -40,13 +47,25 @@ export default defineConfig({
           text: '模板引擎',
           items: [
             { text: '概述', link: '/templateEngine/' },
-            { text: 'Layout', link: '/templateEngine/layout.md' },
-            { text: 'Page', link: '/templateEngine/page.md' },
-            { text: 'View', link: '/templateEngine/view.md' },
-            { text: 'Script', link: '/templateEngine/js.md' },
-            { text: 'Style', link: '/templateEngine/css.md' },
-            { text: '模板绑定语法', link: '/templateEngine/template-binding-syntax.md' },
-            { text: 'k-data', link: '/templateEngine/k-data.md' },
+            {
+              text: '站点资源',
+              collapsed: false,
+              items: [
+                { text: 'Layout（布局）', link: '/templateEngine/layout/' },
+                { text: 'Page（页面）', link: '/templateEngine/page/' },
+                { text: 'View（视图）', link: '/templateEngine/view/' },
+                { text: 'Script（脚本）', link: '/templateEngine/js/' },
+                { text: 'Style（样式）', link: '/templateEngine/css/' },
+              ]
+            },
+            {
+              text: '语法与数据',
+              collapsed: false,
+              items: [
+                { text: '模板绑定语法', link: '/templateEngine/binding/' },
+                { text: 'k-data', link: '/templateEngine/k-data/' },
+              ]
+            },
           ]
         }
       ],

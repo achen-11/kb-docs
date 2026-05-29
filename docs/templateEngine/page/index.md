@@ -70,14 +70,14 @@ Layout 中 `k-placeholder="Main"` 与 Page 中 `<placeholder id="Main">` 必须�
 <view id="product_card"></view>
 ```
 
-`id` 对应站点 **View** 资源名称。详见 [View](./view.md)。
+`id` 对应站点 **View** 资源名称。详见 [View](../view/)。
 
 ## 脚本与样式
 
-- **全局**：在 Layout 的 `<head>` 用 `<link href="...">`、`<script src="...">` 引用 [Style](./css.md) / [Script](./js.md) 的路由 URL
+- **全局**：在 Layout 的 `<head>` 用 `<link href="...">`、`<script src="...">` 引用 [Style](../css/) / [Script](../js/) 的路由 URL
 - **本页**：可在 Page 内写 `<script env="server">`（KScript）或 `<script type="module">`（前端 ES Module）
 
-推荐结构：`env="server"` 的数据脚本放在区块顶部，前端交互 script 放在 View 底部或独立 [Script](./js.md) 资源。
+推荐结构：`env="server"` 的数据脚本放在区块顶部，前端交互 script 放在 View 底部或独立 [Script](../js/) 资源。
 
 ## 组件拆分原则
 
@@ -95,7 +95,7 @@ Page 不宜堆过多 markup。出现以下情况时，把区块拆成 **View**�
 
 ## 相关文档
 
-- [Layout](./layout.md)
-- [View](./view.md)
-- [模板绑定语法](./template-binding-syntax.md)
+- [Layout](../layout/)
+- [View](../view/)
+- [模板绑定语法](../binding/)
 - [k.page](/api/page/) — 当前页 Meta

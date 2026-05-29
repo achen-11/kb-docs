@@ -46,11 +46,11 @@ Layout 正文中至少要有一个占位元素，用于接收 Page 注入的内�
 
 ## 常见放什么
 
-- **`<head>`**：meta、全局 [Style](./css.md)、Tailwind CDN、`<script type="importmap">`（见 [Script](./js.md)）
+- **`<head>`**：meta、全局 [Style](../css/)、Tailwind CDN、`<script type="importmap">`（见 [Script](../js/)）
 - **`<body>` 固定结构**：顶栏、侧栏壳、页脚
 - **`k-placeholder`**：留给各 Page 的差异内容
 
-Layout 里也可以写 **`env="server"`** 与 `k-content` 等，用于全站共享的服务端变量（例如站点名），详见 [模板绑定语法](./template-binding-syntax.md)。
+Layout 里也可以写 **`env="server"`** 与 `k-content` 等，用于全站共享的服务端变量（例如站点名），详见 [模板绑定语法](../binding/)。
 
 ## 与 Page 的配合
 
@@ -67,7 +67,7 @@ Page 通过 `<layout id="布局名称">` 引用 Layout，并用 `<placeholder id
 </layout>
 ```
 
-`layout` 的 `id` 对应后台 Layout 资源的 **名称**。占位 id 与 Layout 中 `k-placeholder` 的值一一对应。详见 [Page](./page.md)。
+`layout` 的 `id` 对应后台 Layout 资源的 **名称**。占位 id 与 Layout 中 `k-placeholder` 的值一一对应。详见 [Page](../page/)。
 
 ## 何时新建 Layout
 
@@ -82,7 +82,7 @@ Page 通过 `<layout id="布局名称">` 引用 Layout，并用 `<placeholder id
 
 ## 相关文档
 
-- [Page](./page.md)
-- [View](./view.md)
-- [Script](./js.md) · [Style](./css.md)
-- [模板绑定语法](./template-binding-syntax.md)
+- [Page](../page/)
+- [View](../view/)
+- [Script](../js/) · [Style](../css/)
+- [模板绑定语法](../binding/)
