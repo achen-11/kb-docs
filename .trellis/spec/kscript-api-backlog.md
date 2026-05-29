@@ -107,7 +107,7 @@ k.xxx.yyy
 | `k.logger` | `KLogger` | ✅ | k-logger.md | | |
 | `k.label` / `k.t` | 方法 | ✅ label.md | k-label.md | | |
 | `k.site` | `kSiteDb` | 🔴 | k-site/* | | **大模块，宜拆分** |
-| `k.page` | `KPage` | ✅ | site/k-page.md | | 与 `k.site.pages` 区分 |
+| `k.page` | `KPage` | ✅ | page/index.md | | 与 `k.site.pages` 区分 |
 | `k.module` | `KModule` | 🔴 侧边栏 | k-module.md | | 仅模块上下文部分 API |
 | `k.net` | `KNET` | ✅ | net/* | | 见子表 |
 | `k.mail` | `Mail` | ✅ | business/mail.md | | |
@@ -140,12 +140,12 @@ k.xxx.yyy
 
 | ID | 建议文档路径 | 状态 | 源码 |
 |----|--------------|------|------|
-| `k.DB` 概述 | `docs/api/data/database.md` | ✅ | `KDB.cs` |
-| `k.DB.sqlite` | `docs/api/data/sqlite/` | ✅ | `SqliteDatabase.cs` |
-| `k.DB.mysql` | `docs/api/data/mysql.md` | 🔴 | `MysqlDatabase.cs` |
-| `k.DB.sqlServer` | `docs/api/data/sqlserver.md` | 🔴 | `SqlServerDatabase.cs` |
-| `k.DB.mongo` | `docs/api/data/mongo.md` | 🔴 | `KDB.Mongo` |
-| `k.DB.indexedDb` / worm | `docs/api/data/indexeddb.md` | 🔴 | `kDatabase` / `KWormDb` |
+| `k.DB` 概述 | `docs/api/database/` | ✅ | `KDB.cs` |
+| `k.DB.sqlite` | `docs/api/sqlite/` | ✅ | `SqliteDatabase.cs` |
+| `k.DB.mysql` | `docs/api/mysql/` | 🔴 | `MysqlDatabase.cs` |
+| `k.DB.sqlServer` | `docs/api/sqlserver/` | 🔴 | `SqlServerDatabase.cs` |
+| `k.DB.mongo` | `docs/api/mongo/` | 🔴 | `KDB.Mongo` |
+| `k.DB.indexedDb` / worm | `docs/api/indexeddb/` | 🔴 | `kDatabase` / `KWormDb` |
 | `k.DB.getDB(type)` | 合入 database 概述 | 🔴 | `KDB.getDB` |
 
 ### 文件 `k.file`
@@ -182,7 +182,7 @@ k.xxx.yyy
 
 | 子模块 (JS) | 建议文档 | 旧文档 | 状态 |
 |-------------|----------|--------|------|
-| `k.site` 概述 + List/Get/CreateSite | `site/site.md` | k-site/index.md | 🔴 侧边栏 |
+| `k.site` 概述 + List/Get/CreateSite | `site/index.md` | k-site/index.md | ✅ |
 | `k.site.pages` | `site/page.md` | k-site/pages.md | ✅ ai-check 已 push |
 | `k.site.layouts` | `site/layout.md` | k-site/layouts.md | ✅ ai-check 已 push |
 | `k.site.views` | `site/view.md` | k-site/views.md | ✅ |
@@ -201,7 +201,7 @@ k.xxx.yyy
 
 | ID | 文档 | 状态 |
 |----|------|------|
-| `k.page` setTitle/setMeta… | `site/k-page.md` | ✅ |
+| `k.page` setTitle/setMeta… | `page/index.md` | ✅ |
 
 ### 模块 `k.module`
 

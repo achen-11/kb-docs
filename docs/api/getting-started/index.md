@@ -53,7 +53,7 @@ k.DB.
 
 ## 下一步
 
-- [k.api](./core/api.md) - 创建 GET/POST 路由
-- [k.request](./core/request.md) - 处理 HTTP 请求
-- [k.DB 数据库操作](./data/database.md) - 数据库 CRUD
+- [k.api](./api/) - 创建 GET/POST 路由
+- [k.request](./request/) - 处理 HTTP 请求
+- [k.DB 数据库操作](./database/) - 数据库 CRUD
 - [认证与授权](./auth.md) - 登录与会话相关 API

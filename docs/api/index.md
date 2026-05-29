@@ -1,68 +1,62 @@
 # API 详情
 
-KScript API 完整参考文档（服务端 `k.*`）。
+KScript API 完整参考（服务端 `k.*`）。文档路径与模块名一致，**按字母序**排列便于检索。
 
-## 分类导航
+## 入门
 
-### 入门
+| 文档 | 说明 |
+|------|------|
+| [快速开始](./getting-started/) | API 基础与快速上手 |
+| [认证与授权](./getting-started/auth.md) | 登录与会话 |
 
-- [快速开始](./getting-started/) — API 基础与快速上手
-- [认证与授权](./getting-started/auth.md) — 登录与会话
+## KScript API（A–Z）
 
-### 核心
+| 模块 | 文档 | 说明 |
+|------|------|------|
+| `k.account` | [account/](./account/) | 登录、用户、组织、OAuth |
+| `k.api` | [api/](./api/) | API 路由 |
+| `k.cache` | [cache/](./cache/) | 站点内存缓存 |
+| `k.commerce` | [commerce/](./commerce/commerce.md) | 电商（含 product、cart、order 等子页） |
+| `k.content` | [content/](./content/) | 内容类型与内容项 |
+| `k.cookie` | [cookie/](./cookie/) | Cookie |
+| `k.DB` | [database/](./database/) · [sqlite/](./sqlite/) | 数据库与 SQLite |
+| `k.file` | [file/](./file/file.md) | 站点目录文件 |
+| `k.label` | [label/](./label/) | 多语言 `k.t` / `k.label` |
+| `k.logger` | [logger/](./logger/) | 代码日志 |
+| `k.mail` | [mail/](./mail/) | 发信、IMAP、SES |
+| `k.media` | [media/](./media/) | 媒体库 |
+| `k.module` | [module/](./module/) | 脚本模块上下文 |
+| `k.net` | [net/](./net/) | httpClient、url、webSocket、DNS、IP |
+| `k.page` | [page/](./page/) | 当前页 title / meta |
+| `k.payment` | [payment/](./payment/) | 支付集成 |
+| `k.request` | [request/](./request/) | HTTP 请求 |
+| `k.response` | [response/](./response/) | HTTP 响应 |
+| `k.security` | [security/](./security/) | 加密与哈希 |
+| `k.session` | [session/](./session/) | 会话 |
+| `k.site` | [site/](./site/) | 页面、布局、视图、脚本、样式、codes |
+| `k.state` | [state/](./state/) | 当前请求视图数据 |
+| `k.storage` | [storage/](./storage/) | 云对象存储 |
+| `k.utils` | [utils/](./utils/) | 工具集（子模块见 utils 索引） |
 
-- [k.api](./core/api.md) — API 路由创建
-- [k.request](./core/request.md) — HTTP 请求处理
-- [k.response](./core/response.md) — HTTP 响应处理
-- [k.session](./core/session.md) — 会话状态
-- [k.cookie](./core/cookie.md) — Cookie 管理
-- [k.security](./core/security.md) — 安全加密
-- [k.cache](./core/cache.md) — 站点内存缓存
-- [k.state](./core/state.md) — 当前请求视图数据
+### k.site 子资源（`site/` 目录内）
 
-### 数据
+| 成员 | 文档 |
+|------|------|
+| `k.site.pages` | [page.md](./site/page.md) |
+| `k.site.layouts` | [layout.md](./site/layout.md) |
+| `k.site.views` | [view.md](./site/view.md) |
+| `k.site.scripts` | [js.md](./site/js.md) |
+| `k.site.styles` | [css.md](./site/css.md) |
+| `k.site.codes` | [code.md](./site/code.md) |
 
-- [k.DB](./data/database.md) — 数据库操作
-- [k.DB.sqlite](./data/sqlite/) — SQLite
-- [k.content](./data/content.md) — 内容管理
-- [k.storage](./data/storage.md) — 云对象存储（OSS / S3 / Azure）
+### k.file 子页
 
-### 文件
+[folder](./file/file-folder.md) · [resumable](./file/file-resumable.md) · [数据结构](./file/file-info.md)
 
-- [k.file](./file/file.md) — 站点目录文件读写
-- [folder](./file/file-folder.md) · [resumable](./file/file-resumable.md) · [数据结构](./file/file-info.md)
+### k.commerce / k.payment / k.net / k.utils
 
-### 业务
+各模块子页见对应目录内侧边栏或 [utils 索引](./utils/index.md)。
 
-- [k.commerce](./commerce/commerce.md) — 电商模块
-- [k.payment](./payment/) — 支付集成
-- [k.account](./account/) — 平台账户（登录、用户、组织、OAuth）
-- [k.mail](./business/mail.md) — 发信、IMAP、SES、反垃圾
+## 计划中文档
 
-### 站点
-
-- [k.site](./site/site.md) — 站点资源总览
-- [k.page](./site/k-page.md) — 当前页 title / meta
-- [k.media](./site/media.md) — 媒体库图片与文件夹
-- [pages](./site/page.md) · [layouts](./site/layout.md) · [views](./site/view.md)
-- [scripts](./site/js.md) · [styles](./site/css.md)
-- [k.module](./site/module.md) — 脚本模块
-- [k.label & k.t](./site/label.md) — 多语言
-
-### k.utils
-
-- [k.utils](./utils/) — 工具集概述（子模块按字母分列于侧边栏）
-
-### k.net
-
-- [k.net](./net/) — 概述与选型
-- [httpClient](./net/httpclient.md) · [url](./net/url.md) · [webSocket](./net/websocket.md)
-- [DNS](./net/dns.md) · [IP](./net/ip.md)
-
-### 日志
-
-- [k.logger](./logger/k-logger.md) — 代码日志
-
-### 计划中文档
-
-以下模块在 backlog 中，尚未发布独立页面：`k.emailMarketing` 等。清单见仓库 `.trellis/spec/kscript-api-backlog.md`。
+尚未单独成页的能力见 `.trellis/spec/kscript-api-backlog.md`（如 `k.emailMarketing`）。

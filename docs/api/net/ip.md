@@ -53,4 +53,4 @@ k.api.get("geo", () => {
 ## 相关文档
 
 - [k.net.DNS](./dns.md)
-- [k.request](../core/request.md)
+- [k.request](../request/)

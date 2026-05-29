@@ -11,7 +11,7 @@
 |-----|------|
 | **`k.page`** | 当前页 `setTitle`、`setNameMeta`、`setPropertyMeta` 等（本页） |
 | **`k.site.pages`** | 站点内 Page 资源的增删改查，见 [page.md](./page.md) |
-| **`k.response.meta`** | 同一套页头绑定的另一入口：`meta.title`、`meta.setMeta(name, content)`，见 [k.response](../core/response.md) |
+| **`k.response.meta`** | 同一套页头绑定的另一入口：`meta.title`、`meta.setMeta(name, content)`，见 [k.response](../response/) |
 
 `k.page.setNameMeta("description", "…")` 与 `k.response.meta.setMeta("description", "…")` 写入同一绑定列表；按团队习惯择一即可。
 :::
@@ -111,5 +111,5 @@ k.page.setPropertyMeta("og:title", productName)
 ## 相关文档
 
 - [k.site.pages](./page.md) — 站点页面资源管理
-- [k.response](../core/response.md) — `k.response.meta` 读写页头绑定
-- [k.request](../core/request.md) — 当前请求参数
+- [k.response](../response/) — `k.response.meta` 读写页头绑定
+- [k.request](../request/) — 当前请求参数

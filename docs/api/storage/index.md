@@ -175,6 +175,6 @@ client.putMetadata("/media/photo.jpg", { alt: "cover" })
 
 ## 相关文档
 
-- [k.media](../site/media.md) — 站点媒体库
+- [k.media](../media/) — 站点媒体库
 - [k.file](../file/file.md) — 站点目录文件
 - [k.net.url](../net/url.md) — 拉取远程 URL 二进制

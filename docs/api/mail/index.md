@@ -227,5 +227,5 @@ k.api.post(() => {
 
 ## 相关文档
 
-- [k.api](../core/api.md)
+- [k.api](../api/)
 - [k.payment](../payment/) — 与邮件支付无关，业务收款用支付 API

@@ -34,4 +34,4 @@ const all = k.utils.clientJS.i18n(true)
 
 ## 相关文档
 
-- [k.label](../site/label.md) — 多语言标签
+- [k.label](../label/) — 多语言标签

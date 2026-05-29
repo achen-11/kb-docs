@@ -216,7 +216,7 @@ k.api.get(() => {
 
 ## 相关文档
 
-- [k.site](./site.md)
+- [k.site](./)
 - [k.site.codes](./code.md) — API 与 CodeBlock（`codeType`）
 - [k.site.styles](./css.md)
 - [k.site.pages](./page.md)

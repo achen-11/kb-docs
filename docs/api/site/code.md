@@ -8,7 +8,7 @@
 
 | `codeType`（写入时） | 枚举值（读取时常见） | 含义 | 典型用途 |
 |---------------------|---------------------|------|----------|
-| **`"Api"`** | `4` 或 `"Api"` | API 脚本 | 使用 [k.api](../core/api.md) 定义 HTTP 接口；**有路由 URL**，可用 `getByUrl` / `getUrl` |
+| **`"Api"`** | `4` 或 `"Api"` | API 脚本 | 使用 [k.api](../api/) 定义 HTTP 接口；**有路由 URL**，可用 `getByUrl` / `getUrl` |
 | **`"CodeBlock"`** | `10` 或 `"CodeBlock"` | 代码块 | 可复用 KScript 模块（`export function` 等）；**无独立路由**，在页面/视图中引用 |
 | `"PageScript"` | `5` | 页面脚本 | 嵌入页面的脚本 |
 | `"PaymentCallBack"` 等 | `7` 等 | 其它 | 支付回调等专用类型 |
@@ -253,7 +253,7 @@ k.api.get(() => {
 
 ## 相关文档
 
-- [k.api](../core/api.md) — API 路由写法
-- [k.site](./site.md)
+- [k.api](../api/) — API 路由写法
+- [k.site](./)
 - [k.site.scripts](./js.md) — 外链 JS 资源（非 Code 仓库）
 - [k.module](./module.md) — 模块上下文

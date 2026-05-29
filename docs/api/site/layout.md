@@ -192,6 +192,6 @@ k.api.get(() => {
 
 ## 相关文档
 
-- [k.site](./site.md)
+- [k.site](./)
 - [k.site.pages](./page.md)
 - [k.site.views](./view.md)

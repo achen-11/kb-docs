@@ -101,4 +101,4 @@ k.api.post("importLogo", () => {
 ## 相关文档
 
 - [k.net.httpClient](./httpclient.md)
-- [k.media](../site/media.md)
+- [k.media](../media/)

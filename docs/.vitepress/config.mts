@@ -5,6 +5,27 @@ export default defineConfig({
   description: 'Kooboo Documentation',
   lang: 'zh-CN',
   ignoreDeadLinks: true,
+  rewrites: {
+    'api/core/api.md': 'api/api/index.md',
+    'api/core/cache.md': 'api/cache/index.md',
+    'api/core/cookie.md': 'api/cookie/index.md',
+    'api/core/request.md': 'api/request/index.md',
+    'api/core/response.md': 'api/response/index.md',
+    'api/core/security.md': 'api/security/index.md',
+    'api/core/session.md': 'api/session/index.md',
+    'api/core/state.md': 'api/state/index.md',
+    'api/data/content.md': 'api/content/index.md',
+    'api/data/database.md': 'api/database/index.md',
+    'api/data/storage.md': 'api/storage/index.md',
+    'api/data/sqlite/index.md': 'api/sqlite/index.md',
+    'api/business/mail.md': 'api/mail/index.md',
+    'api/logger/k-logger.md': 'api/logger/index.md',
+    'api/site/site.md': 'api/site/index.md',
+    'api/site/k-page.md': 'api/page/index.md',
+    'api/site/label.md': 'api/label/index.md',
+    'api/site/media.md': 'api/media/index.md',
+    'api/site/module.md': 'api/module/index.md',
+  },
   themeConfig: {
     siteTitle: 'Kooboo',
     nav: [
@@ -30,180 +51,147 @@ export default defineConfig({
           ]
         },
         {
-          text: '核心',
-          items: [
-            { text: 'k.api', link: '/api/core/api.md' },
-            { text: 'k.request', link: '/api/core/request.md' },
-            { text: 'k.response', link: '/api/core/response.md' },
-            { text: 'k.session', link: '/api/core/session.md' },
-            { text: 'k.cookie', link: '/api/core/cookie.md' },
-            { text: 'k.security', link: '/api/core/security.md' },
-            { text: 'k.cache', link: '/api/core/cache.md' },
-            { text: 'k.state', link: '/api/core/state.md' }
-          ]
-        },
-        {
-          text: '数据',
+          text: 'KScript API（A–Z）',
           items: [
             {
-              text: 'k.DB',
-              collapsed: false,
+              text: 'k.account',
+              collapsed: true,
               items: [
-                { text: '概述', link: '/api/data/database.md' },
-                { text: 'sqlite', link: '/api/data/sqlite/' }
+                { text: '概述', link: '/api/account/' },
+                { text: 'login', link: '/api/account/login.md' },
+                { text: 'OAuth', link: '/api/account/oauth.md' },
+                { text: 'organization', link: '/api/account/organization.md' },
+                { text: 'user', link: '/api/account/user.md' },
               ]
             },
-            { text: 'k.content', link: '/api/data/content.md' },
-            { text: 'k.storage', link: '/api/data/storage.md' },
-          ]
-        },
-        {
-          text: '文件',
-          collapsed: false,
-          items: [
-            { text: '概述', link: '/api/file/file.md' },
-            { text: 'folder', link: '/api/file/file-folder.md' },
-            { text: 'resumable', link: '/api/file/file-resumable.md' },
-            { text: '数据结构', link: '/api/file/file-info.md' },
-          ]
-        },
-        {
-          text: '电商',
-          items: [
+            { text: 'k.api', link: '/api/api/' },
+            { text: 'k.cache', link: '/api/cache/' },
             {
               text: 'k.commerce',
-              collapsed: false,
+              collapsed: true,
               items: [
                 { text: '概述', link: '/api/commerce/commerce.md' },
-                { text: 'product', link: '/api/commerce/product.md' },
-                { text: 'category', link: '/api/commerce/category.md' },
+                { text: 'address', link: '/api/commerce/address.md' },
                 { text: 'cart', link: '/api/commerce/cart.md' },
-                { text: 'order', link: '/api/commerce/order.md' },
+                { text: 'category', link: '/api/commerce/category.md' },
+                { text: 'currency', link: '/api/commerce/currency.md' },
                 { text: 'customer', link: '/api/commerce/customer.md' },
                 { text: 'discount', link: '/api/commerce/discount.md' },
-                { text: 'address', link: '/api/commerce/address.md' },
                 { text: 'loyalty', link: '/api/commerce/loyalty.md' },
                 { text: 'membership', link: '/api/commerce/membership.md' },
+                { text: 'order', link: '/api/commerce/order.md' },
+                { text: 'product', link: '/api/commerce/product.md' },
+                { text: 'settings', link: '/api/commerce/settings.md' },
                 { text: 'shipping', link: '/api/commerce/shipping.md' },
                 { text: 'wishlist', link: '/api/commerce/wishlist.md' },
-                { text: 'currency', link: '/api/commerce/currency.md' },
-                { text: 'settings', link: '/api/commerce/settings.md' },
               ]
-            }
-          ]
-        },
-        {
-          text: '支付',
-          items: [
+            },
+            { text: 'k.content', link: '/api/content/' },
+            { text: 'k.cookie', link: '/api/cookie/' },
+            {
+              text: 'k.DB',
+              collapsed: true,
+              items: [
+                { text: '概述', link: '/api/database/' },
+                { text: 'sqlite', link: '/api/sqlite/' },
+              ]
+            },
+            {
+              text: 'k.file',
+              collapsed: true,
+              items: [
+                { text: '概述', link: '/api/file/file.md' },
+                { text: 'folder', link: '/api/file/file-folder.md' },
+                { text: 'resumable', link: '/api/file/file-resumable.md' },
+                { text: '数据结构', link: '/api/file/file-info.md' },
+              ]
+            },
+            { text: 'k.label', link: '/api/label/' },
+            { text: 'k.logger', link: '/api/logger/' },
+            { text: 'k.mail', link: '/api/mail/' },
+            { text: 'k.media', link: '/api/media/' },
+            { text: 'k.module', link: '/api/module/' },
+            {
+              text: 'k.net',
+              collapsed: true,
+              items: [
+                { text: '概述', link: '/api/net/' },
+                { text: 'DNS', link: '/api/net/dns.md' },
+                { text: 'httpClient', link: '/api/net/httpclient.md' },
+                { text: 'IP', link: '/api/net/ip.md' },
+                { text: 'url', link: '/api/net/url.md' },
+                { text: 'webSocket', link: '/api/net/websocket.md' },
+              ]
+            },
+            { text: 'k.page', link: '/api/page/' },
             {
               text: 'k.payment',
-              collapsed: false,
+              collapsed: true,
               items: [
                 { text: '概述', link: '/api/payment/' },
                 { text: 'Alipay', link: '/api/payment/alipay.md' },
+                { text: 'MoneyBoxs', link: '/api/payment/moneyboxs.md' },
+                { text: 'Pay.NL', link: '/api/payment/paynl.md' },
+                { text: 'PayPal', link: '/api/payment/paypal.md' },
+                { text: 'Square', link: '/api/payment/square.md' },
+                { text: 'Stripe', link: '/api/payment/stripe.md' },
+                { text: 'TwoCheckout', link: '/api/payment/two-checkout.md' },
                 { text: 'Wechat', link: '/api/payment/wechat.md' },
                 { text: 'Wechat H5 Flow', link: '/api/payment/wechat-h5-flow.md' },
-                { text: 'PayPal', link: '/api/payment/paypal.md' },
-                { text: 'Stripe', link: '/api/payment/stripe.md' },
-                { text: 'Square', link: '/api/payment/square.md' },
-                { text: 'Pay.NL', link: '/api/payment/paynl.md' },
-                { text: 'TwoCheckout', link: '/api/payment/two-checkout.md' },
-                { text: 'MoneyBoxs', link: '/api/payment/moneyboxs.md' },
               ]
-            }
-          ]
-        },
-        {
-          text: '业务',
-          items: [
-            { text: 'k.mail', link: '/api/business/mail.md' },
-          ]
-        },
-        {
-          text: '账户',
-          items: [
-            { text: 'k.account', link: '/api/account/' },
-            { text: '登录', link: '/api/account/login.md' },
-            { text: '用户', link: '/api/account/user.md' },
-            { text: '组织', link: '/api/account/organization.md' },
-            { text: 'OAuth', link: '/api/account/oauth.md' },
-          ]
-        },
-        {
-          text: '多语言',
-          items: [
-            { text: 'k.label & k.t', link: '/api/site/label.md' }
-          ]
-        },
-        {
-          text: '站点',
-          items: [
-            { text: 'k.site', link: '/api/site/site.md' },
-            { text: 'k.page', link: '/api/site/k-page.md' },
-            { text: 'k.media', link: '/api/site/media.md' },
-            { text: 'k.module', link: '/api/site/module.md' }
-          ]
-        },
-        {
-          text: '开发',
-          items: [
-            { text: "layout", link: '/api/site/layout.md' },
-            { text: "page", link: '/api/site/page.md' },
-            { text: "view", link: '/api/site/view.md' },
-            { text: "css", link: '/api/site/css.md' },
-            { text: "js", link: '/api/site/js.md' },
-            { text: "codes", link: '/api/site/code.md' },
-          ]
-        },
-        {
-          text: '日志',
-          items: [
-            { text: 'k.logger', link: '/api/logger/k-logger.md' },
-          ]
-        },
-        {
-          text: 'k.utils',
-          collapsed: true,
-          items: [
-            { text: '概述', link: '/api/utils/' },
-            { text: 'CDN', link: '/api/utils/cdn.md' },
-            { text: 'clientJS', link: '/api/utils/clientJS.md' },
-            { text: 'community', link: '/api/utils/community.md' },
-            { text: 'compression', link: '/api/utils/compression.md' },
-            { text: 'converter', link: '/api/utils/converter.md' },
-            { text: 'CRM', link: '/api/utils/crm.md' },
-            { text: 'date', link: '/api/utils/date.md' },
-            { text: 'dom', link: '/api/utils/dom.md' },
-            { text: 'google', link: '/api/utils/google.md' },
-            { text: 'image', link: '/api/utils/image.md' },
-            { text: 'inlineHtml', link: '/api/utils/inlineHtml.md' },
-            { text: 'IP', link: '/api/utils/ip.md' },
-            { text: 'mime', link: '/api/utils/mime.md' },
-            { text: 'ninjible', link: '/api/utils/ninjible.md' },
-            { text: 'office', link: '/api/utils/office.md' },
-            { text: 'puppeteer', link: '/api/utils/puppeteer.md' },
-            { text: 'screenShot', link: '/api/utils/screenShot.md' },
-            { text: 'sftpClient', link: '/api/utils/sftpClient.md' },
-            { text: 'sitemap', link: '/api/utils/sitemap.md' },
-            { text: 'sms', link: '/api/utils/sms.md' },
-            { text: 'sshClient', link: '/api/utils/sshClient.md' },
-            { text: 'string', link: '/api/utils/string.md' },
-            { text: 'telnetClient', link: '/api/utils/telnetClient.md' },
-            { text: 'template', link: '/api/utils/template.md' },
-            { text: 'uri', link: '/api/utils/uri.md' },
-            { text: 'xml', link: '/api/utils/xml.md' },
-          ]
-        },
-        {
-          text: 'k.net',
-          collapsed: false,
-          items: [
-            { text: '概述', link: '/api/net/' },
-            { text: 'httpClient', link: '/api/net/httpclient.md' },
-            { text: 'url', link: '/api/net/url.md' },
-            { text: 'webSocket', link: '/api/net/websocket.md' },
-            { text: 'DNS', link: '/api/net/dns.md' },
-            { text: 'IP', link: '/api/net/ip.md' },
+            },
+            { text: 'k.request', link: '/api/request/' },
+            { text: 'k.response', link: '/api/response/' },
+            { text: 'k.security', link: '/api/security/' },
+            { text: 'k.session', link: '/api/session/' },
+            {
+              text: 'k.site',
+              collapsed: true,
+              items: [
+                { text: '概述', link: '/api/site/' },
+                { text: 'codes', link: '/api/site/code.md' },
+                { text: 'css', link: '/api/site/css.md' },
+                { text: 'js', link: '/api/site/js.md' },
+                { text: 'layouts', link: '/api/site/layout.md' },
+                { text: 'pages', link: '/api/site/page.md' },
+                { text: 'views', link: '/api/site/view.md' },
+              ]
+            },
+            { text: 'k.state', link: '/api/state/' },
+            { text: 'k.storage', link: '/api/storage/' },
+            {
+              text: 'k.utils',
+              collapsed: true,
+              items: [
+                { text: '概述', link: '/api/utils/' },
+                { text: 'CDN', link: '/api/utils/cdn.md' },
+                { text: 'clientJS', link: '/api/utils/clientJS.md' },
+                { text: 'community', link: '/api/utils/community.md' },
+                { text: 'compression', link: '/api/utils/compression.md' },
+                { text: 'converter', link: '/api/utils/converter.md' },
+                { text: 'CRM', link: '/api/utils/crm.md' },
+                { text: 'date', link: '/api/utils/date.md' },
+                { text: 'dom', link: '/api/utils/dom.md' },
+                { text: 'google', link: '/api/utils/google.md' },
+                { text: 'image', link: '/api/utils/image.md' },
+                { text: 'inlineHtml', link: '/api/utils/inlineHtml.md' },
+                { text: 'IP', link: '/api/utils/ip.md' },
+                { text: 'mime', link: '/api/utils/mime.md' },
+                { text: 'ninjible', link: '/api/utils/ninjible.md' },
+                { text: 'office', link: '/api/utils/office.md' },
+                { text: 'puppeteer', link: '/api/utils/puppeteer.md' },
+                { text: 'screenShot', link: '/api/utils/screenShot.md' },
+                { text: 'sftpClient', link: '/api/utils/sftpClient.md' },
+                { text: 'sitemap', link: '/api/utils/sitemap.md' },
+                { text: 'sms', link: '/api/utils/sms.md' },
+                { text: 'sshClient', link: '/api/utils/sshClient.md' },
+                { text: 'string', link: '/api/utils/string.md' },
+                { text: 'telnetClient', link: '/api/utils/telnetClient.md' },
+                { text: 'template', link: '/api/utils/template.md' },
+                { text: 'uri', link: '/api/utils/uri.md' },
+                { text: 'xml', link: '/api/utils/xml.md' },
+              ]
+            },
           ]
         }
       ]

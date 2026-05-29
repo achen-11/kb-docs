@@ -44,4 +44,4 @@ k.api.post(() => {
 
 - [登录](./login.md)
 - [k.payment](../payment/) — 站点支付
-- [k.cookie](../core/cookie.md) — 请求 Cookie
+- [k.cookie](../cookie/) — 请求 Cookie

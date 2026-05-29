@@ -230,5 +230,5 @@ k.api.get("toValidPath", () => {
 
 - [k.file/folder](./file-folder.md) - 文件夹操作
 - [k.file/resumable](./file-resumable.md) - 断点续传
-- [k.site](./site.md) - 站点管理
+- [k.site](./) - 站点管理
 

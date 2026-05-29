@@ -31,5 +31,5 @@
 
 ## 相关文档
 
-- [k.media](../site/media.md) — 媒体库
+- [k.media](../media/) — 媒体库
 - [k.file](../file/file.md)

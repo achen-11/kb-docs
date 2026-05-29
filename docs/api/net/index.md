@@ -28,4 +28,4 @@ ICMP 探测使用 **`k.utils.ping`**（不在 `k.net` 下）。SSH/SFTP/Telnet �
 ## 相关文档
 
 - [k.file](../file/file.md) — 站点磁盘文件（与出站 HTTP 不同）
-- [k.request](../core/request.md) — 当前入站请求
+- [k.request](../request/) — 当前入站请求

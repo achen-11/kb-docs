@@ -4,7 +4,7 @@
 
 ## 概述
 
-Kooboo 中与「当前用户是否已登录」相关的操作主要通过 `k.account` 完成；请求级会话见 [k.session](../core/session.md)，Cookie 见 [k.cookie](../core/cookie.md)。加密与令牌见 [k.security](../core/security.md)。
+Kooboo 中与「当前用户是否已登录」相关的操作主要通过 `k.account` 完成；请求级会话见 [k.session](../session/)，Cookie 见 [k.cookie](../cookie/)。加密与令牌见 [k.security](../security/)。
 
 ::: tip
 `k.user` 上部分属性已标记为过时，新代码请使用 `k.account` / `k.account.user`。
@@ -63,6 +63,6 @@ k.api.get("profile", () => {
 
 ## 相关文档
 
-- [k.session](../core/session.md) — 服务端会话存储
-- [k.security](../core/security.md) — 加密、哈希等
+- [k.session](../session/) — 服务端会话存储
+- [k.security](../security/) — 加密、哈希等
 - [快速开始](./index.md)

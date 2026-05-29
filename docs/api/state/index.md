@@ -84,6 +84,6 @@ const products = k.state.get("products")
 
 ## 相关文档
 
-- [k.page](../site/k-page.md) — 当前页 `<title>` / `<meta>`
+- [k.page](../page/) — 当前页 `<title>` / `<meta>`
 - [k.cache](./cache.md) — 站点缓存
 - [k.session](./session.md) — 会话

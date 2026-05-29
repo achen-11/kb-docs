@@ -153,4 +153,4 @@ k.api.get("getAllFiles", () => {
 
 - [k.file](./file.md) - 核心文件操作
 - [k.file/resumable](./file-resumable.md) - 断点续传
-- [k.site](./site.md) - 站点管理
+- [k.site](./) - 站点管理
