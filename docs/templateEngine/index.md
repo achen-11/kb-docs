@@ -6,7 +6,7 @@
 
 在 Kooboo 中，**可访问的 HTML 页面**由 **Page** 定义；**Layout** 提供整站共用的 HTML 骨架（`<head>`、导航、占位区）；**View** 是可复用的 HTML 片段；**Script** / **Style** 是带路由的独立 `.js` / `.css` 资源，供布局或页面引用。
 
-服务端数据与 DOM 绑定使用 **`env="server"`** 与 `k-content`、`k-for` 等指令（见 [模板绑定语法](./binding/)）。声明式数据查询推荐 **[k-data](./k-data/)**（`k-query` 已弃用）。
+服务端数据与 DOM 绑定使用 **`env="server"`** 与 `k-content`、`k-for` 等指令（见 [模板绑定语法](./binding/)）。声明式数据查询使用 **[k-data](./k-data/)**（替代已弃用的 `k-query`）。
 
 ## 资源关系
 
@@ -52,7 +52,7 @@ flowchart TB
 | [Script](./js/) | 站点 JS 资源、`type="module"` |
 | [Style](./css/) | 站点 CSS、与 Tailwind 等配合 |
 | [模板绑定语法](./binding/) | `env="server"`、`k-content`、`k-for` 等 |
-| [k-data](./k-data/) | 声明式数据（编写中） |
+| [k-data](./k-data/) | `<k-data>`、`<query>`、JSON5 条件 |
 
 ## 与 KScript API 的分工
 
@@ -64,5 +64,5 @@ flowchart TB
 
 ## 数据查询
 
-- **推荐**：[k-data](./k-data/)（下一步补充）
-- **已弃用**：`k-query` 不再维护；旧链接会重定向到 k-data 说明页
+- [k-data](./k-data/) — 声明式数据（`let` / `query` / `map` / `export`）
+- 历史 `k-query` 已弃用；旧 URL 会重定向到 k-data

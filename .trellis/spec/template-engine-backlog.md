@@ -13,13 +13,13 @@
 | Script | `js/index.md` | 路由 JS、importmap |
 | Style | `css/index.md` | 路由 CSS、Tailwind |
 | 模板绑定 | `binding/index.md` | `env="server"`、`k-*` 指令 |
-| k-data 占位 | `k-data/index.md` | 待写，替代 k-query |
+| k-data | `k-data/*` | 概述、标签、query、functions、condition |
 
 ## 待办
 
 | 优先级 | 主题 | 参考 |
 |--------|------|------|
-| P0 | **k-data** 全文 | `Kooboo/.../references/Frontend/k-data/` |
+| P1 | k-data 示例页 / ai-check | 站点实测 |
 | P1 | k-label 模板侧 | `references/Frontend/k-label.md` + `/api/label/` |
 | P2 | 前端 code-style | `references/Frontend/code-style.md` |
 | P3 | CDN-Vue 专题 | `references/Frontend/cdn-vue/` |

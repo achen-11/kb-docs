@@ -69,7 +69,17 @@ export default defineConfig({
               collapsed: false,
               items: [
                 { text: '模板绑定语法', link: '/templateEngine/binding/' },
-                { text: 'k-data', link: '/templateEngine/k-data/' },
+                {
+                  text: 'k-data',
+                  collapsed: false,
+                  items: [
+                    { text: '概述', link: '/templateEngine/k-data/' },
+                    { text: '标签语法', link: '/templateEngine/k-data/tags.md' },
+                    { text: 'query 数据源', link: '/templateEngine/k-data/query.md' },
+                    { text: '内置函数', link: '/templateEngine/k-data/functions.md' },
+                    { text: '条件表达式', link: '/templateEngine/k-data/condition.md' },
+                  ]
+                },
               ]
             },
           ]
