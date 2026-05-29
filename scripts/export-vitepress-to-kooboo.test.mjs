@@ -17,7 +17,7 @@ test('toKoobooPageRoute maps directory index to trailing slash route', () => {
 })
 
 test('toKoobooPageRoute keeps html extension for non-index pages', () => {
-  assert.equal(toKoobooPageRoute('api/core/api.html'), '/api/core/api.html')
+  assert.equal(toKoobooPageRoute('api/getting-started/auth.html'), '/api/getting-started/auth.html')
   assert.equal(toKoobooPageRoute('404.html'), '/404.html')
 })
 
