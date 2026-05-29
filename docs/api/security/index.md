@@ -355,7 +355,7 @@ k.api.get(() => {
 
 ## 相关文档
 
-- [k.request](./request.md) - HTTP 请求信息
-- [k.response](./response.md) - HTTP 响应处理
-- [k.cookie](./cookie.md) - Cookie 管理
+- [k.request](../request/) - HTTP 请求信息
+- [k.response](../response/) - HTTP 响应处理
+- [k.cookie](../cookie/) - Cookie 管理
 

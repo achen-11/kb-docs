@@ -96,4 +96,4 @@ const label = k.site.labels.get("Cancel");
 ## 相关文档
 
 - [k.site](/api/site/) - 站点概述
-- [开发指南 - 标签使用](/guide/label)
+- [最佳实践](/guide/) — 开发指南（整理中）

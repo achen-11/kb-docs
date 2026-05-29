@@ -133,4 +133,4 @@ k.api.post("saveChunk", () => {
 
 - [k.file](./file.md) - 核心文件操作
 - [k.file/folder](./file-folder.md) - 文件夹操作
-- [k.site](./) - 站点管理
+- [k.site](../site/) - 站点管理

@@ -198,6 +198,6 @@ k.api.get("download", () => {
 
 ## 相关文档
 
-- [k.request](./request.md) - HTTP 请求处理
-- [k.cookie](./cookie.md) - Cookie 管理
-- [k.session](./session.md) - 会话状态
+- [k.request](../request/) - HTTP 请求处理
+- [k.cookie](../cookie/) - Cookie 管理
+- [k.session](../session/) - 会话状态

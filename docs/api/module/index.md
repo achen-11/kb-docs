@@ -32,5 +32,5 @@ k.api.get(() => {
 
 ## 相关文档
 
-- [k.site](./)
+- [k.site](../site/)
 - [k.file](../file/file.md) — 模块本地文件还可通过 `k.module.localFile` 访问（待专文）

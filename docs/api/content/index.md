@@ -516,5 +516,5 @@ k.api.get(() => {
 
 ## 相关文档
 
-- [k.DB](./database.md) - 数据库操作
+- [k.DB](../database/) - 数据库操作
 - [k.request](../request/) - 请求对象

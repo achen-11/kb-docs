@@ -16,7 +16,7 @@
 
 | 模块                       | 说明              |
 | ------------------------ | --------------- |
-| [k.DB.sqlite](./sqlite/) | SQLite 数据库，无需配置 |
+| [k.DB.sqlite](../sqlite/) | SQLite 数据库，无需配置 |
 
 
 ## TypeScript 定义
@@ -47,10 +47,10 @@ interface SQLiteDB {
 
 ## sqlite 与 ORM
 
-如需更便捷的 ORM 操作，可以使用 [k.DB.sqlite](./sqlite/) 模块进行直接的 SQL 查询。
+如需更便捷的 ORM 操作，可以使用 [k.DB.sqlite](../sqlite/) 模块进行直接的 SQL 查询。
 
 ## 相关文档
 
-- [k.DB.sqlite](./sqlite/) - SQLite 数据库操作
-- [k.content](./content.md) - 内容管理
+- [k.DB.sqlite](../sqlite/) - SQLite 数据库操作
+- [k.content](../content/) - 内容管理
 

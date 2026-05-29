@@ -172,5 +172,5 @@ k.api.get(() => {
 
 ## 相关文档
 
-- [k.session](./session.md)
-- [k.cookie](./cookie.md)
+- [k.session](../session/)
+- [k.cookie](../cookie/)

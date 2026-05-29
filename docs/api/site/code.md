@@ -256,4 +256,4 @@ k.api.get(() => {
 - [k.api](../api/) — API 路由写法
 - [k.site](./)
 - [k.site.scripts](./js.md) — 外链 JS 资源（非 Code 仓库）
-- [k.module](./module.md) — 模块上下文
+- [k.module](../module/) — 模块上下文
