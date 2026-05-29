@@ -107,9 +107,9 @@ k.xxx.yyy
 | `k.logger` | `KLogger` | ✅ | k-logger.md | | |
 | `k.label` / `k.t` | 方法 | ✅ label.md | k-label.md | | |
 | `k.site` | `kSiteDb` | 🔴 | k-site/* | | **大模块，宜拆分** |
-| `k.page` | `KPage` | 🔴 侧边栏 | k-page.md | | 与 `k.site.pages` 区分 |
+| `k.page` | `KPage` | ✅ | site/k-page.md | | 与 `k.site.pages` 区分 |
 | `k.module` | `KModule` | 🔴 侧边栏 | k-module.md | | 仅模块上下文部分 API |
-| `k.net` | `KNET` | 🔴 | k-net/* | | 见子表 |
+| `k.net` | `KNET` | ✅ | net/* | | 见子表 |
 | `k.mail` | `Mail` | ✅ | business/mail.md | | |
 | `k.emailMarketing` | `KEmailMarketing` | 🔴 | k-emailMarketing.md | | |
 | `k.account` | `KAccount` | ✅ | k-account.md | | login/user/org/oauth |
@@ -201,7 +201,7 @@ k.xxx.yyy
 
 | ID | 文档 | 状态 |
 |----|------|------|
-| `k.page` setTitle/setMeta… | `site/page-meta.md` 或合入 page | 🔴 |
+| `k.page` setTitle/setMeta… | `site/k-page.md` | ✅ |
 
 ### 模块 `k.module`
 
@@ -213,11 +213,11 @@ k.xxx.yyy
 
 | 子模块 | 建议文档 | 旧文档 | 状态 |
 |--------|----------|--------|------|
-| `k.net.httpClient` | `network/httpclient.md` | k-net/httpClient.md | 🔴 侧边栏 |
-| `k.net.webSocket` | `network/websocket.md` | k-net/webSocket.md | 🔴 |
-| `k.net.url` (Curl) | `network/url.md` | k-net/url.md | 🔴 |
-| `k.net.DNS` | `network/dns.md` | k-net/DNS.md | 🔴 index 已链 |
-| `k.net.IP` | `network/ip.md` 或合入 httpclient | k-net/IP.md | 🔴 P2 |
+| `k.net.httpClient` | `net/httpclient.md` | k-net/httpClient.md | ✅ |
+| `k.net.webSocket` | `net/websocket.md` | k-net/webSocket.md | ✅ |
+| `k.net.url` (Curl) | `net/url.md` | k-net/url.md | ✅ |
+| `k.net.DNS` | `net/dns.md` | k-net/DNS.md | ✅ |
+| `k.net.IP` | `net/ip.md` | k-net/IP.md | ✅ |
 
 ### 工具 `k.utils`（**建议按子目录多次提交**）
 

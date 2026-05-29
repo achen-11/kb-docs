@@ -40,15 +40,18 @@ KScript API 完整参考文档（服务端 `k.*`）。
 ### 站点
 
 - [k.site](./site/site.md) — 站点资源总览
+- [k.page](./site/k-page.md) — 当前页 title / meta
+- [k.media](./site/media.md) — 媒体库图片与文件夹
 - [pages](./site/page.md) · [layouts](./site/layout.md) · [views](./site/view.md)
 - [scripts](./site/js.md) · [styles](./site/css.md)
 - [k.module](./site/module.md) — 脚本模块
 - [k.label & k.t](./site/label.md) — 多语言
 
-### 网络
+### k.net
 
-- [k.net.httpClient](./network/httpclient.md) — 出站 HTTP
-- [k.net.webSocket](./network/websocket.md) — WebSocket
+- [k.net](./net/) — 概述与选型
+- [httpClient](./net/httpclient.md) · [url](./net/url.md) · [webSocket](./net/websocket.md)
+- [DNS](./net/dns.md) · [IP](./net/ip.md)
 
 ### 日志
 
@@ -56,4 +59,4 @@ KScript API 完整参考文档（服务端 `k.*`）。
 
 ### 计划中文档
 
-以下模块在 backlog 中，尚未发布独立页面：`k.storage`、`k.emailMarketing`、`k.net.DNS`、`k.utils`、`k.state` 等。清单见仓库 `.trellis/spec/kscript-api-backlog.md`。
+以下模块在 backlog 中，尚未发布独立页面：`k.storage`、`k.emailMarketing`、`k.utils`、`k.state` 等。清单见仓库 `.trellis/spec/kscript-api-backlog.md`。

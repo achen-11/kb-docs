@@ -137,6 +137,8 @@ export default defineConfig({
           text: '站点',
           items: [
             { text: 'k.site', link: '/api/site/site.md' },
+            { text: 'k.page', link: '/api/site/k-page.md' },
+            { text: 'k.media', link: '/api/site/media.md' },
             { text: 'k.module', link: '/api/site/module.md' }
           ]
         },
@@ -158,10 +160,15 @@ export default defineConfig({
           ]
         },
         {
-          text: '网络',
+          text: 'k.net',
+          collapsed: false,
           items: [
-            { text: 'k.net.httpClient', link: '/api/network/httpclient.md' },
-            { text: 'k.net.webSocket', link: '/api/network/websocket.md' },
+            { text: '概述', link: '/api/net/' },
+            { text: 'httpClient', link: '/api/net/httpclient.md' },
+            { text: 'url', link: '/api/net/url.md' },
+            { text: 'webSocket', link: '/api/net/websocket.md' },
+            { text: 'DNS', link: '/api/net/dns.md' },
+            { text: 'IP', link: '/api/net/ip.md' },
           ]
         }
       ]
