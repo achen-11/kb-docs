@@ -95,9 +95,3 @@ flowchart TB
 |------|----------|------|
 | 账户级 | `/_Admin/`、`/_Admin/create` | 本文、[新建站点](./create-site.md) |
 | 站点级 | `/_Admin/site/pages?SiteId=…` 等 | [菜单总览](../navigation.md) |
-
-## 下一步
-
-- [新建站点](./create-site.md) — 空白站点、导入、克隆
-- [站点后台菜单总览](../navigation.md) — 进入站点后功能分布
-- [数据类型与内容夹](../content/data-types.md) — 配置 `k.content` 的前置步骤

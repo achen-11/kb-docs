@@ -60,7 +60,7 @@
 
 1. [站点后台菜单总览](../navigation.md) — 熟悉左侧菜单  
 2. **页面**、**媒体库** — 先有可访问页面（相关文档待补充）  
-3. [数据类型与内容夹](../content/data-types.md) — 若要用 `k.content`  
+3. [内容](../content/index.md) — 若要用 `k.content`  
 4. [模板引擎](/templateEngine/) — 开发 Layout / Page / View  
 
 ## 相关链接
@@ -72,7 +72,3 @@
 | 导入 | `/_Admin/create/import` |
 | 克隆 | `/_Admin/create/clone` |
 | 站点控制面板 | `/_Admin/site?SiteId={站点GUID}` |
-
-## 上一步
-
-[登录与站点列表](./login-and-site-list.md)
