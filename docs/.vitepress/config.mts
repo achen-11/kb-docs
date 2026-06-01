@@ -40,7 +40,15 @@ const cmsSidebar = [
         items: [
           { text: '概述', link: '/cms/content/' },
           { text: '数据类型', link: '/cms/content/content-types' },
-          { text: '内容（内容夹）', link: '/cms/content/contents' },
+          {
+            text: '内容夹',
+            collapsed: false,
+            items: [
+              { text: '内容夹列表', link: '/cms/content/contents-folders-list' },
+              { text: '内容夹设置', link: '/cms/content/contents-folder-settings' },
+              { text: '内容条目', link: '/cms/content/contents-entries' },
+            ],
+          },
         ],
       },
     ],

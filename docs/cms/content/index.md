@@ -25,7 +25,7 @@ flowchart LR
 
 | 菜单 | 路径 | 文档 | 说明 |
 |------|------|------|------|
-| **内容** | `/content/contents` | [内容（内容夹）](./contents.md) | 内容夹列表、条目列表与编辑 |
+| **内容** | `/content/contents` | [内容夹列表](./contents-folders-list.md) 等，见下 |
 | **数据类型** | `/content/contentTypes` | [数据类型](./content-types.md) | 字段模型 |
 | Labels | `/content/labels` | 待写 | 多语言文案，`k.label` |
 | HTML 片段 | `/content/htmlblocks` | 待写 | 可复用 HTML 块 |
@@ -38,11 +38,19 @@ flowchart LR
 - **预览 URL** 常指向 [页面](/cms/site/pages.md) 路由，用于后台预览或前台详情页。
 :::
 
+## 内容夹文档
+
+| 文档 | 说明 |
+|------|------|
+| [内容夹列表](./contents-folders-list.md) | 新建 **文件夹** / **单条内容**、`k.content` 用法差异 |
+| [内容夹设置](./contents-folder-settings.md) | 设置弹窗：基本信息、**关联数据**、字段 |
+| [内容条目](./contents-entries.md) | 条目列表、新建/编辑、保存与预览 |
+
 ## 典型建站顺序
 
 1. [数据类型](./content-types.md) — 例如 `Article`：标题、正文、封面图、日期。  
-2. [内容（内容夹）](./contents.md) — 新建文件夹 `Article`，绑定上述类型。  
-3. 在内容夹内 **新建** 条目并保存。  
+2. [内容夹列表](./contents-folders-list.md) — 新建文件夹 `Article`，在 [设置](./contents-folder-settings.md) 中配好关联（如需）。  
+3. [内容条目](./contents-entries.md) — 新建并保存条目。  
 4. 模板中用 `k-data` 或 KScript 读取，见 [k.content API](/api/content/)。
 
 ## 相关

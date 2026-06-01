@@ -75,6 +75,27 @@ async function closeFieldEditor(page) {
   await page.waitForTimeout(500)
 }
 
+async function captureFolderSettings(page) {
+  const contentsUrl = `${BASE}/_Admin/content/contents?SiteId=${SITE_ID}`
+  await page.goto(contentsUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2000)
+  const row = page.locator('tbody tr').first()
+  await row.hover()
+  await page.waitForTimeout(400)
+  const setting = row.locator('[data-cy="setting"]')
+  await setting.waitFor({ state: 'visible', timeout: 15000 })
+  await setting.click()
+  await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+  await page.waitForTimeout(800)
+  await snapDialog(page, 'contents-folder-settings-basic.png')
+  await clickFieldTab(page, '关联数据')
+  await snapDialog(page, 'contents-folder-settings-relation.png')
+  await clickFieldTab(page, '字段')
+  await snapDialog(page, 'contents-folder-settings-fields.png')
+  await page.keyboard.press('Escape')
+  await page.waitForTimeout(500)
+}
+
 async function captureFieldEditor(page) {
   await openFieldEditor(page)
   await snapDialog(page, 'field-editor-basic.png')
@@ -135,6 +156,8 @@ async function main() {
 
   await captureFieldEditor(page)
 
+  await captureFolderSettings(page)
+
   const contentsUrl = `${BASE}/_Admin/content/contents?SiteId=${SITE_ID}`
   await page.goto(contentsUrl, { waitUntil: 'networkidle', timeout: 60000 })
   await page.waitForTimeout(2500)
@@ -146,6 +169,14 @@ async function main() {
   await page.waitForURL(/textContentsByFolder|\/content\/content/, { timeout: 60000 })
   await page.waitForTimeout(3000)
   await snap(page, 'contents-entry.png')
+
+  const newBtn = page.locator('[data-cy="new-text-content"]').first()
+  if (await newBtn.count()) {
+    await newBtn.click()
+    await page.waitForURL(/\/content\/content/, { timeout: 60000 })
+    await page.waitForTimeout(3000)
+    await snap(page, 'contents-entry-edit.png')
+  }
 
   await browser.close()
   console.log('done')

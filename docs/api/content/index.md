@@ -6,7 +6,7 @@
 
 `k.content` 提供了一套完整的内容管理 API，用于对站点内容进行创建、查询、更新、删除等操作。
 
-**前置条件**：须在后台配置**数据类型**与**内容夹**。操作步骤见 [后台：内容](/cms/content/)（[数据类型](/cms/content/content-types) · [内容夹](/cms/content/contents)）。
+**前置条件**：须在后台配置**数据类型**与**内容夹**。操作步骤见 [后台：内容](/cms/content/)（[数据类型](/cms/content/content-types) · [内容夹列表](/cms/content/contents-folders-list)）。
 
 ## TypeScript 定义
 
