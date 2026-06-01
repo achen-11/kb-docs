@@ -64,6 +64,25 @@ cd kb-remote-site && kb push images/cms
 
 曾考虑 `docs/public` 链到 `kb-remote-site/images`；当前采用 **构建时复制**，避免 symlink，且 `docs/public` 单独进 Git、与 gitignore 的 `kb-remote-site/*` 不冲突。
 
+## Mermaid 流程图（文字勿溢出）
+
+本站 **不是** VitePress 内置 Mermaid，也不是官方 `mermaid.js`，而是构建期插件 [`vitepress-plugin-mermaid-diagram`](https://www.npmjs.com/package/vitepress-plugin-mermaid-diagram)：自研布局 + 静态 SVG，中文标签宽度用启发式估算，**容易比浏览器实际渲染偏窄**，再叠上并排 `subgraph`，就会出现你看到的「字出框」。
+
+### 写作约定（优先遵守）
+
+| 做法 | 说明 |
+|------|------|
+| 换行用 `\n` | 插件支持 `A[第一行\n第二行]`；**不要**写 `<br/>`（会当普通字符画进 SVG，框宽也算错） |
+| 节点文案宜短 | 细节放在下方表格或正文；长句拆成多节点或拆成两张图 |
+| 少用并排 subgraph | 两个子图横排时各自可用宽度变窄，中文更易溢出 |
+| 复杂关系 | 可改用表格 + 一张简单示意图，不必一张图塞满 |
+
+### 全局可调（次要）
+
+在 `docs/.vitepress/config.mts` 的 `diagramPlugin` 上可加大 `flowchart.nodesep` / `ranksep`，或略调 `theme.fontSize`，只能缓解间距，**不能**从根本上修正中文估宽。
+
+若仍频繁溢出，长期选项是：向插件仓库提 issue（CJK 估宽）、升级插件版本，或评估改回基于官方 Mermaid 的 VitePress 集成（体积与构建更重）。
+
 ## 扩展
 
 若 API、模板引擎也要配图，在 `docs/public/` 下增加目录（如 `api/`），并在 `scripts/sync-doc-images-to-kooboo.mjs` 的同步列表里登记，映射为 `images/api/...`，文中写 `/api/...`。

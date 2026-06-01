@@ -41,11 +41,11 @@ const cmsSidebar = [
           { text: '概述', link: '/cms/content/' },
           { text: '数据类型', link: '/cms/content/content-types' },
           {
-            text: '内容夹',
+            text: '内容',
             collapsed: false,
             items: [
-              { text: '内容夹列表', link: '/cms/content/contents-folders-list' },
-              { text: '内容夹设置', link: '/cms/content/contents-folder-settings' },
+              { text: '内容列表', link: '/cms/content/contents-folders-list' },
+              { text: '内容设置', link: '/cms/content/contents-folder-settings' },
               { text: '内容条目', link: '/cms/content/contents-entries' },
             ],
           },

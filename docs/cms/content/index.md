@@ -10,13 +10,13 @@
 | 概念 | 后台菜单 | 作用 |
 |------|----------|------|
 | **数据类型** | 内容 → **数据类型** | 定义字段模型（名称、控件类型、多语言等） |
-| **内容夹** | 内容 → **内容** | 按类型建「文件夹」或「单条内容」，其下录入条目 |
+| **内容文件夹** | 内容 → **内容** | 按类型建「文件夹」或「单条内容」，其下录入条目 |
 
-须 **先建数据类型，再建内容夹**。内容夹的 **名称** 即 API 中的文件夹键，例如 `k.content.Article.all()` 里的 `Article`。
+须 **先建数据类型，再建内容文件夹**。内容文件夹的 **名称** 即 API 中的文件夹键，例如 `k.content.Article.all()` 里的 `Article`。
 
 ```mermaid
 flowchart LR
-  A[数据类型] --> B[内容夹]
+  A[数据类型] --> B[内容文件夹]
   B --> C[内容条目]
   C --> D[k.content / k-data]
 ```
@@ -25,7 +25,7 @@ flowchart LR
 
 | 菜单 | 路径 | 文档 | 说明 |
 |------|------|------|------|
-| **内容** | `/content/contents` | [内容夹列表](./contents-folders-list.md) 等，见下 |
+| **内容** | `/content/contents` | [内容列表](./contents-folders-list.md) 等，见下 |
 | **数据类型** | `/content/contentTypes` | [数据类型](./content-types.md) | 字段模型 |
 | Labels | `/content/labels` | 待写 | 多语言文案，`k.label` |
 | HTML 片段 | `/content/htmlblocks` | 待写 | 可复用 HTML 块 |
@@ -38,18 +38,18 @@ flowchart LR
 - **预览 URL** 常指向 [页面](/cms/site/pages.md) 路由，用于后台预览或前台详情页。
 :::
 
-## 内容夹文档
+## 内容文件夹文档
 
 | 文档 | 说明 |
 |------|------|
-| [内容夹列表](./contents-folders-list.md) | 新建 **文件夹** / **单条内容**、`k.content` 用法差异 |
-| [内容夹设置](./contents-folder-settings.md) | 设置弹窗：基本信息、**关联数据**、字段 |
+| [内容列表](./contents-folders-list.md) | 新建 **文件夹** / **单条内容**、`k.content` 用法差异 |
+| [内容设置](./contents-folder-settings.md) | 设置弹窗：基本信息、**关联数据**、字段 |
 | [内容条目](./contents-entries.md) | 条目列表、新建/编辑、保存与预览 |
 
 ## 典型建站顺序
 
 1. [数据类型](./content-types.md) — 例如 `Article`：标题、正文、封面图、日期。  
-2. [内容夹列表](./contents-folders-list.md) — 新建文件夹 `Article`，在 [设置](./contents-folder-settings.md) 中配好关联（如需）。  
+2. [内容列表](./contents-folders-list.md) — 新建文件夹 `Article`，在 [设置](./contents-folder-settings.md) 中配好关联（如需）。  
 3. [内容条目](./contents-entries.md) — 新建并保存条目。  
 4. 模板中用 `k-data` 或 KScript 读取，见 [k.content API](/api/content/)。
 

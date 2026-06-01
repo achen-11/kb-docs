@@ -1,16 +1,16 @@
 # 内容条目
 
-> **文件夹**：`/_Admin/content/textContentsByFolder?SiteId=...&folder={内容夹Id}`  
-> **编辑条目**：`/_Admin/content/content?SiteId=...&folder={内容夹Id}&id={条目Id}`（新建可无 `id`）  
+> **文件夹**：`/_Admin/content/textContentsByFolder?SiteId=...&folder={内容文件夹Id}`  
+> **编辑条目**：`/_Admin/content/content?SiteId=...&folder={内容文件夹Id}&id={条目Id}`（新建可无 `id`）  
 > **单条内容**：列表点名称直接进入 `content` 路由，仅维护唯一一条
 
-在某一 [内容夹](./contents-folders-list.md) 下创建、编辑具体数据行。表单字段由该夹的 [数据类型](./content-types.md) 决定；若配置了 [关联数据](./contents-folder-settings.md)，编辑页会出现对应区块（类别/内嵌选择器）。
+在某一 [内容文件夹](./contents-folders-list.md) 下创建、编辑具体数据行。表单字段由该夹的 [数据类型](./content-types.md) 决定；若配置了 [关联数据](./contents-folder-settings.md)，编辑页会出现对应区块（类别/内嵌选择器）。
 
 ## 进入方式
 
-| 内容夹类型 | 操作 |
+| 内容文件夹类型 | 操作 |
 |------------|------|
-| **文件夹** | 列表点击内容夹 **名称** → 条目列表 → **新建** / 行内编辑 |
+| **文件夹** | 列表点击内容文件夹 **名称** → 条目列表 → **新建** / 行内编辑 |
 | **单条内容** | 列表点击 **名称** → 直接进入该条编辑（无列表页） |
 
 <DocImage src="/cms/content/contents-entry.png" alt="文件夹内条目列表" width="1120" />
@@ -26,17 +26,17 @@
 | 搜索、筛选 | 若数据类型含可用于筛选的字段，顶部可能出现筛选器 |
 | 批量删除等 | 勾选后操作（权限允许时） |
 
-列表列一般包含标识、摘要字段、在线状态、修改时间等（随数据类型与 [内容夹设置 · 字段](./contents-folder-settings.md#字段) 顺序而变）。
+列表列一般包含标识、摘要字段、在线状态、修改时间等（随数据类型与 [内容文件夹设置 · 字段](./contents-folder-settings.md#字段) 顺序而变）。
 
 ## 编辑页
 
 路由 `content`，中央为动态表单：
 
 - **数据类型字段**：文本、富文本、图片、日期等。
-- **类别数据**：按 [内容夹设置](./contents-folder-settings.md) 中配置的别名，从关联夹 **多选/单选** 条目（勾选「多个」时允许多选）。
+- **类别数据**：按 [内容文件夹设置](./contents-folder-settings.md) 中配置的别名，从关联夹 **多选/单选** 条目（勾选「多个」时允许多选）。
 - **内嵌数据**：从关联夹 **挑选要嵌入** 的条目，可排序；分组内嵌在 UI 上分区展示。
 
-底部栏（**文件夹** 且非单条内容夹时常见）：
+底部栏（**文件夹** 且非单条内容文件夹时常见）：
 
 | 按钮 | 说明 |
 |------|------|
@@ -56,7 +56,7 @@
 
 ## 保存后如何用 k.content
 
-| 内容夹类型 | 读取方式 |
+| 内容文件夹类型 | 读取方式 |
 |------------|----------|
 | 文件夹 | `k.content.{夹名}.all()`、`get(id)`、`find(...)` 等 |
 | 单条内容 | `k.content.{夹名}.字段Name` 直接访问 |
@@ -66,7 +66,7 @@
 
 | 文档 | 说明 |
 |------|------|
-| [内容夹列表](./contents-folders-list.md) | 文件夹 vs 单条内容 |
-| [内容夹设置](./contents-folder-settings.md) | 关联与字段顺序 |
+| [内容列表](./contents-folders-list.md) | 文件夹 vs 单条内容 |
+| [内容设置](./contents-folder-settings.md) | 关联与字段顺序 |
 | [k.content](/api/content/) | CRUD、查询运算符 |
 | [k-data](/templateEngine/k-data/query.md) | 模板列表绑定 |
