@@ -64,6 +64,17 @@ cd kb-remote-site && kb push images/cms
 
 曾考虑 `docs/public` 链到 `kb-remote-site/images`；当前采用 **构建时复制**，避免 symlink，且 `docs/public` 单独进 Git、与 gitignore 的 `kb-remote-site/*` 不冲突。
 
+## 表格列宽
+
+Markdown **不能**写列宽。本站已在 `docs/.vitepress/theme/custom.css` 统一处理：
+
+| 规则 | 效果 |
+|------|------|
+| 所有 `th` | `white-space: nowrap`，表头单行 |
+| 首列 `th` / `td` | 不换行 + `width: 1%`，按内容收窄，把宽度让给说明列 |
+
+两列表格（`| 列/操作 | 说明 |`）无需额外写法。若某表**必须**让首列折行，用 HTML 包住：`<div class="table-wrap-first">` + `<table>...</table>`。
+
 ## Mermaid 流程图（文字勿溢出）
 
 本站 **不是** VitePress 内置 Mermaid，也不是官方 `mermaid.js`，而是构建期插件 [`vitepress-plugin-mermaid-diagram`](https://www.npmjs.com/package/vitepress-plugin-mermaid-diagram)：自研布局 + 静态 SVG，中文标签宽度用启发式估算，**容易比浏览器实际渲染偏窄**，再叠上并排 `subgraph`，就会出现你看到的「字出框」。

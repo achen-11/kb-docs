@@ -127,3 +127,26 @@ body.doc-image-preview-open {
 .doc-image-preview-fade-leave-to {
   opacity: 0;
 }
+
+/* 正文表格：表头与首列标签尽量单行（避免「列 / 操作」「最后修改」等被挤断行） */
+.vp-doc table {
+  table-layout: auto;
+}
+
+.vp-doc table th {
+  white-space: nowrap;
+}
+
+.vp-doc table th:first-child,
+.vp-doc table td:first-child {
+  white-space: nowrap;
+  width: 1%;
+  vertical-align: top;
+}
+
+/* 首列故意需要折行的表格，在表格外包一层 <div class="table-wrap-first">（HTML 块） */
+.vp-doc .table-wrap-first table th:first-child,
+.vp-doc .table-wrap-first table td:first-child {
+  white-space: normal;
+  width: auto;
+}
