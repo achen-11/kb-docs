@@ -29,7 +29,7 @@ flowchart LR
 | **数据类型** | `/content/contentTypes` | [数据类型](./content-types.md) | 字段模型 |
 | **标签** | `/content/labels` | [标签](./labels.md) | 多语言文案，`k.label` / `k.t` |
 | **HTML 片段** | `/content/htmlblocks` | [HTML 片段](./html-blocks.md) | 可复用 HTML 块 |
-| 文件 | `/content/files` | 待写 | 站点文件（高级菜单） |
+| **文件** | `/content/files` | [文件](./files.md) | 站点文件（高级菜单） |
 | 标签属性 | `/content/text` | 待写 | 标签属性（高级菜单） |
 | 参数配置 | `/content/useroptions` | 待写 | 用户可编辑参数（高级菜单） |
 

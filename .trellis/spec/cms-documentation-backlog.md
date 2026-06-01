@@ -33,6 +33,7 @@
 | ✅ | `cms/content/contents-entries.md` | 条目编辑 |
 | ✅ | `cms/content/labels.md` | `/content/labels` |
 | ✅ | `cms/content/html-blocks.md` | `/content/htmlblocks` |
+| ✅ | `cms/content/files.md` | `/content/files`（编辑菜单） |
 
 ## P1 — 页面与开发资源（对齐 templateEngine）
 

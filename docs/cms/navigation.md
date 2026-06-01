@@ -37,7 +37,7 @@
 
 ## 内容
 
-左侧分组：**内容**（部分子项需在「高级菜单」中开启）
+左侧分组：**内容**（部分子项需在 **编辑菜单** 中勾选后才显示）
 
 | 菜单 | 路径 | 说明 |
 |------|------|------|
@@ -45,11 +45,11 @@
 | 数据类型 | `/content/contentTypes` | 字段模型，须先于内容夹创建 |
 | 标签 | `/content/labels` | 多语言文案，对应 `k.label` / `k.t` |
 | HTML 片段 | `/content/htmlblocks` | 可复用 HTML 块，见 [HTML 片段](./content/html-blocks.md) |
-| 文件 | `/content/files` | 站点文件（高级） |
-| 标签属性 | `/content/text` | 标签属性（高级） |
-| 参数配置 | `/content/useroptions` | 用户可编辑参数（高级） |
+| 文件 | `/content/files` | CMS 文件库，见 [文件](./content/files.md) |
+| 标签属性 | `/content/text` | 标签属性（编辑菜单） |
+| 参数配置 | `/content/useroptions` | 用户可编辑参数（编辑菜单） |
 
-相关文档：[内容概述](./content/index.md) · [数据类型](./content/content-types.md) · [内容列表](./content/contents-folders-list.md) · [标签](./content/labels.md) · [HTML 片段](./content/html-blocks.md)
+相关文档：[内容概述](./content/index.md) · [数据类型](./content/content-types.md) · [内容列表](./content/contents-folders-list.md) · [标签](./content/labels.md) · [HTML 片段](./content/html-blocks.md) · [文件](./content/files.md)
 
 ## 电商
 
@@ -157,10 +157,21 @@
 | AI App Builder | `/ai-app-builder` |
 | AI Chat | `/ai-chat/overview` |
 
-## 权限与高级菜单
+## 权限与编辑菜单
 
-- 子菜单是否可见取决于站点角色与功能权限（`meta.menu.permission`）。
-- 标有 `advanced: true` 的项可能默认折叠，需在后台打开「高级菜单」后才显示。
+- 子菜单是否可见，还取决于站点角色与功能权限（`meta.menu.permission`）。
+- 路由上标有 `advanced: true` 的项（如 **文件**、**HTML 片段**、**标签属性** 等）默认**不显示**在左侧栏，需要在 **编辑菜单** 里勾选后才会出现。
+
+### 如何打开编辑菜单
+
+1. 进入站点后台任意页（如 [控制面板](./site/dashboard.md)）。
+2. 点击左侧栏底部的 **编辑菜单**（铅笔图标，`editMenu`）。
+3. 在弹出面板中勾选或取消各分组下的菜单项；提示文案为「将不常用的菜单隐藏」。
+4. 关闭面板后，左侧菜单立即按你的选择显示或隐藏。
+
+<DocImage src="/cms/navigation-edit-menu.png" alt="编辑菜单：勾选要在侧栏显示的内容、站点设置等子项" width="1120" />
+
+勾选 **内容 → 文件**、**HTML 片段** 等后，即可在左侧 **内容** 分组下看到对应入口，详见各子文档。
 
 ## 维护说明
 

@@ -6,9 +6,10 @@
 
 `k.site` 是 Kooboo **当前站点**内容的统一入口。通过 `pages`、`layouts`、`views`、`scripts`、`styles` 等子 API 进行 CRUD，并支持创建站点、导入导出等管理操作。
 
-::: warning 与 k.file 的区别
-- **k.site**：站点结构化资源（页面、布局、代码块等），带版本与路由。
-- **k.file**：站点目录下的任意文本/二进制文件，见 [k.file](../file/file.md)。
+::: warning 与 k.file、CMS 文件库的区别
+- **k.site**：站点结构化资源（页面、布局、View、Script 等），带版本与路由。
+- **k.file**：站点磁盘目录上的文件 KScript 读写，**无**后台专用管理页，见 [k.file](../file/file.md)。
+- **内容 → 文件**（CmsFile）：后台 [CMS 文件库](/cms/content/files)，有 URL、**无**对应 `k.site.files` / `k.file` 路径，见 [后台：文件](/cms/content/files)。
 :::
 
 ## 子模块导航
@@ -21,7 +22,6 @@
 | `k.site.scripts` | [js.md](./js.md) |
 | `k.site.styles` | [css.md](./css.md) |
 | `k.site.codes` | [code.md](./code.md) — API 与 CodeBlock（`codeType`） |
-| `k.site.files` | 站点文件仓库（与 k.file 配合说明待补充） |
 
 ## 常用方法（节选）
 
@@ -49,3 +49,4 @@ k.api.get("siteSize", () => {
 - [k.page](../page/) — 当前渲染页的元数据（`k.page.setTitle` 等）
 - [k.module](../module/) — 脚本模块上下文
 - [k.label](../label/) — 多语言 `k.t` / `k.label`
+- [后台：文件](/cms/content/files) — CMS 文件库（非 `k.file`）

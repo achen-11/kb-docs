@@ -190,6 +190,11 @@ async function main() {
   await page.keyboard.press('Escape')
   await page.waitForTimeout(500)
 
+  const filesUrl = `${BASE}/_Admin/content/files?SiteId=${SITE_ID}&folder=/&provider=default`
+  await page.goto(filesUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await snap(page, 'files-list.png')
+
   const htmlBlocksUrl = `${BASE}/_Admin/content/htmlblocks?SiteId=${SITE_ID}`
   await page.goto(htmlBlocksUrl, { waitUntil: 'networkidle', timeout: 60000 })
   await page.waitForTimeout(2500)
