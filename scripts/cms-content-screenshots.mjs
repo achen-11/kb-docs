@@ -178,6 +178,18 @@ async function main() {
     await snap(page, 'contents-entry-edit.png')
   }
 
+  const labelsUrl = `${BASE}/_Admin/content/labels?SiteId=${SITE_ID}`
+  await page.goto(labelsUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await snap(page, 'labels-list.png')
+
+  await page.locator('[data-cy="edit"]').first().click()
+  await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+  await page.waitForTimeout(800)
+  await snapDialog(page, 'labels-edit.png')
+  await page.keyboard.press('Escape')
+  await page.waitForTimeout(500)
+
   await browser.close()
   console.log('done')
 }

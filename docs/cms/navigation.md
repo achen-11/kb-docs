@@ -43,13 +43,13 @@
 |------|------|------|
 | 内容 | `/content/contents` | 内容夹与条目，对应 `k.content.{文件夹名}` |
 | 数据类型 | `/content/contentTypes` | 字段模型，须先于内容夹创建 |
-| Labels | `/content/labels` | 多语言文案，对应 `k.label` |
+| 标签 | `/content/labels` | 多语言文案，对应 `k.label` / `k.t` |
 | HTML 片段 | `/content/htmlblocks` | 可复用 HTML 块 |
 | 文件 | `/content/files` | 站点文件（高级） |
 | 标签属性 | `/content/text` | 标签属性（高级） |
 | 参数配置 | `/content/useroptions` | 用户可编辑参数（高级） |
 
-相关文档：[内容概述](./content/index.md) · [数据类型](./content/content-types.md) · [内容夹列表](./content/contents-folders-list.md)
+相关文档：[内容概述](./content/index.md) · [数据类型](./content/content-types.md) · [内容列表](./content/contents-folders-list.md) · [标签](./content/labels.md)
 
 ## 电商
 

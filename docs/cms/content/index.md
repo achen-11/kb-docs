@@ -27,7 +27,7 @@ flowchart LR
 |------|------|------|------|
 | **内容** | `/content/contents` | [内容列表](./contents-folders-list.md) 等，见下 |
 | **数据类型** | `/content/contentTypes` | [数据类型](./content-types.md) | 字段模型 |
-| Labels | `/content/labels` | 待写 | 多语言文案，`k.label` |
+| **标签** | `/content/labels` | [标签](./labels.md) | 多语言文案，`k.label` / `k.t` |
 | HTML 片段 | `/content/htmlblocks` | 待写 | 可复用 HTML 块 |
 | 文件 | `/content/files` | 待写 | 站点文件（高级菜单） |
 | 标签属性 | `/content/text` | 待写 | 标签属性（高级菜单） |

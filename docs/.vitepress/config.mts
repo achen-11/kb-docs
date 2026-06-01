@@ -49,6 +49,7 @@ const cmsSidebar = [
               { text: '内容条目', link: '/cms/content/contents-entries' },
             ],
           },
+          { text: '标签', link: '/cms/content/labels' },
         ],
       },
     ],

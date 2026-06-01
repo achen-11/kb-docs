@@ -31,9 +31,7 @@
 | ✅ | `cms/content/contents-folders-list.md` | `/content/contents` |
 | ✅ | `cms/content/contents-folder-settings.md` | 设置弹窗 + 关联数据 |
 | ✅ | `cms/content/contents-entries.md` | 条目编辑 |
-| ✅ | `cms/content/contents.md` | 重定向 stub |
-| ⬜ | `cms/content/data-types.md` | 重定向 stub |
-| ⬜ | `cms/content/labels.md` | `/content/labels` |
+| ✅ | `cms/content/labels.md` | `/content/labels` |
 | ⬜ | `cms/content/html-blocks.md` | `/content/htmlblocks` |
 
 ## P1 — 页面与开发资源（对齐 templateEngine）
