@@ -190,6 +190,27 @@ async function main() {
   await page.keyboard.press('Escape')
   await page.waitForTimeout(500)
 
+  const htmlBlocksUrl = `${BASE}/_Admin/content/htmlblocks?SiteId=${SITE_ID}`
+  await page.goto(htmlBlocksUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await snap(page, 'html-blocks-list.png')
+
+  const newHtml = page.locator('[data-cy="new"]').first()
+  if (await newHtml.count()) {
+    await newHtml.click()
+    await page.waitForURL(/htmlBlock\/edit/, { timeout: 60000 })
+    await page.waitForTimeout(3000)
+    await snap(page, 'html-blocks-edit.png')
+  } else {
+    const editHtml = page.locator('[data-cy="edit"]').first()
+    if (await editHtml.count()) {
+      await editHtml.click()
+      await page.waitForURL(/htmlBlock\/edit/, { timeout: 60000 })
+      await page.waitForTimeout(3000)
+      await snap(page, 'html-blocks-edit.png')
+    }
+  }
+
   await browser.close()
   console.log('done')
 }

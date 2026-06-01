@@ -50,6 +50,7 @@ const cmsSidebar = [
             ],
           },
           { text: '标签', link: '/cms/content/labels' },
+          { text: 'HTML 片段', link: '/cms/content/html-blocks' },
         ],
       },
     ],
