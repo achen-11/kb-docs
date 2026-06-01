@@ -49,7 +49,7 @@
 | 标签属性 | `/content/text` | 标签属性（高级） |
 | 参数配置 | `/content/useroptions` | 用户可编辑参数（高级） |
 
-相关文档：[数据类型与内容夹](./content/data-types.md)
+相关文档：[内容概述](./content/index.md) · [数据类型](./content/content-types.md) · [内容（内容夹）](./content/contents.md)
 
 ## 电商
 

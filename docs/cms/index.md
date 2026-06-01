@@ -30,7 +30,7 @@ flowchart LR
 | 2 | [站点后台菜单总览](./navigation.md) | 知道 `SiteId` 下功能在哪一栏 |
 | 3 | [控制面板](./site/dashboard.md) · [媒体库](./site/media.md) | 站点概览与图片资源 |
 | 4 | [页面](./site/pages.md) | 创建可访问的页面 |
-| 5 | [数据类型与内容](./content/data-types.md) | 为 `k.content` 准备数据 |
+| 5 | [内容](./content/index.md)（[数据类型](./content/content-types.md) · [内容夹](./content/contents.md)） | 为 `k.content` 准备数据 |
 | 6 | 开发菜单（待写） | Layout、View、Script，见 [模板引擎](/templateEngine/) |
 | 7 | 服务集成（待写） | 支付、短信、JWT 等 |
 
@@ -67,4 +67,4 @@ flowchart LR
 - [登录与站点列表](./getting-started/login-and-site-list.md)
 - [新建站点](./getting-started/create-site.md)
 - [菜单总览](./navigation.md)
-- [内容：数据类型](./content/data-types.md)
+- [内容](./content/index.md)

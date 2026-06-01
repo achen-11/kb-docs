@@ -22,14 +22,25 @@ const cmsSidebar = [
         items: [
           { text: '控制面板', link: '/cms/site/dashboard' },
           { text: '媒体库', link: '/cms/site/media' },
-          { text: '页面', link: '/cms/site/pages' },
+          {
+            text: '页面',
+            collapsed: false,
+            items: [
+              { text: '页面列表', link: '/cms/site/pages' },
+              { text: '页面设置', link: '/cms/site/pages-setting' },
+              { text: '编辑代码', link: '/cms/site/pages-edit-code' },
+              { text: '在线编辑', link: '/cms/site/pages-inline-edit' },
+            ],
+          },
         ],
       },
       {
         text: '内容',
         collapsed: false,
         items: [
-          { text: '数据类型与内容夹', link: '/cms/content/data-types' },
+          { text: '概述', link: '/cms/content/' },
+          { text: '数据类型', link: '/cms/content/content-types' },
+          { text: '内容（内容夹）', link: '/cms/content/contents' },
         ],
       },
     ],

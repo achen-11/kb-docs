@@ -17,15 +17,21 @@
 |------|------|----------------|
 | ✅ | `cms/site/dashboard.md` | `/site` |
 | ✅ | `cms/site/media.md` | `/site/media` |
-| 🟡 | `cms/site/pages.md` | `/site/pages` — 正文完成，待配图 |
+| ✅ | `cms/site/pages.md` | `/site/pages` 列表 |
+| ✅ | `cms/site/pages-setting.md` | `page/setting` |
+| ✅ | `cms/site/pages-edit-code.md` | `page/edit` |
+| ✅ | `cms/site/pages-inline-edit.md` | `inline-design` |
 
 ## P1 — 内容与数据（对齐 k.content）
 
 | 状态 | 文档 | Frontend 路由 |
 |------|------|----------------|
-| ✅ | `cms/content/data-types.md` | `/content/contentTypes` |
-| ⬜ | `cms/content/folders.md` | `/content/contents` |
+| ✅ | `cms/content/index.md` | 内容分组概述 |
+| ✅ | `cms/content/content-types.md` | `/content/contentTypes` + 字段编辑器配图 |
+| ✅ | `cms/content/contents.md` | `/content/contents` |
+| ⬜ | `cms/content/data-types.md` | 重定向 stub，保留旧链接 |
 | ⬜ | `cms/content/labels.md` | `/content/labels` |
+| ⬜ | `cms/content/html-blocks.md` | `/content/htmlblocks` |
 
 ## P1 — 页面与开发资源（对齐 templateEngine）
 
