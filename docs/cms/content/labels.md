@@ -101,8 +101,8 @@ k.t('Welcome {name}', { name: '张三' })
 |------|------|
 | [内容模块概述](./index.md) | 内容分组菜单 |
 | [k.label API](/api/label/) | 多语言配置、`k.label` / `k.t` |
-| [站点后台菜单总览](../navigation.md) | 完整菜单（含「标签属性」等高级项） |
+| [站点后台菜单总览](../navigation.md) | 完整菜单（含「元素属性」等项） |
 
-::: warning 「标签」与「标签属性」
-左侧 **内容 → 标签**（`/content/labels`）管理 **Label** 文案。高级菜单中的 **标签属性**（`/content/text`）是另一功能，文档待写。
+::: warning 「标签」与「元素属性」
+左侧 **内容 → 标签**（`/content/labels`）管理 **Label** 多语言文案。**内容 → 元素属性**（`/content/text`）管理模板里 **`k-config`** 的 HTML 属性，见 [元素属性](./tag-attributes.md)。
 :::

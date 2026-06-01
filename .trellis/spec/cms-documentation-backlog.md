@@ -34,6 +34,7 @@
 | ✅ | `cms/content/labels.md` | `/content/labels` |
 | ✅ | `cms/content/html-blocks.md` | `/content/htmlblocks` |
 | ✅ | `cms/content/files.md` | `/content/files`（编辑菜单） |
+| 🟡 | `cms/content/tag-attributes.md` | `/content/text` · KConfig / `k-config` |
 
 ## P1 — 页面与开发资源（对齐 templateEngine）
 

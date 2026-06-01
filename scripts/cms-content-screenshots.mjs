@@ -190,6 +190,20 @@ async function main() {
   await page.keyboard.press('Escape')
   await page.waitForTimeout(500)
 
+  const textUrl = `${BASE}/_Admin/content/text?SiteId=${SITE_ID}`
+  await page.goto(textUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await snap(page, 'tag-attributes-list.png')
+  const editTag = page.locator('[data-cy="edit"]').first()
+  if (await editTag.count()) {
+    await editTag.click()
+    await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+    await page.waitForTimeout(800)
+    await snapDialog(page, 'tag-attributes-edit.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(500)
+  }
+
   const filesUrl = `${BASE}/_Admin/content/files?SiteId=${SITE_ID}&folder=/&provider=default`
   await page.goto(filesUrl, { waitUntil: 'networkidle', timeout: 60000 })
   await page.waitForTimeout(2500)
