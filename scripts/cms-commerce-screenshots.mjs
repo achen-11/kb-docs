@@ -166,7 +166,34 @@ async function captureCreateVariantDialog(page) {
   }
 }
 
+async function captureProductTypes(page) {
+  const typesUrl = `${BASE}/_Admin/commerce/product-types?SiteId=${SITE_ID}`
+  await page.goto(typesUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await snap(page, 'product-types-list.png')
+
+  const createBtn = page.locator('button').filter({
+    has: page.locator('.icon-a-addto'),
+  }).first()
+  await createBtn.waitFor({ state: 'visible', timeout: 30000 })
+  await createBtn.click()
+  await snapDialog(page, 'product-types-create-dialog.png')
+
+  const dialog = page.locator('.el-dialog').last()
+  await dialog.locator('input').first().fill('Doc 示例类型')
+  await dialog.getByRole('button', { name: /保存|确定|confirm/i }).click()
+  await page.waitForTimeout(2000)
+
+  const row = page.locator('tbody tr').first()
+  await row.hover()
+  await page.waitForTimeout(400)
+  await row.locator('.icon-a-writein').click()
+  await snapDialog(page, 'product-types-edit-dialog.png')
+  await page.keyboard.press('Escape')
+}
+
 async function main() {
+  const only = process.env.KOOBOO_SCREENSHOT_SCOPE
   await mkdir(OUT_DIR, { recursive: true })
   const browser = await chromium.launch({ headless: true })
   const context = await browser.newContext({
@@ -177,23 +204,29 @@ async function main() {
 
   await login(page)
 
-  const listUrl = `${BASE}/_Admin/commerce/product-management?SiteId=${SITE_ID}`
-  await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
-  await page.waitForTimeout(3000)
-  await snap(page, 'product-management-list.png')
+  if (!only || only === 'product-management') {
+    const listUrl = `${BASE}/_Admin/commerce/product-management?SiteId=${SITE_ID}`
+    await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
+    await page.waitForTimeout(3000)
+    await snap(page, 'product-management-list.png')
 
-  const editUrl = `${BASE}/_Admin/commerce/product-management/edit?id=${PRODUCT_ID}&SiteId=${SITE_ID}`
-  await page.goto(editUrl, { waitUntil: 'networkidle', timeout: 60000 })
-  await page.getByRole('button', { name: /保存并返回/ }).waitFor({
-    state: 'visible',
-    timeout: 60000,
-  })
-  await page.waitForTimeout(2500)
+    const editUrl = `${BASE}/_Admin/commerce/product-management/edit?id=${PRODUCT_ID}&SiteId=${SITE_ID}`
+    await page.goto(editUrl, { waitUntil: 'networkidle', timeout: 60000 })
+    await page.getByRole('button', { name: /保存并返回/ }).waitFor({
+      state: 'visible',
+      timeout: 60000,
+    })
+    await page.waitForTimeout(2500)
 
-  await snapBasicSection(page)
-  await snapVariantSections(page)
-  await captureEditVariantDialog(page)
-  await captureCreateVariantDialog(page)
+    await snapBasicSection(page)
+    await snapVariantSections(page)
+    await captureEditVariantDialog(page)
+    await captureCreateVariantDialog(page)
+  }
+
+  if (!only || only === 'product-types') {
+    await captureProductTypes(page)
+  }
 
   await browser.close()
   console.log('done →', OUT_DIR)
