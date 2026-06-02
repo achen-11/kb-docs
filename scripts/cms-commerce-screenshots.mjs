@@ -166,6 +166,47 @@ async function captureCreateVariantDialog(page) {
   }
 }
 
+async function captureProductCategories(page) {
+  const listUrl = `${BASE}/_Admin/commerce/product-categories?SiteId=${SITE_ID}`
+  await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await snap(page, 'product-categories-list.png')
+
+  const createUrl = `${BASE}/_Admin/commerce/product-categories/create?SiteId=${SITE_ID}`
+  await page.goto(createUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2000)
+  await snap(page, 'product-categories-create.png')
+
+  await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2000)
+  const editLink = page.locator('a .icon-a-writein').first()
+  if (await editLink.count()) {
+    await editLink.click()
+    await page.waitForURL(/product-categories\/edit/, { timeout: 60000 })
+    await page.waitForTimeout(2000)
+    await snap(page, 'product-categories-edit.png')
+    await page.goBack({ waitUntil: 'networkidle' }).catch(() => {})
+    await page.waitForTimeout(1500)
+  }
+
+  await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2000)
+  try {
+    const countTag = page
+      .locator('tbody tr')
+      .first()
+      .locator('.el-tag.cursor-pointer')
+    await countTag.scrollIntoViewIfNeeded()
+    await countTag.click({ force: true, timeout: 15000 })
+    await snapDialog(page, 'product-categories-products-dialog.png')
+    await page.keyboard.press('Escape')
+  } catch {
+    console.warn(
+      'skip product-categories-products-dialog.png: 商品数标签不可点或未显示'
+    )
+  }
+}
+
 async function captureProductTypes(page) {
   const typesUrl = `${BASE}/_Admin/commerce/product-types?SiteId=${SITE_ID}`
   await page.goto(typesUrl, { waitUntil: 'networkidle', timeout: 60000 })
@@ -226,6 +267,10 @@ async function main() {
 
   if (!only || only === 'product-types') {
     await captureProductTypes(page)
+  }
+
+  if (!only || only === 'product-categories') {
+    await captureProductCategories(page)
   }
 
   await browser.close()
