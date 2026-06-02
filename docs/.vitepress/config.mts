@@ -18,7 +18,7 @@ const cmsSidebar = [
       { text: '站点后台菜单总览', link: '/cms/navigation' },
       {
         text: '站点',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: '控制面板', link: '/cms/site/dashboard' },
           { text: '媒体库', link: '/cms/site/media' },
@@ -36,13 +36,13 @@ const cmsSidebar = [
       },
       {
         text: '内容',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: '概述', link: '/cms/content/' },
           { text: '数据类型', link: '/cms/content/content-types' },
           {
             text: '内容',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: '内容列表', link: '/cms/content/contents-folders-list' },
               { text: '内容设置', link: '/cms/content/contents-folder-settings' },
@@ -54,6 +54,34 @@ const cmsSidebar = [
           { text: '文件', link: '/cms/content/files' },
           { text: '元素属性', link: '/cms/content/tag-attributes' },
           { text: '参数配置', link: '/cms/content/user-options' },
+        ],
+      },
+      {
+        text: '电商',
+        collapsed: false,
+        items: [
+          { text: '概述', link: '/cms/commerce/' },
+          {
+            text: '商品管理',
+            collapsed: false,
+            items: [
+              { text: '列表', link: '/cms/commerce/product-management' },
+              { text: '新建与编辑', link: '/cms/commerce/product-management-detail' },
+            ],
+          },
+          { text: '商品类型', link: '/cms/commerce/product-types' },
+          { text: '商品分类', link: '/cms/commerce/product-categories' },
+          { text: '购物车', link: '/cms/commerce/carts' },
+          { text: '顾客管理', link: '/cms/commerce/customers' },
+          { text: '订单', link: '/cms/commerce/orders' },
+          { text: '销售统计', link: '/cms/commerce/sale-stats' },
+          { text: '优惠折扣', link: '/cms/commerce/discounts' },
+          { text: '货币', link: '/cms/commerce/currencies' },
+          { text: '配送', link: '/cms/commerce/shippings' },
+          { text: '会员', link: '/cms/commerce/loyalty' },
+          { text: '税', link: '/cms/commerce/taxes' },
+          { text: '通知', link: '/cms/commerce/notification' },
+          { text: '设置', link: '/cms/commerce/settings' },
         ],
       },
     ],

@@ -55,24 +55,24 @@
 
 左侧分组：**电商**（`advanced`）
 
-| 菜单 | 路径 |
-|------|------|
-| 商品管理 | `/commerce/product-management` |
-| 商品类型 | `/commerce/product-types` |
-| 商品分类 | `/commerce/product-categories` |
-| 购物车 | `/commerce/carts` |
-| 顾客管理 | `/commerce/customers` |
-| 订单 | `/commerce/orders` |
-| 销售统计 | `/commerce/sale-stats` |
-| 优惠折扣 | `/commerce/discounts` |
-| 货币 | `/commerce/currencies` |
-| 配送 | `/commerce/shippings` |
-| 会员 | `/commerce/loyalty` |
-| 税 | `/commerce/taxes` |
-| 通知 | `/commerce/notification` |
-| 设置 | `/commerce/settings` |
+| 菜单 | 路径 | 文档 |
+|------|------|------|
+| 商品管理 | `/commerce/product-management` | [列表](./commerce/product-management.md) · [详情](./commerce/product-management-detail.md) |
+| 商品类型 | `/commerce/product-types` | [商品类型](./commerce/product-types.md) |
+| 商品分类 | `/commerce/product-categories` | [商品分类](./commerce/product-categories.md) |
+| 购物车 | `/commerce/carts` | [购物车](./commerce/carts.md) |
+| 顾客管理 | `/commerce/customers` | [顾客管理](./commerce/customers.md) |
+| 订单 | `/commerce/orders` | [订单](./commerce/orders.md) |
+| 销售统计 | `/commerce/sale-stats` | [销售统计](./commerce/sale-stats.md) |
+| 优惠折扣 | `/commerce/discounts` | [优惠折扣](./commerce/discounts.md) |
+| 货币 | `/commerce/currencies` | [货币](./commerce/currencies.md) |
+| 配送 | `/commerce/shippings` | [配送](./commerce/shippings.md) |
+| 会员 | `/commerce/loyalty` | [会员](./commerce/loyalty.md) |
+| 税 | `/commerce/taxes` | [税](./commerce/taxes.md) |
+| 通知 | `/commerce/notification` | [通知](./commerce/notification.md) |
+| 设置 | `/commerce/settings` | [设置](./commerce/settings.md) |
 
-开发参考：[k.commerce](/api/commerce/commerce.md)
+概述：[电商](./commerce/index.md) · 开发参考：[k.commerce](/api/commerce/commerce.md)
 
 ## 运维中心
 

@@ -32,6 +32,68 @@ kb-remote-site/images/cms/      # 构建时从 public 复制，供 kb push（git
 
 ## 工作流
 
+### 后台截图（三种方式，按场景选）
+
+| 方式 | 适用 | 凭证 |
+|------|------|------|
+| **Playwright 脚本** | 本地/CI 批量重跑、可复现 | `.env` 的 `KOOBOO_PASS` |
+| **Cursor `browser_*` MCP** | Agent 会话内交互后截图 | 你在 **Browser 面板** 已登录后台即可 |
+| **cdp-bridge MCP** | 复用本机 **Chrome** 已开 tab | 同上，无需把密码交给终端 |
+
+Agent 配图时：**若 Browser 已登录 redev 后台**，优先 `browser_navigate` → `browser_snapshot` 点按 → `browser_take_screenshot`（可 `ref` 截元素、`fullPage` 截长页），再把 PNG 放到 `docs/public/cms/<subdir>/`。不必强行走 Playwright。
+
+Playwright 适合你不打开 IDE 浏览器、或要一条命令刷全站配图时：
+
+本仓库脚本用 **无头 Chromium** 自动登录 `/_Admin` 并写入 `docs/public/cms/`。密码放在仓库根 **`.env`**（已 gitignore）或命令行环境变量，勿提交 Git。
+
+**首次在本机**（与 `playwright` 包版本一致，当前 **1.58.x**）：
+
+```bash
+pnpm install
+pnpm exec playwright install chromium
+```
+
+**运行**（任选）：
+
+```bash
+pnpm screenshots:cms:site
+pnpm screenshots:cms:content
+pnpm screenshots:cms:commerce
+# 或直接
+node scripts/cms-commerce-screenshots.mjs
+```
+
+凭证：`KOOBOO_USER`、`KOOBOO_PASS`（`.env` 里也支持 `kooboo_user` / `kooboo_pass`）。电商脚本可选 `KOOBOO_PRODUCT_ID`、`KOOBOO_SITE_ID`。
+
+脚本列表：
+
+| 脚本 | 输出目录 |
+|------|----------|
+| `scripts/cms-screenshots.mjs` | `docs/public/cms/site/` |
+| `scripts/cms-content-screenshots.mjs` | `docs/public/cms/content/` |
+| `scripts/cms-commerce-screenshots.mjs` | `docs/public/cms/commerce/` |
+
+视口默认 1440×900、`deviceScaleFactor: 2`，与人工浏览器截图清晰度接近。弹窗类图用 `.el-dialog` 元素截图。
+
+### Cursor Browser MCP（`browser_*`）
+
+1. 在 Cursor **Browser** 中打开并登录 `https://www.redev.cn/_Admin/...?SiteId=...`。
+2. Agent：`browser_navigate` → `browser_snapshot`（拿 `ref`）→ `browser_click` / `browser_fill` 等打开目标 UI。
+3. `browser_take_screenshot`：`filename` 自定；截元素时传 `ref`（来自 snapshot）。
+4. 将生成的 PNG **复制或保存到** `docs/public/cms/<subdir>/`（与文中 `/cms/...` 路径一致）。
+
+弹窗、分块图：先 snapshot 定位 `.el-dialog` 或区块，再元素截图；比整页裁剪更稳。
+
+### cdp-bridge（本机 Chrome）
+
+已用 Chrome 登录、且 Browser 面板未用时，可用 **`user-cdp-bridge`**（`browser_batch` → `Page.captureScreenshot`），大 JSON 用：
+
+```bash
+node scripts/save-cdp-png.mjs <subdir> <filename.png> <agent-tools路径或 .cdp-scratch/last.json>
+```
+
+`subdir` 为 `content`、`commerce`、`site` 等。
+
 ### 日常写文档
 
 1. 截图保存到 `docs/public/cms/...`。

@@ -1,7 +1,9 @@
 /**
  * Capture Kooboo admin CMS screenshots for docs/public/cms/site/
  * Usage: node scripts/cms-screenshots.mjs
+ * Credentials: KOOBOO_PASS in env or kb-docs/.env (see load-env.mjs)
  */
+import './load-env.mjs'
 import { chromium } from 'playwright'
 import { mkdir } from 'fs/promises'
 import path from 'path'
@@ -16,7 +18,7 @@ const USER = process.env.KOOBOO_USER || 'wg-gmail'
 const PASS = process.env.KOOBOO_PASS || ''
 
 if (!PASS) {
-  console.error('Set KOOBOO_PASS')
+  console.error('Set KOOBOO_PASS in the environment or kb-docs/.env')
   process.exit(1)
 }
 

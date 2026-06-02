@@ -31,14 +31,16 @@ flowchart LR
 | 3 | [控制面板](./site/dashboard.md) · [媒体库](./site/media.md) | 站点概览与图片资源 |
 | 4 | [页面](./site/pages.md) | 创建可访问的页面 |
 | 5 | [内容](./content/index.md)（[数据类型](./content/content-types.md) · [内容列表](./content/contents-folders-list.md)） | 为 `k.content` 准备数据 |
-| 6 | 开发菜单（待写） | Layout、View、Script，见 [模板引擎](/templateEngine/) |
-| 7 | 服务集成（待写） | 支付、短信、JWT 等 |
+| 6 | [电商](./commerce/index.md)（按需） | 商品、订单；见 [k.commerce](/api/commerce/commerce.md) |
+| 7 | 开发菜单（待写） | Layout、View、Script，见 [模板引擎](/templateEngine/) |
+| 8 | 服务集成（待写） | 支付、短信、JWT 等 |
 
 ## 与开发文档的关系
 
 | 你在后台做 | 接下来看 |
 |------------|----------|
 | 建内容类型、内容夹 | [k.content](/api/content/) |
+| 商品、订单、购物车 | [k.commerce](/api/commerce/commerce.md) · [电商后台](./commerce/index.md) |
 | 建 Layout / Page / View | [模板引擎](/templateEngine/) |
 | 配微信支付、支付宝 | [k.payment](/api/payment/) |
 | 开多语言、维护 Label | [k.label](/api/label/) · [模板绑定](../templateEngine/binding/) |

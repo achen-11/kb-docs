@@ -6,3 +6,4 @@ old-source/*
 kb-remote-site/*
 /docs/superpowers/*
 .env
+.cdp-scratch/

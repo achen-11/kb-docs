@@ -1,12 +1,9 @@
 /**
  * Capture Kooboo admin CMS screenshots for docs/public/cms/content/
- * Usage: KOOBOO_PASS=... node scripts/cms-content-screenshots.mjs
- *
- * 若本机 Playwright 浏览器未安装，可改用 cdp-bridge MCP：
- * 1. 在 Chrome 登录 redev 后台并打开目标页
- * 2. browser_batch → Page.captureScreenshot
- * 3. node scripts/extract-cdp-batch-png.mjs <batch-json.txt> <filename.png>
+ * Usage: node scripts/cms-content-screenshots.mjs
+ * Credentials: KOOBOO_PASS in env or kb-docs/.env (see load-env.mjs)
  */
+import './load-env.mjs'
 import { chromium } from 'playwright'
 import { mkdir } from 'fs/promises'
 import path from 'path'
@@ -23,7 +20,7 @@ const USER = process.env.KOOBOO_USER || 'wg-gmail'
 const PASS = process.env.KOOBOO_PASS || ''
 
 if (!PASS) {
-  console.error('Set KOOBOO_PASS')
+  console.error('Set KOOBOO_PASS in the environment or kb-docs/.env')
   process.exit(1)
 }
 

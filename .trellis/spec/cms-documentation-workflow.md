@@ -73,6 +73,12 @@ API 页中的「须在后台配置」应链接到对应 `docs/cms/` 文章，不
 - 文末用 **相关** 表链到 API / 模板引擎；**不要**写「上一步 / 下一步」小节（VitePress 侧边栏顺序已提供 Previous / Next）  
 - 不写 KScript 示例（链到 API 即可）
 
+## 配图采集
+
+- **Agent 会话**：优先 **Cursor Browser MCP**（`browser_navigate` / `browser_take_screenshot`），后台已登录即可，见 [documentation-images.md](./documentation-images.md)。
+- **本地批量**：Playwright — `pnpm screenshots:cms:content` / `commerce` / `site`；凭证为 `.env` 的 `KOOBOO_PASS`。
+- **本机 Chrome tab**：**cdp-bridge** + `scripts/save-cdp-png.mjs`。
+
 ## 验证
 
 - CMS 文档**不做** ai-check 脚本测试  
