@@ -1,6 +1,11 @@
 /**
  * Capture Kooboo admin CMS screenshots for docs/public/cms/content/
  * Usage: KOOBOO_PASS=... node scripts/cms-content-screenshots.mjs
+ *
+ * 若本机 Playwright 浏览器未安装，可改用 cdp-bridge MCP：
+ * 1. 在 Chrome 登录 redev 后台并打开目标页
+ * 2. browser_batch → Page.captureScreenshot
+ * 3. node scripts/extract-cdp-batch-png.mjs <batch-json.txt> <filename.png>
  */
 import { chromium } from 'playwright'
 import { mkdir } from 'fs/promises'
@@ -202,6 +207,41 @@ async function main() {
     await snapDialog(page, 'tag-attributes-edit.png')
     await page.keyboard.press('Escape')
     await page.waitForTimeout(500)
+  }
+
+  const userOptionsUrl = `${BASE}/_Admin/content/useroptions?SiteId=${SITE_ID}`
+  await page.goto(userOptionsUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await snap(page, 'user-options-list.png')
+
+  const newOpt = page.locator('[data-cy="new"]').first()
+  if (await newOpt.count()) {
+    await newOpt.click()
+    await page.waitForURL(/useroptions\/create/, { timeout: 60000 })
+    await page.waitForTimeout(2000)
+    await snap(page, 'user-options-create.png')
+    await page.goBack({ waitUntil: 'networkidle' }).catch(() => {})
+    await page.waitForTimeout(1500)
+  }
+
+  const settingLink = page.locator('[data-cy="setting"]').first()
+  if (await settingLink.count()) {
+    await settingLink.click()
+    await page.waitForURL(/useroptions\/setting/, { timeout: 60000 })
+    await page.waitForTimeout(2000)
+    await snap(page, 'user-options-setting.png')
+    await page.goBack({ waitUntil: 'networkidle' }).catch(() => {})
+    await page.waitForTimeout(1500)
+  }
+
+  await page.goto(userOptionsUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2000)
+  const editOpt = page.locator('[data-cy="edit"]').first()
+  if (await editOpt.count()) {
+    await editOpt.click()
+    await page.waitForURL(/useroptions\/edit/, { timeout: 60000 })
+    await page.waitForTimeout(2000)
+    await snap(page, 'user-options-edit.png')
   }
 
   const filesUrl = `${BASE}/_Admin/content/files?SiteId=${SITE_ID}&folder=/&provider=default`

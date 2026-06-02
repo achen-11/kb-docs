@@ -5,3 +5,4 @@ node_modules
 old-source/*
 kb-remote-site/*
 /docs/superpowers/*
+.env

@@ -53,6 +53,7 @@ const cmsSidebar = [
           { text: 'HTML 片段', link: '/cms/content/html-blocks' },
           { text: '文件', link: '/cms/content/files' },
           { text: '元素属性', link: '/cms/content/tag-attributes' },
+          { text: '参数配置', link: '/cms/content/user-options' },
         ],
       },
     ],
@@ -228,6 +229,7 @@ export default defineConfig({
               ]
             },
             { text: 'k.page', link: '/api/page/' },
+            { text: 'k.paramConfig', link: '/api/param-config/' },
             {
               text: 'k.payment',
               collapsed: true,

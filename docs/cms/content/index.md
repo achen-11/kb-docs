@@ -31,7 +31,7 @@ flowchart LR
 | **HTML 片段** | `/content/htmlblocks` | [HTML 片段](./html-blocks.md) | 可复用 HTML 块 |
 | **文件** | `/content/files` | [文件](./files.md) | 站点文件（高级菜单） |
 | **元素属性** | `/content/text` | [元素属性](./tag-attributes.md) | 模板 `k-config` 可编辑属性（编辑菜单） |
-| 参数配置 | `/content/useroptions` | 待写 | 用户可编辑参数（高级菜单） |
+| **参数配置** | `/content/useroptions` | [参数配置](./user-options.md) | 结构化站点参数，`k.paramConfig`（编辑菜单） |
 
 ::: tip 与媒体库、页面
 - 字段类型为 **图片** 时，值通常来自 [媒体库](/cms/site/media.md)。  

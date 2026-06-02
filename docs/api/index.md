@@ -28,6 +28,7 @@ KScript API 完整参考（服务端 `k.*`）。文档路径与模块名一致�
 | `k.module` | [module/](./module/) | 脚本模块上下文 |
 | `k.net` | [net/](./net/) | httpClient、url、webSocket、DNS、IP |
 | `k.page` | [page/](./page/) | 当前页 title / meta |
+| `k.paramConfig` | [param-config/](./param-config/) | 参数配置（结构化 JSON） |
 | `k.payment` | [payment/](./payment/) | 支付集成 |
 | `k.request` | [request/](./request/) | HTTP 请求 |
 | `k.response` | [response/](./response/) | HTTP 响应 |

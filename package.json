@@ -13,6 +13,7 @@
     "check:dead-links": "node scripts/check-dead-links.mjs"
   },
   "devDependencies": {
+    "playwright": "^1.60.0",
     "vitepress": "^1.6.4",
     "vitepress-plugin-mermaid-diagram": "^0.3.2"
   }
