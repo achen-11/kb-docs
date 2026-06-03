@@ -166,6 +166,84 @@ async function captureCreateVariantDialog(page) {
   }
 }
 
+async function captureOrders(page) {
+  const listUrl = `${BASE}/_Admin/commerce/orders?SiteId=${SITE_ID}`
+  await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await snap(page, 'orders-list.png')
+
+  const orderId = process.env.KOOBOO_ORDER_ID
+  if (orderId) {
+    const detailUrl = `${BASE}/_Admin/commerce/order-detail?SiteId=${SITE_ID}&id=${orderId}`
+    await page.goto(detailUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  } else {
+    const detailIcon = page.locator('.el-table .icon-eyes').first()
+    if (!(await detailIcon.count())) {
+      console.warn('skip orders detail/dialogs: 列表无订单，可设置 KOOBOO_ORDER_ID')
+      return
+    }
+    await detailIcon.click()
+    await page.waitForURL(/order-detail/, { timeout: 60000 })
+  }
+  await page.waitForTimeout(2000)
+  await snap(page, 'orders-detail.png')
+
+  const payBtn = page.getByRole('button', { name: /^付款$|^支付$|^Pay$/i }).first()
+  if (await payBtn.count()) {
+    await payBtn.click()
+    await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+    await page.waitForTimeout(500)
+    await snapDialog(page, 'orders-payment-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  async function snapDeliveryIfPossible() {
+    const deliverBtn = page.locator('button').filter({ hasText: /^发货$/ }).first()
+    if (!(await deliverBtn.count())) return false
+    await deliverBtn.click()
+    await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+    await page.waitForTimeout(500)
+    await snapDialog(page, 'orders-delivery-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+    return true
+  }
+
+  let deliveryCaptured = await snapDeliveryIfPossible()
+  if (!deliveryCaptured && !orderId) {
+    await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
+    await page.waitForTimeout(1000)
+    const eyes = page.locator('.el-table .icon-eyes')
+    const n = Math.min(await eyes.count(), 8)
+    for (let i = 1; i < n; i++) {
+      await eyes.nth(i).click()
+      await page.waitForURL(/order-detail/, { timeout: 60000 })
+      await page.waitForTimeout(1500)
+      deliveryCaptured = await snapDeliveryIfPossible()
+      if (deliveryCaptured) break
+      await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
+      await page.waitForTimeout(800)
+    }
+  }
+  if (!deliveryCaptured) {
+    console.warn(
+      'skip orders-delivery-dialog.png: 未找到可发货订单，可设置 KOOBOO_ORDER_ID 为已付款未发完订单'
+    )
+  }
+
+  const cancelBtn = page.getByRole('button', { name: /^取消$/ }).first()
+  if (await cancelBtn.count()) {
+    await cancelBtn.click()
+    await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+    await page.waitForTimeout(500)
+    await snapDialog(page, 'orders-cancel-dialog.png')
+    await page.keyboard.press('Escape')
+  } else {
+    console.warn('skip orders-cancel-dialog.png: 订单已取消或无取消按钮')
+  }
+}
+
 async function captureDiscounts(page) {
   const listUrl = `${BASE}/_Admin/commerce/discounts?SiteId=${SITE_ID}`
   await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
@@ -474,6 +552,10 @@ async function main() {
 
   if (!only || only === 'discounts') {
     await captureDiscounts(page)
+  }
+
+  if (!only || only === 'orders') {
+    await captureOrders(page)
   }
 
   await browser.close()
