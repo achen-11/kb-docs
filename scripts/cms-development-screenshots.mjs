@@ -9,6 +9,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=code node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=code-log node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=code-search node scripts/cms-development-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=urls node scripts/cms-development-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -719,6 +720,104 @@ async function captureCodeSearch(page) {
   }
 }
 
+function urlsUrl() {
+  return `${BASE}/_Admin/development/urls?SiteId=${SITE_ID}`
+}
+
+async function clickUrlsTab(page, pattern) {
+  const tab = page.locator('.el-tabs__item').filter({ hasText: pattern }).first()
+  if (await tab.count()) {
+    await tab.click()
+    await page.waitForTimeout(1200)
+    return true
+  }
+  return false
+}
+
+async function waitUrlsTable(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('Url') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('.el-table')
+    .first()
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(800)
+}
+
+async function captureUrls(page) {
+  await page.goto(urlsUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await waitUrlsTable(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const tabsBar = page.locator('.el-tabs__header').first()
+  if (await tabsBar.count()) {
+    await snapLocator(tabsBar, 'urls-tabs.png')
+  }
+  await snap(page, 'urls-overview.png', { fullPage: true })
+
+  const internalToolbar = page.locator('.el-tab-pane:visible .flex.space-x-16').first()
+  if (await internalToolbar.count()) {
+    await snapLocator(internalToolbar, 'urls-internal-toolbar.png')
+  }
+  const internalTable = page.locator('.el-tab-pane:visible .el-table').first()
+  if (await internalTable.count()) {
+    await snapLocator(internalTable, 'urls-internal-table.png')
+  }
+
+  const makeAliasBtn = page
+    .getByRole('button', { name: /创建别名|make alias/i })
+    .first()
+  if (await makeAliasBtn.count()) {
+    await makeAliasBtn.click()
+    await snapDialog(page, 'urls-make-alias-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const editBtn = page
+    .locator('.el-tab-pane:visible')
+    .locator('.icon-a-writein')
+    .first()
+  if (await editBtn.count()) {
+    await editBtn.click()
+    await snapDialog(page, 'urls-internal-edit-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  if (await clickUrlsTab(page, /外部|external/i)) {
+    await waitUrlsTable(page)
+    const extToolbar = page.locator('.el-tab-pane:visible .flex.space-x-16').first()
+    if (await extToolbar.count()) {
+      await snapLocator(extToolbar, 'urls-external-toolbar.png')
+    }
+    const extTable = page.locator('.el-tab-pane:visible .el-table').first()
+    if (await extTable.count()) {
+      await snapLocator(extTable, 'urls-external-table.png')
+    }
+    const extEdit = page.locator('.el-tab-pane:visible .icon-a-writein').first()
+    if (await extEdit.count()) {
+      await extEdit.click()
+      await snapDialog(page, 'urls-external-edit-dialog.png')
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(400)
+    }
+  }
+
+  if (await clickUrlsTab(page, /未找到|not found/i)) {
+    await waitUrlsTable(page)
+    const nfTable = page.locator('.el-tab-pane:visible .el-table').first()
+    if (await nfTable.count()) {
+      await snapLocator(nfTable, 'urls-not-found-table.png')
+    }
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE || 'views'
   await mkdir(OUT_DIR, { recursive: true })
@@ -754,6 +853,9 @@ async function main() {
   }
   if (only === 'code-search') {
     await captureCodeSearch(page)
+  }
+  if (only === 'urls') {
+    await captureUrls(page)
   }
 
   await browser.close()
