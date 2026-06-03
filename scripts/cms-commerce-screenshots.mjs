@@ -166,6 +166,38 @@ async function captureCreateVariantDialog(page) {
   }
 }
 
+async function captureCurrencies(page) {
+  const url = `${BASE}/_Admin/commerce/currencies?SiteId=${SITE_ID}`
+  await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await snap(page, 'currencies-list.png')
+
+  const editIcon = page.locator('.el-table .icon-a-writein').first()
+  if (await editIcon.count()) {
+    await editIcon.click()
+  } else {
+    const addBtn = page.getByRole('button', { name: /添加货币/ }).first()
+    if (await addBtn.count()) {
+      await addBtn.click()
+      await page.waitForTimeout(600)
+      const item = page.locator('.el-dropdown-menu:visible .el-dropdown-menu__item').first()
+      if (await item.count()) {
+        await item.click({ force: true })
+      } else {
+        console.warn('skip currencies-edit-dialog.png: 无可添加货币')
+        return
+      }
+    } else {
+      console.warn('skip currencies-edit-dialog.png: 无编辑权限或空列表')
+      return
+    }
+  }
+  await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+  await page.waitForTimeout(500)
+  await snapDialog(page, 'currencies-edit-dialog.png')
+  await page.keyboard.press('Escape')
+}
+
 async function captureOrders(page) {
   const listUrl = `${BASE}/_Admin/commerce/orders?SiteId=${SITE_ID}`
   await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
@@ -556,6 +588,10 @@ async function main() {
 
   if (!only || only === 'orders') {
     await captureOrders(page)
+  }
+
+  if (!only || only === 'currencies') {
+    await captureCurrencies(page)
   }
 
   await browser.close()
