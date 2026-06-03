@@ -93,6 +93,7 @@ const cmsSidebar = [
           { text: '资源守护', link: '/cms/operations/resource-guardian' },
           { text: '页面交互', link: '/cms/operations/page-interaction' },
           { text: 'AB 测试', link: '/cms/operations/ab-testing' },
+          { text: '操作日志', link: '/cms/operations/site-logs' },
         ],
       },
     ],

@@ -5,6 +5,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=resource-guardian node scripts/cms-operations-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=page-interaction node scripts/cms-operations-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=ab-testing node scripts/cms-operations-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=site-logs node scripts/cms-operations-screenshots.mjs
  *
  * Local Kooboo example (AB 测试未上 redev 时):
  *   KOOBOO_BASE=http://localhost KOOBOO_SITE_ID=... KOOBOO_USER=... KOOBOO_PASS=... \\
@@ -726,6 +727,90 @@ async function captureAbTesting(page) {
   }
 }
 
+function siteLogsUrl(suffix = '', query = {}) {
+  const pathPart = suffix ? `site-logs/${suffix}` : 'site-logs'
+  const q = new URLSearchParams({ SiteId: SITE_ID, ...query })
+  return `${BASE}/_Admin/system/${pathPart}?${q}`
+}
+
+async function waitSiteLogsList(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('SiteLog/list') && r.status() === 200,
+      { timeout: 90000 }
+    )
+    .catch(() => {})
+  await page
+    .waitForSelector('.el-table', { state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+}
+
+async function captureSiteLogs(page, context) {
+  await page.goto(siteLogsUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await waitSiteLogsList(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const filters = page.locator('.p-24 > .flex.space-x-16').first()
+  if (await filters.count()) {
+    await snapLocator(filters, 'site-logs-filters.png')
+  }
+  await snap(page, 'site-logs-overview.png', { fullPage: true })
+
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'site-logs-table.png')
+  }
+
+  const firstRow = page.locator('.el-table__body tr').first()
+  if (await firstRow.count()) {
+    await firstRow.locator('.el-checkbox').click().catch(() => {})
+    await page.waitForTimeout(500)
+    const checkout = page.locator('[data-cy="checkout"]').first()
+    if (await checkout.count()) {
+      await checkout.click()
+      await snapDialog(page, 'site-logs-checkout-dialog.png')
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(400)
+    }
+  }
+
+  const logItem = page.locator('[data-cy="log-item"]').first()
+  if (await logItem.count()) {
+    await logItem.click()
+    await page.waitForURL(/site-logs\/versions/, { timeout: 30000 })
+    await page.waitForTimeout(1500)
+    await snap(page, 'site-logs-versions.png', { fullPage: true })
+
+    const versionRows = page.locator('.el-table__body tr')
+    const rowCount = await versionRows.count()
+    if (rowCount >= 1) {
+      const pickRow = rowCount >= 2 ? 1 : 0
+      await versionRows.nth(pickRow).locator('.el-checkbox').click().catch(() => {})
+      await page.waitForTimeout(400)
+      const compareBtn = page.locator('[data-cy="compare-with-current"]').first()
+      if (await compareBtn.count()) {
+        const pagesBefore = context.pages().length
+        await compareBtn.click()
+        await page.waitForTimeout(2000)
+        let comparePage =
+          context.pages().find((p) => p.url().includes('version-compare')) ||
+          (context.pages().length > pagesBefore
+            ? context.pages()[context.pages().length - 1]
+            : null)
+        if (comparePage && comparePage.url().includes('version-compare')) {
+          await comparePage.waitForLoadState('networkidle', { timeout: 60000 }).catch(() => {})
+          await comparePage.waitForTimeout(2000)
+          await snap(comparePage, 'site-logs-version-compare.png', {
+            fullPage: true,
+          })
+          if (comparePage !== page) await comparePage.close()
+        }
+      }
+    }
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE
   await mkdir(OUT_DIR, { recursive: true })
@@ -749,6 +834,9 @@ async function main() {
   }
   if (!only || only === 'ab-testing') {
     await captureAbTesting(page)
+  }
+  if (!only || only === 'site-logs') {
+    await captureSiteLogs(page, context)
   }
 
   await browser.close()
