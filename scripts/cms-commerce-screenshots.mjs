@@ -166,6 +166,63 @@ async function captureCreateVariantDialog(page) {
   }
 }
 
+async function captureCarts(page) {
+  const listUrl = `${BASE}/_Admin/commerce/carts?SiteId=${SITE_ID}`
+  await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await snap(page, 'carts-list.png')
+
+  const createUrl = `${BASE}/_Admin/commerce/cart/create?SiteId=${SITE_ID}`
+  await page.goto(createUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2000)
+  await snap(page, 'carts-create.png')
+
+  const addProduct = page.getByRole('button', { name: /添加商品/ })
+  if (await addProduct.count()) {
+    await addProduct.click()
+    await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+    await page.waitForTimeout(500)
+    await snapDialog(page, 'carts-select-variant-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(1500)
+
+  const cartId = process.env.KOOBOO_CART_ID
+  if (cartId) {
+    const editUrl = `${BASE}/_Admin/commerce/cart/edit?SiteId=${SITE_ID}&id=${cartId}`
+    await page.goto(editUrl, { waitUntil: 'networkidle', timeout: 60000 })
+    await page.waitForTimeout(2000)
+    await snap(page, 'carts-edit.png')
+
+    const checkoutUrl = `${BASE}/_Admin/commerce/cart/checkout?SiteId=${SITE_ID}&id=${cartId}`
+    await page.goto(checkoutUrl, { waitUntil: 'networkidle', timeout: 60000 })
+    await page.waitForTimeout(2000)
+    await snap(page, 'carts-checkout.png')
+    return
+  }
+
+  const editIcon = page.locator('.el-table .icon-a-writein').first()
+  if (await editIcon.count()) {
+    await editIcon.click()
+    await page.waitForURL(/cart\/edit/, { timeout: 60000 })
+    await page.waitForTimeout(2000)
+    await snap(page, 'carts-edit.png')
+
+    const idFromUrl = new URL(page.url()).searchParams.get('id')
+    if (idFromUrl) {
+      const checkoutUrl = `${BASE}/_Admin/commerce/cart/checkout?SiteId=${SITE_ID}&id=${idFromUrl}`
+      await page.goto(checkoutUrl, { waitUntil: 'networkidle', timeout: 60000 })
+      await page.waitForTimeout(2000)
+      await snap(page, 'carts-checkout.png')
+    }
+  } else {
+    console.warn('skip carts-edit.png / carts-checkout.png: 列表无购物车，可设置 KOOBOO_CART_ID')
+  }
+}
+
 async function captureCustomers(page) {
   const url = `${BASE}/_Admin/commerce/customers?SiteId=${SITE_ID}`
   await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 })
@@ -383,6 +440,10 @@ async function main() {
 
   if (!only || only === 'customers') {
     await captureCustomers(page)
+  }
+
+  if (!only || only === 'carts') {
+    await captureCarts(page)
   }
 
   await browser.close()
