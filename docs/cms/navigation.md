@@ -87,7 +87,7 @@
 | AB 测试 | `/system/ab-testing` | [AB 测试](./operations/ab-testing.md) |
 | 错误监控 | `/system/error-monitoring` | *待编写* |
 | 操作日志 | `/system/site-logs` | [操作日志](./operations/site-logs.md) |
-| 协作同步 | `/system/sync` | *待编写* |
+| 协作同步 | `/system/sync` | [协作同步](./operations/sync.md) |
 | 搜索 | `/system/search` | *待编写* |
 | 自动化 | `/system/automation` | *待编写* |
 | AI 服务 | `/system/ai-service` | *待编写* |

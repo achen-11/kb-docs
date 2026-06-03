@@ -94,6 +94,7 @@ const cmsSidebar = [
           { text: '页面交互', link: '/cms/operations/page-interaction' },
           { text: 'AB 测试', link: '/cms/operations/ab-testing' },
           { text: '操作日志', link: '/cms/operations/site-logs' },
+          { text: '协作同步', link: '/cms/operations/sync' },
         ],
       },
     ],

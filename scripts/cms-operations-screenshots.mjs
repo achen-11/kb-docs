@@ -6,6 +6,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=page-interaction node scripts/cms-operations-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=ab-testing node scripts/cms-operations-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=site-logs node scripts/cms-operations-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=sync node scripts/cms-operations-screenshots.mjs
  *
  * Local Kooboo example (AB 测试未上 redev 时):
  *   KOOBOO_BASE=http://localhost KOOBOO_SITE_ID=... KOOBOO_USER=... KOOBOO_PASS=... \\
@@ -811,6 +812,127 @@ async function captureSiteLogs(page, context) {
   }
 }
 
+function syncUrl(suffix = '', query = {}) {
+  const pathPart = suffix ? `sync/${suffix}` : 'sync'
+  const q = new URLSearchParams({ SiteId: SITE_ID, ...query })
+  return `${BASE}/_Admin/system/${pathPart}?${q}`
+}
+
+async function waitSyncList(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('publish/list') && r.status() === 200,
+      { timeout: 90000 }
+    )
+    .catch(() => {})
+  await page
+    .waitForSelector('.el-table', { state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+}
+
+async function ensureSyncRelation(page) {
+  await page.goto(syncUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await waitSyncList(page)
+  if ((await page.locator('.el-table__body tr').count()) > 0) return
+
+  const newSync = page.locator('[data-cy="new-sync"]').first()
+  if (!(await newSync.count())) return
+  await newSync.click()
+  await page.waitForTimeout(800)
+  const serverSelect = page.locator('.el-dialog [data-cy="servers"]').first()
+  if (!(await serverSelect.count())) {
+    await page.keyboard.press('Escape')
+    return
+  }
+  await serverSelect.click()
+  const serverOpt = page.locator('[data-cy="server-opt"]').first()
+  if (!(await serverOpt.count())) {
+    await page.keyboard.press('Escape')
+    return
+  }
+  await serverOpt.click()
+  await page.waitForTimeout(2500)
+  const siteSelect = page.locator('.el-dialog [data-cy="sites"]').first()
+  if (await siteSelect.count()) {
+    await siteSelect.click()
+    const siteOpt = page.locator('[data-cy="site-opt"]').first()
+    if (await siteOpt.count()) {
+      await siteOpt.click()
+      const confirm = page
+        .locator('.el-dialog')
+        .last()
+        .getByRole('button', { name: /确定|确认|保存|save/i })
+        .first()
+      if (await confirm.count()) await confirm.click()
+      await waitSyncList(page)
+      return
+    }
+  }
+  await page.keyboard.press('Escape')
+}
+
+async function captureSync(page) {
+  await ensureSyncRelation(page)
+  await page.goto(syncUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await waitSyncList(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('.p-24 > .flex.items-center.py-24').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'sync-toolbar.png')
+  }
+  await snap(page, 'sync-overview.png', { fullPage: true })
+
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'sync-list-table.png')
+  }
+
+  const newSync = page.locator('[data-cy="new-sync"]').first()
+  if (await newSync.count()) {
+    await newSync.click()
+    await snapDialog(page, 'sync-add-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const firstRow = page.locator('.el-table__body tr').first()
+  if (await firstRow.count()) {
+    const progressIcon = firstRow.locator('.icon-a-debug-step-over').first()
+    if (await progressIcon.count()) {
+      await progressIcon.click()
+      await snapDialog(page, 'sync-progress-dialog.png')
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(400)
+    }
+
+    const diffLink = firstRow.locator('a').first()
+    if (await diffLink.count()) {
+      await diffLink.click()
+      await page.waitForURL(/sync\/list/, { timeout: 30000 })
+      await page.waitForTimeout(2000)
+      await snap(page, 'sync-publishing.png', { fullPage: true })
+      const changesTable = page.locator('.el-tab-pane:visible .el-table').first()
+      if (await changesTable.count()) {
+        await snapLocator(changesTable, 'sync-local-changes.png')
+      } else {
+        await snapLocator(page.locator('.el-tabs').first(), 'sync-local-changes.png')
+      }
+      await page.goto(syncUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+      await waitSyncList(page)
+    }
+  }
+
+  const serverBtn = page.locator('.icon-yunfuwuqi').first()
+  if (await serverBtn.count()) {
+    await serverBtn.click()
+    await page.waitForURL(/sync\/server/, { timeout: 30000 })
+    await page.waitForTimeout(1500)
+    await snap(page, 'sync-server-list.png', { fullPage: true })
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE
   await mkdir(OUT_DIR, { recursive: true })
@@ -837,6 +959,9 @@ async function main() {
   }
   if (!only || only === 'site-logs') {
     await captureSiteLogs(page, context)
+  }
+  if (!only || only === 'sync') {
+    await captureSync(page)
   }
 
   await browser.close()
