@@ -8,6 +8,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=styles-inline node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=code node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=code-log node scripts/cms-development-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=code-search node scripts/cms-development-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -682,6 +683,42 @@ async function captureCodeLog(page) {
   }
 }
 
+function codeSearchUrl() {
+  return `${BASE}/_Admin/development/code-search?SiteId=${SITE_ID}`
+}
+
+async function captureCodeSearch(page) {
+  await page.goto(codeSearchUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await page.waitForTimeout(1500)
+
+  const keyword =
+    process.env.KOOBOO_CODE_SEARCH_KEYWORD || 'function'
+  const searchInput = page
+    .getByPlaceholder(/搜索代码|search code/i)
+    .first()
+  if (await searchInput.count()) {
+    await searchInput.fill(keyword)
+    await page
+      .waitForResponse(
+        (r) => r.url().includes('CodeSearch') && r.status() === 200,
+        { timeout: 60000 }
+      )
+      .catch(() => {})
+    await page.waitForTimeout(1500)
+  }
+
+  const toolbar = page.locator('.flex.items-center.py-24').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'code-search-toolbar.png')
+  }
+  await snap(page, 'code-search-overview.png', { fullPage: true })
+
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'code-search-results.png')
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE || 'views'
   await mkdir(OUT_DIR, { recursive: true })
@@ -714,6 +751,9 @@ async function main() {
   }
   if (only === 'code-log') {
     await captureCodeLog(page)
+  }
+  if (only === 'code-search') {
+    await captureCodeSearch(page)
   }
 
   await browser.close()

@@ -28,7 +28,7 @@
 | 样式 | `/development/styles` | `style` | [样式](./styles.md) |
 | 代码 | `/development/code` | `code` | [代码](./code.md) |
 | 代码日志 | `/development/code-log` | `code·log` | [代码日志](./code-log.md) |
-| 代码搜索 | `/development/code-search` | `code` · `view` | *待编写* |
+| 代码搜索 | `/development/code-search` | `code·view` | [代码搜索](./code-search.md) |
 | URL | `/development/urls` | `link` | *待编写* |
 | 表单 | `/development/forms` | `form` | *待编写* |
 | 菜单 | `/development/menus` | `menu` | *待编写* |
