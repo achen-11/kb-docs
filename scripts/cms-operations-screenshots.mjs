@@ -3,6 +3,7 @@
  * Usage:
  *   KOOBOO_SCREENSHOT_SCOPE=visitor-logs node scripts/cms-operations-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=resource-guardian node scripts/cms-operations-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=page-interaction node scripts/cms-operations-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -357,6 +358,172 @@ async function captureResourceGuardian(page) {
   }
 }
 
+function pageInteractionUrl(suffix = '') {
+  const pathPart = suffix ? `page-interaction/${suffix}` : 'page-interaction'
+  return `${BASE}/_Admin/system/${pathPart}?SiteId=${SITE_ID}`
+}
+
+async function waitPageInteractionStats(page) {
+  await page
+    .waitForResponse(
+      (r) =>
+        r.url().includes('PageInteraction/GetStats') && r.status() === 200,
+      { timeout: 90000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('.page-interaction')
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1500)
+}
+
+async function ensurePageInteractionEnabled(page) {
+  const root = page.locator('.page-interaction').first()
+  const sw = root.locator('.el-switch').first()
+  if (!(await sw.count())) return
+  if (!(await sw.locator('.is-checked').count())) {
+    await sw.click()
+    await page.waitForTimeout(2000)
+    await waitPageInteractionStats(page)
+  }
+}
+
+async function openPageInteractionDetail(page, context) {
+  const findDetail = () =>
+    context.pages().find((p) => p.url().includes('page-interaction/detail'))
+
+  const pageLink = page.locator('.page-interaction .el-table .el-link').first()
+  if (await pageLink.count()) {
+    await pageLink.click()
+    await page.waitForTimeout(2500)
+    let detail = findDetail()
+    if (detail) {
+      await detail.waitForLoadState('domcontentloaded', { timeout: 60000 })
+      await detail.waitForTimeout(3000)
+      return detail
+    }
+    if (page.url().includes('page-interaction/detail')) {
+      await page.waitForTimeout(3000)
+      return page
+    }
+  }
+
+  const editBtn = page.getByRole('button', { name: /编辑锚点/ }).first()
+  if (await editBtn.count()) {
+    await editBtn.click()
+    await page.waitForTimeout(2500)
+    const detail = findDetail()
+    if (detail) {
+      await detail.waitForLoadState('domcontentloaded', { timeout: 60000 })
+      await detail.waitForTimeout(3000)
+      return detail
+    }
+    if (page.url().includes('page-interaction/detail')) {
+      await page.waitForTimeout(3000)
+      return page
+    }
+  }
+
+  const { startDate, endDate } = await readDateRange(page)
+  const fallback = `${pageInteractionUrl('detail')}&path=${encodeURIComponent('/')}&startDate=${startDate || ''}&endDate=${endDate || ''}&type=Page`
+  await page.goto(fallback, { waitUntil: 'networkidle', timeout: 90000 })
+  await page.waitForTimeout(4000)
+  return page
+}
+
+async function capturePageInteraction(page, context) {
+  await page.goto(pageInteractionUrl(), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await waitPageInteractionStats(page)
+  await ensurePageInteractionEnabled(page)
+
+  const root = page.locator('.page-interaction').first()
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await snapLocator(
+    root.locator('> .flex.items-center.justify-between').first(),
+    'page-interaction-header.png'
+  )
+  await snap(page, 'page-interaction-overview.png', { fullPage: true })
+
+  const editEntry = root.locator('> .mb-16').first()
+  if (await editEntry.count()) {
+    await snapLocator(editEntry, 'page-interaction-edit-entry.png')
+  }
+
+  const overviewTitle = page.getByText(/页面锚点点击总览/).first()
+  if (await overviewTitle.count()) {
+    const block = overviewTitle.locator(
+      'xpath=ancestor::div[contains(@class,"rounded-normal")][1]'
+    )
+    if (await block.count()) {
+      await snapLocator(block, 'page-interaction-overview-block.png')
+    }
+  }
+
+  const anchorGrid = root.locator('.grid.grid-cols-2.gap-12').first()
+  if (await anchorGrid.count()) {
+    await snapLocator(anchorGrid, 'page-interaction-anchor-sections.png')
+  }
+
+  const detailPage = await openPageInteractionDetail(page, context)
+
+  if (detailPage && !detailPage.isClosed()) {
+    await detailPage.setViewportSize({ width: 1440, height: 900 })
+    const detailRoot = detailPage.locator('.absolute.inset-0.flex.flex-col').first()
+    if (await detailRoot.count()) {
+      await snapLocator(detailRoot, 'page-interaction-detail.png')
+    } else {
+      await snap(detailPage, 'page-interaction-detail.png', { fullPage: true })
+    }
+
+    const anchorRow = detailPage
+      .locator('.hover\\:bg-blue\\/10.rounded-normal')
+      .first()
+    if (await anchorRow.count()) {
+      await anchorRow.click()
+      await detailPage.waitForTimeout(600)
+      await snap(detailPage, 'page-interaction-detail-anchor-stats.png', {
+        fullPage: true,
+      })
+    } else {
+      await snap(detailPage, 'page-interaction-detail-anchor-stats.png', {
+        fullPage: true,
+      })
+    }
+
+    const detailUrl = new URL(detailPage.url())
+    const pagePath = detailUrl.searchParams.get('path') || '/'
+    const startDate = detailUrl.searchParams.get('startDate') || ''
+    const endDate = detailUrl.searchParams.get('endDate') || ''
+    const id = detailUrl.searchParams.get('id') || ''
+    const type = detailUrl.searchParams.get('type') || ''
+    const editorQ = new URLSearchParams({
+      SiteId: SITE_ID,
+      path: pagePath,
+      startDate,
+      endDate,
+    })
+    if (id) editorQ.set('id', id)
+    if (type) editorQ.set('type', type)
+
+    const editorPage = await context.newPage()
+    await editorPage.setViewportSize({ width: 1440, height: 900 })
+    await editorPage.goto(
+      `${BASE}/_Admin/visual-anchor-editor?${editorQ}`,
+      { waitUntil: 'networkidle', timeout: 90000 }
+    )
+    await editorPage.waitForTimeout(5000)
+    await snap(editorPage, 'page-interaction-visual-editor.png', {
+      fullPage: true,
+    })
+    await editorPage.close()
+    await detailPage.close()
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE
   await mkdir(OUT_DIR, { recursive: true })
@@ -374,6 +541,9 @@ async function main() {
   }
   if (!only || only === 'resource-guardian') {
     await captureResourceGuardian(page)
+  }
+  if (!only || only === 'page-interaction') {
+    await capturePageInteraction(page, context)
   }
 
   await browser.close()
