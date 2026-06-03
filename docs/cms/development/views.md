@@ -3,7 +3,7 @@
 > 菜单：**开发 → 组件**  
 > 深链：`/_Admin/development/views?SiteId={站点GUID}`
 
-**组件（View）** 是站点内可复用的 **HTML 模板片段**，供 [页面](../site/pages.md)、Layout（待编写）等引用。在后台维护 View 名称与模板正文；语法与渲染见 [View 模板引擎](/templateEngine/view/)。
+**组件（View）** 是站点内可复用的 **HTML 模板片段**，供 [页面](../site/pages.md)、[布局](./layouts.md) 等引用。在后台维护 View 名称与模板正文；语法与渲染见 [View 模板引擎](/templateEngine/view/)。
 
 ::: tip 权限
 菜单权限：`view`（查看）。新建、编辑、删除、复制需 `view` · `edit` / `delete`。列表行末 **版本** 图标需 `site` · `log`。
@@ -102,4 +102,4 @@
 | [页面](../site/pages.md) | 页面树与引用 View |
 | [在线编辑](../site/pages-inline-edit.md) | 页面内联改 HTML |
 | [View 模板引擎](/templateEngine/view/) | View 语法与概念 |
-| 开发概述 · Layout | 布局文档待编写 |
+| [布局（Layouts）](./layouts.md) | 页面外壳与 `@RenderBody()` |

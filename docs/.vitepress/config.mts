@@ -103,6 +103,7 @@ const cmsSidebar = [
         items: [
           { text: '概述', link: '/cms/development/' },
           { text: '组件（Views）', link: '/cms/development/views' },
+          { text: '布局（Layouts）', link: '/cms/development/layouts' },
         ],
       },
     ],

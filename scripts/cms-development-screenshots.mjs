@@ -2,6 +2,7 @@
  * Capture Kooboo admin CMS screenshots for docs/public/cms/development/
  * Usage:
  *   KOOBOO_SCREENSHOT_SCOPE=views node scripts/cms-development-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=layouts node scripts/cms-development-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -157,6 +158,82 @@ async function captureViews(page) {
   }
 }
 
+function layoutsUrl() {
+  return `${BASE}/_Admin/development/layouts?SiteId=${SITE_ID}`
+}
+
+function layoutEditUrl(id) {
+  const q = id ? `&id=${id}` : ''
+  return `${BASE}/_Admin/development/layout/edit?SiteId=${SITE_ID}${q}`
+}
+
+async function waitLayoutsList(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('/Layout') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('.el-table')
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+}
+
+async function captureLayouts(page) {
+  await page.goto(layoutsUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await waitLayoutsList(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('.p-24 > .flex.items-center.py-24').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'layouts-toolbar.png')
+  }
+  await snap(page, 'layouts-overview.png', { fullPage: true })
+
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'layouts-list-table.png')
+  }
+
+  const firstRow = page.locator('.el-table__body tr').first()
+  if (await firstRow.count()) {
+    await firstRow.locator('.el-checkbox').click()
+    await page.waitForTimeout(400)
+    const copyBtn = page.locator('[data-cy="copy"]').first()
+    if (await copyBtn.count()) {
+      await copyBtn.click()
+      await snapDialog(page, 'layouts-copy-dialog.png')
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(400)
+    }
+    await firstRow.locator('.el-checkbox').click().catch(() => {})
+
+    const nameLink = page.locator('[data-cy="name"]').first()
+    if (await nameLink.count()) {
+      await nameLink.click()
+      await page.waitForURL(/layout\/edit/, { timeout: 30000 })
+      await page.waitForTimeout(2000)
+      const header = page
+        .locator('.border-b.border-solid.border-line')
+        .first()
+      if (await header.count()) {
+        await snapLocator(header, 'layouts-edit-header.png')
+      }
+      await snap(page, 'layouts-edit-overview.png', { fullPage: false })
+    }
+  } else {
+    await page.goto(layoutEditUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+    await page.waitForTimeout(2000)
+    const header = page.locator('.border-b.border-solid.border-line').first()
+    if (await header.count()) {
+      await snapLocator(header, 'layouts-edit-header.png')
+    }
+    await snap(page, 'layouts-edit-overview.png', { fullPage: false })
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE || 'views'
   await mkdir(OUT_DIR, { recursive: true })
@@ -171,6 +248,9 @@ async function main() {
 
   if (only === 'views') {
     await captureViews(page)
+  }
+  if (only === 'layouts') {
+    await captureLayouts(page)
   }
 
   await browser.close()

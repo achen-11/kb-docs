@@ -23,7 +23,7 @@
 | 菜单 | 路径 | 权限（feature） | 文档 |
 |------|------|-----------------|------|
 | 组件（Views） | `/development/views` | `view` | [组件](./views.md) |
-| 布局（Layouts） | `/development/layouts` | `layout` | *待编写* |
+| 布局（Layouts） | `/development/layouts` | `layout` | [布局](./layouts.md) |
 | 脚本 | `/development/scripts` | `script` | *待编写* |
 | 样式 | `/development/styles` | `style` | *待编写* |
 | 代码 | `/development/code` | `code` | *待编写* |
