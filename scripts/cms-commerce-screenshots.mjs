@@ -166,6 +166,32 @@ async function captureCreateVariantDialog(page) {
   }
 }
 
+async function captureDiscounts(page) {
+  const listUrl = `${BASE}/_Admin/commerce/discounts?SiteId=${SITE_ID}`
+  await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await snap(page, 'discounts-list.png')
+
+  const createUrl = `${BASE}/_Admin/commerce/discounts/create?SiteId=${SITE_ID}`
+  await page.goto(createUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2000)
+  await snap(page, 'discounts-edit.png')
+
+  await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(1500)
+
+  const ordersIcon = page.locator('.el-table .icon-gaojisousuo1').first()
+  if (await ordersIcon.count()) {
+    await ordersIcon.click()
+    await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+    await page.waitForTimeout(800)
+    await snapDialog(page, 'discounts-orders-dialog.png')
+    await page.keyboard.press('Escape')
+  } else {
+    console.warn('skip discounts-orders-dialog.png: 列表无折扣规则')
+  }
+}
+
 async function captureCarts(page) {
   const listUrl = `${BASE}/_Admin/commerce/carts?SiteId=${SITE_ID}`
   await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
@@ -444,6 +470,10 @@ async function main() {
 
   if (!only || only === 'carts') {
     await captureCarts(page)
+  }
+
+  if (!only || only === 'discounts') {
+    await captureDiscounts(page)
   }
 
   await browser.close()
