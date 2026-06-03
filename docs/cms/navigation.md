@@ -109,7 +109,7 @@
 | 代码搜索 | `/development/code-search` | [代码搜索](./development/code-search.md) |
 | URL | `/development/urls` | [URL](./development/urls.md) |
 | 表单 | `/development/forms` | [表单](./development/forms.md) |
-| 菜单 | `/development/menus` | *待编写* |
+| 菜单 | `/development/menus` | [菜单](./development/menus.md) |
 | 身份验证 | `/development/authentication` | *待编写* |
 | Open API | `/development/openapis` | *待编写* |
 | SPA 多语言 | `/development/spamultilingual` | *待编写* |

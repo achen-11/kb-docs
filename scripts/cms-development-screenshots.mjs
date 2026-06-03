@@ -11,6 +11,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=code-search node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=urls node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=forms node scripts/cms-development-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=menus node scripts/cms-development-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -938,6 +939,101 @@ async function captureForms(page) {
   }
 }
 
+function menusUrl() {
+  return `${BASE}/_Admin/development/menus?SiteId=${SITE_ID}`
+}
+
+async function waitMenuEdit(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('Menu') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('[data-cy="menu-item-wrapper"], [data-cy="menu-name"]')
+    .first()
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1000)
+}
+
+async function captureMenus(page) {
+  await page.goto(menusUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await page
+    .locator('.el-table')
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+
+  const toolbar = page.locator('.p-24 > .flex.items-center.py-24').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'menus-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'menus-list-table.png')
+  }
+  await snap(page, 'menus-overview.png', { fullPage: true })
+
+  const addMenu = page.locator('[data-cy="add-menu"]').first()
+  let nameCell = page.locator('[data-cy="name"]').first()
+  if (await addMenu.count()) {
+    await addMenu.click()
+    await snapDialog(page, 'menus-add-dialog.png')
+    if (!(await nameCell.count())) {
+      const menuNameInput = page.locator('.el-dialog [data-cy="menu-name"]').first()
+      if (await menuNameInput.count()) {
+        await menuNameInput.fill(`_cms_doc_menu_${Date.now().toString(36).slice(-6)}`)
+        const confirm = page
+          .locator('.el-dialog')
+          .last()
+          .getByRole('button', { name: /确定|确认|保存|save/i })
+          .first()
+        if (await confirm.count()) await confirm.click()
+        await page.waitForTimeout(1500)
+        nameCell = page.locator('[data-cy="name"]').first()
+      }
+    } else {
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(400)
+    }
+  }
+
+  nameCell = page.locator('[data-cy="name"]').first()
+  if (await nameCell.count()) {
+    await nameCell.click()
+    await page.waitForURL(/menu\/edit/, { timeout: 30000 })
+    await waitMenuEdit(page)
+    await snap(page, 'menus-edit-overview.png', { fullPage: true })
+
+    const card = page.locator('.el-card').first()
+    if (await card.count()) {
+      await snapLocator(card, 'menus-edit-items.png')
+    }
+
+    let addItem = page.locator('[data-cy="add-item"]').first()
+    if (!(await addItem.count())) {
+      addItem = page.getByRole('button', { name: /创建菜单/ }).first()
+    }
+    if (await addItem.count()) {
+      await addItem.click()
+      await snapDialog(page, 'menus-item-dialog.png')
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(400)
+      await snapLocator(card, 'menus-edit-items.png')
+    }
+
+    const editTemplate = page.locator('[data-cy="edit-template"]').first()
+    if (await editTemplate.count()) {
+      await editTemplate.click()
+      await page.waitForTimeout(800)
+      await snapDialog(page, 'menus-template-dialog.png')
+      await page.keyboard.press('Escape')
+    }
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE || 'views'
   await mkdir(OUT_DIR, { recursive: true })
@@ -979,6 +1075,9 @@ async function main() {
   }
   if (only === 'forms') {
     await captureForms(page)
+  }
+  if (only === 'menus') {
+    await captureMenus(page)
   }
 
   await browser.close()

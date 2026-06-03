@@ -111,6 +111,7 @@ const cmsSidebar = [
           { text: '代码搜索', link: '/cms/development/code-search' },
           { text: 'URL', link: '/cms/development/urls' },
           { text: '表单', link: '/cms/development/forms' },
+          { text: '菜单', link: '/cms/development/menus' },
         ],
       },
     ],
