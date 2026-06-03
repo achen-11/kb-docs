@@ -84,7 +84,7 @@
 | 行为分析 | `/system/user-behavior-analysis` | *待编写* |
 | 资源守护 | `/system/resource-guardian` | [资源守护](./operations/resource-guardian.md) |
 | 页面交互 | `/system/page-interaction` | [页面交互](./operations/page-interaction.md) |
-| AB 测试 | `/system/ab-testing` | *待编写* |
+| AB 测试 | `/system/ab-testing` | [AB 测试](./operations/ab-testing.md) |
 | 错误监控 | `/system/error-monitoring` | *待编写* |
 | 站点日志 | `/system/site-logs` | *待编写* |
 | 协作同步 | `/system/sync` | *待编写* |

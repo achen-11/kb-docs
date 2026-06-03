@@ -4,6 +4,11 @@
  *   KOOBOO_SCREENSHOT_SCOPE=visitor-logs node scripts/cms-operations-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=resource-guardian node scripts/cms-operations-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=page-interaction node scripts/cms-operations-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=ab-testing node scripts/cms-operations-screenshots.mjs
+ *
+ * Local Kooboo example (AB 测试未上 redev 时):
+ *   KOOBOO_BASE=http://localhost KOOBOO_SITE_ID=... KOOBOO_USER=... KOOBOO_PASS=... \\
+ *   KOOBOO_SCREENSHOT_SCOPE=ab-testing node scripts/cms-operations-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -524,6 +529,203 @@ async function capturePageInteraction(page, context) {
   }
 }
 
+function abTestingUrl(suffix = '', query = {}) {
+  const pathPart = suffix ? `ab-testing/${suffix}` : 'ab-testing'
+  const q = new URLSearchParams({ SiteId: SITE_ID, ...query })
+  return `${BASE}/_Admin/system/${pathPart}?${q}`
+}
+
+async function waitAbTestingList(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('abTesting/Info') && r.status() === 200,
+      { timeout: 90000 }
+    )
+    .catch(() => {})
+  await page.waitForSelector('.el-table', { state: 'visible', timeout: 30000 }).catch(() => {})
+  await page.waitForTimeout(1200)
+}
+
+async function clickNextStep(page) {
+  const next = page.getByRole('button', { name: /下一步|next/i }).first()
+  if (await next.count()) {
+    await next.click()
+    await page.waitForTimeout(900)
+  }
+}
+
+const AB_TEST_SAMPLE_NAME = '_cms_doc_screenshot'
+
+async function fillCreateWizard(page, { snapSteps = false } = {}) {
+  await page.goto(abTestingUrl('create'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await page.waitForSelector('.el-steps', { timeout: 30000 })
+  const formBox = page.locator('.max-w-800px').first()
+
+  const nameInput = page
+    .locator('.el-form-item')
+    .filter({ hasText: /实验名称|experiment/i })
+    .locator('input')
+    .first()
+  if (await nameInput.count()) {
+    await nameInput.fill(AB_TEST_SAMPLE_NAME)
+  }
+  if (snapSteps) {
+    await snapLocator(formBox, 'ab-testing-create-step-basic.png')
+  }
+  await clickNextStep(page)
+
+  const typeSelect = page.locator('.el-form .el-select').first()
+  if (await typeSelect.count()) {
+    await typeSelect.click()
+    await page.locator('.el-select-dropdown__item:visible').first().click()
+    await page.waitForTimeout(600)
+  }
+  const objectSelect = page.locator('.el-form .el-select').nth(1)
+  if (await objectSelect.count()) {
+    await objectSelect.click()
+    await page.waitForTimeout(1500)
+    const opt = page.locator('.el-select-dropdown__item:visible').first()
+    if (await opt.count()) await opt.click()
+    await page.waitForTimeout(600)
+  }
+  if (snapSteps) {
+    await snapLocator(formBox, 'ab-testing-create-step-goal.png')
+  }
+  await clickNextStep(page)
+
+  if (snapSteps) {
+    await snapLocator(formBox, 'ab-testing-create-step-config.png')
+  }
+  await clickNextStep(page)
+
+  if (snapSteps) {
+    await snapLocator(formBox, 'ab-testing-create-step-traffic.png')
+  }
+}
+
+async function snapCreateWizardSteps(page) {
+  await fillCreateWizard(page, { snapSteps: true })
+}
+
+async function ensureSampleAbTest(page) {
+  await page.goto(abTestingUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await waitAbTestingList(page)
+  if (
+    await page
+      .locator('.el-table__body')
+      .getByText(AB_TEST_SAMPLE_NAME, { exact: true })
+      .count()
+  ) {
+    return AB_TEST_SAMPLE_NAME
+  }
+
+  await fillCreateWizard(page, { snapSteps: false })
+  const saveBtn = page.getByRole('button', { name: /^保存$|^save$/i }).first()
+  if (await saveBtn.count()) {
+    await saveBtn.click()
+    await page
+      .waitForURL((url) => !url.pathname.includes('/create'), {
+        timeout: 60000,
+      })
+      .catch(() => {})
+    await waitAbTestingList(page)
+  }
+  return AB_TEST_SAMPLE_NAME
+}
+
+async function captureAbTesting(page) {
+  await ensureSampleAbTest(page)
+
+  await page.goto(abTestingUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await waitAbTestingList(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const headerRow = page.locator('.p-24 > .flex.items-center.justify-between').first()
+  if (await headerRow.count()) {
+    await snapLocator(headerRow, 'ab-testing-header.png')
+  }
+  await snap(page, 'ab-testing-overview.png', { fullPage: true })
+
+  const toolbar = page.locator('.flex.space-x-16.mt-16').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'ab-testing-list-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'ab-testing-list-table.png')
+  }
+
+  await snapCreateWizardSteps(page)
+
+  await page.goto(abTestingUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await waitAbTestingList(page)
+
+  let testName = AB_TEST_SAMPLE_NAME
+  const nameCell = page.locator('.el-table__body .text-blue').first()
+  if (await nameCell.count()) {
+    const fromList = ((await nameCell.textContent()) || '').trim().split('\n')[0]
+    if (fromList) testName = fromList
+  }
+  if (!testName) {
+    const rowAction = page
+      .locator('.el-table__body tr')
+      .first()
+      .locator('.cursor-pointer')
+      .first()
+    if (await rowAction.count()) {
+      await rowAction.click()
+      await page.waitForURL(/ab-testing\/report/, { timeout: 30000 }).catch(() => {})
+      const url = new URL(page.url())
+      testName = url.searchParams.get('name') || ''
+    }
+  }
+
+  if (testName && !page.url().includes('report')) {
+    await page.goto(abTestingUrl('report', { name: testName }), {
+      waitUntil: 'networkidle',
+      timeout: 90000,
+    })
+    await page
+      .waitForResponse(
+        (r) => r.url().includes('abTesting/Report') && r.status() === 200,
+        { timeout: 45000 }
+      )
+      .catch(() => {})
+    await page.waitForTimeout(1500)
+
+    const reportHeader = page.locator('.p-24 > .flex.items-center.gap-8').first()
+    if (await reportHeader.count()) {
+      await snapLocator(reportHeader, 'ab-testing-report-header.png')
+    }
+
+    const detailTab = page.getByRole('tab', { name: /实验详情/ }).first()
+    if (await detailTab.count()) {
+      await detailTab.click()
+      await page.waitForTimeout(600)
+    }
+    await snap(page, 'ab-testing-report-detail.png', { fullPage: true })
+
+    const reportTab = page.getByRole('tab', { name: /实验报告/ }).first()
+    if (await reportTab.count()) {
+      await reportTab.click()
+      await page.waitForTimeout(800)
+    }
+    await snap(page, 'ab-testing-report-report.png', { fullPage: true })
+  } else if (page.url().includes('ab-testing/report')) {
+    const detailTab = page.getByRole('tab', { name: /实验详情/ }).first()
+    if (await detailTab.count()) await detailTab.click()
+    await page.waitForTimeout(600)
+    await snap(page, 'ab-testing-report-detail.png', { fullPage: true })
+    const reportTab = page.getByRole('tab', { name: /实验报告/ }).first()
+    if (await reportTab.count()) await reportTab.click()
+    await page.waitForTimeout(800)
+    await snap(page, 'ab-testing-report-report.png', { fullPage: true })
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE
   await mkdir(OUT_DIR, { recursive: true })
@@ -544,6 +746,9 @@ async function main() {
   }
   if (!only || only === 'page-interaction') {
     await capturePageInteraction(page, context)
+  }
+  if (!only || only === 'ab-testing') {
+    await captureAbTesting(page)
   }
 
   await browser.close()
