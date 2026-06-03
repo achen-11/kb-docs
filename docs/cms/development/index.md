@@ -24,7 +24,7 @@
 |------|------|-----------------|------|
 | 组件（Views） | `/development/views` | `view` | [组件](./views.md) |
 | 布局（Layouts） | `/development/layouts` | `layout` | [布局](./layouts.md) |
-| 脚本 | `/development/scripts` | `script` | *待编写* |
+| 脚本 | `/development/scripts` | `script` | [脚本](./scripts.md) |
 | 样式 | `/development/styles` | `style` | *待编写* |
 | 代码 | `/development/code` | `code` | *待编写* |
 | 代码日志 | `/development/code-log` | `code` · `log` | *待编写* |

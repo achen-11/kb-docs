@@ -3,6 +3,7 @@
  * Usage:
  *   KOOBOO_SCREENSHOT_SCOPE=views node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=layouts node scripts/cms-development-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=scripts node scripts/cms-development-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -234,6 +235,116 @@ async function captureLayouts(page) {
   }
 }
 
+function scriptsUrl(tab = 'external') {
+  return `${BASE}/_Admin/development/scripts?SiteId=${SITE_ID}&name=${tab}`
+}
+
+function scriptEditUrl(id) {
+  const q = id ? `&id=${id}` : ''
+  return `${BASE}/_Admin/development/script/edit?SiteId=${SITE_ID}${q}`
+}
+
+async function waitScriptsExternal(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('Script') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('.el-table')
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+}
+
+async function captureScripts(page) {
+  await page.goto(scriptsUrl('external'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await waitScriptsExternal(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const tabsBar = page.locator('.el-tabs__header').first()
+  if (await tabsBar.count()) {
+    const tabsWrap = tabsBar.locator('..').locator('..')
+    await snapLocator(tabsWrap, 'scripts-tabs.png').catch(async () => {
+      await snapLocator(tabsBar, 'scripts-tabs.png')
+    })
+  }
+  await snap(page, 'scripts-overview.png', { fullPage: true })
+
+  const toolbar = page.locator('.el-tab-pane:visible .flex.items-center.mb-12').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'scripts-external-toolbar.png')
+  }
+
+  const extTable = page.locator('.el-tab-pane:visible .el-table').first()
+  if (await extTable.count()) {
+    await snapLocator(extTable, 'scripts-external-table.png')
+  }
+
+  const settingsBtn = page.locator('.icon-a-setup').first()
+  if (await settingsBtn.count()) {
+    await settingsBtn.click()
+    await snapDialog(page, 'scripts-settings-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  await page.getByRole('tab', { name: /内嵌|embedded/i }).click()
+  await page.waitForTimeout(1500)
+  const embTable = page.locator('.el-tab-pane:visible .el-table').first()
+  if (await embTable.count()) {
+    await snapLocator(embTable, 'scripts-embedded-table.png')
+  }
+
+  await page.getByRole('tab', { name: /群组|group/i }).click()
+  await page.waitForTimeout(1500)
+  const groupToolbar = page.locator('.el-tab-pane:visible .flex.items-center.mb-12').first()
+  if (await groupToolbar.count()) {
+    await snapLocator(groupToolbar, 'scripts-group-toolbar.png')
+  }
+  const groupTable = page.locator('.el-tab-pane:visible .el-table').first()
+  if (await groupTable.count()) {
+    await snapLocator(groupTable, 'scripts-group-table.png')
+  }
+
+  const newGroup = page.locator('[data-cy="new-group"]').first()
+  if (await newGroup.count()) {
+    await newGroup.click()
+    await snapDialog(page, 'scripts-group-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  await page.goto(scriptsUrl('external'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await waitScriptsExternal(page)
+  const nameLink = page.locator('[data-cy="name"]').first()
+  if (await nameLink.count()) {
+    await nameLink.click()
+    await page.waitForURL(/script\/edit/, { timeout: 30000 })
+    await page.waitForTimeout(2000)
+    const header = page.locator('.border-b.border-solid.border-line').first()
+    if (await header.count()) {
+      await snapLocator(header, 'scripts-edit-header.png')
+    }
+    await snap(page, 'scripts-edit-overview.png', { fullPage: false })
+  } else {
+    await page.goto(scriptEditUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+    await page.waitForTimeout(2000)
+    const header = page.locator('.border-b.border-solid.border-line').first()
+    if (await header.count()) {
+      await snapLocator(header, 'scripts-edit-header.png')
+    }
+    await snap(page, 'scripts-edit-overview.png', { fullPage: false })
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE || 'views'
   await mkdir(OUT_DIR, { recursive: true })
@@ -251,6 +362,9 @@ async function main() {
   }
   if (only === 'layouts') {
     await captureLayouts(page)
+  }
+  if (only === 'scripts') {
+    await captureScripts(page)
   }
 
   await browser.close()

@@ -102,7 +102,7 @@
 |------|------|------|
 | 组件（Views） | `/development/views` | [组件](./development/views.md) |
 | 布局（Layouts） | `/development/layouts` | [布局](./development/layouts.md) |
-| 脚本 | `/development/scripts` | *待编写* |
+| 脚本 | `/development/scripts` | [脚本](./development/scripts.md) |
 | 样式 | `/development/styles` | *待编写* |
 | 代码 | `/development/code` | *待编写* |
 | 代码日志 | `/development/code-log` | *待编写* |
