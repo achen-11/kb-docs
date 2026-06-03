@@ -166,6 +166,59 @@ async function captureCreateVariantDialog(page) {
   }
 }
 
+async function captureTaxes(page) {
+  const listUrl = `${BASE}/_Admin/commerce/taxes?SiteId=${SITE_ID}`
+  await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await snap(page, 'taxes-list.png')
+
+  const createBtn = page
+    .locator('button:not([disabled])')
+    .filter({ has: page.locator('.icon-a-addto') })
+    .first()
+  if (await createBtn.count()) {
+    await createBtn.click()
+    await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+    await page.waitForTimeout(500)
+    await snapDialog(page, 'taxes-select-country-dialog.png')
+
+    const countryRow = page.locator('.el-dialog tbody tr').first()
+    if (await countryRow.count()) {
+      await countryRow.click()
+      await page.waitForURL(/taxes\/create/, { timeout: 60000 })
+      await page.waitForTimeout(2000)
+      await snap(page, 'taxes-edit.png')
+      return
+    }
+    await page.keyboard.press('Escape')
+  } else {
+    console.warn(
+      'skip taxes-select-country-dialog.png: 创建按钮无权限，改用已有规则或直链 create'
+    )
+  }
+
+  const editLink = page.locator('a .icon-a-writein').first()
+  if (await editLink.count()) {
+    await editLink.click()
+    await page.waitForURL(/taxes\/edit/, { timeout: 60000 })
+    await page.waitForTimeout(2000)
+    await snap(page, 'taxes-edit.png')
+    return
+  }
+
+  for (const country of ['China', 'United States', 'Germany']) {
+    const createUrl = `${BASE}/_Admin/commerce/taxes/create?SiteId=${SITE_ID}&country=${encodeURIComponent(country)}`
+    await page.goto(createUrl, { waitUntil: 'networkidle', timeout: 60000 })
+    await page.waitForTimeout(1500)
+    const baseTax = page.locator('.el-input-number').first()
+    if (await baseTax.count()) {
+      await snap(page, 'taxes-edit.png')
+      return
+    }
+  }
+  console.warn('skip taxes-edit.png: 列表无规则且 create 直链不可用')
+}
+
 async function captureCurrencies(page) {
   const url = `${BASE}/_Admin/commerce/currencies?SiteId=${SITE_ID}`
   await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 })
@@ -592,6 +645,10 @@ async function main() {
 
   if (!only || only === 'currencies') {
     await captureCurrencies(page)
+  }
+
+  if (!only || only === 'taxes') {
+    await captureTaxes(page)
   }
 
   await browser.close()
