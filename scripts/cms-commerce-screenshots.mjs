@@ -166,6 +166,78 @@ async function captureCreateVariantDialog(page) {
   }
 }
 
+async function captureShippings(page) {
+  const url = `${BASE}/_Admin/commerce/shippings?SiteId=${SITE_ID}`
+  await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await snap(page, 'shippings-express-list.png')
+
+  const digitalTab = page.getByRole('tab', { name: /数字产品/ })
+  if (await digitalTab.count()) {
+    await digitalTab.click()
+    await page.waitForTimeout(2000)
+    await snap(page, 'shippings-digital-list.png')
+  }
+
+  await page.getByRole('tab', { name: /实体产品/ }).click().catch(() => {})
+  await page.waitForTimeout(800)
+
+  const editLink = page.locator('a .icon-a-writein').first()
+  if (await editLink.count()) {
+    await editLink.click()
+    await page.waitForURL(/shippings\/edit/, { timeout: 60000 })
+    await page.waitForTimeout(2000)
+    await snap(page, 'shippings-express-edit.png')
+    await page.goBack({ waitUntil: 'networkidle' }).catch(() => {})
+    await page.waitForTimeout(1000)
+  }
+
+  if (await digitalTab.count()) {
+    await digitalTab.click()
+    await page.waitForTimeout(1500)
+    const digitalEdit = page.locator('a .icon-a-writein').first()
+    if (await digitalEdit.count()) {
+      await digitalEdit.click()
+      await page.waitForURL(/digital-shippings\/edit/, { timeout: 60000 })
+      await page.waitForTimeout(2000)
+      await snap(page, 'shippings-digital-edit.png')
+    }
+  }
+}
+
+async function captureCommerceSettings(page) {
+  const url = `${BASE}/_Admin/commerce/settings?SiteId=${SITE_ID}`
+  await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await snap(page, 'commerce-settings-overview.png')
+
+  const cards = page.locator('.rounded-normal.bg-fff')
+  if ((await cards.count()) >= 2) {
+    await cards.nth(1).scrollIntoViewIfNeeded()
+    await page.waitForTimeout(400)
+    await snapLocator(cards.nth(1), 'commerce-settings-custom-fields.png')
+  }
+  if ((await cards.count()) >= 3) {
+    await cards.nth(2).scrollIntoViewIfNeeded()
+    await page.waitForTimeout(400)
+    await snapLocator(cards.nth(2), 'commerce-settings-display.png')
+  }
+
+  const addBtn = page
+    .locator('.rounded-normal.bg-fff')
+    .nth(1)
+    .locator('button')
+    .filter({ has: page.locator('.icon-a-addto') })
+    .first()
+  if (await addBtn.count()) {
+    await addBtn.click()
+    await snapDialog(page, 'commerce-settings-custom-field-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+}
+
 async function captureProductCategories(page) {
   const listUrl = `${BASE}/_Admin/commerce/product-categories?SiteId=${SITE_ID}`
   await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
@@ -271,6 +343,14 @@ async function main() {
 
   if (!only || only === 'product-categories') {
     await captureProductCategories(page)
+  }
+
+  if (!only || only === 'settings') {
+    await captureCommerceSettings(page)
+  }
+
+  if (!only || only === 'shippings') {
+    await captureShippings(page)
   }
 
   await browser.close()
