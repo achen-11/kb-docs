@@ -10,6 +10,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=code-log node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=code-search node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=urls node scripts/cms-development-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=forms node scripts/cms-development-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -818,6 +819,125 @@ async function captureUrls(page) {
   }
 }
 
+function formsUrl(tab = 'external') {
+  return `${BASE}/_Admin/development/forms?SiteId=${SITE_ID}&name=${tab}`
+}
+
+async function clickFormsTab(page, pattern) {
+  const tab = page.locator('.el-tabs__item').filter({ hasText: pattern }).first()
+  if (await tab.count()) {
+    await tab.click()
+    await page.waitForTimeout(1200)
+    return true
+  }
+  return false
+}
+
+async function waitFormsTable(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('Form') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('.el-table')
+    .first()
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(800)
+}
+
+async function captureForms(page) {
+  await page.goto(formsUrl('external'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await waitFormsTable(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const tabsBar = page.locator('.el-tabs__header').first()
+  if (await tabsBar.count()) {
+    await snapLocator(tabsBar, 'forms-tabs.png')
+  }
+  await snap(page, 'forms-overview.png', { fullPage: true })
+
+  const extToolbar = page.locator('.el-tab-pane:visible .flex.items-center.pb-12').first()
+  if (await extToolbar.count()) {
+    await snapLocator(extToolbar, 'forms-external-toolbar.png')
+  }
+  const extTable = page.locator('.el-tab-pane:visible .el-table').first()
+  if (await extTable.count()) {
+    await snapLocator(extTable, 'forms-external-table.png')
+  }
+
+  const settingBtn = page.locator('.el-tab-pane:visible .icon-a-setup').first()
+  if (await settingBtn.count()) {
+    await settingBtn.click()
+    await snapDialog(page, 'forms-setting-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const nameLink = page.locator('.el-tab-pane:visible [data-cy="name"]').first()
+  if (await nameLink.count()) {
+    const href = await nameLink.getAttribute('href')
+    if (href) {
+      const target = href.startsWith('http') ? href : `${BASE}${href}`
+      await page.goto(target, { waitUntil: 'networkidle', timeout: 90000 })
+      await page.waitForTimeout(2000)
+      const header = page.locator('.border-b.border-solid.border-line').first()
+      if (await header.count()) {
+        await snapLocator(header, 'forms-edit-header.png')
+      }
+      await snap(page, 'forms-edit-overview.png', { fullPage: false })
+      await page.goto(formsUrl('external'), {
+        waitUntil: 'networkidle',
+        timeout: 90000,
+      })
+      await waitFormsTable(page)
+    }
+  } else {
+    await page.goto(`${BASE}/_Admin/development/form/edit?SiteId=${SITE_ID}`, {
+      waitUntil: 'networkidle',
+      timeout: 90000,
+    })
+    await page.waitForTimeout(2000)
+    const header = page.locator('.border-b.border-solid.border-line').first()
+    if (await header.count()) {
+      await snapLocator(header, 'forms-edit-header.png')
+    }
+    await snap(page, 'forms-edit-overview.png', { fullPage: false })
+    await page.goto(formsUrl('external'), {
+      waitUntil: 'networkidle',
+      timeout: 90000,
+    })
+    await waitFormsTable(page)
+  }
+
+  const dataLink = page
+    .locator('.el-tab-pane:visible a')
+    .filter({ has: page.locator('[data-cy="data"]') })
+    .first()
+  if (await dataLink.count()) {
+    const href = await dataLink.getAttribute('href')
+    if (href) {
+      const target = href.startsWith('http') ? href : `${BASE}${href}`
+      await page.goto(target, { waitUntil: 'networkidle', timeout: 90000 })
+      await page.waitForTimeout(2000)
+      await snap(page, 'forms-values.png', { fullPage: true })
+    }
+  }
+
+  if (await clickFormsTab(page, /内嵌|embedded/i)) {
+    await waitFormsTable(page)
+    const embTable = page.locator('.el-tab-pane:visible .el-table').first()
+    if (await embTable.count()) {
+      await snapLocator(embTable, 'forms-embedded-table.png')
+    }
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE || 'views'
   await mkdir(OUT_DIR, { recursive: true })
@@ -856,6 +976,9 @@ async function main() {
   }
   if (only === 'urls') {
     await captureUrls(page)
+  }
+  if (only === 'forms') {
+    await captureForms(page)
   }
 
   await browser.close()
