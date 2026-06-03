@@ -5,6 +5,31 @@
 
 查看站点 **KScript / 代码执行** 产生的运行日志：按日志级别、时间、TraceId、关键字筛选，并查看单条详情。与 [操作日志](../operations/site-logs.md)（内容变更审计）不同，本页面向 **运行时诊断**。
 
+列表中的每一条记录，均来自脚本中的 [`k.logger`](/api/logger/) 调用；后台不提供手工「新建日志」，只负责查询、筛选与查看详情。
+
+## 日志来源（k.logger）
+
+在 Code、API、页面脚本等 KScript 中写入日志，例如：
+
+```ts
+k.logger.information('Payment.Callback', `orderId=${orderId}`)
+k.logger.error('Payment.Callback', JSON.stringify(err))
+```
+
+| `k.logger` 方法 | 后台页签 / `level` | 列表「分类」列 | 列表「消息」列 |
+|-----------------|-------------------|----------------|----------------|
+| `debug()` | 调试 · `Debug` | 第 1 个参数 `category`（可省略） | 消息正文 |
+| `information()` | 信息 · `Information` | 同上 | 同上 |
+| `warning()` | 警告 · `Warning` | 同上 | 同上 |
+| `error()` | 错误 · `Error` | 同上 | 同上 |
+| `critical()` | 严重 · `Critical` | 同上 | 同上 |
+
+只传一个参数时，该参数为 **消息**，**分类** 为空。对象须先 `JSON.stringify()` 再写入。
+
+同一 HTTP 请求内的多条日志往往共用 **TraceId**（便于在后台按 TraceId 串联排查）。脚本侧也可用 [`k.logger.query()`](/api/logger/) 按条件查询，参数与下文筛选栏、分页字段一致。
+
+页头 **启用**（`codeLogSettings.enable`）关闭后，站点不再采集新的 `k.logger` 日志；已有历史周次数据仍可切换 **周** 查看。
+
 ::: tip 权限
 菜单权限：`code·log`。须在编辑菜单中勾选 **开发 → 代码日志**（`advanced`）。
 :::
@@ -20,7 +45,7 @@
 
 | 控件 | 说明 |
 |------|------|
-| **启用** | `codeLogSettings.enable`；切换后立即 `saveSite`，关闭后不再采集新日志 |
+| **启用** | `codeLogSettings.enable`；切换后立即 `saveSite`，关闭后不再写入/采集 `k.logger` 新日志 |
 | **周** | 选择日志分区周次（`weekname`，选项来自 `getWeeks`）；切换后刷新列表 |
 
 <DocImage src="/cms/development/code-log-header.png" alt="代码日志页头：启用与周次" width="1120" />
@@ -75,6 +100,7 @@
 
 | 文档 | 说明 |
 |------|------|
+| [k.logger](/api/logger/) | 记录与查询日志（开发必读） |
 | [开发概述](./index.md) | 开发菜单索引 |
 | [代码](./code.md) | 代码文件编辑 |
 | [操作日志](../operations/site-logs.md) | 站点对象变更审计 |
