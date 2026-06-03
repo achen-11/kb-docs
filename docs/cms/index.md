@@ -32,7 +32,7 @@ flowchart LR
 | 4 | [页面](./site/pages.md) | 创建可访问的页面 |
 | 5 | [内容](./content/index.md)（[数据类型](./content/content-types.md) · [内容列表](./content/contents-folders-list.md)） | 为 `k.content` 准备数据 |
 | 6 | [电商](./commerce/index.md)（按需） | 商品、订单；见 [k.commerce](/api/commerce/commerce.md) |
-| 7 | 开发菜单（待写） | Layout、View、Script，见 [模板引擎](/templateEngine/) |
+| 7 | [开发](./development/index.md)（子项待写） | Layout、View、Script；见 [模板引擎](/templateEngine/) |
 | 8 | 服务集成（待写） | 支付、短信、JWT 等 |
 
 ## 与开发文档的关系

@@ -96,27 +96,29 @@
 
 ## 开发
 
-左侧分组：**开发**
+左侧分组：**开发**（`advanced`）
 
-| 菜单 | 路径 | 模板引擎 / API |
-|------|------|----------------|
-| 组件（Views） | `/development/views` | [View](/templateEngine/view/) · `k.site.views` |
-| 布局（Layouts） | `/development/layouts` | [Layout](/templateEngine/layout/) |
-| 脚本 | `/development/scripts` | [Script](/templateEngine/js/) |
-| 样式 | `/development/styles` | [Style](/templateEngine/css/) |
-| 代码 | `/development/code` | `k.site.codes` |
-| 代码日志 | `/development/code-log` | |
-| 代码搜索 | `/development/code-search` | |
-| URL | `/development/urls` | |
-| 表单 | `/development/forms` | |
-| 菜单 | `/development/menus` | |
-| 身份验证 | `/development/authentication` | |
-| Open API | `/development/openapis` | |
-| SPA 多语言 | `/development/spamultilingual` | |
-| 模块 | `/development/modules` | `k.module` |
-| 任务 | `/development/jobs` | |
+| 菜单 | 路径 | 文档 |
+|------|------|------|
+| 组件（Views） | `/development/views` | *待编写* |
+| 布局（Layouts） | `/development/layouts` | *待编写* |
+| 脚本 | `/development/scripts` | *待编写* |
+| 样式 | `/development/styles` | *待编写* |
+| 代码 | `/development/code` | *待编写* |
+| 代码日志 | `/development/code-log` | *待编写* |
+| 代码搜索 | `/development/code-search` | *待编写* |
+| URL | `/development/urls` | *待编写* |
+| 表单 | `/development/forms` | *待编写* |
+| 菜单 | `/development/menus` | *待编写* |
+| 身份验证 | `/development/authentication` | *待编写* |
+| Open API | `/development/openapis` | *待编写* |
+| SPA 多语言 | `/development/spamultilingual` | *待编写* |
+| 模块 | `/development/modules` | *待编写* |
+| 任务 | `/development/jobs` | *待编写* |
 
-页面设计器路由（无左侧菜单项）：`/page/edit`、`/page/design` 等，从页面列表进入。
+概述：[开发](./development/index.md)（含模板引擎 / API 对照表）
+
+页面设计器路由（无左侧菜单项）：`/page/edit`、`/page/design` 等，从 [页面](./site/pages.md) 列表进入。
 
 ## 数据库
 

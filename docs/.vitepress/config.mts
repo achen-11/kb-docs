@@ -97,6 +97,13 @@ const cmsSidebar = [
           { text: '协作同步', link: '/cms/operations/sync' },
         ],
       },
+      {
+        text: '开发',
+        collapsed: true,
+        items: [
+          { text: '概述', link: '/cms/development/' },
+        ],
+      },
     ],
   },
 ]
