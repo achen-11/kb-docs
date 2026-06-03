@@ -5,6 +5,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=layouts node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=scripts node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=styles node scripts/cms-development-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=styles-inline node scripts/cms-development-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -369,6 +370,51 @@ async function waitStylesExternal(page) {
   await page.waitForTimeout(1200)
 }
 
+async function waitStylesInlineList(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('InlineList') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page.waitForTimeout(800)
+}
+
+async function captureStylesInline(page) {
+  await page.goto(stylesUrl('inline'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await waitStylesInlineList(page)
+
+  const inlineTable = page.locator('.el-tab-pane:visible .el-table').first()
+  if (await inlineTable.count()) {
+    await snapLocator(inlineTable, 'styles-inline-table.png')
+  }
+
+  const inlineName = page.locator('.el-tab-pane:visible [data-cy="name"]').first()
+  if (!(await inlineName.count())) {
+    console.warn('no inline style rows — skip styles-inline-dialog.png')
+    return
+  }
+  await inlineName.click()
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('getInline') && r.status() === 200,
+      { timeout: 30000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('[data-cy="style-rule-item"]')
+    .first()
+    .waitFor({ state: 'visible', timeout: 15000 })
+    .catch(() => {})
+  await page.waitForTimeout(500)
+  await snapDialog(page, 'styles-inline-dialog.png')
+  await page.keyboard.press('Escape')
+  await page.waitForTimeout(400)
+}
+
 async function captureStyles(page) {
   await page.goto(stylesUrl('external'), {
     waitUntil: 'networkidle',
@@ -411,19 +457,7 @@ async function captureStyles(page) {
     await snapLocator(embTable, 'styles-embedded-table.png')
   }
 
-  await page.getByRole('tab', { name: /行内|inline/i }).click()
-  await page.waitForTimeout(1500)
-  const inlineTable = page.locator('.el-tab-pane:visible .el-table').first()
-  if (await inlineTable.count()) {
-    await snapLocator(inlineTable, 'styles-inline-table.png')
-  }
-  const inlineName = page.locator('[data-cy="name"]').first()
-  if (await inlineName.count()) {
-    await inlineName.click()
-    await snapDialog(page, 'styles-inline-dialog.png')
-    await page.keyboard.press('Escape')
-    await page.waitForTimeout(400)
-  }
+  await captureStylesInline(page)
 
   await page.getByRole('tab', { name: /群组|group/i }).click()
   await page.waitForTimeout(1500)
@@ -492,6 +526,9 @@ async function main() {
   }
   if (only === 'styles') {
     await captureStyles(page)
+  }
+  if (only === 'styles-inline') {
+    await captureStylesInline(page)
   }
 
   await browser.close()
