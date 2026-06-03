@@ -166,6 +166,54 @@ async function captureCreateVariantDialog(page) {
   }
 }
 
+async function captureLoyalty(page) {
+  const base = `${BASE}/_Admin/commerce/loyalty?SiteId=${SITE_ID}`
+
+  await page.goto(`${base}&name=membership`, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await snap(page, 'loyalty-membership.png')
+
+  const createMembership = page
+    .locator('button:not([disabled])')
+    .filter({ has: page.locator('.icon-a-addto') })
+    .first()
+  if (await createMembership.count()) {
+    await createMembership.click()
+    await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+    await page.waitForTimeout(500)
+    await snapDialog(page, 'loyalty-membership-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  await page.goto(`${base}&name=member`, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2000)
+  await snap(page, 'loyalty-members.png')
+
+  const detailIcon = page.locator('.el-table .icon-eyes').first()
+  if (await detailIcon.count()) {
+    await detailIcon.click()
+    await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+    await page.waitForTimeout(800)
+    await snapDialog(page, 'loyalty-member-detail-dialog.png')
+    await page.keyboard.press('Escape')
+  }
+
+  await page.goto(`${base}&name=earnPointsConfig`, {
+    waitUntil: 'networkidle',
+    timeout: 60000,
+  })
+  await page.waitForTimeout(2000)
+  await snap(page, 'loyalty-earn-points.png')
+
+  await page.goto(`${base}&name=redeemPointsConfig`, {
+    waitUntil: 'networkidle',
+    timeout: 60000,
+  })
+  await page.waitForTimeout(2000)
+  await snap(page, 'loyalty-redeem-points.png')
+}
+
 async function captureTaxes(page) {
   const listUrl = `${BASE}/_Admin/commerce/taxes?SiteId=${SITE_ID}`
   await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
@@ -649,6 +697,10 @@ async function main() {
 
   if (!only || only === 'taxes') {
     await captureTaxes(page)
+  }
+
+  if (!only || only === 'loyalty') {
+    await captureLoyalty(page)
   }
 
   await browser.close()
