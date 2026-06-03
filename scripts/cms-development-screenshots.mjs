@@ -4,6 +4,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=views node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=layouts node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=scripts node scripts/cms-development-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=styles node scripts/cms-development-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -345,6 +346,129 @@ async function captureScripts(page) {
   }
 }
 
+function stylesUrl(tab = 'external') {
+  return `${BASE}/_Admin/development/styles?SiteId=${SITE_ID}&name=${tab}`
+}
+
+function styleEditUrl(id) {
+  const q = id ? `&id=${id}` : ''
+  return `${BASE}/_Admin/development/style/edit?SiteId=${SITE_ID}${q}`
+}
+
+async function waitStylesExternal(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('Style') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('.el-table')
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+}
+
+async function captureStyles(page) {
+  await page.goto(stylesUrl('external'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await waitStylesExternal(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const tabsBar = page.locator('.el-tabs__header').first()
+  if (await tabsBar.count()) {
+    const tabsWrap = tabsBar.locator('..').locator('..')
+    await snapLocator(tabsWrap, 'styles-tabs.png').catch(async () => {
+      await snapLocator(tabsBar, 'styles-tabs.png')
+    })
+  }
+  await snap(page, 'styles-overview.png', { fullPage: true })
+
+  const toolbar = page.locator('.el-tab-pane:visible .flex.items-center.mb-12').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'styles-external-toolbar.png')
+  }
+
+  const extTable = page.locator('.el-tab-pane:visible .el-table').first()
+  if (await extTable.count()) {
+    await snapLocator(extTable, 'styles-external-table.png')
+  }
+
+  const settingsBtn = page.locator('.icon-a-setup').first()
+  if (await settingsBtn.count()) {
+    await settingsBtn.click()
+    await snapDialog(page, 'styles-settings-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  await page.getByRole('tab', { name: /内嵌|embedded/i }).click()
+  await page.waitForTimeout(1500)
+  const embTable = page.locator('.el-tab-pane:visible .el-table').first()
+  if (await embTable.count()) {
+    await snapLocator(embTable, 'styles-embedded-table.png')
+  }
+
+  await page.getByRole('tab', { name: /行内|inline/i }).click()
+  await page.waitForTimeout(1500)
+  const inlineTable = page.locator('.el-tab-pane:visible .el-table').first()
+  if (await inlineTable.count()) {
+    await snapLocator(inlineTable, 'styles-inline-table.png')
+  }
+  const inlineName = page.locator('[data-cy="name"]').first()
+  if (await inlineName.count()) {
+    await inlineName.click()
+    await snapDialog(page, 'styles-inline-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  await page.getByRole('tab', { name: /群组|group/i }).click()
+  await page.waitForTimeout(1500)
+  const groupToolbar = page.locator('.el-tab-pane:visible .flex.items-center.mb-12').first()
+  if (await groupToolbar.count()) {
+    await snapLocator(groupToolbar, 'styles-group-toolbar.png')
+  }
+  const groupTable = page.locator('.el-tab-pane:visible .el-table').first()
+  if (await groupTable.count()) {
+    await snapLocator(groupTable, 'styles-group-table.png')
+  }
+  const newGroup = page.locator('[data-cy="new-group"]').first()
+  if (await newGroup.count()) {
+    await newGroup.click()
+    await snapDialog(page, 'styles-group-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  await page.goto(stylesUrl('external'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await waitStylesExternal(page)
+  const nameLink = page.locator('[data-cy="name"]').first()
+  if (await nameLink.count()) {
+    await nameLink.click()
+    await page.waitForURL(/style\/edit/, { timeout: 30000 })
+    await page.waitForTimeout(2000)
+    const header = page.locator('.border-b.border-solid.border-line').first()
+    if (await header.count()) {
+      await snapLocator(header, 'styles-edit-header.png')
+    }
+    await snap(page, 'styles-edit-overview.png', { fullPage: false })
+  } else {
+    await page.goto(styleEditUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+    await page.waitForTimeout(2000)
+    const header = page.locator('.border-b.border-solid.border-line').first()
+    if (await header.count()) {
+      await snapLocator(header, 'styles-edit-header.png')
+    }
+    await snap(page, 'styles-edit-overview.png', { fullPage: false })
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE || 'views'
   await mkdir(OUT_DIR, { recursive: true })
@@ -365,6 +489,9 @@ async function main() {
   }
   if (only === 'scripts') {
     await captureScripts(page)
+  }
+  if (only === 'styles') {
+    await captureStyles(page)
   }
 
   await browser.close()
