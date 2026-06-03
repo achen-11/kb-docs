@@ -86,7 +86,7 @@ const cmsSidebar = [
       },
       {
         text: '运维中心',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: '概述', link: '/cms/operations/' },
           { text: '访问统计', link: '/cms/operations/visitor-logs' },
@@ -99,9 +99,10 @@ const cmsSidebar = [
       },
       {
         text: '开发',
-        collapsed: true,
+        collapsed: false,
         items: [
           { text: '概述', link: '/cms/development/' },
+          { text: '组件（Views）', link: '/cms/development/views' },
         ],
       },
     ],

@@ -100,7 +100,7 @@
 
 | 菜单 | 路径 | 文档 |
 |------|------|------|
-| 组件（Views） | `/development/views` | *待编写* |
+| 组件（Views） | `/development/views` | [组件](./development/views.md) |
 | 布局（Layouts） | `/development/layouts` | *待编写* |
 | 脚本 | `/development/scripts` | *待编写* |
 | 样式 | `/development/styles` | *待编写* |

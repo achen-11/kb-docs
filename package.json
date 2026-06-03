@@ -13,7 +13,8 @@
     "check:dead-links": "node scripts/check-dead-links.mjs",
     "screenshots:cms:site": "node scripts/cms-screenshots.mjs",
     "screenshots:cms:content": "node scripts/cms-content-screenshots.mjs",
-    "screenshots:cms:commerce": "node scripts/cms-commerce-screenshots.mjs"
+    "screenshots:cms:commerce": "node scripts/cms-commerce-screenshots.mjs",
+    "screenshots:cms:development": "node scripts/cms-development-screenshots.mjs"
   },
   "devDependencies": {
     "playwright": "1.58.2",
