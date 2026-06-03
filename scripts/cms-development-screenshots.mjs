@@ -6,6 +6,8 @@
  *   KOOBOO_SCREENSHOT_SCOPE=scripts node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=styles node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=styles-inline node scripts/cms-development-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=code node scripts/cms-development-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=code-log node scripts/cms-development-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -503,6 +505,183 @@ async function captureStyles(page) {
   }
 }
 
+function codeUrl(tab = 'all') {
+  return `${BASE}/_Admin/development/code?SiteId=${SITE_ID}&name=${tab}`
+}
+
+function codeEditUrl(type = 'Api', id) {
+  const q = id ? `&id=${id}` : ''
+  return `${BASE}/_Admin/development/code/edit?SiteId=${SITE_ID}&type=${type}${q}`
+}
+
+async function waitCodeList(page) {
+  await page
+    .waitForResponse(
+      (r) =>
+        (r.url().includes('Code') || r.url().includes('code')) &&
+        r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('.el-table')
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+}
+
+async function clickCodeTab(page, pattern) {
+  const tab = page.locator('.el-tabs__item').filter({ hasText: pattern }).first()
+  if (await tab.count()) {
+    await tab.click()
+    await page.waitForTimeout(1200)
+    return true
+  }
+  return false
+}
+
+async function captureCode(page) {
+  await page.goto(codeUrl('all'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await waitCodeList(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const header = page.locator('.flex.items-center.p-24.relative').first()
+  if (await header.count()) {
+    await snapLocator(header, 'code-header.png')
+  }
+
+  const tabsBar = page.locator('.el-tabs__header').first()
+  if (await tabsBar.count()) {
+    await snapLocator(tabsBar, 'code-tabs.png')
+  }
+
+  await snap(page, 'code-overview.png', { fullPage: true })
+
+  const toolbar = page.locator('.el-tab-pane:visible .flex.justify-between.pb-12').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'code-toolbar.png')
+  }
+
+  const createBtn = page.locator('[data-cy="create"]').first()
+  if (await createBtn.count()) {
+    await createBtn.click()
+    await page.waitForTimeout(400)
+    const menu = page.locator('.el-dropdown-menu:visible').first()
+    if (await menu.count()) {
+      await snapLocator(menu, 'code-create-dropdown.png')
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(300)
+    }
+  }
+
+  const table = page.locator('.el-tab-pane:visible .el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'code-list-table.png')
+  }
+
+  if (await clickCodeTab(page, /api/i)) {
+    const apiSettings = page.locator('.el-tab-pane:visible .icon-a-setup').first()
+    if (await apiSettings.count()) {
+      await apiSettings.click()
+      await snapDialog(page, 'code-api-settings-dialog.png')
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(400)
+    }
+    await page.goto(codeUrl('all'), { waitUntil: 'networkidle', timeout: 90000 })
+    await waitCodeList(page)
+  }
+
+  const expandAllBtn = page.locator('[data-cy="expand-all"]').first()
+  if (await expandAllBtn.count()) {
+    await expandAllBtn.click()
+    await page.waitForTimeout(600)
+  }
+
+  const nameLink = page.locator('.el-tab-pane:visible [data-cy="name"]').first()
+  let openedEdit = false
+  if (await nameLink.count()) {
+    const href = await nameLink.getAttribute('href')
+    if (href) {
+      const target = href.startsWith('http') ? href : `${BASE}${href}`
+      await page.goto(target, { waitUntil: 'networkidle', timeout: 90000 })
+      openedEdit = true
+    } else {
+      await nameLink.click({ force: true })
+      await page.waitForURL(/code\/edit/, { timeout: 30000 }).catch(() => {})
+      openedEdit = page.url().includes('code/edit')
+    }
+  }
+  if (!openedEdit) {
+    await page.goto(codeEditUrl('Api'), {
+      waitUntil: 'networkidle',
+      timeout: 90000,
+    })
+  }
+  await page.waitForTimeout(2000)
+  const editHeader = page.locator('.border-b.border-solid.border-line').first()
+  if (await editHeader.count()) {
+    await snapLocator(editHeader, 'code-edit-header.png')
+  }
+  await snap(page, 'code-edit-overview.png', { fullPage: false })
+}
+
+function codeLogUrl() {
+  return `${BASE}/_Admin/development/code-log?SiteId=${SITE_ID}`
+}
+
+async function waitCodeLogList(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('CodeLog') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('.el-table__body tr')
+    .first()
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+}
+
+async function captureCodeLog(page) {
+  await page.goto(codeLogUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await waitCodeLogList(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  await snap(page, 'code-log-overview.png', { fullPage: true })
+
+  const header = page.locator('.p-24').first()
+  if (await header.count()) {
+    await snapLocator(header, 'code-log-header.png')
+  }
+
+  const tabsBar = page.locator('.el-tabs--hide-content .el-tabs__header').first()
+  if (await tabsBar.count()) {
+    await snapLocator(tabsBar, 'code-log-tabs.png')
+  }
+
+  const filters = page.locator('.p-24 .flex.items-center.space-x-16.mb-24').first()
+  if (await filters.count()) {
+    await snapLocator(filters, 'code-log-filters.png')
+  }
+
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'code-log-table.png')
+  }
+
+  const detailIcon = page.locator('.icon-eyes').first()
+  if (await detailIcon.count()) {
+    await detailIcon.click()
+    await snapDialog(page, 'code-log-detail-dialog.png')
+    await page.keyboard.press('Escape')
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE || 'views'
   await mkdir(OUT_DIR, { recursive: true })
@@ -529,6 +708,12 @@ async function main() {
   }
   if (only === 'styles-inline') {
     await captureStylesInline(page)
+  }
+  if (only === 'code') {
+    await captureCode(page)
+  }
+  if (only === 'code-log') {
+    await captureCodeLog(page)
   }
 
   await browser.close()

@@ -26,8 +26,8 @@
 | 布局（Layouts） | `/development/layouts` | `layout` | [布局](./layouts.md) |
 | 脚本 | `/development/scripts` | `script` | [脚本](./scripts.md) |
 | 样式 | `/development/styles` | `style` | [样式](./styles.md) |
-| 代码 | `/development/code` | `code` | *待编写* |
-| 代码日志 | `/development/code-log` | `code` · `log` | *待编写* |
+| 代码 | `/development/code` | `code` | [代码](./code.md) |
+| 代码日志 | `/development/code-log` | `code·log` | [代码日志](./code-log.md) |
 | 代码搜索 | `/development/code-search` | `code` · `view` | *待编写* |
 | URL | `/development/urls` | `link` | *待编写* |
 | 表单 | `/development/forms` | `form` | *待编写* |

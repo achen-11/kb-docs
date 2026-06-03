@@ -106,6 +106,8 @@ const cmsSidebar = [
           { text: '布局（Layouts）', link: '/cms/development/layouts' },
           { text: '脚本', link: '/cms/development/scripts' },
           { text: '样式', link: '/cms/development/styles' },
+          { text: '代码', link: '/cms/development/code' },
+          { text: '代码日志', link: '/cms/development/code-log' },
         ],
       },
     ],
