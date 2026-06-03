@@ -198,6 +198,40 @@ async function captureCreateVariantDialog(page) {
   }
 }
 
+async function waitSaleStatsReady(page) {
+  await page.waitForResponse(
+    (r) => r.url().includes('SaleStats') && r.status() === 200,
+    { timeout: 60000 }
+  ).catch(() => {})
+  await page
+    .waitForSelector('.el-table tbody tr', { state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1000)
+}
+
+async function captureSaleStats(page) {
+  const url = `${BASE}/_Admin/commerce/sale-stats?SiteId=${SITE_ID}`
+  await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 })
+  await waitSaleStatsReady(page)
+  await snap(page, 'sale-stats-product.png')
+
+  const orderTab = page.getByRole('tab', { name: /订单详情报表|订单统计|Order Report/i })
+  if (await orderTab.count()) {
+    await orderTab.click()
+    await waitSaleStatsReady(page)
+    await snap(page, 'sale-stats-order.png')
+  }
+
+  const dailyTab = page.getByRole('tab', { name: /日销售报表|日统计|Daily Report/i })
+  if (await dailyTab.count()) {
+    await dailyTab.click()
+    await waitSaleStatsReady(page)
+    await snap(page, 'sale-stats-daily.png')
+  } else {
+    console.warn('skip sale-stats-daily.png / sale-stats-order.png: Tab 文案未匹配')
+  }
+}
+
 async function captureNotificationOverview(page) {
   const url = `${BASE}/_Admin/commerce/notification?SiteId=${SITE_ID}`
   await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 })
@@ -819,6 +853,10 @@ async function main() {
 
   if (only === 'notification-overview') {
     await captureNotificationOverview(page)
+  }
+
+  if (!only || only === 'sale-stats') {
+    await captureSaleStats(page)
   }
 
   await browser.close()
