@@ -166,6 +166,34 @@ async function captureCreateVariantDialog(page) {
   }
 }
 
+async function captureCustomers(page) {
+  const url = `${BASE}/_Admin/commerce/customers?SiteId=${SITE_ID}`
+  await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.waitForTimeout(2500)
+  await snap(page, 'customers-list.png')
+
+  const editIcon = page.locator('.el-table .icon-a-writein').first()
+  if (await editIcon.count()) {
+    await editIcon.click()
+    await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+    await page.waitForTimeout(800)
+    await snapDialog(page, 'customers-edit-dialog.png')
+
+    const addAddr = page
+      .locator('.el-dialog')
+      .last()
+      .getByRole('button', { name: /添加地址/ })
+    if (await addAddr.count()) {
+      await addAddr.click()
+      await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+      await page.waitForTimeout(500)
+      await snapDialog(page, 'customers-address-dialog.png')
+      await page.keyboard.press('Escape')
+    }
+    await page.keyboard.press('Escape')
+  }
+}
+
 async function captureShippings(page) {
   const url = `${BASE}/_Admin/commerce/shippings?SiteId=${SITE_ID}`
   await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 })
@@ -351,6 +379,10 @@ async function main() {
 
   if (!only || only === 'shippings') {
     await captureShippings(page)
+  }
+
+  if (!only || only === 'customers') {
+    await captureCustomers(page)
   }
 
   await browser.close()
