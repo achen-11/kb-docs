@@ -84,6 +84,14 @@ const cmsSidebar = [
           { text: '设置', link: '/cms/commerce/settings' },
         ],
       },
+      {
+        text: '运维',
+        collapsed: false,
+        items: [
+          { text: '概述', link: '/cms/operations/' },
+          { text: '访问统计', link: '/cms/operations/visitor-logs' },
+        ],
+      },
     ],
   },
 ]

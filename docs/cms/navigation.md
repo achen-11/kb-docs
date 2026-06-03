@@ -78,19 +78,21 @@
 
 左侧分组：**运维中心**（路由前缀 `/system`，与「站点设置」不同分组）
 
-| 菜单 | 路径 |
-|------|------|
-| 访问统计 | `/system/visitor-logs` |
-| 行为分析 | `/system/user-behavior-analysis` |
-| 资源守护 | `/system/resource-guardian` |
-| 页面交互 | `/system/page-interaction` |
-| AB测试 | `/system/ab-testing` |
-| 错误监控 | `/system/error-monitoring` |
-| 站点日志 | `/system/site-logs` |
-| 协作同步 | `/system/sync` |
-| 搜索 | `/system/search` |
-| 自动化 | `/system/automation` |
-| AI 服务 | `/system/ai-service` |
+| 菜单 | 路径 | 文档 |
+|------|------|------|
+| 访问统计 | `/system/visitor-logs` | [访问统计](./operations/visitor-logs.md) |
+| 行为分析 | `/system/user-behavior-analysis` | *待编写* |
+| 资源守护 | `/system/resource-guardian` | *待编写* |
+| 页面交互 | `/system/page-interaction` | *待编写* |
+| AB 测试 | `/system/ab-testing` | *待编写* |
+| 错误监控 | `/system/error-monitoring` | *待编写* |
+| 站点日志 | `/system/site-logs` | *待编写* |
+| 协作同步 | `/system/sync` | *待编写* |
+| 搜索 | `/system/search` | *待编写* |
+| 自动化 | `/system/automation` | *待编写* |
+| AI 服务 | `/system/ai-service` | *待编写* |
+
+概述：[运维中心](./operations/index.md)
 
 ## 开发
 
