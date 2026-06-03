@@ -49,10 +49,42 @@ async function login(page) {
   await page.waitForTimeout(2000)
 }
 
-async function snap(page, name) {
+async function snap(page, name, options = {}) {
+  const { fullPage = false } = options
   const file = path.join(OUT_DIR, name)
-  await page.screenshot({ path: file, fullPage: false })
+  await page.screenshot({ path: file, fullPage })
   console.log('saved', file)
+}
+
+async function waitNotificationOverviewReady(page) {
+  await page.waitForSelector('.el-form', { state: 'visible', timeout: 60000 })
+  await Promise.all([
+    page
+      .waitForResponse(
+        (r) => r.url().includes('EmailEvents') && r.status() === 200,
+        { timeout: 60000 }
+      )
+      .catch(() => null),
+    page
+      .waitForResponse(
+        (r) => r.url().includes('WebhookEvents') && r.status() === 200,
+        { timeout: 60000 }
+      )
+      .catch(() => null),
+  ])
+  await page
+    .waitForFunction(
+      () => {
+        const items = document.querySelectorAll('[data-cy=added-item]')
+        if (items.length >= 1) return true
+        const addBtns = document.querySelectorAll('[data-cy=add]')
+        return addBtns.length >= 2
+      },
+      { timeout: 30000 }
+    )
+    .catch(() => {})
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await page.waitForTimeout(1200)
 }
 
 async function snapLocator(locator, name) {
@@ -163,6 +195,84 @@ async function captureCreateVariantDialog(page) {
       '「添加规格」未出现（需先有选项组且变体带规格值）。',
       '可用 Browser MCP 手动补图，或换 KOOBOO_PRODUCT_ID。'
     )
+  }
+}
+
+async function captureNotificationOverview(page) {
+  const url = `${BASE}/_Admin/commerce/notification?SiteId=${SITE_ID}`
+  await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 })
+  await waitNotificationOverviewReady(page)
+  await snap(page, 'notification-overview.png', { fullPage: true })
+}
+
+async function captureNotification(page, overviewOnly = false) {
+  const url = `${BASE}/_Admin/commerce/notification?SiteId=${SITE_ID}`
+  await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 })
+  await waitNotificationOverviewReady(page)
+  await snap(page, 'notification-overview.png', { fullPage: true })
+  if (overviewOnly) return
+
+  const emailAdd = page.locator('[data-cy=add]').first()
+  if (await emailAdd.count()) {
+    await emailAdd.click()
+    await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+    const eventSelect = page.locator('.el-dialog .el-select').first()
+    if (await eventSelect.count()) {
+      await eventSelect.click()
+      await page.locator('.el-select-dropdown:visible .el-select-dropdown__item').first().click()
+      await page.waitForTimeout(800)
+    }
+    await snapDialog(page, 'notification-email-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const koobooRadio = page.locator('.el-radio-button').filter({ hasText: /^Kooboo$/ })
+  const customRadio = page.locator('.el-radio-button').filter({ hasText: /自定义/ })
+  if (await customRadio.count()) {
+    await customRadio.click()
+    await page.waitForTimeout(400)
+    const smtpBtn = page.getByRole('button', { name: /设置服务器|服务器信息/ }).first()
+    if (await smtpBtn.count()) {
+      await smtpBtn.click()
+      await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+      await page.waitForTimeout(500)
+      await snapDialog(page, 'notification-smtp-dialog.png')
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(400)
+    }
+    if (await koobooRadio.count()) await koobooRadio.click()
+  } else {
+    console.warn('skip notification-smtp-dialog.png: 未找到自定义邮件服务器选项')
+  }
+
+  const emailLog = page.getByRole('button', { name: /^日志$/ }).first()
+  if (await emailLog.count()) {
+    await emailLog.click()
+    await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+    await page.waitForTimeout(1000)
+    await snapDialog(page, 'notification-email-log-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const webhookAdd = page.locator('[data-cy=add]').nth(1)
+  if (await webhookAdd.count()) {
+    await webhookAdd.click()
+    await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+    await page.waitForTimeout(500)
+    await snapDialog(page, 'notification-webhook-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const webhookLog = page.getByRole('button', { name: /^日志$/ }).nth(1)
+  if (await webhookLog.count()) {
+    await webhookLog.click()
+    await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
+    await page.waitForTimeout(1000)
+    await snapDialog(page, 'notification-webhook-log-dialog.png')
+    await page.keyboard.press('Escape')
   }
 }
 
@@ -701,6 +811,14 @@ async function main() {
 
   if (!only || only === 'loyalty') {
     await captureLoyalty(page)
+  }
+
+  if (!only || only === 'notification') {
+    await captureNotification(page)
+  }
+
+  if (only === 'notification-overview') {
+    await captureNotificationOverview(page)
   }
 
   await browser.close()
