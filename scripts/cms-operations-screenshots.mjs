@@ -1,6 +1,8 @@
 /**
  * Capture Kooboo admin CMS screenshots for docs/public/cms/operations/
- * Usage: KOOBOO_SCREENSHOT_SCOPE=visitor-logs node scripts/cms-operations-screenshots.mjs
+ * Usage:
+ *   KOOBOO_SCREENSHOT_SCOPE=visitor-logs node scripts/cms-operations-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=resource-guardian node scripts/cms-operations-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -55,6 +57,15 @@ async function snapLocator(locator, name) {
   await locator.page().waitForTimeout(500)
   const file = path.join(OUT_DIR, name)
   await locator.screenshot({ path: file })
+  console.log('saved', file)
+}
+
+async function snapDialog(page, name) {
+  const dialog = page.locator('.el-dialog').last()
+  await dialog.waitFor({ state: 'visible', timeout: 30000 })
+  await page.waitForTimeout(400)
+  const file = path.join(OUT_DIR, name)
+  await dialog.screenshot({ path: file })
   console.log('saved', file)
 }
 
@@ -186,6 +197,166 @@ async function captureVisitorLogs(page) {
   }
 }
 
+async function waitResourceGuardianReady(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('ResourceLog') && r.status() === 200,
+      { timeout: 90000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('.resource-guardian')
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1500)
+}
+
+function resourceGuardianUrl(suffix = '') {
+  const pathPart = suffix
+    ? `resource-guardian/${suffix}`
+    : 'resource-guardian'
+  return `${BASE}/_Admin/system/${pathPart}?SiteId=${SITE_ID}`
+}
+
+async function captureResourceGuardian(page) {
+  await page.goto(resourceGuardianUrl(), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await waitResourceGuardianReady(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const root = page.locator('.resource-guardian').first()
+  await snapLocator(
+    root.locator('> .flex.items-center.justify-between').first(),
+    'resource-guardian-header.png'
+  )
+  await snap(page, 'resource-guardian-overview.png', { fullPage: true })
+  await snapLocator(
+    root.locator('> .flex.gap-24px').first(),
+    'resource-guardian-toolbar.png'
+  )
+  const statCards = root.locator('.grid.grid-cols-4').first()
+  if (await statCards.count()) {
+    await snapLocator(statCards, 'resource-guardian-stat-cards.png')
+  }
+
+  const bandwidth = page.getByText(/带宽分析区块/).first()
+  if (await bandwidth.count()) {
+    const block = bandwidth.locator(
+      'xpath=ancestor::div[contains(@class,"rounded-8px")][1]'
+    )
+    if (await block.count()) {
+      await snapLocator(block, 'resource-guardian-bandwidth.png')
+    }
+  }
+
+  const twoCol = root.locator('.grid.grid-cols-2').first()
+  if (await twoCol.count()) {
+    await snapLocator(twoCol, 'resource-guardian-composition-ranking.png')
+  }
+
+  const liveLog = page.getByText(/实时资源清单/).first()
+  if (await liveLog.count()) {
+    const block = liveLog.locator(
+      'xpath=ancestor::div[contains(@class,"rounded-8px")][1]'
+    )
+    if (await block.count()) {
+      await snapLocator(block, 'resource-guardian-live-log.png')
+    }
+  }
+
+  const botTitle = page.getByText(/机器人情报分析/).first()
+  if (await botTitle.count()) {
+    const block = botTitle.locator(
+      'xpath=ancestor::div[contains(@class,"rounded-8px")][1]'
+    )
+    if (await block.count()) {
+      await snapLocator(block, 'resource-guardian-bot-intelligence.png')
+    }
+  }
+
+  const external = page
+    .getByText(/正在使用你资源的外部站点/)
+    .first()
+  if (await external.count()) {
+    const block = external.locator(
+      'xpath=ancestor::div[contains(@class,"rounded-8px")][1]'
+    )
+    if (await block.count()) {
+      await snapLocator(block, 'resource-guardian-external-domains.png')
+    }
+  }
+
+  const invalidCard = statCards.locator('> div').nth(1)
+  if (await invalidCard.count()) {
+    await invalidCard.click()
+    await snapDialog(page, 'resource-guardian-invalid-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const protectedCard = statCards.locator('> div').nth(2)
+  if (await protectedCard.count()) {
+    await protectedCard.click()
+    await snapDialog(page, 'resource-guardian-protected-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  await page.goto(resourceGuardianUrl('protection-rules'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('ResourceLog/Setting') && r.status() === 200,
+      { timeout: 45000 }
+    )
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+  const rulesMain = page.locator('.p-24.pb-150px').first()
+  if (await rulesMain.count()) {
+    await snapLocator(rulesMain, 'resource-guardian-protection-rules.png')
+  }
+  const addRule = page.getByRole('button', { name: /添加规则/ }).first()
+  if (await addRule.count()) {
+    await addRule.click()
+    await snapDialog(page, 'resource-guardian-rule-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  await page.goto(resourceGuardianUrl('log-list'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await waitResourceGuardianReady(page)
+  const logHeader = page.locator('.relative.p-24, .p-24 .mb-24').first()
+  const logTable = page.locator('.el-table').first()
+  if ((await logHeader.count()) && (await logTable.count())) {
+    const box = await logHeader.boundingBox()
+    const tableBox = await logTable.boundingBox()
+    if (box && tableBox) {
+      const file = path.join(OUT_DIR, 'resource-guardian-log-list.png')
+      await page.screenshot({
+        path: file,
+        clip: {
+          x: Math.min(box.x, tableBox.x),
+          y: box.y,
+          width:
+            Math.max(box.x + box.width, tableBox.x + tableBox.width) -
+            Math.min(box.x, tableBox.x),
+          height: tableBox.y + tableBox.height - box.y + 40,
+        },
+      })
+      console.log('saved', file)
+    }
+  } else if (await logTable.count()) {
+    await snapLocator(logTable, 'resource-guardian-log-list.png')
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE
   await mkdir(OUT_DIR, { recursive: true })
@@ -200,6 +371,9 @@ async function main() {
 
   if (!only || only === 'visitor-logs') {
     await captureVisitorLogs(page)
+  }
+  if (!only || only === 'resource-guardian') {
+    await captureResourceGuardian(page)
   }
 
   await browser.close()

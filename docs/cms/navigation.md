@@ -82,7 +82,7 @@
 |------|------|------|
 | 访问统计 | `/system/visitor-logs` | [访问统计](./operations/visitor-logs.md) |
 | 行为分析 | `/system/user-behavior-analysis` | *待编写* |
-| 资源守护 | `/system/resource-guardian` | *待编写* |
+| 资源守护 | `/system/resource-guardian` | [资源守护](./operations/resource-guardian.md) |
 | 页面交互 | `/system/page-interaction` | *待编写* |
 | AB 测试 | `/system/ab-testing` | *待编写* |
 | 错误监控 | `/system/error-monitoring` | *待编写* |

@@ -58,7 +58,7 @@ const cmsSidebar = [
       },
       {
         text: '电商',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: '概述', link: '/cms/commerce/' },
           {
@@ -85,11 +85,12 @@ const cmsSidebar = [
         ],
       },
       {
-        text: '运维',
+        text: '运维中心',
         collapsed: false,
         items: [
           { text: '概述', link: '/cms/operations/' },
           { text: '访问统计', link: '/cms/operations/visitor-logs' },
+          { text: '资源守护', link: '/cms/operations/resource-guardian' },
         ],
       },
     ],
