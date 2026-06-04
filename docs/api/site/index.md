@@ -4,7 +4,7 @@
 
 ## 概述
 
-`k.site` 是 Kooboo **当前站点**内容的统一入口。通过 `pages`、`layouts`、`views`、`scripts`、`styles` 等子 API 进行 CRUD，并支持创建站点、导入导出等管理操作。
+`k.site` 是 Kooboo **当前站点**内容的统一入口。通过 `pages`、`layouts`、`views`、`scripts`、`styles`、`menus` 等子 API 进行 CRUD，并支持创建站点、导入导出等管理操作。
 
 ::: warning 与 k.file、CMS 文件库的区别
 - **k.site**：站点结构化资源（页面、布局、View、Script 等），带版本与路由。
@@ -22,6 +22,7 @@
 | `k.site.scripts` | [js.md](./js.md) |
 | `k.site.styles` | [css.md](./css.md) |
 | `k.site.codes` | [code.md](./code.md) — API 与 CodeBlock（`codeType`） |
+| `k.site.menus` | [menu.md](./menu.md) — 前台导航菜单 |
 
 ## 常用方法（节选）
 

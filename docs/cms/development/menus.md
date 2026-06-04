@@ -3,7 +3,11 @@
 > 菜单：**开发 → 菜单**  
 > 深链：`/_Admin/development/menus?SiteId={站点GUID}`
 
-管理站点 **导航菜单** 定义：创建菜单组、维护多级 **菜单项**（名称、链接、多语言），并配置输出 HTML **模板**（占位符渲染子项）。前台通过菜单 API / 模板引用展示，与 [页面](../site/pages.md) 路径配合。
+管理站点 **导航菜单** 定义：创建菜单组、维护多级 **菜单项**（名称、链接、多语言），并配置输出 HTML **模板**（占位符渲染子项）。定义保存后须在 **Layout / Page / View** 中引用才会出现在访客站点上，见 [前台使用](#前台使用)。
+
+::: info 不是后台左侧菜单
+本页是 **访客站点** 的导航数据，与 [编辑菜单](../navigation.md#权限与编辑菜单)（控制 Kooboo 后台功能树）无关。
+:::
 
 ::: tip 权限
 菜单权限：`menu`（查看）。**新建菜单**、编辑项、拖拽排序、删项、改模板需 `menu·edit`；列表批量删除菜单需 `menu·delete`。行末 **版本** 需 `site·log`。
@@ -90,10 +94,51 @@
 
 <DocImage src="/cms/development/menus-template-dialog.png" alt="菜单模板编辑与预览" width="1120" />
 
+## 前台使用
+
+后台保存菜单后，在 **公共 Layout** 或需要导航的 **Page / View** 中选用以下方式之一（无单独「启用」开关）。
+
+### 使用 `<menu>` 组件（沿用本节模板）
+
+在 HTML 中插入 **Menu** 组件，`id` 填写上表 **名称** 列中的菜单名（如 `main`）。输出结构由 [菜单模板弹窗](#菜单模板弹窗) 中的 `{href}`、`{anchortext}`、`{items}` 等占位符决定，并自动处理当前页高亮。
+
+```html
+<menu id="main"></menu>
+```
+
+可选属性 `menulevel` 限制渲染层级（如 `menulevel="2"`）。设计器组件面板拖入 **Menu** 等价。
+
+### 使用 `k.site.menus` + `k-for`（自定义结构）
+
+在 `env="server"` 脚本中读取菜单，再用 [模板绑定语法](/templateEngine/binding/) 的 `k-for` 自行拼 HTML，适合与站点 CSS 强耦合的导航栏。
+
+```html
+<div env="server">
+    <script>
+        var nav = k.site.menus.get("main");
+        var items = nav && nav.children ? nav.children : [];
+    </script>
+    <ul>
+        <li k-for="item in items" repeat-self>
+            <a k-attribute="href {item.url}" k-content="item.name"></a>
+        </li>
+    </ul>
+</div>
+```
+
+方法说明、`createSubMenu`、多语言 `getName` 等见 **[k.site.menus](/api/site/menu.md)**。请勿使用已弃用的 `k-query` / `v-query` 取菜单。
+
+### 脚本动态维护（可选）
+
+安装向导、迁移等场景可在 Code / `k.api` 中调用 `k.site.menus.create`、`menu.createSubMenu` 等；日常运营仍建议在本页维护。
+
 ## 相关
 
 | 文档 | 说明 |
 |------|------|
+| [k.site.menus](/api/site/menu.md) | KScript API：`get`、`list`、子项维护、前台示例 |
+| [模板绑定语法](/templateEngine/binding/) | `k-for`、`k-content`、`k-attribute` |
 | [开发概述](./index.md) | 开发菜单索引 |
 | [页面](../site/pages.md) | 菜单项 URL 常指向页面 |
 | [URL](./urls.md) | 站点路径与路由 |
+| [编辑菜单](../navigation.md#权限与编辑菜单) | 后台左侧功能树（非本文） |

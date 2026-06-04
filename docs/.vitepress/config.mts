@@ -317,6 +317,7 @@ export default defineConfig({
                 { text: 'css', link: '/api/site/css.md' },
                 { text: 'js', link: '/api/site/js.md' },
                 { text: 'layouts', link: '/api/site/layout.md' },
+                { text: 'menus', link: '/api/site/menu.md' },
                 { text: 'pages', link: '/api/site/page.md' },
                 { text: 'views', link: '/api/site/view.md' },
               ]

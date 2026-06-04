@@ -34,7 +34,7 @@ k.api.post(() => {
 | `k.DB` | 数据库操作 |
 | `k.content` | 内容管理 |
 | `k.file` | 文件操作 |
-| `k.site` | 站点管理 |
+| `k.site` | 站点管理（页面、布局、菜单等） |
 | `k.net` | 网络请求 |
 | `k.commerce` | 电商功能 |
 | `k.payment` | 支付功能 |

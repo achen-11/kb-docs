@@ -47,6 +47,7 @@
 | Scripts | [Script](/templateEngine/js/) |
 | Styles | [Style](/templateEngine/css/) |
 | Code | `k.site.codes`（API） |
+| Menus | [k.site.menus](/api/site/menu.md) |
 | Modules | `k.module`（API） |
 
 ## 无侧栏菜单的编辑路由

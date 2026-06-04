@@ -60,6 +60,7 @@ flowchart TB
 |------|----------|
 | 在 **HTML 模板** 里写布局、占位、视图引用 | 本目录 `templateEngine/*` |
 | 用 **`k.site.pages`** 等 **脚本** 增删改资源 | [k.site](/api/site/) |
+| 输出 **站点导航菜单**（`<menu>` 或 `k.site.menus` + `k-for`） | [k.site.menus](/api/site/menu.md) · [CMS：菜单](/cms/development/menus) |
 | 改 **当前请求** 的 title/meta | [k.page](/api/page/) |
 
 ## 数据查询
