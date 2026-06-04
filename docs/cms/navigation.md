@@ -111,7 +111,7 @@
 | 表单 | `/development/forms` | [表单](./development/forms.md) |
 | 菜单 | `/development/menus` | [菜单](./development/menus.md) |
 | 身份验证 | `/development/authentication` | [身份验证](./development/authentication.md) |
-| Open API | `/development/openapis` | *待编写* |
+| Open API | `/development/openapis` | [Open API](./development/openapis.md) |
 | SPA 多语言 | `/development/spamultilingual` | *待编写* |
 | 模块 | `/development/modules` | *待编写* |
 | 任务 | `/development/jobs` | *待编写* |

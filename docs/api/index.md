@@ -26,6 +26,7 @@ KScript API 完整参考（服务端 `k.*`）。文档路径与模块名一致�
 | `k.mail` | [mail/](./mail/) | 发信、IMAP、SES |
 | `k.media` | [media/](./media/) | 媒体库 |
 | `k.module` | [module/](./module/) | 脚本模块上下文 |
+| `k.openApi` | [openapi/](./openapi/) | 外部 OpenAPI 定义调用与授权 |
 | `k.net` | [net/](./net/) | httpClient、url、webSocket、DNS、IP |
 | `k.page` | [page/](./page/) | 当前页 title / meta |
 | `k.paramConfig` | [param-config/](./param-config/) | 参数配置（结构化 JSON） |

@@ -13,6 +13,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=forms node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=menus node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=authentication node scripts/cms-development-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=openapis node scripts/cms-development-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -940,6 +941,125 @@ async function captureForms(page) {
   }
 }
 
+function openapisUrl() {
+  return `${BASE}/_Admin/development/openapis?SiteId=${SITE_ID}`
+}
+
+function openapiEditUrl(id) {
+  const q = id ? `&id=${id}` : ''
+  return `${BASE}/_Admin/development/openapi/edit?SiteId=${SITE_ID}${q}`
+}
+
+function openapiAuthorizesUrl(id) {
+  return `${BASE}/_Admin/development/openapi/authorizes?SiteId=${SITE_ID}&id=${id}`
+}
+
+async function waitOpenapisList(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('OpenApi') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('.el-table')
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+}
+
+async function captureOpenapis(page) {
+  await page.goto(openapisUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await waitOpenapisList(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('.p-24 > .flex.items-center.py-24').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'openapis-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'openapis-list-table.png')
+  }
+  await snap(page, 'openapis-overview.png', { fullPage: true })
+
+  const firstRow = page.locator('.el-table__body tr').first()
+  let openApiId = null
+  if (await firstRow.count()) {
+    const editLink = firstRow.locator('[data-cy="edit"]').first()
+    if (await editLink.count()) {
+      await editLink.click()
+      await page.waitForURL(/openapi\/edit/, { timeout: 60000 })
+      openApiId = new URL(page.url()).searchParams.get('id')
+      await page.waitForTimeout(1500)
+      await snap(page, 'openapis-edit.png', { fullPage: true })
+
+      const cacheAdd = page.locator('[data-cy="add"]').first()
+      if (await cacheAdd.count()) {
+        await cacheAdd.scrollIntoViewIfNeeded()
+        await page.waitForTimeout(400)
+        await snapLocator(
+          page.locator('.el-card').first(),
+          'openapis-edit-cache.png'
+        )
+      }
+
+      const urlInput = page.locator('[data-cy="url"]').first()
+      if (await urlInput.count()) {
+        await snapLocator(
+          page.locator('.el-card').first(),
+          'openapis-edit-url.png'
+        )
+      } else {
+        const typeCode = page.locator('[data-cy="type-code"]').first()
+        if (await typeCode.count()) {
+          await typeCode.click()
+          await page.waitForTimeout(400)
+        }
+        const codeRadio = page.locator('[data-cy="type-code"]').first()
+        if (!(await codeRadio.count())) {
+          await page.goBack()
+          await page.goto(openapiEditUrl(), { waitUntil: 'networkidle' })
+          await page.waitForTimeout(1000)
+          await page.locator('[data-cy="type-code"]').click()
+          await page.waitForTimeout(500)
+        }
+        await snap(page, 'openapis-edit-code.png', { fullPage: true })
+      }
+
+      if (openApiId) {
+        await page.goto(openapiAuthorizesUrl(openApiId), {
+          waitUntil: 'networkidle',
+          timeout: 90000,
+        })
+        await page.waitForTimeout(1500)
+        await snap(page, 'openapis-authorizes.png', { fullPage: true })
+
+        const createAuth = page
+          .getByRole('button', { name: /创建|create/i })
+          .first()
+        if (await createAuth.count()) {
+          await createAuth.click()
+          await snapDialog(page, 'openapis-authorize-dialog.png')
+          await page.keyboard.press('Escape')
+        }
+      }
+      await page.goto(openapisUrl(), { waitUntil: 'networkidle' })
+    }
+  }
+
+  await page.goto(openapiEditUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await page.waitForTimeout(800)
+  const urlType = page.locator('[data-cy="type-url"]').first()
+  if (await urlType.count()) {
+    await urlType.click()
+    await page.waitForTimeout(500)
+    await snapLocator(page.locator('.el-card').first(), 'openapis-edit-url.png')
+  }
+
+  await page.goto(openapisUrl(), { waitUntil: 'networkidle' })
+}
+
 function authenticationUrl() {
   return `${BASE}/_Admin/development/authentication?SiteId=${SITE_ID}`
 }
@@ -1144,6 +1264,9 @@ async function main() {
   }
   if (only === 'authentication') {
     await captureAuthentication(page)
+  }
+  if (only === 'openapis') {
+    await captureOpenapis(page)
   }
 
   await browser.close()

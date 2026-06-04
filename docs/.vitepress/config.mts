@@ -113,6 +113,7 @@ const cmsSidebar = [
           { text: '表单', link: '/cms/development/forms' },
           { text: '菜单', link: '/cms/development/menus' },
           { text: '身份验证', link: '/cms/development/authentication' },
+          { text: 'Open API', link: '/cms/development/openapis' },
         ],
       },
     ],
@@ -275,6 +276,7 @@ export default defineConfig({
             { text: 'k.mail', link: '/api/mail/' },
             { text: 'k.media', link: '/api/media/' },
             { text: 'k.module', link: '/api/module/' },
+            { text: 'k.openApi', link: '/api/openapi/' },
             {
               text: 'k.net',
               collapsed: true,
