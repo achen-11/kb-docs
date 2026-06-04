@@ -110,7 +110,7 @@
 | URL | `/development/urls` | [URL](./development/urls.md) |
 | 表单 | `/development/forms` | [表单](./development/forms.md) |
 | 菜单 | `/development/menus` | [菜单](./development/menus.md) |
-| 身份验证 | `/development/authentication` | *待编写* |
+| 身份验证 | `/development/authentication` | [身份验证](./development/authentication.md) |
 | Open API | `/development/openapis` | *待编写* |
 | SPA 多语言 | `/development/spamultilingual` | *待编写* |
 | 模块 | `/development/modules` | *待编写* |

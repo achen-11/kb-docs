@@ -12,6 +12,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=urls node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=forms node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=menus node scripts/cms-development-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=authentication node scripts/cms-development-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -939,6 +940,68 @@ async function captureForms(page) {
   }
 }
 
+function authenticationUrl() {
+  return `${BASE}/_Admin/development/authentication?SiteId=${SITE_ID}`
+}
+
+async function waitAuthenticationList(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('Authentication') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('.el-table')
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+}
+
+async function captureAuthentication(page) {
+  await page.goto(authenticationUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await waitAuthenticationList(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('.p-24 > .flex.items-center.py-24').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'authentication-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'authentication-list-table.png')
+  }
+  await snap(page, 'authentication-overview.png', { fullPage: true })
+
+  const createBtn = page.locator('[data-cy="create"]').first()
+  if (await createBtn.count()) {
+    await createBtn.click()
+    await snapDialog(page, 'authentication-edit-dialog.png')
+
+    const matcher = page.locator('[data-cy="matcher"]').first()
+    if (await matcher.count()) {
+      await matcher.click()
+      await page.waitForTimeout(300)
+      const conditionOpt = page
+        .locator('[data-cy="matcher-opt"]')
+        .filter({ hasText: /Condition/i })
+        .first()
+      if (await conditionOpt.count()) {
+        await conditionOpt.click()
+        await page.waitForTimeout(500)
+        const addCond = page.locator('[data-cy="add-condition"]').first()
+        if (await addCond.count()) {
+          await addCond.click()
+          await page.waitForTimeout(400)
+        }
+        await snapDialog(page, 'authentication-condition.png')
+      }
+    }
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+}
+
 function menusUrl() {
   return `${BASE}/_Admin/development/menus?SiteId=${SITE_ID}`
 }
@@ -1078,6 +1141,9 @@ async function main() {
   }
   if (only === 'menus') {
     await captureMenus(page)
+  }
+  if (only === 'authentication') {
+    await captureAuthentication(page)
   }
 
   await browser.close()

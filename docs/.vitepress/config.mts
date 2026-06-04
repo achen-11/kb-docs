@@ -112,6 +112,7 @@ const cmsSidebar = [
           { text: 'URL', link: '/cms/development/urls' },
           { text: '表单', link: '/cms/development/forms' },
           { text: '菜单', link: '/cms/development/menus' },
+          { text: '身份验证', link: '/cms/development/authentication' },
         ],
       },
     ],
