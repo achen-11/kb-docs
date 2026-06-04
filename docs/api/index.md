@@ -52,6 +52,7 @@ KScript API 完整参考（服务端 `k.*`）。文档路径与模块名一致�
 | `k.site.styles` | [css.md](./site/css.md) |
 | `k.site.codes` | [code.md](./site/code.md) |
 | `k.site.menus` | [menu.md](./site/menu.md) |
+| `k.site.runJob` | [job.md](./site/job.md) |
 
 ### k.file 子页
 

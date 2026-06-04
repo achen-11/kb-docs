@@ -64,6 +64,7 @@ flowchart TB
 | 调用 **外部 OpenAPI** 服务 | [k.openApi](/api/openapi/) · [CMS：Open API](/cms/development/openapis) |
 | **SPA** 前端拉取 JSON 词典 | [SPA 多语言 API](/api/spa-multilingual/) · [CMS](/cms/development/spa-multilingual) |
 | **可安装模块**（路由、view/api） | [k.module](/api/module/) · [CMS：模块](/cms/development/modules) |
+| **计划任务** | [k.site · 任务](/api/site/job.md) · [CMS：任务](/cms/development/jobs) |
 | 改 **当前请求** 的 title/meta | [k.page](/api/page/) |
 
 ## 数据查询

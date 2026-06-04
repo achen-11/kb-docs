@@ -198,4 +198,4 @@ interface KModule {
 - [k.site](../site/) — 站点资源  
 - [k.DB](../database/) — 站点数据库  
 - [k.file](../file/file.md) — 站点磁盘文件（非模块目录）  
-- [开发概述](/cms/development/) — 站点级 Job 菜单（文档待编写）
+- [开发 · 任务](/cms/development/jobs.md) — 站点级计划任务（`k.site.runJob`）

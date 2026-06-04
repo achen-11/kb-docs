@@ -114,7 +114,7 @@
 | Open API | `/development/openapis` | [Open API](./development/openapis.md) |
 | SPA 多语言 | `/development/spamultilingual` | [SPA 多语言](./development/spa-multilingual.md) |
 | 模块 | `/development/modules` | [模块](./development/modules.md) |
-| 任务 | `/development/jobs` | *待编写* |
+| 任务 | `/development/jobs` | [任务](./development/jobs.md) |
 
 概述：[开发](./development/index.md)（含模板引擎 / API 对照表）
 

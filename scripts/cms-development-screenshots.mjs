@@ -16,6 +16,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=openapis node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=spamultilingual node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=modules node scripts/cms-development-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=jobs node scripts/cms-development-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -1297,6 +1298,65 @@ async function waitMenuEdit(page) {
   await page.waitForTimeout(1000)
 }
 
+function jobsUrl() {
+  return `${BASE}/_Admin/development/jobs?SiteId=${SITE_ID}`
+}
+
+async function waitJobsList(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('Job/list') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('.el-table, .el-tabs')
+    .first()
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+}
+
+async function captureJobs(page) {
+  await page.goto(jobsUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await waitJobsList(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('[data-cy="add-job"]').locator('..').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'jobs-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'jobs-list-table.png')
+  }
+  await snap(page, 'jobs-overview.png', { fullPage: true })
+
+  const addBtn = page.locator('[data-cy="add-job"]').first()
+  if (await addBtn.count()) {
+    await addBtn.click()
+    await snapDialog(page, 'jobs-edit-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const completedTab = page
+    .locator('.el-tabs__item')
+    .filter({ hasText: /已完成|completed/i })
+    .first()
+  if (await completedTab.count()) {
+    await completedTab.click()
+    await page
+      .waitForResponse(
+        (r) => r.url().includes('Job/Logs') && r.status() === 200,
+        { timeout: 60000 }
+      )
+      .catch(() => {})
+    await page.waitForTimeout(1000)
+    await snap(page, 'jobs-logs-completed.png', { fullPage: true })
+  }
+}
+
 async function captureMenus(page) {
   await page.goto(menusUrl(), { waitUntil: 'networkidle', timeout: 90000 })
   await page
@@ -1429,6 +1489,9 @@ async function main() {
   }
   if (only === 'modules') {
     await captureModules(page)
+  }
+  if (only === 'jobs') {
+    await captureJobs(page)
   }
 
   await browser.close()

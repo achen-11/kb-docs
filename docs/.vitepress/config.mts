@@ -116,6 +116,7 @@ const cmsSidebar = [
           { text: 'Open API', link: '/cms/development/openapis' },
           { text: 'SPA 多语言', link: '/cms/development/spa-multilingual' },
           { text: '模块', link: '/cms/development/modules' },
+          { text: '任务', link: '/cms/development/jobs' },
         ],
       },
     ],

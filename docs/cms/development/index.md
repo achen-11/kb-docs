@@ -36,7 +36,7 @@
 | Open API | `/development/openapis` | `openApi` | [Open API](./openapis.md) |
 | SPA 多语言 | `/development/spamultilingual` | `spaMultilingual` | [SPA 多语言](./spa-multilingual.md) |
 | 模块 | `/development/modules` | `module` | [模块](./modules.md) |
-| 任务 | `/development/jobs` | `job` | *待编写* |
+| 任务 | `/development/jobs` | `job` | [任务](./jobs.md) |
 
 ### 开发参考（模板引擎 / API）
 
@@ -52,6 +52,7 @@
 | Open API | [k.openApi](/api/openapi/) |
 | SPA 多语言 | [SPA 多语言 API](/api/spa-multilingual/) |
 | Modules | [k.module](/api/module/) |
+| Jobs | [k.site · 任务](/api/site/job.md) |
 
 ## 无侧栏菜单的编辑路由
 

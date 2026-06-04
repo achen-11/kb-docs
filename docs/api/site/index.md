@@ -23,6 +23,7 @@
 | `k.site.styles` | [css.md](./css.md) |
 | `k.site.codes` | [code.md](./code.md) — API 与 CodeBlock（`codeType`） |
 | `k.site.menus` | [menu.md](./menu.md) — 前台导航菜单 |
+| `k.site.runJob` | [job.md](./job.md) — 计划任务手动触发 |
 
 ## 常用方法（节选）
 
