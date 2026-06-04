@@ -15,6 +15,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=authentication node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=openapis node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=spamultilingual node scripts/cms-development-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=modules node scripts/cms-development-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -942,6 +943,104 @@ async function captureForms(page) {
   }
 }
 
+function modulesUrl() {
+  return `${BASE}/_Admin/development/modules?SiteId=${SITE_ID}`
+}
+
+function devModeModulesUrl(moduleId) {
+  return `${BASE}/_Admin/dev-mode?SiteId=${SITE_ID}&activity=modules&moduleId=${moduleId}`
+}
+
+async function waitModulesList(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('ScriptModule') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('.el-table, .p-24')
+    .first()
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+}
+
+async function captureModules(page) {
+  await page.goto(modulesUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await waitModulesList(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('.p-24 > .flex.items-center.py-24').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'modules-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'modules-list-table.png')
+  }
+  await snap(page, 'modules-overview.png', { fullPage: true })
+
+  const createBtn = page.locator('[data-cy="create-module"]').first()
+  if (await createBtn.count()) {
+    await createBtn.click()
+    await snapDialog(page, 'modules-add-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const importBtn = page.locator('[data-cy="import"]').first()
+  if (await importBtn.count()) {
+    await importBtn.click()
+    await snapDialog(page, 'modules-import-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  let moduleId = null
+  const nameLink = page.locator('[data-cy="name"]').first()
+  if (await nameLink.count()) {
+    const href = await nameLink.getAttribute('href')
+    if (href) {
+      const m = href.match(/moduleId=([^&]+)/)
+      if (m) moduleId = m[1]
+    }
+    if (!moduleId) {
+      await nameLink.click()
+      await page.waitForURL(/dev-mode/, { timeout: 60000 })
+      moduleId = new URL(page.url()).searchParams.get('moduleId')
+      await page.waitForTimeout(2000)
+      await snap(page, 'modules-devmode.png', { fullPage: true })
+      await page.goto(modulesUrl(), { waitUntil: 'networkidle' })
+      await waitModulesList(page)
+    }
+  }
+
+  const settingBtn = page.locator('[data-cy="setting"]').first()
+  if (await settingBtn.count()) {
+    await settingBtn.click()
+    await snapDialog(page, 'modules-setting-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const descBtn = page.locator('[data-cy="description"]').first()
+  if (await descBtn.count()) {
+    await descBtn.click()
+    await snapDialog(page, 'modules-readme-dialog.png')
+    await page.keyboard.press('Escape')
+  }
+
+  if (moduleId && !(await page.url()).includes('dev-mode')) {
+    await page.goto(devModeModulesUrl(moduleId), {
+      waitUntil: 'networkidle',
+      timeout: 90000,
+    })
+    await page.waitForTimeout(2500)
+    await snap(page, 'modules-devmode.png', { fullPage: true })
+  }
+}
+
 function spaMultilingualUrl() {
   return `${BASE}/_Admin/development/spamultilingual?SiteId=${SITE_ID}`
 }
@@ -1327,6 +1426,9 @@ async function main() {
   }
   if (only === 'spamultilingual') {
     await captureSpaMultilingual(page)
+  }
+  if (only === 'modules') {
+    await captureModules(page)
   }
 
   await browser.close()

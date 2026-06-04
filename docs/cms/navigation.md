@@ -113,10 +113,14 @@
 | 身份验证 | `/development/authentication` | [身份验证](./development/authentication.md) |
 | Open API | `/development/openapis` | [Open API](./development/openapis.md) |
 | SPA 多语言 | `/development/spamultilingual` | [SPA 多语言](./development/spa-multilingual.md) |
-| 模块 | `/development/modules` | *待编写* |
+| 模块 | `/development/modules` | [模块](./development/modules.md) |
 | 任务 | `/development/jobs` | *待编写* |
 
 概述：[开发](./development/index.md)（含模板引擎 / API 对照表）
+
+::: info 模块注入的侧栏菜单
+已上线模块可在 **`module.config`** 中配置 **`menu`**，将自定义入口挂到左侧某一 **顶级分组** 下。`parent` 填该分组在路由中的 **`menu.name`**（如 `content`、`commerce`、`development`、`system`、`database`）。详见 [模块 · 挂载站点后台菜单](./development/modules.md#挂载站点后台菜单-menu)。
+:::
 
 页面设计器路由（无左侧菜单项）：`/page/edit`、`/page/design` 等，从 [页面](./site/pages.md) 列表进入。
 

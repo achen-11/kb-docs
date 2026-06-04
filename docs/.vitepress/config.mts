@@ -115,6 +115,7 @@ const cmsSidebar = [
           { text: '身份验证', link: '/cms/development/authentication' },
           { text: 'Open API', link: '/cms/development/openapis' },
           { text: 'SPA 多语言', link: '/cms/development/spa-multilingual' },
+          { text: '模块', link: '/cms/development/modules' },
         ],
       },
     ],
