@@ -35,6 +35,7 @@ KScript API 完整参考（服务端 `k.*`）。文档路径与模块名一致�
 | `k.response` | [response/](./response/) | HTTP 响应 |
 | `k.security` | [security/](./security/) | 加密与哈希 |
 | `k.session` | [session/](./session/) | 会话 |
+| SPA 多语言 | [spa-multilingual/](./spa-multilingual/) | `/_spa/lang/{lang}` 词典（无 `k.*` CRUD） |
 | `k.site` | [site/](./site/) | 页面、布局、视图、脚本、样式、codes |
 | `k.state` | [state/](./state/) | 当前请求视图数据 |
 | `k.storage` | [storage/](./storage/) | 云对象存储 |

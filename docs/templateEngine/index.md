@@ -62,6 +62,7 @@ flowchart TB
 | 用 **`k.site.pages`** 等 **脚本** 增删改资源 | [k.site](/api/site/) |
 | 输出 **站点导航菜单**（`<menu>` 或 `k.site.menus` + `k-for`） | [k.site.menus](/api/site/menu.md) · [CMS：菜单](/cms/development/menus) |
 | 调用 **外部 OpenAPI** 服务 | [k.openApi](/api/openapi/) · [CMS：Open API](/cms/development/openapis) |
+| **SPA** 前端拉取 JSON 词典 | [SPA 多语言 API](/api/spa-multilingual/) · [CMS](/cms/development/spa-multilingual) |
 | 改 **当前请求** 的 title/meta | [k.page](/api/page/) |
 
 ## 数据查询

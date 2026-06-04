@@ -114,6 +114,7 @@ const cmsSidebar = [
           { text: '菜单', link: '/cms/development/menus' },
           { text: '身份验证', link: '/cms/development/authentication' },
           { text: 'Open API', link: '/cms/development/openapis' },
+          { text: 'SPA 多语言', link: '/cms/development/spa-multilingual' },
         ],
       },
     ],
@@ -311,6 +312,7 @@ export default defineConfig({
             { text: 'k.response', link: '/api/response/' },
             { text: 'k.security', link: '/api/security/' },
             { text: 'k.session', link: '/api/session/' },
+            { text: 'SPA 多语言', link: '/api/spa-multilingual/' },
             {
               text: 'k.site',
               collapsed: true,

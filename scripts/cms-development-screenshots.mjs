@@ -14,6 +14,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=menus node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=authentication node scripts/cms-development-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=openapis node scripts/cms-development-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=spamultilingual node scripts/cms-development-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -941,6 +942,62 @@ async function captureForms(page) {
   }
 }
 
+function spaMultilingualUrl() {
+  return `${BASE}/_Admin/development/spamultilingual?SiteId=${SITE_ID}`
+}
+
+async function waitSpaMultilingualList(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('SpaMultilingual') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+}
+
+async function captureSpaMultilingual(page) {
+  await page.goto(spaMultilingualUrl(), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await waitSpaMultilingualList(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('.p-24 > .flex.items-center.py-24').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'spamultilingual-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'spamultilingual-table.png')
+  }
+  await snap(page, 'spamultilingual-overview.png', { fullPage: true })
+
+  const settingBtn = page.locator('[data-cy="setting"]').first()
+  if (await settingBtn.count()) {
+    await settingBtn.click()
+    await snapDialog(page, 'spamultilingual-setting-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const uploadBtn = page.locator('[data-cy="upload"]').first()
+  if (await uploadBtn.count()) {
+    await uploadBtn.click()
+    await snapDialog(page, 'spamultilingual-import-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const editBtn = page.locator('[data-cy="edit"]').first()
+  if (await editBtn.count()) {
+    await editBtn.click()
+    await snapDialog(page, 'spamultilingual-edit-dialog.png')
+    await page.keyboard.press('Escape')
+  }
+}
+
 function openapisUrl() {
   return `${BASE}/_Admin/development/openapis?SiteId=${SITE_ID}`
 }
@@ -1267,6 +1324,9 @@ async function main() {
   }
   if (only === 'openapis') {
     await captureOpenapis(page)
+  }
+  if (only === 'spamultilingual') {
+    await captureSpaMultilingual(page)
   }
 
   await browser.close()

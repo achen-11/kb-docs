@@ -34,7 +34,7 @@
 | 菜单 | `/development/menus` | `menu` | [菜单](./menus.md) |
 | 身份验证 | `/development/authentication` | `authentication` | [身份验证](./authentication.md) |
 | Open API | `/development/openapis` | `openApi` | [Open API](./openapis.md) |
-| SPA 多语言 | `/development/spamultilingual` | `spaMultilingual` | *待编写* |
+| SPA 多语言 | `/development/spamultilingual` | `spaMultilingual` | [SPA 多语言](./spa-multilingual.md) |
 | 模块 | `/development/modules` | `module` | *待编写* |
 | 任务 | `/development/jobs` | `job` | *待编写* |
 
@@ -50,6 +50,7 @@
 | Menus | [k.site.menus](/api/site/menu.md) |
 | Authentication | [k.security.jwt](/api/security/) · [k.response](/api/response/) |
 | Open API | [k.openApi](/api/openapi/) |
+| SPA 多语言 | [SPA 多语言 API](/api/spa-multilingual/) |
 | Modules | `k.module`（API） |
 
 ## 无侧栏菜单的编辑路由

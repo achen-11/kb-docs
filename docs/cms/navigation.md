@@ -112,7 +112,7 @@
 | 菜单 | `/development/menus` | [菜单](./development/menus.md) |
 | 身份验证 | `/development/authentication` | [身份验证](./development/authentication.md) |
 | Open API | `/development/openapis` | [Open API](./development/openapis.md) |
-| SPA 多语言 | `/development/spamultilingual` | *待编写* |
+| SPA 多语言 | `/development/spamultilingual` | [SPA 多语言](./development/spa-multilingual.md) |
 | 模块 | `/development/modules` | *待编写* |
 | 任务 | `/development/jobs` | *待编写* |
 

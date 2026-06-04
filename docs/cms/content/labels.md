@@ -3,7 +3,7 @@
 > 菜单：**内容 → 标签**（界面英文菜单名可能为 Labels）  
 > 深链：`/_Admin/content/labels?SiteId={站点GUID}`
 
-**标签**用于集中维护站点的**多语言文案**（按钮、提示、固定段落等），避免在页面/View 里硬编码。模板与 KScript 中通过 `k.label()`、`k.t()` 按**当前语言**取文案，详见 [k.label API](/api/label/)。
+**标签**用于集中维护站点的**多语言文案**（按钮、提示、固定段落等），避免在页面/View 里硬编码。模板与 KScript 中通过 `k.label()`、`k.t()` 按**当前语言**取文案，详见 [k.label API](/api/label/)。独立 SPA 使用 `/_spa/lang/{lang}` 词典时见 [SPA 多语言](/cms/development/spa-multilingual)。
 
 ::: tip 前置：启用多语言
 须在 **站点设置 → 基础设置** 中配置站点语言（如 `zh`、`en`），路径约为 `/_Admin/system/settings?SiteId=...`。未启用多语言时，编辑弹窗通常只显示一种语言的「值」字段。配置步骤亦见 [k.label API · 前置要求](/api/label/#前置要求)。
