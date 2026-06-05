@@ -236,6 +236,10 @@ interface ITable {
 4. **服务端执行**：在 `env="server"` 的 Code、API、定时任务等环境中调用。  
 5. **大表**：避免对大表 `all()`；优先 `pagination` 或 `Query().skip().take()`。
 
+## 关联表（表关系）
+
+在后台 [IndexedDB 表关系](/cms/database/table-relation) 中配置后，读取主表记录时可用 **关系名称** 访问另一侧表数据（一对多/多对多为数组）。例如 `const items = order.lineItems`。
+
 ## 相关文档
 
 - [k.DB 概述](../database/)  

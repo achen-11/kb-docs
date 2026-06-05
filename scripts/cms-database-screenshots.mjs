@@ -2,6 +2,7 @@
  * Capture Kooboo admin CMS screenshots for docs/public/cms/database/
  * Usage:
  *   KOOBOO_SCREENSHOT_SCOPE=table node scripts/cms-database-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=table-relation node scripts/cms-database-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -173,6 +174,57 @@ async function captureIndexedDbTable(page) {
   }
 }
 
+function tableRelationUrl() {
+  return `${BASE}/_Admin/database/table-relation?SiteId=${SITE_ID}`
+}
+
+async function waitTableRelationList(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('TableRelation/list') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('.el-table, [data-cy="create-table-relation"]')
+    .first()
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+}
+
+async function captureTableRelation(page) {
+  await page.goto(tableRelationUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await waitTableRelationList(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('[data-cy="create-table-relation"]').locator('..').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'table-relation-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'table-relation-list.png')
+  }
+  await snap(page, 'table-relation-overview.png', { fullPage: true })
+
+  const createBtn = page.locator('[data-cy="create-table-relation"]').first()
+  if (await createBtn.count()) {
+    await createBtn.click()
+    await page
+      .waitForResponse(
+        (r) =>
+          r.url().includes('TableRelation/getTablesAndFields') &&
+          r.status() === 200,
+        { timeout: 60000 }
+      )
+      .catch(() => {})
+    await page.waitForTimeout(800)
+    await snapDialog(page, 'table-relation-create-dialog.png')
+    await page.keyboard.press('Escape')
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE || 'table'
   const browser = await chromium.launch({ headless: true })
@@ -185,6 +237,9 @@ async function main() {
 
   if (only === 'table') {
     await captureIndexedDbTable(page)
+  }
+  if (only === 'table-relation') {
+    await captureTableRelation(page)
   }
 
   await browser.close()
