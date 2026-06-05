@@ -6,26 +6,25 @@
 
 `k.DB` 提供对 Kooboo 内置数据库的访问，支持：
 
-- **SQLite** - 开箱即用，无需配置
-- **MySQL / SQL Server / MongoDB** - 需在系统配置中设置连接字符串
-
-所有数据库操作采用统一的 API 设计，底层自动适配不同的数据库引擎。
+- **IndexedDB（站点动态表）** — 后台 [IndexedDB 表](/cms/database/table) 建表，脚本使用 `k.DB.indexedDb.{表名}`
+- **SQLite** — 开箱即用，无需配置
+- **MySQL / SQL Server** — 须在服务集成中配置连接字符串
 
 ## 子模块
 
-
-| 模块                       | 说明              |
-| ------------------------ | --------------- |
-| [k.DB.sqlite](../sqlite/) | SQLite 数据库，无需配置 |
+| 模块 | 说明 |
+|------|------|
+| [k.DB.indexedDb](../indexed-db/) | 站点 IndexedDB 动态表（对象 CRUD） |
+| [k.DB.sqlite](../sqlite/) | SQLite（SQL） |
 
 
 ## TypeScript 定义
 
 ```ts
 interface KDB {
-    /** 获取 sqlite 数据库实例 */
+    /** 站点 IndexedDB 动态表（表名为属性） */
+    indexedDb: IDatabase;
     sqlite: SQLiteDB;
-    /** 获取指定类型的数据库实例 */
     getDB(dbType: DbType): GenericDB;
 }
 
@@ -45,12 +44,16 @@ interface SQLiteDB {
 }
 ```
 
-## sqlite 与 ORM
+## 选型建议
 
-如需更便捷的 ORM 操作，可以使用 [k.DB.sqlite](../sqlite/) 模块进行直接的 SQL 查询。
+- **后台已建 IndexedDB 表、希望用对象读写** → [k.DB.indexedDb](../indexed-db/)
+- **需要手写 SQL、或操作 SQLite 文件表** → [k.DB.sqlite](../sqlite/)
+- **对接 MySQL / SQL Server** → 配置连接后使用 `getDB`（见类型定义），后台见 [CMS 数据库](/cms/database/)
 
 ## 相关文档
 
-- [k.DB.sqlite](../sqlite/) - SQLite 数据库操作
-- [k.content](../content/) - 内容管理
+- [k.DB.indexedDb](../indexed-db/) — IndexedDB 动态表 API
+- [k.DB.sqlite](../sqlite/) — SQLite 数据库操作
+- [k.content](../content/) — 内容管理
+- [CMS：数据库](/cms/database/) — 后台表结构、键值与 SQL 日志
 

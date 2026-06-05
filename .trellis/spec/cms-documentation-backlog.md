@@ -64,4 +64,19 @@
 
 ## P3 — 数据库 / 运维 / 高级
 
-按需从 `navigation.md` 拆文。
+### 数据库（`docs/cms/database/`）
+
+| 状态 | 文档 | Frontend 路由 |
+|------|------|----------------|
+| ✅ | `database/index.md` | 概述 |
+| ✅ | `database/table.md` | `/database/table` |
+| ⬜ | `database/table-relation.md` | `/database/table-relation` |
+| ⬜ | `database/key-value.md` | `/database/key-value` |
+| ⬜ | `database/sqlite-table.md` | `/database/sqlite-table` |
+| ⬜ | `database/mysql-table.md` | `/database/mysql-table` |
+| ⬜ | `database/sqlserver-table.md` | `/database/sqlserver-table` |
+| ⬜ | `database/sql-logs.md` | `/database/sql-logs` |
+
+子路由（无独立菜单）：`/database/table/columns`、`/data`、`/edit-data` — 写入对应表类型篇目。
+
+运维 / 站点设置等仍按需从 `navigation.md` 拆文。

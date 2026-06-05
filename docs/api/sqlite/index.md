@@ -214,5 +214,6 @@ k.api.get(() => {
 ## 相关文档
 
 - [k.DB](../database/) - 数据库总览与入口
+- [k.DB.indexedDb](../indexed-db/) - IndexedDB 动态表
 - [k.content](../content/) - 内容管理 API
 

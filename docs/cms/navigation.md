@@ -126,19 +126,19 @@
 
 ## 数据库
 
-左侧分组：**数据库**
+左侧分组：**数据库**（`advanced`）
 
-| 菜单 | 路径 |
-|------|------|
-| IndexedDB 表 | `/database/table` |
-| IndexedDB 表关系 | `/database/table-relation` |
-| 键值存储 | `/database/key-value` |
-| SQLite 表 | `/database/sqlite-table` |
-| MySQL 表 | `/database/mysql-table` |
-| SQL Server 表 | `/database/sqlserver-table` |
-| SQL 日志 | `/database/sql-logs` |
+| 菜单 | 路径 | 文档 |
+|------|------|------|
+| IndexedDB 表 | `/database/table` | [IndexedDB 表](./database/table.md) |
+| IndexedDB 表关系 | `/database/table-relation` | [表关系](./database/table-relation.md) |
+| 键值存储 | `/database/key-value` | [键值存储](./database/key-value.md) |
+| SQLite 表 | `/database/sqlite-table` | [SQLite 表](./database/sqlite-table.md) |
+| MySQL 表 | `/database/mysql-table` | [MySQL 表](./database/mysql-table.md) |
+| SQL Server 表 | `/database/sqlserver-table` | [SQL Server 表](./database/sqlserver-table.md) |
+| SQL 日志 | `/database/sql-logs` | [SQL 日志](./database/sql-logs.md) |
 
-开发参考：[k.DB](/api/database/)
+概述：[数据库](./database/index.md) · 开发参考：[k.DB](/api/database/) · [k.DB.sqlite](/api/sqlite/)
 
 ## 站点设置
 

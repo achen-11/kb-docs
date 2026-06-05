@@ -47,6 +47,8 @@ API 页中的「须在后台配置」应链接到对应 `docs/cms/` 文章，不
 
 ## 呈现方式（降低截图维护成本）
 
+Markdown 排版（标题与 `---` 分割线等）见 **[markdown-vitepress.md](./markdown-vitepress.md)**。
+
 每条 CMS 文档建议包含：
 
 1. **菜单路径**（必填）— 如：内容 → 数据类型  

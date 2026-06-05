@@ -60,6 +60,8 @@ Backlog 清单：`.trellis/spec/kscript-api-backlog.md`。
 
 ### 文档正文表述规范（全模块适用）
 
+VitePress 标题自带上边框，**勿在 `##` / `###` 前后加 `---`**，以免出现双线；见 [markdown-vitepress.md](./markdown-vitepress.md)。
+
 `docs/api/**` 只写**当前页面对应、且应在智能提示中出现的 API**。不写的内容不必在正文反复交代。
 
 | 推荐 | 避免（出现在 `docs/api/*.md`） |

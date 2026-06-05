@@ -32,8 +32,9 @@ flowchart LR
 | 4 | [页面](./site/pages.md) | 创建可访问的页面 |
 | 5 | [内容](./content/index.md)（[数据类型](./content/content-types.md) · [内容列表](./content/contents-folders-list.md)） | 为 `k.content` 准备数据 |
 | 6 | [电商](./commerce/index.md)（按需） | 商品、订单；见 [k.commerce](/api/commerce/commerce.md) |
-| 7 | [开发](./development/index.md)（子项待写） | Layout、View、Script；见 [模板引擎](/templateEngine/) |
-| 8 | 服务集成（待写） | 支付、短信、JWT 等 |
+| 7 | [开发](./development/index.md) | Layout、View、Code、模块等；见 [模板引擎](/templateEngine/) |
+| 8 | [数据库](./database/index.md)（子项编写中） | IndexedDB、KV、SQLite/MySQL/SQL Server |
+| 9 | 站点设置 / 服务集成（待写） | 域名、多语言、支付、JWT 等 |
 
 ## 与开发文档的关系
 
@@ -42,6 +43,7 @@ flowchart LR
 | 建内容类型、内容夹 | [k.content](/api/content/) |
 | 商品、订单、购物车 | [k.commerce](/api/commerce/commerce.md) · [电商后台](./commerce/index.md) |
 | 建 Layout / Page / View | [模板引擎](/templateEngine/) |
+| 建 IndexedDB 表、查 SQL 日志 | [数据库](./database/index.md) · [k.DB](/api/database/) |
 | 配微信支付、支付宝 | [k.payment](/api/payment/) |
 | 开多语言、维护 Label | [k.label](/api/label/) · [模板绑定](../templateEngine/binding/) |
 

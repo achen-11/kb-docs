@@ -145,7 +145,8 @@ k.xxx.yyy
 | `k.DB.mysql` | `docs/api/mysql/` | 🔴 | `MysqlDatabase.cs` |
 | `k.DB.sqlServer` | `docs/api/sqlserver/` | 🔴 | `SqlServerDatabase.cs` |
 | `k.DB.mongo` | `docs/api/mongo/` | 🔴 | `KDB.Mongo` |
-| `k.DB.indexedDb` / worm | `docs/api/indexeddb/` | 🔴 | `kDatabase` / `KWormDb` |
+| `k.DB.indexedDb` | `docs/api/indexed-db/` | ✅ | `kDatabase` / `KTable` |
+| `k.DB` worm (`SequenceDb`) | `docs/api/database/` 或独立页 | 🔴 | `KWormDb` |
 | `k.DB.getDB(type)` | 合入 database 概述 | 🔴 | `KDB.getDB` |
 
 ### 文件 `k.file`

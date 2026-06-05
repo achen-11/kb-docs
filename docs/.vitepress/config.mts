@@ -99,7 +99,7 @@ const cmsSidebar = [
       },
       {
         text: '开发',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: '概述', link: '/cms/development/' },
           { text: '组件（Views）', link: '/cms/development/views' },
@@ -117,6 +117,20 @@ const cmsSidebar = [
           { text: 'SPA 多语言', link: '/cms/development/spa-multilingual' },
           { text: '模块', link: '/cms/development/modules' },
           { text: '定时任务', link: '/cms/development/jobs' },
+        ],
+      },
+      {
+        text: '数据库',
+        collapsed: true,
+        items: [
+          { text: '概述', link: '/cms/database/' },
+          { text: 'IndexedDB 表', link: '/cms/database/table' },
+          { text: 'IndexedDB 表关系', link: '/cms/database/table-relation' },
+          { text: '键值存储', link: '/cms/database/key-value' },
+          { text: 'SQLite 表', link: '/cms/database/sqlite-table' },
+          { text: 'MySQL 表', link: '/cms/database/mysql-table' },
+          { text: 'SQL Server 表', link: '/cms/database/sqlserver-table' },
+          { text: 'SQL 日志', link: '/cms/database/sql-logs' },
         ],
       },
     ],
@@ -261,6 +275,7 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: '概述', link: '/api/database/' },
+                { text: 'indexedDb', link: '/api/indexed-db/' },
                 { text: 'sqlite', link: '/api/sqlite/' },
               ]
             },
