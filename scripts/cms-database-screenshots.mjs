@@ -3,6 +3,7 @@
  * Usage:
  *   KOOBOO_SCREENSHOT_SCOPE=table node scripts/cms-database-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=table-relation node scripts/cms-database-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=key-value node scripts/cms-database-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -225,6 +226,48 @@ async function captureTableRelation(page) {
   }
 }
 
+function keyValueUrl() {
+  return `${BASE}/_Admin/database/key-value?SiteId=${SITE_ID}`
+}
+
+async function waitKeyValueList(page) {
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('KeyValue/list') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page
+    .locator('.el-table, [data-cy="create-key-value"]')
+    .first()
+    .waitFor({ state: 'visible', timeout: 30000 })
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+}
+
+async function captureKeyValue(page) {
+  await page.goto(keyValueUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await waitKeyValueList(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('[data-cy="create-key-value"]').locator('..').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'key-value-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'key-value-list.png')
+  }
+  await snap(page, 'key-value-overview.png', { fullPage: true })
+
+  const createBtn = page.locator('[data-cy="create-key-value"]').first()
+  if (await createBtn.count()) {
+    await createBtn.click()
+    await snapDialog(page, 'key-value-edit-dialog.png')
+    await page.keyboard.press('Escape')
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE || 'table'
   const browser = await chromium.launch({ headless: true })
@@ -240,6 +283,9 @@ async function main() {
   }
   if (only === 'table-relation') {
     await captureTableRelation(page)
+  }
+  if (only === 'key-value') {
+    await captureKeyValue(page)
   }
 
   await browser.close()

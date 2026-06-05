@@ -15,6 +15,7 @@
 | 模块 | 说明 |
 |------|------|
 | [k.DB.indexedDb](../indexed-db/) | 站点 IndexedDB 动态表（对象 CRUD） |
+| [k.DB.keyValue](../key-value/) | 站点键值对 |
 | [k.DB.sqlite](../sqlite/) | SQLite（SQL） |
 
 
@@ -47,12 +48,14 @@ interface SQLiteDB {
 ## 选型建议
 
 - **后台已建 IndexedDB 表、希望用对象读写** → [k.DB.indexedDb](../indexed-db/)
+- **简单字符串键值、无表结构** → [k.DB.keyValue](../key-value/)
 - **需要手写 SQL、或操作 SQLite 文件表** → [k.DB.sqlite](../sqlite/)
 - **对接 MySQL / SQL Server** → 配置连接后使用 `getDB`（见类型定义），后台见 [CMS 数据库](/cms/database/)
 
 ## 相关文档
 
 - [k.DB.indexedDb](../indexed-db/) — IndexedDB 动态表 API
+- [k.DB.keyValue](../key-value/) — 键值存储 API
 - [k.DB.sqlite](../sqlite/) — SQLite 数据库操作
 - [k.content](../content/) — 内容管理
 - [CMS：数据库](/cms/database/) — 后台表结构、键值与 SQL 日志

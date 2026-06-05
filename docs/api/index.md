@@ -19,7 +19,7 @@ KScript API 完整参考（服务端 `k.*`）。文档路径与模块名一致�
 | `k.commerce` | [commerce/](./commerce/commerce.md) | 电商（含 product、cart、order 等子页） |
 | `k.content` | [content/](./content/) | 内容类型与内容项 |
 | `k.cookie` | [cookie/](./cookie/) | Cookie |
-| `k.DB` | [database/](./database/) · [indexed-db/](./indexed-db/) · [sqlite/](./sqlite/) | 数据库、IndexedDB 动态表、SQLite |
+| `k.DB` | [database/](./database/) · [indexed-db/](./indexed-db/) · [key-value/](./key-value/) · [sqlite/](./sqlite/) | 数据库、IndexedDB、键值、SQLite |
 | `k.file` | [file/](./file/file.md) | 站点目录文件 |
 | `k.label` | [label/](./label/) | 多语言 `k.t` / `k.label` |
 | `k.logger` | [logger/](./logger/) | 代码日志 |

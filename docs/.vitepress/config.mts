@@ -276,6 +276,7 @@ export default defineConfig({
               items: [
                 { text: '概述', link: '/api/database/' },
                 { text: 'indexedDb', link: '/api/indexed-db/' },
+                { text: 'keyValue', link: '/api/key-value/' },
                 { text: 'sqlite', link: '/api/sqlite/' },
               ]
             },
