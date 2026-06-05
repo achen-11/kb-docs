@@ -4,6 +4,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=table node scripts/cms-database-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=table-relation node scripts/cms-database-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=key-value node scripts/cms-database-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=sqlite-table node scripts/cms-database-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -268,6 +269,103 @@ async function captureKeyValue(page) {
   }
 }
 
+function sqliteTableUrl() {
+  return `${BASE}/_Admin/database/sqlite-table?SiteId=${SITE_ID}`
+}
+
+const SQLITE_DB_TYPE = 'Sqlite'
+
+async function captureSqliteTable(page) {
+  await page.goto(sqliteTableUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('Sqlite/Tables') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('[data-cy="create-table"]').locator('..').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'sqlite-table-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'sqlite-table-list.png')
+  }
+  await snap(page, 'sqlite-table-overview.png', { fullPage: true })
+
+  const createBtn = page.locator('[data-cy="create-table"]').first()
+  if (await createBtn.count()) {
+    await createBtn.click()
+    await snapDialog(page, 'sqlite-table-create-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  let tableName = null
+  const nameLink = page.locator('[data-cy="name"]').first()
+  if (await nameLink.count()) {
+    tableName = (await nameLink.textContent())?.trim() || null
+  }
+
+  if (!tableName && (await createBtn.count())) {
+    const docTable = `_cms_doc_sqlite_${Date.now().toString(36).slice(-6)}`
+    await createBtn.click()
+    await page.locator('[data-cy="table-name"]').fill(docTable)
+    const confirm = page
+      .locator('.el-dialog')
+      .last()
+      .getByRole('button', { name: /创建|create/i })
+      .first()
+    if (await confirm.count()) await confirm.click()
+    await page.waitForTimeout(2500)
+    tableName = docTable
+  }
+
+  if (tableName) {
+    const enc = encodeURIComponent(tableName)
+    await page.goto(
+      `${BASE}/_Admin/database/table/data?SiteId=${SITE_ID}&table=${enc}&dbType=${SQLITE_DB_TYPE}`,
+      { waitUntil: 'networkidle', timeout: 90000 }
+    )
+    await page.waitForTimeout(1500)
+
+    const dataToolbar = page.locator('.p-24 > .flex.items-center.py-24').first()
+    if (await dataToolbar.count()) {
+      await snapLocator(dataToolbar, 'sqlite-table-data-toolbar.png')
+    }
+    const dataTable = page.locator('.el-table').first()
+    if (await dataTable.count()) {
+      await snapLocator(dataTable, 'sqlite-table-data.png')
+    }
+
+    const importBtn = page.getByRole('button', { name: /导入数据|import/i }).first()
+    if (await importBtn.count()) {
+      await importBtn.click()
+      await page.waitForTimeout(600)
+      await snapDialog(page, 'sqlite-table-import-dialog.png')
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(400)
+    }
+
+    await page.goto(
+      `${BASE}/_Admin/database/table/columns?SiteId=${SITE_ID}&table=${enc}&dbType=${SQLITE_DB_TYPE}`,
+      { waitUntil: 'networkidle', timeout: 90000 }
+    )
+    await page.waitForTimeout(1500)
+    await snap(page, 'sqlite-table-columns.png', { fullPage: true })
+
+    const newCol = page.locator('[data-cy="new-column"]').first()
+    if (await newCol.count()) {
+      await newCol.click()
+      await snapDialog(page, 'sqlite-table-column-dialog.png')
+      await page.keyboard.press('Escape')
+    }
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE || 'table'
   const browser = await chromium.launch({ headless: true })
@@ -286,6 +384,9 @@ async function main() {
   }
   if (only === 'key-value') {
     await captureKeyValue(page)
+  }
+  if (only === 'sqlite-table') {
+    await captureSqliteTable(page)
   }
 
   await browser.close()

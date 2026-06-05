@@ -214,6 +214,7 @@ k.api.get(() => {
 ## 相关文档
 
 - [k.DB](../database/) - 数据库总览与入口
+- [CMS：SQLite 表](/cms/database/sqlite-table) - 后台表结构与 CSV 导入
 - [k.DB.indexedDb](../indexed-db/) - IndexedDB 动态表
 - [k.content](../content/) - 内容管理 API
 
