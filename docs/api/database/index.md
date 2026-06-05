@@ -58,5 +58,5 @@ interface SQLiteDB {
 - [k.DB.keyValue](../key-value/) — 键值存储 API
 - [k.DB.sqlite](../sqlite/) — SQLite 数据库操作
 - [k.content](../content/) — 内容管理
-- [CMS：数据库](/cms/database/) — 后台表结构、键值与 SQL 日志
+- [CMS：数据库](/cms/database/) — 后台表结构、键值与 [SQL 日志](/cms/database/sql-logs)
 

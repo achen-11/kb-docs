@@ -161,7 +161,7 @@ k.DB.indexedDb.orders.add({ orderNo: "A1002", amount: 99 })
 链式 API（`find` / `findAll` / `add` / `update` / `delete` / `pagination` 等）见 **[k.DB.indexedDb](/api/indexed-db/)**。后台在本页所做的列与数据变更，与脚本读写同一张表。
 
 ::: tip SQL 日志
-若站点开启 SQL/数据库日志，相关记录可在 [SQL 日志](./sql-logs.md) 中查看（IndexedDB 与外部 SQL 的展示方式以界面为准）。
+IndexedDB 操作 **不会** 写入 SQL 日志。仅 `k.DB.sqlite` / MySQL / SQL Server 的 SQL 在开启站点 **SQL 日志** 后可于 [SQL 日志](./sql-logs.md) 查看。
 :::
 
 ## 典型工作流

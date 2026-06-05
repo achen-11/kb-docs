@@ -5,6 +5,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=table-relation node scripts/cms-database-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=key-value node scripts/cms-database-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=sqlite-table node scripts/cms-database-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=sql-logs node scripts/cms-database-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -366,6 +367,43 @@ async function captureSqliteTable(page) {
   }
 }
 
+function sqlLogsUrl() {
+  return `${BASE}/_Admin/database/sql-logs?SiteId=${SITE_ID}`
+}
+
+async function captureSqlLogs(page) {
+  await page.goto(sqlLogsUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('SqlLog/') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('.p-24 > .flex.items-center.py-24').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'sql-logs-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'sql-logs-list.png')
+  }
+  await snap(page, 'sql-logs-overview.png', { fullPage: true })
+
+  let detailBtn = page.locator('.el-table__body .el-icon').first()
+  if (!(await detailBtn.count())) {
+    detailBtn = page.locator('[class*="icon-eyes"]').first()
+  }
+  if (await detailBtn.count()) {
+    await detailBtn.click()
+    await page.waitForTimeout(600)
+    await snapDialog(page, 'sql-logs-detail-dialog.png')
+    await page.keyboard.press('Escape')
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE || 'table'
   const browser = await chromium.launch({ headless: true })
@@ -387,6 +425,9 @@ async function main() {
   }
   if (only === 'sqlite-table') {
     await captureSqliteTable(page)
+  }
+  if (only === 'sql-logs') {
+    await captureSqlLogs(page)
   }
 
   await browser.close()
