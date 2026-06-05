@@ -6,6 +6,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=key-value node scripts/cms-database-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=sqlite-table node scripts/cms-database-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=sql-logs node scripts/cms-database-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=mysql-table node scripts/cms-database-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -404,6 +405,111 @@ async function captureSqlLogs(page) {
   }
 }
 
+function mysqlTableUrl() {
+  return `${BASE}/_Admin/database/mysql-table?SiteId=${SITE_ID}`
+}
+
+const MYSQL_DB_TYPE = 'MySql'
+
+async function captureMysqlTable(page) {
+  await page.goto(mysqlTableUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await page.waitForTimeout(2000)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const guidInfo = page.locator('.guid-info').first()
+  if (await guidInfo.count()) {
+    await snap(page, 'mysql-table-unconfigured.png', { fullPage: true })
+    return
+  }
+
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('MySql/Tables') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page.waitForTimeout(1200)
+
+  const toolbar = page.locator('[data-cy="create-table"]').locator('..').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'mysql-table-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'mysql-table-list.png')
+  }
+  await snap(page, 'mysql-table-overview.png', { fullPage: true })
+
+  const createBtn = page.locator('[data-cy="create-table"]').first()
+  if (await createBtn.count()) {
+    await createBtn.click()
+    await snapDialog(page, 'mysql-table-create-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  let tableName = null
+  const nameLink = page.locator('[data-cy="name"]').first()
+  if (await nameLink.count()) {
+    tableName = (await nameLink.textContent())?.trim() || null
+  }
+
+  if (!tableName && (await createBtn.count())) {
+    const docTable = `_cms_doc_mysql_${Date.now().toString(36).slice(-6)}`
+    await createBtn.click()
+    await page.locator('[data-cy="table-name"]').fill(docTable)
+    const confirm = page
+      .locator('.el-dialog')
+      .last()
+      .getByRole('button', { name: /创建|create/i })
+      .first()
+    if (await confirm.count()) await confirm.click()
+    await page.waitForTimeout(2500)
+    tableName = docTable
+  }
+
+  if (tableName) {
+    const enc = encodeURIComponent(tableName)
+    await page.goto(
+      `${BASE}/_Admin/database/table/data?SiteId=${SITE_ID}&table=${enc}&dbType=${MYSQL_DB_TYPE}`,
+      { waitUntil: 'networkidle', timeout: 90000 }
+    )
+    await page.waitForTimeout(1500)
+
+    const dataToolbar = page.locator('.p-24 > .flex.items-center.py-24').first()
+    if (await dataToolbar.count()) {
+      await snapLocator(dataToolbar, 'mysql-table-data-toolbar.png')
+    }
+    const dataTable = page.locator('.el-table').first()
+    if (await dataTable.count()) {
+      await snapLocator(dataTable, 'mysql-table-data.png')
+    }
+
+    const importBtn = page.getByRole('button', { name: /导入数据|import/i }).first()
+    if (await importBtn.count()) {
+      await importBtn.click()
+      await page.waitForTimeout(600)
+      await snapDialog(page, 'mysql-table-import-dialog.png')
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(400)
+    }
+
+    await page.goto(
+      `${BASE}/_Admin/database/table/columns?SiteId=${SITE_ID}&table=${enc}&dbType=${MYSQL_DB_TYPE}`,
+      { waitUntil: 'networkidle', timeout: 90000 }
+    )
+    await page.waitForTimeout(1500)
+    await snap(page, 'mysql-table-columns.png', { fullPage: true })
+
+    const newCol = page.locator('[data-cy="new-column"]').first()
+    if (await newCol.count()) {
+      await newCol.click()
+      await snapDialog(page, 'mysql-table-column-dialog.png')
+      await page.keyboard.press('Escape')
+    }
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE || 'table'
   const browser = await chromium.launch({ headless: true })
@@ -428,6 +534,9 @@ async function main() {
   }
   if (only === 'sql-logs') {
     await captureSqlLogs(page)
+  }
+  if (only === 'mysql-table') {
+    await captureMysqlTable(page)
   }
 
   await browser.close()

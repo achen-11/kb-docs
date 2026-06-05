@@ -73,7 +73,7 @@
 | ✅ | `database/table-relation.md` | `/database/table-relation` |
 | ✅ | `database/key-value.md` | `/database/key-value` |
 | ✅ | `database/sqlite-table.md` | `/database/sqlite-table` |
-| ⬜ | `database/mysql-table.md` | `/database/mysql-table` |
+| ✅ | `database/mysql-table.md` | `/database/mysql-table` |
 | ⬜ | `database/sqlserver-table.md` | `/database/sqlserver-table` |
 | ✅ | `database/sql-logs.md` | `/database/sql-logs` |
 
