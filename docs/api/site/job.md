@@ -1,10 +1,10 @@
-# k.site · 计划任务
+# k.site.runJob
 
-> 对应后台 [开发 → 任务](/cms/development/jobs.md)
+> 对应后台 [开发 → 定时任务](/cms/development/jobs.md)
 
 ## 概述
 
-站点 **计划任务（SiteJob）** 在后台配置名称、调度与 **内联 KScript**。运行时由 `JobService` 在服务端执行，不经过前台 HTTP。
+站点 **定时任务（SiteJob）** 在后台配置名称、调度与 **内联 KScript**。运行时由 `JobService` 在服务端执行，不经过前台 HTTP。
 
 脚本侧仅提供 **触发** 与（部分版本）**状态查询**；任务的增删改请在后台完成。
 

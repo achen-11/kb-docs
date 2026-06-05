@@ -1,9 +1,9 @@
-# 任务（Jobs）
+# 定时任务（Jobs）
 
-> 菜单：**开发 → 任务**  
+> 菜单：**开发 → 定时任务**  
 > 深链：`/_Admin/development/jobs?SiteId={站点GUID}`
 
-**任务**用于在 Kooboo 服务端按计划执行 **KScript / TypeScript** 代码：可配置 **单次** 或 **重复** 调度，适合定时同步、清理缓存、批量通知等后台逻辑。任务脚本在站点 **RenderContext** 中运行，可使用 `k.content`、`k.DB`、`k.mail` 等 API（与 [开发 → 代码](./code.md) 中的 Code 资源类似，但由调度器触发而非 HTTP 请求）。
+**定时任务**用于在 Kooboo 服务端按计划执行 **KScript / TypeScript** 代码：可配置 **单次** 或 **重复** 调度，适合定时同步、清理缓存、批量通知等后台逻辑。任务脚本在站点 **RenderContext** 中运行，可使用 `k.content`、`k.DB`、`k.mail` 等 API（与 [开发 → 代码](./code.md) 中的 Code 资源类似，但由调度器触发而非 HTTP 请求）。
 
 ::: tip 权限
 查看任务列表与日志：`job`（查看）。**添加任务**、编辑、保存、**运行** 需 `job·edit`；多选 **删除** 需 `job·delete`。
@@ -21,8 +21,8 @@
 
 ## 如何打开
 
-1. 在 [编辑菜单](../navigation.md#权限与编辑菜单) 中勾选 **开发 → 任务**。
-2. 左侧 **开发 → 任务**。
+1. 在 [编辑菜单](../navigation.md#权限与编辑菜单) 中勾选 **开发 → 定时任务**。
+2. 左侧 **开发 → 定时任务**。
 
 <DocImage src="/cms/development/jobs-overview.png" alt="任务页：页签与任务列表" width="1120" />
 
