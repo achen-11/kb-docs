@@ -10,11 +10,11 @@
 :::
 
 ::: info 与模块任务、邮件任务的区别
-| | **开发 → 任务** | **模块 `module.config` 的 task** | 邮件迁移等 |
+| | **开发 → 定时任务** | **模块 `module.config` 的 task** | 邮件迁移等 |
 |--|-----------------|----------------------------------|------------|
 | 配置 | 本页 Monaco 内联脚本 | 模块包内 `task` 定义 | 其它后台功能内置 |
 | 作用域 | 当前站点 | 模块上下文 | 邮件站点 |
-| 脚本触发 | `k.site.runJob`（见 [k.site · 任务](/api/site/job.md)） | 模块事件 | — |
+| 脚本触发 | `k.site.runJob`（见 [k.site.runJob](/api/site/job.md)） | 模块事件 | — |
 
 站点须 **已发布**（`Published`）后调度器才会自动执行；未发布时仅可 **手动运行** 调试。
 :::
@@ -24,7 +24,7 @@
 1. 在 [编辑菜单](../navigation.md#权限与编辑菜单) 中勾选 **开发 → 定时任务**。
 2. 左侧 **开发 → 定时任务**。
 
-<DocImage src="/cms/development/jobs-overview.png" alt="任务页：页签与任务列表" width="1120" />
+<DocImage src="/cms/development/jobs-overview.png" alt="定时任务页：页签与任务列表" width="1120" />
 
 ## 页签
 
@@ -124,7 +124,7 @@ Kooboo 后台 `JobService` 每秒扫描内存中的任务记录：
 
 | 文档 | 说明 |
 |------|------|
-| [k.site · 任务](/api/site/job.md) | `k.site.runJob` |
+| [k.site.runJob](/api/site/job.md) | 脚本手动触发 |
 | [代码](./code.md) | 可复用的 Code 资源（任务内联脚本与之独立） |
 | [模块](./modules.md) | 模块 `task` 与 `k.module` |
 | [运维 · 操作日志](../operations/site-logs.md) | 站点对象变更历史（非任务执行日志） |

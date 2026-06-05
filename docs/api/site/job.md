@@ -40,9 +40,9 @@ k.site.runJob("nightly_sync")
 
 ## 与 k.site.codes 的区别
 
-| | **SiteJob（任务）** | **k.site.codes** |
-|--|---------------------|------------------|
-| 配置 | 开发 → 任务 | 开发 → 代码 |
+| | **SiteJob（定时任务）** | **k.site.codes** |
+|--|---------------------------|------------------|
+| 配置 | 开发 → 定时任务 | 开发 → 代码 |
 | 触发 | 调度器 / `runJob` | HTTP 路由、事件、页面引用 |
 | 代码存储 | `SiteJob.Code` 内联 | `Code` 资源 `body` |
 
@@ -54,6 +54,6 @@ k.site.runJob("nightly_sync")
 
 ## 相关
 
-- [任务（CMS）](/cms/development/jobs.md)
+- [定时任务（CMS）](/cms/development/jobs.md)
 - [k.site](./index.md)
 - [k.site.codes](./code.md)

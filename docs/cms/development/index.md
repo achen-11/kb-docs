@@ -3,7 +3,7 @@
 > 菜单：左侧 **开发** 分组（须在 **编辑菜单** 中勾选显示）  
 > 路由前缀：`/_Admin/development/...?SiteId={站点GUID}`
 
-**开发**分组集中管理站点的 **模板与站点级资源**：View、Layout、Script、Style、Code，以及 URL 路由、表单、后台菜单、身份验证、Open API、SPA 多语言、模块与计划任务等。与 [页面](../site/pages.md)（页面树与可视化编辑）配合，构成 Kooboo 站点的前端实现层。
+**开发**分组集中管理站点的 **模板与站点级资源**：View、Layout、Script、Style、Code，以及 URL 路由、表单、后台菜单、身份验证、Open API、SPA 多语言、模块与定时任务等。与 [页面](../site/pages.md)（页面树与可视化编辑）配合，构成 Kooboo 站点的前端实现层。
 
 ::: tip 与模板引擎文档
 本系列说明 **后台点哪里、填什么**；语法与 API 见 [模板引擎](/templateEngine/)（Layout、View、Script、Style 等）及 [KScript API](/api/)。二者通过菜单中的对象类型一一对应。
@@ -36,7 +36,7 @@
 | Open API | `/development/openapis` | `openApi` | [Open API](./openapis.md) |
 | SPA 多语言 | `/development/spamultilingual` | `spaMultilingual` | [SPA 多语言](./spa-multilingual.md) |
 | 模块 | `/development/modules` | `module` | [模块](./modules.md) |
-| 任务 | `/development/jobs` | `job` | [任务](./jobs.md) |
+| 定时任务 | `/development/jobs` | `job` | [定时任务](./jobs.md) |
 
 ### 开发参考（模板引擎 / API）
 
@@ -52,7 +52,7 @@
 | Open API | [k.openApi](/api/openapi/) |
 | SPA 多语言 | [SPA 多语言 API](/api/spa-multilingual/) |
 | Modules | [k.module](/api/module/) |
-| Jobs | [k.site · 任务](/api/site/job.md) |
+| 定时任务 | [k.site.runJob](/api/site/job.md) |
 
 ## 无侧栏菜单的编辑路由
 
@@ -92,7 +92,7 @@
 3. **Scripts / Styles** — 站点级 JS/CSS 资源  
 4. **URLs** — 自定义路由与绑定  
 5. **Forms / Menus / Authentication** — 表单、后台菜单与登录方式（按项目需要）  
-6. **Open API / SPA 多语言 / Modules / Jobs** — 集成与扩展  
+6. **Open API / SPA 多语言 / 模块 / 定时任务** — 集成与扩展  
 
 具体步骤以各子篇文档为准（编写中）。
 

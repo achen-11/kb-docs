@@ -322,7 +322,7 @@ export default defineConfig({
                 { text: '概述', link: '/api/site/' },
                 { text: 'codes', link: '/api/site/code.md' },
                 { text: 'css', link: '/api/site/css.md' },
-                { text: 'job', link: '/api/site/job.md' },
+                { text: 'runJob', link: '/api/site/job.md' },
                 { text: 'js', link: '/api/site/js.md' },
                 { text: 'layouts', link: '/api/site/layout.md' },
                 { text: 'menus', link: '/api/site/menu.md' },

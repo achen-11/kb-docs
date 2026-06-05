@@ -211,4 +211,4 @@
 | [站点后台菜单总览](../navigation.md) | `menu.parent` 可挂接的顶级菜单 `name` |
 | [代码](./code.md) | 站点级 CodeBlock / API |
 | [开发概述](./index.md) | 开发分组索引 |
-| [开发概述 · 任务](./index.md#子菜单与后台顺序一致) | 站点计划任务（与 `k.module.task` 配合，文档待编写） |
+| [开发 · 定时任务](./jobs.md) | 站点级 `k.site.runJob`（与模块 `k.module.task` 不同） |
