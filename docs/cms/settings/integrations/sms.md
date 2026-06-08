@@ -5,6 +5,8 @@
 
 **SMS** 分组配置短信服务商参数，供站点发送验证码、通知等（具体调用以脚本/模块为准）。
 
+<DocImage src="/cms/settings/settings-integrations-sms.png" alt="SMS 分组" width="1120" />
+
 ## 集成项
 
 | 名称 | 说明 |

@@ -5,6 +5,8 @@
 
 **OAuth2** 分组配置第三方 **社交/平台登录**（AppId、Secret、回调等）。保存后，前台通过 Kooboo OAuth 回调路由完成授权；弹窗 **Alert** 常给出须在厂商控制台登记的 **回调 URL**（如 `{BaseUrl}_api/oauth2callback/GoogleLogin`）。
 
+<DocImage src="/cms/settings/settings-integrations-oauth2.png" alt="OAuth2 分组" width="1120" />
+
 ## 集成项
 
 | 名称 | 说明 |

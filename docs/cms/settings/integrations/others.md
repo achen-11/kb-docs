@@ -5,6 +5,8 @@
 
 **Others** 分组存放不便归入 Database / Payment 等的 **站点级扩展集成**。
 
+<DocImage src="/cms/settings/settings-integrations-others.png" alt="Others 分组" width="1120" />
+
 ## 集成项
 
 | 名称 | 说明 |

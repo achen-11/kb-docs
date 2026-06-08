@@ -5,6 +5,8 @@
 
 **Database** 分组配置站点可用的 **外部数据库与缓存** 连接，以及内置 **SQLite** 的少量选项。保存后，脚本通过 **`k.DB.mysql`**、**`k.DB.sqlServer`**、**`k.DB.mongo`**、**`k.DB.redis`** 等访问；未配置或连接无效时，对应 [数据库](../../database/index.md) 菜单会显示引导页。
 
+<DocImage src="/cms/settings/settings-integrations-database.png" alt="Database 分组" width="1120" />
+
 ## 集成项
 
 | 名称 | 说明 | 后台菜单 |

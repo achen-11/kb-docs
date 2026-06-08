@@ -5,6 +5,8 @@
 
 **Storage** 分组将 **媒体库**、**内容文件** 等二进制资源存到第三方对象存储（或启用远程存储）。常见字段包括 **Endpoint**、**AccessKeyId**、**AccessKeySecret**、**Bucket**、**MediaLibraryFolder**、**CmsFileFolder**、**BindingDomain**、**Enable** / **EnableSSL** 等（以编辑弹窗为准）。
 
+<DocImage src="/cms/settings/settings-integrations-storage.png" alt="Storage 分组" width="1120" />
+
 ## 集成项
 
 | 名称 | 说明 |

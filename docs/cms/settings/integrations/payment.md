@@ -5,7 +5,9 @@
 
 **Payment** 分组启用并配置各 **支付渠道** 的商户密钥、回调与证书。保存后，Code 与电商通过 **`k.payment.get('…')`** 或 **`k.payment.alipayForm`** 等属性调用；配置项 **名称** 须与 API 属性名一致。
 
-<DocImage src="/cms/settings/settings-integrations-payment.png" alt="Payment 分组" width="1120" />
+<DocImage src="/cms/settings/settings-integrations-payment.png" alt="Payment 分组（文档配图已打码）" width="1120" />
+
+列表 **值** 列可能显示 JSON 摘要；文档配图已对密钥等敏感字段打码，实际后台以你站点配置为准。
 
 ## 集成项与 API 文档
 

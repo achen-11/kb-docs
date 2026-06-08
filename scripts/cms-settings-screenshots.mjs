@@ -214,22 +214,31 @@ function configUrl(group) {
   return `${BASE}/_Admin/system/config?SiteId=${SITE_ID}${q}`
 }
 
+async function captureIntegrationGroup(page, group, file) {
+  await page.goto(configUrl(group), { waitUntil: 'networkidle', timeout: 90000 })
+  await page.waitForTimeout(1500)
+  const panel = page.locator('.el-collapse-item').filter({ hasText: group }).first()
+  if (await panel.count()) {
+    await snapLocator(panel, `settings-integrations-${file}.png`)
+  }
+}
+
 async function captureIntegrations(page) {
   await page.goto(configUrl(), { waitUntil: 'networkidle', timeout: 90000 })
   await page.waitForTimeout(2000)
   await snap(page, 'settings-integrations-overview.png', { fullPage: true })
 
-  for (const [group, file] of [
+  const groups = [
     ['Database', 'database'],
-    ['Payment', 'payment'],
-  ]) {
-    await page.goto(configUrl(group), { waitUntil: 'networkidle', timeout: 90000 })
-    await page.waitForTimeout(1500)
-    const panel = page.locator('.el-collapse-item').filter({ hasText: group }).first()
-    if (await panel.count()) {
-      await snapLocator(panel, `settings-integrations-${file}.png`)
-    }
+    ['SMS', 'sms'],
+    ['OAuth2', 'oauth2'],
+    ['Storage', 'storage'],
+    ['Others', 'others'],
+  ]
+  for (const [group, file] of groups) {
+    await captureIntegrationGroup(page, group, file)
   }
+  // Payment: use manually masked screenshot (settings-integrations-payment.png)
 
   await page.goto(configUrl('Database'), {
     waitUntil: 'networkidle',
