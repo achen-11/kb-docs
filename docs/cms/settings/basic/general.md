@@ -20,6 +20,8 @@
 
 通过 **多语言** 分组面板开关 `enableMultilingual`。关闭后保存时会收起为仅保留 **默认语言** 一条 culture，并关闭路径模式相关项。
 
+<DocImage src="/cms/settings/settings-basic-multilingual.png" alt="多语言配置" width="1120" />
+
 ### 语言列表
 
 | 操作 | 说明 |

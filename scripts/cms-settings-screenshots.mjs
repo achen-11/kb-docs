@@ -2,6 +2,7 @@
  * Capture Kooboo admin CMS screenshots for docs/public/cms/settings/
  * Usage:
  *   KOOBOO_SCREENSHOT_SCOPE=basic node scripts/cms-settings-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=multilingual node scripts/cms-settings-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -72,6 +73,64 @@ async function snapLocator(locator, name) {
   console.log('saved', file)
 }
 
+async function ensureMultilingualExpanded(page) {
+  const multiSwitch = page.locator('[data-cy="多语言"]').first()
+  if (!(await multiSwitch.count())) return false
+
+  const checked = await multiSwitch.evaluate((el) => {
+    const root = el.closest('.el-switch')
+    return root?.classList.contains('is-checked') ?? false
+  })
+  if (!checked) {
+    await multiSwitch.click()
+    await page.waitForTimeout(600)
+  }
+  return true
+}
+
+async function captureMultilingual(page) {
+  await page.goto(settingsUrl('basic'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await page.waitForTimeout(2000)
+
+  if (!(await ensureMultilingualExpanded(page))) return
+
+  const panel = page
+    .locator('.bg-\\[\\#fafafa\\], .dark\\:bg-\\[\\#333\\]')
+    .filter({ hasText: /默认语言|defaultLanguage/i })
+    .first()
+
+  if (await panel.count()) {
+    const header = page
+      .locator('.el-form-item')
+      .filter({ has: page.locator('[data-cy="多语言"]') })
+      .first()
+    if (await header.count()) {
+      await header.scrollIntoViewIfNeeded()
+      await page.waitForTimeout(300)
+      const box1 = await header.boundingBox()
+      const box2 = await panel.boundingBox()
+      if (box1 && box2) {
+        const file = path.join(OUT_DIR, 'settings-basic-multilingual.png')
+        await page.screenshot({
+          path: file,
+          clip: {
+            x: Math.min(box1.x, box2.x),
+            y: box1.y,
+            width: Math.max(box1.width, box2.width),
+            height: box2.y + box2.height - box1.y,
+          },
+        })
+        console.log('saved', file)
+        return
+      }
+    }
+    await snapLocator(panel, 'settings-basic-multilingual.png')
+  }
+}
+
 async function captureBasicSettings(page) {
   await page.goto(settingsUrl('basic'), {
     waitUntil: 'networkidle',
@@ -83,6 +142,8 @@ async function captureBasicSettings(page) {
   if (await tabs.count()) {
     await snapLocator(tabs, 'settings-basic-tabs.png')
   }
+
+  await captureMultilingual(page)
 
   for (const [name, file] of BASIC_TABS) {
     await page.goto(settingsUrl(name), {
@@ -109,6 +170,9 @@ async function main() {
 
   if (only === 'basic') {
     await captureBasicSettings(page)
+  }
+  if (only === 'multilingual') {
+    await captureMultilingual(page)
   }
 
   await browser.close()
