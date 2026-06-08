@@ -6,6 +6,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=domains node scripts/cms-settings-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=integrations node scripts/cms-settings-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=site-users node scripts/cms-settings-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=roles node scripts/cms-settings-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -228,6 +229,68 @@ function siteUsersUrl() {
   return `${BASE}/_Admin/system/siteuser?SiteId=${SITE_ID}`
 }
 
+function rolesUrl() {
+  return `${BASE}/_Admin/system/roles?SiteId=${SITE_ID}`
+}
+
+async function captureRoles(page) {
+  await page.goto(rolesUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('Role/list') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page.waitForTimeout(1500)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('[data-cy="add-role"]').locator('..').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'settings-roles-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'settings-roles-list.png')
+  }
+  await snap(page, 'settings-roles-overview.png', { fullPage: true })
+
+  const devRow = page.locator('tr').filter({ hasText: 'developer' }).first()
+  const editBtn = devRow.locator('[data-cy="edit"]').first()
+  if (await editBtn.count()) {
+    await editBtn.click()
+    await page.waitForTimeout(800)
+    await snapDialog(page, 'settings-roles-edit-dialog.png')
+
+    const pagesFeature = page
+      .locator('.el-dialog .el-popover')
+      .first()
+    if (await pagesFeature.count()) {
+      const trigger = pagesFeature.locator('.el-checkbox').first()
+      await trigger.click({ force: true })
+      await page.waitForTimeout(600)
+      const popover = page.locator('.el-popper:visible').last()
+      if (await popover.isVisible().catch(() => false)) {
+        const file = path.join(OUT_DIR, 'settings-roles-permission-detail.png')
+        await popover.screenshot({ path: file })
+        console.log('saved', file)
+      }
+    }
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(200)
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(500)
+  }
+
+  const addBtn = page.locator('[data-cy="add-role"]').first()
+  if (await addBtn.count()) {
+    await addBtn.click()
+    await page.waitForTimeout(800)
+    await snapDialog(page, 'settings-roles-add-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+}
+
 async function captureSiteUsers(page) {
   await page.goto(siteUsersUrl(), { waitUntil: 'networkidle', timeout: 90000 })
   await page
@@ -320,6 +383,9 @@ async function main() {
   }
   if (only === 'site-users') {
     await captureSiteUsers(page)
+  }
+  if (only === 'roles') {
+    await captureRoles(page)
   }
 
   await browser.close()

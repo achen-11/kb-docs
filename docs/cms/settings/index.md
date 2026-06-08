@@ -30,7 +30,7 @@
 | 域名管理 | `/system/domains` | `domain` | [域名管理](./domains.md) | ✅ |
 | 服务集成 | `/system/config` | `config` | [服务集成](./integrations/) | ✅ |
 | 用户管理 | `/system/siteuser` | `siteUser` | [站点用户](./site-users.md) | ✅ |
-| 角色权限 | `/system/roles` | `role` | [角色权限](./roles.md) | ⬜ |
+| 角色权限 | `/system/roles` | `role` | [角色权限](./roles.md) | ✅ |
 | 请求 Hook | `/system/front-events` | `frontEvents` | [请求 Hook](./request-hooks.md) | ⬜ |
 | 操作 Hook | `/system/backend-events` | `backendEvents` | [操作 Hook](./action-hooks.md) | ⬜ |
 | Cookie 管理 | `/system/cookie` | `site·edit` | [Cookie](./cookie.md) | ⬜ |
