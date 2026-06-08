@@ -133,6 +133,22 @@ const cmsSidebar = [
           { text: 'SQL 日志', link: '/cms/database/sql-logs' },
         ],
       },
+      {
+        text: '站点设置',
+        collapsed: true,
+        items: [
+          { text: '概述', link: '/cms/settings/' },
+          { text: '基础设置', link: '/cms/settings/basic' },
+          { text: '域名管理', link: '/cms/settings/domains' },
+          { text: '服务集成', link: '/cms/settings/integrations' },
+          { text: '站点用户', link: '/cms/settings/site-users' },
+          { text: '角色权限', link: '/cms/settings/roles' },
+          { text: '请求 Hook', link: '/cms/settings/request-hooks' },
+          { text: '操作 Hook', link: '/cms/settings/action-hooks' },
+          { text: 'Cookie', link: '/cms/settings/cookie' },
+          { text: 'AI 服务', link: '/cms/settings/ai-service' },
+        ],
+      },
     ],
   },
 ]

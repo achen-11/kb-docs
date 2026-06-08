@@ -51,16 +51,27 @@
 |------|------|----------------|
 | ⬜ | `cms/commerce/overview.md` | `/commerce/settings` |
 | ⬜ | `cms/commerce/products.md` | `/commerce/product-management` |
-| ⬜ | `cms/settings/integrations-payment.md` | `/system/config` |
 
-## P2 — 站点设置
+支付集成配置见 [settings/integrations.md](../docs/cms/settings/integrations.md)（Payment 分组），不单列 commerce 篇。
 
-| 状态 | 文档 | Frontend 路由 |
-|------|------|----------------|
-| ⬜ | `cms/settings/basic.md` | `/system/settings` |
-| ⬜ | `cms/settings/domains.md` | `/system/domains` |
-| ⬜ | `cms/settings/multilingual.md` | `/system/settings`（Multilingual 分组） |
-| ⬜ | `cms/settings/integrations.md` | `/system/config` |
+## P2 — 站点设置（`docs/cms/settings/`）
+
+概述：[settings/index.md](../docs/cms/settings/index.md) · 配图脚本：`scripts/cms-settings-screenshots.mjs`（待建）→ `docs/public/cms/settings/`
+
+| 状态 | 文档 | Frontend 路由 | 备注 |
+|------|------|----------------|------|
+| 🟡 | `settings/index.md` | — | 目录规划 ✅；子篇待写 |
+| ⬜ | `settings/basic.md` | `/system/settings` | Tab：`basic` / `access` / `performance` / `seo` / `editor` / `advance`；**多语言**在 `basic` Tab 内 |
+| ⬜ | `settings/domains.md` | `/system/domains` | |
+| ⬜ | `settings/integrations.md` | `/system/config` | Group：Database、Payment、SMS、OAuth2、Storage、Others；Payment → [api/payment](/api/payment/) |
+| ⬜ | `settings/site-users.md` | `/system/siteuser` | 菜单文案「用户管理」 |
+| ⬜ | `settings/roles.md` | `/system/roles` | `advanced` |
+| ⬜ | `settings/request-hooks.md` | `/system/front-events` | 含 `/front-events/edit` |
+| ⬜ | `settings/action-hooks.md` | `/system/backend-events` | 含 `/backend-events/edit` |
+| ⬜ | `settings/cookie.md` | `/system/cookie` | |
+| ⬜ | `settings/ai-service.md` | `/system/ai-service` | 与运维中心同一页；运维 [operations/index.md](../docs/cms/operations/index.md) 互链 |
+
+子路由无独立菜单：`settings?name=*` → `basic.md`；Hook `edit` → 对应 Hook 篇目。
 
 ## P3 — 数据库 / 运维 / 高级
 

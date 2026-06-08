@@ -33,8 +33,8 @@ flowchart LR
 | 5 | [内容](./content/index.md)（[数据类型](./content/content-types.md) · [内容列表](./content/contents-folders-list.md)） | 为 `k.content` 准备数据 |
 | 6 | [电商](./commerce/index.md)（按需） | 商品、订单；见 [k.commerce](/api/commerce/commerce.md) |
 | 7 | [开发](./development/index.md) | Layout、View、Code、模块等；见 [模板引擎](/templateEngine/) |
-| 8 | [数据库](./database/index.md)（子项编写中） | IndexedDB、KV、SQLite/MySQL/SQL Server |
-| 9 | 站点设置 / 服务集成（待写） | 域名、多语言、支付、JWT 等 |
+| 8 | [数据库](./database/index.md) | IndexedDB、KV、SQLite/MySQL/SQL Server、SQL 日志 |
+| 9 | [站点设置](./settings/index.md)（编写中） | 基础、域名、服务集成、用户/角色、Hook、Cookie、AI |
 
 ## 与开发文档的关系
 
@@ -44,7 +44,7 @@ flowchart LR
 | 商品、订单、购物车 | [k.commerce](/api/commerce/commerce.md) · [电商后台](./commerce/index.md) |
 | 建 Layout / Page / View | [模板引擎](/templateEngine/) |
 | 建 IndexedDB 表、查 SQL 日志 | [数据库](./database/index.md) · [k.DB](/api/database/) |
-| 配微信支付、支付宝 | [k.payment](/api/payment/) |
+| 配域名、支付、数据库连接 | [站点设置](./settings/index.md) · [k.payment](/api/payment/) |
 | 开多语言、维护 Label | [k.label](/api/label/) · [模板绑定](../templateEngine/binding/) |
 
 ## 两类地址

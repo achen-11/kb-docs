@@ -28,10 +28,10 @@
 | 协作同步 | `/system/sync` | [协作同步](./sync.md) |
 | 搜索 | `/system/search` | *待编写* |
 | 自动化 | `/system/automation` | *待编写* |
-| AI 服务 | `/system/ai-service` | *待编写* |
+| AI 服务 | `/system/ai-service` | [AI 服务](../settings/ai-service.md) |
 
 ::: info AI 服务与站点设置
-**AI 服务** 在 **运维中心** 与 **站点设置** 中各有一个菜单项，打开为同一页面 `/_Admin/system/ai-service`。文档只维护一份（完成时写在 `ai-service.md`，两处互相链接）。
+**AI 服务** 在 **运维中心** 与 **站点设置** 中各有一个菜单项，打开为同一页面 `/_Admin/system/ai-service`。文档只维护一份：[站点设置 · AI 服务](../settings/ai-service.md)，两处互相链接。
 :::
 
 ## 建议阅读顺序

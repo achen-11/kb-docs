@@ -90,7 +90,7 @@
 | 协作同步 | `/system/sync` | [协作同步](./operations/sync.md) |
 | 搜索 | `/system/search` | *待编写* |
 | 自动化 | `/system/automation` | *待编写* |
-| AI 服务 | `/system/ai-service` | *待编写* |
+| AI 服务 | `/system/ai-service` | [AI 服务](./settings/ai-service.md) |
 
 概述：[运维中心](./operations/index.md)
 
@@ -144,19 +144,19 @@
 
 左侧分组：**站点设置**（同为 `/system` 前缀，菜单名与「运维中心」不同）
 
-| 菜单 | 路径 | 说明 |
+| 菜单 | 路径 | 文档 |
 |------|------|------|
-| 基础设置 | `/system/settings` | 站点名、多语言、预览等 |
-| 域名管理 | `/system/domains` | 绑定域名 |
-| 服务集成 | `/system/config` | 支付、短信、邮件、JWT 等 |
-| 站点用户 | `/system/siteuser` | |
-| 角色权限 | `/system/roles` | |
-| 请求 Hook | `/system/front-events` | 拦截 HTTP 请求 |
-| 操作 Hook | `/system/backend-events` | 拦截后台操作 |
-| Cookie | `/system/cookie` | |
-| AI 服务 | `/system/ai-service` | 与运维分组中同名入口同一功能页 |
+| 基础设置 | `/system/settings` | [基础设置](./settings/basic.md) |
+| 域名管理 | `/system/domains` | [域名管理](./settings/domains.md) |
+| 服务集成 | `/system/config` | [服务集成](./settings/integrations.md) |
+| 用户管理 | `/system/siteuser` | [站点用户](./settings/site-users.md) |
+| 角色权限 | `/system/roles` | [角色权限](./settings/roles.md) |
+| 请求 Hook | `/system/front-events` | [请求 Hook](./settings/request-hooks.md) |
+| 操作 Hook | `/system/backend-events` | [操作 Hook](./settings/action-hooks.md) |
+| Cookie 管理 | `/system/cookie` | [Cookie](./settings/cookie.md) |
+| AI 服务 | `/system/ai-service` | [AI 服务](./settings/ai-service.md) |
 
-支付、JWT 等集成配置示例：`/_Admin/system/config?SiteId=...`
+概述：[站点设置](./settings/index.md) · 集成深链示例：`/_Admin/system/config?SiteId=...&group=Payment`
 
 ## 独立功能（非左侧主菜单）
 
