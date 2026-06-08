@@ -148,7 +148,7 @@
 |------|------|------|
 | 基础设置 | `/system/settings` | [基础设置](./settings/basic/) |
 | 域名管理 | `/system/domains` | [域名管理](./settings/domains.md) |
-| 服务集成 | `/system/config` | [服务集成](./settings/integrations.md) |
+| 服务集成 | `/system/config` | [服务集成](./settings/integrations/) |
 | 用户管理 | `/system/siteuser` | [站点用户](./settings/site-users.md) |
 | 角色权限 | `/system/roles` | [角色权限](./settings/roles.md) |
 | 请求 Hook | `/system/front-events` | [请求 Hook](./settings/request-hooks.md) |

@@ -4,6 +4,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=basic node scripts/cms-settings-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=multilingual node scripts/cms-settings-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=domains node scripts/cms-settings-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=integrations node scripts/cms-settings-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -208,6 +209,46 @@ async function captureDomains(page) {
   }
 }
 
+function configUrl(group) {
+  const q = group ? `&group=${encodeURIComponent(group)}` : ''
+  return `${BASE}/_Admin/system/config?SiteId=${SITE_ID}${q}`
+}
+
+async function captureIntegrations(page) {
+  await page.goto(configUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await page.waitForTimeout(2000)
+  await snap(page, 'settings-integrations-overview.png', { fullPage: true })
+
+  for (const [group, file] of [
+    ['Database', 'database'],
+    ['Payment', 'payment'],
+  ]) {
+    await page.goto(configUrl(group), { waitUntil: 'networkidle', timeout: 90000 })
+    await page.waitForTimeout(1500)
+    const panel = page.locator('.el-collapse-item').filter({ hasText: group }).first()
+    if (await panel.count()) {
+      await snapLocator(panel, `settings-integrations-${file}.png`)
+    }
+  }
+
+  await page.goto(configUrl('Database'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await page.waitForTimeout(1200)
+  const editMysql = page.locator('[data-cy="Mysql"]').first()
+  if (!(await editMysql.count())) {
+    const editSqlite = page.locator('[data-cy="Sqlite"]').first()
+    if (await editSqlite.count()) await editSqlite.click()
+  } else {
+    await editMysql.click()
+  }
+  if (await page.locator('.el-dialog').count()) {
+    await snapDialog(page, 'settings-integrations-edit-dialog.png')
+    await page.keyboard.press('Escape')
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE || 'basic'
   await mkdir(OUT_DIR, { recursive: true })
@@ -228,6 +269,9 @@ async function main() {
   }
   if (only === 'domains') {
     await captureDomains(page)
+  }
+  if (only === 'integrations') {
+    await captureIntegrations(page)
   }
 
   await browser.close()

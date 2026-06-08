@@ -26,7 +26,7 @@
 ## 配置 MySQL 连接
 
 1. 打开 **站点设置 → 服务集成**：`/_Admin/system/config?SiteId={站点GUID}`  
-2. 展开 **Database** 分组，编辑 **Mysql**。  
+2. 展开 **Database** 分组，编辑 **Mysql**。详见 [服务集成 · Database](../integrations/database.md)。  
 3. 填写 **连接字符串**（ConnectionString），保存。
 
 示例格式（以 Kooboo 内置说明为准）：

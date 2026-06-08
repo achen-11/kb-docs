@@ -13,7 +13,7 @@
 
 | 值 | 说明 |
 |----|------|
-| **Auto** | 自动：优先级 **MySQL > SQL Server > SQLite**（须在 [服务集成](../integrations.md) 配好连接） |
+| **Auto** | 自动：优先级 **MySQL > SQL Server > SQLite**（须在 [服务集成](../integrations/) 配好连接） |
 | **Sqlite** / **Mysql** / **SqlServer** | 固定指向对应库 |
 
 详见 [k.DB](/api/database/) 与 [数据库](../../database/index.md) 各表篇。
@@ -51,4 +51,4 @@
 
 - [基础设置概述](./index.md)  
 - [SQL 日志](../../database/sql-logs.md)  
-- [服务集成](../integrations.md)（Database 连接）
+- [服务集成](../integrations/)（Database 连接）

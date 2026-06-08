@@ -28,7 +28,7 @@
 |------|------|-----------------|------|------|
 | 基础设置 | `/system/settings` | `site·edit` | [基础设置](./basic/) | ✅ |
 | 域名管理 | `/system/domains` | `domain` | [域名管理](./domains.md) | ✅ |
-| 服务集成 | `/system/config` | `config` | [服务集成](./integrations.md) | ⬜ |
+| 服务集成 | `/system/config` | `config` | [服务集成](./integrations/) | ✅ |
 | 用户管理 | `/system/siteuser` | `siteUser` | [站点用户](./site-users.md) | ⬜ |
 | 角色权限 | `/system/roles` | `role` | [角色权限](./roles.md) | ⬜ |
 | 请求 Hook | `/system/front-events` | `frontEvents` | [请求 Hook](./request-hooks.md) | ⬜ |
@@ -67,18 +67,18 @@
 
 ## 服务集成（`config`）分组预览
 
-**服务集成**页按 **Group** 折叠展示 `CoreSetting` 项；编辑单条集成须 `config·edit`。CMS 写操作步骤与字段含义，密钥类细节链 API / 厂商文档。
+**服务集成**页按 **Group** 折叠展示 `CoreSetting` 项；详见 [服务集成](./integrations/)。
 
-| Group | 典型项 | CMS / API 交叉参考 |
-|-------|--------|-------------------|
-| **Database** | Mysql、SqlServer、Mongo、Redis… | [MySQL 表](../database/mysql-table.md)、[SQL Server 表](../database/sqlserver-table.md) |
-| **Payment** | Alipay、WeChat、Stripe、PayPal… | [k.payment](/api/payment/) |
-| **SMS** | 阿里、腾讯、中国移动… | API（待链） |
-| **OAuth2** | Google、Facebook、微信登录… | [身份验证](../development/authentication.md) |
-| **Storage** | 对象存储 | API（待链） |
-| **Others** | JWT、Firebase… | 按需链 API |
+| Group | 文档 |
+|-------|------|
+| **Database** | [Database](./integrations/database.md) |
+| **Payment** | [Payment](./integrations/payment.md) |
+| **SMS** | [SMS](./integrations/sms.md) |
+| **OAuth2** | [OAuth2](./integrations/oauth2.md) |
+| **Storage** | [Storage](./integrations/storage.md) |
+| **Others** | [Others](./integrations/others.md) |
 
-支付类集成 **不在** 电商设置里重复配置，以本页 **Payment** 分组为准。
+支付类集成 **不在** 电商设置里重复配置，以 **Payment** 分组为准。
 
 ## 建议编写顺序
 
@@ -86,7 +86,7 @@
 
 1. **[基础设置](./basic/)** — 六 Tab 子篇（含多语言、SQL 日志开关等）  
 2. **[域名管理](./domains.md)** — 绑定、主域名、SSL  
-3. **[服务集成](./integrations.md)** — 总览 + 各 Group；Database / Payment 与已有 database、payment API 交叉链接  
+3. **[服务集成](./integrations/)** — 各 Group 子篇；Database / Payment 与 API 交叉链接  
 4. **[站点用户](./site-users.md)** · **[角色权限](./roles.md)** — 后台账号与 feature 权限  
 5. **[Cookie](./cookie.md)**  
 6. **[请求 Hook](./request-hooks.md)** · **[操作 Hook](./action-hooks.md)** — 含 edit 子页  

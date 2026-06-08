@@ -52,7 +52,7 @@
 | ⬜ | `cms/commerce/overview.md` | `/commerce/settings` |
 | ⬜ | `cms/commerce/products.md` | `/commerce/product-management` |
 
-支付集成配置见 [settings/integrations.md](../docs/cms/settings/integrations.md)（Payment 分组），不单列 commerce 篇。
+支付集成配置见 [settings/integrations/payment.md](../docs/cms/settings/integrations/payment.md)（Payment 分组），不单列 commerce 篇。
 
 ## P2 — 站点设置（`docs/cms/settings/`）
 
@@ -69,7 +69,13 @@
 | ✅ | `settings/basic/editor.md` | `?name=editor` | |
 | ✅ | `settings/basic/advanced.md` | `?name=advance` | SQL/代码日志、Hook 总开关 |
 | ✅ | `settings/domains.md` | `/system/domains` | |
-| ⬜ | `settings/integrations.md` | `/system/config` | Group：Database、Payment、SMS、OAuth2、Storage、Others；Payment → [api/payment](/api/payment/) |
+| ✅ | `settings/integrations/index.md` | `/system/config` | 概述 + 编辑弹窗 |
+| ✅ | `settings/integrations/database.md` | `?group=Database` | |
+| ✅ | `settings/integrations/payment.md` | `?group=Payment` | → [api/payment](/api/payment/) |
+| ✅ | `settings/integrations/sms.md` | `?group=SMS` | |
+| ✅ | `settings/integrations/oauth2.md` | `?group=OAuth2` | |
+| ✅ | `settings/integrations/storage.md` | `?group=Storage` | |
+| ✅ | `settings/integrations/others.md` | `?group=Others` | |
 | ⬜ | `settings/site-users.md` | `/system/siteuser` | 菜单文案「用户管理」 |
 | ⬜ | `settings/roles.md` | `/system/roles` | `advanced` |
 | ⬜ | `settings/request-hooks.md` | `/system/front-events` | 含 `/front-events/edit` |

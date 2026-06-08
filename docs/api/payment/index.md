@@ -4,7 +4,7 @@
 
 ## 概述
 
-`k.payment` 提供支付请求创建、支付状态查询、支付请求记录读取等能力。使用前需要先在站点 CMS 的配置菜单中启用并配置对应支付方式。
+`k.payment` 提供支付请求创建、支付状态查询、支付请求记录读取等能力。使用前需要先在站点 [CMS 服务集成 · Payment](/cms/settings/integrations/payment) 中启用并配置对应支付方式。
 
 `charge()` 会写入站点内置 **PaymentRequest**；若传入 Commerce `order`，支付成功后由内建 callback 更新订单。不要默认自建一套平行支付表。
 
