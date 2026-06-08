@@ -7,6 +7,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=integrations node scripts/cms-settings-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=site-users node scripts/cms-settings-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=roles node scripts/cms-settings-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=request-hooks node scripts/cms-settings-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -291,6 +292,89 @@ async function captureRoles(page) {
   }
 }
 
+function frontEventsUrl() {
+  return `${BASE}/_Admin/system/front-events?SiteId=${SITE_ID}`
+}
+
+function frontEventsEditUrl(name, display) {
+  const q = display
+    ? `&display=${encodeURIComponent(display)}`
+    : ''
+  return `${BASE}/_Admin/system/front-events/edit?SiteId=${SITE_ID}&name=${name}${q}`
+}
+
+async function captureRequestHooks(page) {
+  await page.goto(frontEventsUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('BusinessRule/list') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page.waitForTimeout(1500)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('[data-cy="new-event"]').locator('..').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'settings-request-hooks-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'settings-request-hooks-list.png')
+  }
+  await snap(page, 'settings-request-hooks-overview.png', { fullPage: true })
+
+  const newBtn = page.locator('[data-cy="new-event"]').first()
+  if (await newBtn.count()) {
+    await newBtn.click()
+    await page.waitForTimeout(600)
+    await snapDialog(page, 'settings-request-hooks-event-picker.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  await page.goto(
+    frontEventsEditUrl('RouteFinding', 'RouteFinding'),
+    { waitUntil: 'networkidle', timeout: 90000 }
+  )
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('BusinessRule/ListByEvent') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page.waitForTimeout(1500)
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await snap(page, 'settings-request-hooks-edit.png', { fullPage: true })
+
+  const editCondition = page.locator('[data-cy="edit-condition"]').first()
+  if (await editCondition.count()) {
+    await editCondition.click()
+    await page.waitForTimeout(600)
+    await snapDialog(page, 'settings-request-hooks-condition-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const newRule = page.locator('[data-cy="new-rule"]').first()
+  if (await newRule.count()) {
+    await newRule.click()
+    await page.waitForTimeout(300)
+    const doItem = page.locator('[data-cy="do"]').first()
+    if (await doItem.count()) {
+      await doItem.click()
+      await page.waitForTimeout(600)
+      const addCode = page.locator('[data-cy="add-code"]').last()
+      if (await addCode.count()) {
+        await addCode.click()
+        await page.waitForTimeout(600)
+        await snapDialog(page, 'settings-request-hooks-code-dialog.png')
+        await page.keyboard.press('Escape')
+      }
+    }
+  }
+}
+
 async function captureSiteUsers(page) {
   await page.goto(siteUsersUrl(), { waitUntil: 'networkidle', timeout: 90000 })
   await page
@@ -386,6 +470,9 @@ async function main() {
   }
   if (only === 'roles') {
     await captureRoles(page)
+  }
+  if (only === 'request-hooks') {
+    await captureRequestHooks(page)
   }
 
   await browser.close()
