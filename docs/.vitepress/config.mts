@@ -138,7 +138,19 @@ const cmsSidebar = [
         collapsed: true,
         items: [
           { text: '概述', link: '/cms/settings/' },
-          { text: '基础设置', link: '/cms/settings/basic' },
+          {
+            text: '基础设置',
+            collapsed: true,
+            items: [
+              { text: '概述', link: '/cms/settings/basic/' },
+              { text: '基础', link: '/cms/settings/basic/general' },
+              { text: '访问控制', link: '/cms/settings/basic/access' },
+              { text: '性能', link: '/cms/settings/basic/performance' },
+              { text: 'SEO', link: '/cms/settings/basic/seo' },
+              { text: '编辑器', link: '/cms/settings/basic/editor' },
+              { text: '高级', link: '/cms/settings/basic/advanced' },
+            ],
+          },
           { text: '域名管理', link: '/cms/settings/domains' },
           { text: '服务集成', link: '/cms/settings/integrations' },
           { text: '站点用户', link: '/cms/settings/site-users' },

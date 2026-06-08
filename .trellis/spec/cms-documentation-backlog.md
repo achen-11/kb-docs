@@ -56,12 +56,18 @@
 
 ## P2 — 站点设置（`docs/cms/settings/`）
 
-概述：[settings/index.md](../docs/cms/settings/index.md) · 配图脚本：`scripts/cms-settings-screenshots.mjs`（待建）→ `docs/public/cms/settings/`
+概述：[settings/index.md](../docs/cms/settings/index.md) · 配图：`pnpm screenshots:cms:settings`（`KOOBOO_SCREENSHOT_SCOPE=basic`）→ `docs/public/cms/settings/`
 
 | 状态 | 文档 | Frontend 路由 | 备注 |
 |------|------|----------------|------|
-| 🟡 | `settings/index.md` | — | 目录规划 ✅；子篇待写 |
-| ⬜ | `settings/basic.md` | `/system/settings` | Tab：`basic` / `access` / `performance` / `seo` / `editor` / `advance`；**多语言**在 `basic` Tab 内 |
+| 🟡 | `settings/index.md` | — | 目录规划 ✅ |
+| ✅ | `settings/basic/index.md` | `/system/settings` | 概述 + Tab 导航 |
+| ✅ | `settings/basic/general.md` | `?name=basic` | 含多语言、导入导出 |
+| ✅ | `settings/basic/access.md` | `?name=access` | |
+| ✅ | `settings/basic/performance.md` | `?name=performance` | |
+| ✅ | `settings/basic/seo.md` | `?name=seo` | |
+| ✅ | `settings/basic/editor.md` | `?name=editor` | |
+| ✅ | `settings/basic/advanced.md` | `?name=advance` | SQL/代码日志、Hook 总开关 |
 | ⬜ | `settings/domains.md` | `/system/domains` | |
 | ⬜ | `settings/integrations.md` | `/system/config` | Group：Database、Payment、SMS、OAuth2、Storage、Others；Payment → [api/payment](/api/payment/) |
 | ⬜ | `settings/site-users.md` | `/system/siteuser` | 菜单文案「用户管理」 |

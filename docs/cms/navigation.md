@@ -146,7 +146,7 @@
 
 | 菜单 | 路径 | 文档 |
 |------|------|------|
-| 基础设置 | `/system/settings` | [基础设置](./settings/basic.md) |
+| 基础设置 | `/system/settings` | [基础设置](./settings/basic/) |
 | 域名管理 | `/system/domains` | [域名管理](./settings/domains.md) |
 | 服务集成 | `/system/config` | [服务集成](./settings/integrations.md) |
 | 用户管理 | `/system/siteuser` | [站点用户](./settings/site-users.md) |

@@ -26,7 +26,7 @@
 
 | 菜单 | 路径 | 权限（feature） | 文档 | 状态 |
 |------|------|-----------------|------|------|
-| 基础设置 | `/system/settings` | `site·edit` | [基础设置](./basic.md) | ⬜ |
+| 基础设置 | `/system/settings` | `site·edit` | [基础设置](./basic/) | ✅ |
 | 域名管理 | `/system/domains` | `domain` | [域名管理](./domains.md) | ⬜ |
 | 服务集成 | `/system/config` | `config` | [服务集成](./integrations.md) | ⬜ |
 | 用户管理 | `/system/siteuser` | `siteUser` | [站点用户](./site-users.md) | ⬜ |
@@ -48,7 +48,7 @@
 
 | 路由 | 从哪进入 | 写入文档 |
 |------|----------|----------|
-| `/system/settings?name={tab}` | 基础设置内 Tab 切换 | [基础设置](./basic.md) 各 Tab 小节 |
+| `/system/settings?name={tab}` | 基础设置内 Tab 切换 | [基础设置](./basic/) 各 Tab 子篇 |
 | `/system/front-events/edit` | 请求 Hook 列表 | [请求 Hook](./request-hooks.md) |
 | `/system/backend-events/edit` | 操作 Hook 列表 | [操作 Hook](./action-hooks.md) |
 
@@ -63,7 +63,7 @@
 | `editor` | 编辑器 | 后台编辑器偏好 |
 | `advance` | 高级 | 默认数据库、SQL 日志、约束修复等（与 [SQL 日志](../database/sql-logs.md) 联动） |
 
-多语言配置嵌在 **基础** Tab 的 `Multilingual` 区域，**不单独成菜单**；文档写在 [基础设置](./basic.md#多语言) 一节，勿与 [开发 → SPA 多语言](../development/spa-multilingual.md) 混淆。
+多语言配置嵌在 **基础** Tab 的 `Multilingual` 区域，**不单独成菜单**；文档写在 [基础 · 基础 Tab](./basic/general.md#多语言)，勿与 [开发 → SPA 多语言](../development/spa-multilingual.md) 混淆。
 
 ## 服务集成（`config`）分组预览
 
@@ -84,7 +84,7 @@
 
 与实施常见路径一致，建议按下列顺序逐篇补充后台步骤与配图（`scripts/cms-settings-screenshots.mjs`，产出 `docs/public/cms/settings/`）：
 
-1. **[基础设置](./basic.md)** — 含多语言、高级项（SQL 日志开关等）  
+1. **[基础设置](./basic/)** — 六 Tab 子篇（含多语言、SQL 日志开关等）  
 2. **[域名管理](./domains.md)** — 绑定、主域名、SSL  
 3. **[服务集成](./integrations.md)** — 总览 + 各 Group；Database / Payment 与已有 database、payment API 交叉链接  
 4. **[站点用户](./site-users.md)** · **[角色权限](./roles.md)** — 后台账号与 feature 权限  
