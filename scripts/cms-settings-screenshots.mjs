@@ -5,6 +5,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=multilingual node scripts/cms-settings-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=domains node scripts/cms-settings-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=integrations node scripts/cms-settings-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=site-users node scripts/cms-settings-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -223,6 +224,41 @@ async function captureIntegrationGroup(page, group, file) {
   }
 }
 
+function siteUsersUrl() {
+  return `${BASE}/_Admin/system/siteuser?SiteId=${SITE_ID}`
+}
+
+async function captureSiteUsers(page) {
+  await page.goto(siteUsersUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('SiteUser/CurrentUsers') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page.waitForTimeout(1500)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('[data-cy="add-user"]').locator('..').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'settings-site-users-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'settings-site-users-list.png')
+  }
+  await snap(page, 'settings-site-users-overview.png', { fullPage: true })
+
+  const addBtn = page.locator('[data-cy="add-user"]').first()
+  if (await addBtn.count()) {
+    await addBtn.click()
+    await page.waitForTimeout(600)
+    await snapDialog(page, 'settings-site-users-add-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+}
+
 async function captureIntegrations(page) {
   await page.goto(configUrl(), { waitUntil: 'networkidle', timeout: 90000 })
   await page.waitForTimeout(2000)
@@ -281,6 +317,9 @@ async function main() {
   }
   if (only === 'integrations') {
     await captureIntegrations(page)
+  }
+  if (only === 'site-users') {
+    await captureSiteUsers(page)
   }
 
   await browser.close()

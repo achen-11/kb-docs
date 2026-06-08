@@ -76,7 +76,7 @@
 | ✅ | `settings/integrations/oauth2.md` | `?group=OAuth2` | |
 | ✅ | `settings/integrations/storage.md` | `?group=Storage` | |
 | ✅ | `settings/integrations/others.md` | `?group=Others` | |
-| ⬜ | `settings/site-users.md` | `/system/siteuser` | 菜单文案「用户管理」 |
+| ✅ | `settings/site-users.md` | `/system/siteuser` | 菜单文案「用户管理」 |
 | ⬜ | `settings/roles.md` | `/system/roles` | `advanced` |
 | ⬜ | `settings/request-hooks.md` | `/system/front-events` | 含 `/front-events/edit` |
 | ⬜ | `settings/action-hooks.md` | `/system/backend-events` | 含 `/backend-events/edit` |
