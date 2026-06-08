@@ -3,6 +3,7 @@
  * Usage:
  *   KOOBOO_SCREENSHOT_SCOPE=basic node scripts/cms-settings-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=multilingual node scripts/cms-settings-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=domains node scripts/cms-settings-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -156,6 +157,57 @@ async function captureBasicSettings(page) {
   }
 }
 
+async function snapDialog(page, name) {
+  const dialog = page.locator('.el-dialog').last()
+  await dialog.waitFor({ state: 'visible', timeout: 30000 })
+  await page.waitForTimeout(400)
+  const file = path.join(OUT_DIR, name)
+  await dialog.screenshot({ path: file })
+  console.log('saved', file)
+}
+
+function domainsUrl() {
+  return `${BASE}/_Admin/system/domains?SiteId=${SITE_ID}`
+}
+
+async function captureDomains(page) {
+  await page.goto(domainsUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('Binding/listbysite') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page.waitForTimeout(1500)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('[data-cy="new-binding"]').locator('..').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'settings-domains-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'settings-domains-list.png')
+  }
+  await snap(page, 'settings-domains-overview.png', { fullPage: true })
+
+  const newBtn = page.locator('[data-cy="new-binding"]').first()
+  if (await newBtn.count()) {
+    await newBtn.click()
+    await page.waitForTimeout(600)
+    await snapDialog(page, 'settings-domains-new-binding.png')
+
+    const adv = page.locator('[data-cy="show-advance-settings"]').first()
+    if (await adv.count()) {
+      await adv.click()
+      await page.waitForTimeout(400)
+      await snapDialog(page, 'settings-domains-new-binding-advanced.png')
+    }
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+}
+
 async function main() {
   const only = process.env.KOOBOO_SCREENSHOT_SCOPE || 'basic'
   await mkdir(OUT_DIR, { recursive: true })
@@ -173,6 +225,9 @@ async function main() {
   }
   if (only === 'multilingual') {
     await captureMultilingual(page)
+  }
+  if (only === 'domains') {
+    await captureDomains(page)
   }
 
   await browser.close()

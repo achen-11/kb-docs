@@ -68,7 +68,7 @@
 | ✅ | `settings/basic/seo.md` | `?name=seo` | |
 | ✅ | `settings/basic/editor.md` | `?name=editor` | |
 | ✅ | `settings/basic/advanced.md` | `?name=advance` | SQL/代码日志、Hook 总开关 |
-| ⬜ | `settings/domains.md` | `/system/domains` | |
+| ✅ | `settings/domains.md` | `/system/domains` | |
 | ⬜ | `settings/integrations.md` | `/system/config` | Group：Database、Payment、SMS、OAuth2、Storage、Others；Payment → [api/payment](/api/payment/) |
 | ⬜ | `settings/site-users.md` | `/system/siteuser` | 菜单文案「用户管理」 |
 | ⬜ | `settings/roles.md` | `/system/roles` | `advanced` |

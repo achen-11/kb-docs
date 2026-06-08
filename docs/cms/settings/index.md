@@ -27,7 +27,7 @@
 | 菜单 | 路径 | 权限（feature） | 文档 | 状态 |
 |------|------|-----------------|------|------|
 | 基础设置 | `/system/settings` | `site·edit` | [基础设置](./basic/) | ✅ |
-| 域名管理 | `/system/domains` | `domain` | [域名管理](./domains.md) | ⬜ |
+| 域名管理 | `/system/domains` | `domain` | [域名管理](./domains.md) | ✅ |
 | 服务集成 | `/system/config` | `config` | [服务集成](./integrations.md) | ⬜ |
 | 用户管理 | `/system/siteuser` | `siteUser` | [站点用户](./site-users.md) | ⬜ |
 | 角色权限 | `/system/roles` | `role` | [角色权限](./roles.md) | ⬜ |
