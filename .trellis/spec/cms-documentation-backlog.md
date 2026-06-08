@@ -74,7 +74,7 @@
 | ✅ | `database/key-value.md` | `/database/key-value` |
 | ✅ | `database/sqlite-table.md` | `/database/sqlite-table` |
 | ✅ | `database/mysql-table.md` | `/database/mysql-table` |
-| ⬜ | `database/sqlserver-table.md` | `/database/sqlserver-table` |
+| ✅ | `database/sqlserver-table.md` | `/database/sqlserver-table` |
 | ✅ | `database/sql-logs.md` | `/database/sql-logs` |
 
 子路由（无独立菜单）：`/database/table/columns`、`/data`、`/edit-data` — 写入对应表类型篇目。

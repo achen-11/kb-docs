@@ -8,7 +8,7 @@
 
 - **IndexedDB（站点动态表）** — 后台 [IndexedDB 表](/cms/database/table) 建表，脚本使用 `k.DB.indexedDb.{表名}`
 - **SQLite** — 开箱即用，无需配置
-- **MySQL / SQL Server** — 须在服务集成中配置连接字符串（后台见 [MySQL 表](/cms/database/mysql-table)）
+- **MySQL / SQL Server** — 须在服务集成中配置连接字符串（后台见 [MySQL 表](/cms/database/mysql-table)、[SQL Server 表](/cms/database/sqlserver-table)）
 
 ## 子模块
 
