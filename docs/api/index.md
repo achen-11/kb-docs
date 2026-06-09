@@ -62,6 +62,6 @@ KScript API 完整参考（服务端 `k.*`）。文档路径与模块名一致�
 
 各模块子页见对应目录内侧边栏或 [utils 索引](./utils/index.md)。
 
-## 计划中文档
+## 后续补充
 
-尚未单独成页的能力见 `.trellis/spec/kscript-api-backlog.md`（如 `k.emailMarketing`）。
+尚未单独成页的能力会继续按模块补充到本目录。

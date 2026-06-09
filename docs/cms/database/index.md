@@ -79,6 +79,6 @@
 | 文档 | 说明 |
 |------|------|
 | [站点后台菜单总览](../navigation.md) | 完整菜单树 |
-| [开发](./development/index.md) | Code 中调用 `k.DB` |
+| [开发](../development/index.md) | Code 中调用 `k.DB` |
 | [k.DB](/api/database/) | 脚本 API |
 | [k.DB.sqlite](/api/sqlite/) | SQLite 查询与表操作 |

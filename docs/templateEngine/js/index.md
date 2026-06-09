@@ -71,7 +71,7 @@ createApp({ /* ... */ }).mount('#app')
 
 ## `type="module"` 与服务端 CodeBlock
 
-服务端可使用带 `env="server"` 的 module 脚本 `import` 其他 CodeBlock，并向模板 `export` 变量，见 [模板绑定语法](./template-binding-syntax.md#type-module)。
+服务端可使用带 `env="server"` 的 module 脚本 `import` 其他 CodeBlock，并向模板 `export` 变量，见 [模板绑定语法](../binding/#type-module)。
 
 ## 相关文档
 

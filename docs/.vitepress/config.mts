@@ -299,6 +299,36 @@ const guideSidebar = [
   },
 ]
 
+const quickStartSidebar = [
+  {
+    text: '快速开始',
+    items: [
+      { text: '总览', link: '/quick-start/' },
+      { text: '创建第一个站点', link: '/quick-start/create-first-site' },
+      { text: '做第一个页面', link: '/quick-start/build-first-page' },
+      { text: '添加内容', link: '/quick-start/add-content' },
+      { text: '发布与域名', link: '/quick-start/publish-domain' },
+      { text: '写第一个 KScript API', link: '/quick-start/add-script-api' },
+    ],
+  },
+]
+
+const productSidebar = [
+  {
+    text: '产品功能',
+    items: [
+      { text: '总览', link: '/product/' },
+      { text: '控制台', link: '/product/console' },
+      { text: '邮箱', link: '/product/mail' },
+      { text: '市场', link: '/product/market' },
+      { text: '开发者模式', link: '/product/developer-mode' },
+      { text: 'AI Claw / AI Chat', link: '/product/ai-chat' },
+      { text: 'AI 悬浮助手', link: '/product/ai-floating-assistant' },
+      { text: '充值与账单', link: '/product/billing' },
+    ],
+  },
+]
+
 export default defineConfig({
   title: 'Kooboo',
   description: 'Kooboo Documentation',
@@ -341,12 +371,18 @@ export default defineConfig({
   themeConfig: {
     siteTitle: 'Kooboo',
     nav: [
-      { text: '最佳实践', link: '/guide/' },
+      { text: '快速开始', link: '/quick-start/' },
+      { text: '产品功能', link: '/product/' },
       { text: '后台 CMS', link: '/cms/' },
       { text: '模板引擎', link: '/templateEngine/' },
-      { text: 'API 详情', link: '/api/' }
+      { text: 'API 详情', link: '/api/' },
+      { text: '最佳实践', link: '/guide/' }
     ],
     sidebar: {
+      '/quick-start/': quickStartSidebar,
+      '/quick-start': quickStartSidebar,
+      '/product/': productSidebar,
+      '/product': productSidebar,
       '/guide/': guideSidebar,
       '/guide': guideSidebar,
       '/cms/': cmsSidebar,
