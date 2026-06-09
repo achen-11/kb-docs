@@ -8,6 +8,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=site-users node scripts/cms-settings-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=roles node scripts/cms-settings-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=request-hooks node scripts/cms-settings-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=action-hooks node scripts/cms-settings-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -170,6 +171,42 @@ async function snapDialog(page, name) {
   console.log('saved', file)
 }
 
+async function snapExpandedDialog(page, name) {
+  const dialog = page.locator('.el-dialog').last()
+  await dialog.waitFor({ state: 'visible', timeout: 30000 })
+  await page.waitForTimeout(400)
+  const expand = (el) => {
+    el.style.maxHeight = 'none'
+    el.style.height = 'auto'
+    el.style.overflow = 'visible'
+    const nodes = el.querySelectorAll('*')
+    for (const node of nodes) {
+      node.style.maxHeight = 'none'
+      node.style.overflow = 'visible'
+    }
+  }
+  await dialog.evaluate(expand)
+  await page.waitForTimeout(400)
+
+  const originalViewport = page.viewportSize()
+  const box = await dialog.boundingBox()
+  if (originalViewport && box && box.y + box.height > originalViewport.height) {
+    await page.setViewportSize({
+      width: originalViewport.width,
+      height: Math.ceil(box.y + box.height + 24),
+    })
+    await page.waitForTimeout(500)
+    await dialog.evaluate(expand)
+  }
+
+  const file = path.join(OUT_DIR, name)
+  await dialog.screenshot({ path: file })
+  if (originalViewport) {
+    await page.setViewportSize(originalViewport)
+  }
+  console.log('saved', file)
+}
+
 function domainsUrl() {
   return `${BASE}/_Admin/system/domains?SiteId=${SITE_ID}`
 }
@@ -303,6 +340,17 @@ function frontEventsEditUrl(name, display) {
   return `${BASE}/_Admin/system/front-events/edit?SiteId=${SITE_ID}&name=${name}${q}`
 }
 
+function backendEventsUrl() {
+  return `${BASE}/_Admin/system/backend-events?SiteId=${SITE_ID}`
+}
+
+function backendEventsEditUrl(name, display) {
+  const q = display
+    ? `&display=${encodeURIComponent(display)}`
+    : ''
+  return `${BASE}/_Admin/system/backend-events/edit?SiteId=${SITE_ID}&name=${name}${q}`
+}
+
 async function captureRequestHooks(page) {
   await page.goto(frontEventsUrl(), { waitUntil: 'networkidle', timeout: 90000 })
   await page
@@ -369,6 +417,78 @@ async function captureRequestHooks(page) {
         await addCode.click()
         await page.waitForTimeout(600)
         await snapDialog(page, 'settings-request-hooks-code-dialog.png')
+        await page.keyboard.press('Escape')
+      }
+    }
+  }
+}
+
+async function captureActionHooks(page) {
+  await page.goto(backendEventsUrl(), { waitUntil: 'networkidle', timeout: 90000 })
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('BackendRule/list') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page.waitForTimeout(1500)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const toolbar = page.locator('[data-cy="new-event"]').locator('..').first()
+  if (await toolbar.count()) {
+    await snapLocator(toolbar, 'settings-action-hooks-toolbar.png')
+  }
+  const table = page.locator('.el-table').first()
+  if (await table.count()) {
+    await snapLocator(table, 'settings-action-hooks-list.png')
+  }
+  await snap(page, 'settings-action-hooks-overview.png', { fullPage: true })
+
+  const newBtn = page.locator('[data-cy="new-event"]').first()
+  if (await newBtn.count()) {
+    await newBtn.click()
+    await page.waitForTimeout(600)
+    await snapExpandedDialog(page, 'settings-action-hooks-event-picker.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  await page.goto(
+    backendEventsEditUrl('ContentUpdated', 'ContentUpdated'),
+    { waitUntil: 'networkidle', timeout: 90000 }
+  )
+  await page
+    .waitForResponse(
+      (r) => r.url().includes('BackendRule/ListByEvent') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page.waitForTimeout(1500)
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await snap(page, 'settings-action-hooks-edit.png', { fullPage: true })
+
+  const editCondition = page.locator('[data-cy="edit-condition"]').first()
+  if (await editCondition.count()) {
+    await editCondition.click()
+    await page.waitForTimeout(600)
+    await snapDialog(page, 'settings-action-hooks-condition-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const newRule = page.locator('[data-cy="new-rule"]').first()
+  if (await newRule.count()) {
+    await newRule.click()
+    await page.waitForTimeout(300)
+    const doItem = page.locator('[data-cy="do"]').first()
+    if (await doItem.count()) {
+      await doItem.click()
+      await page.waitForTimeout(600)
+      const addCode = page.locator('[data-cy="add-code"]').last()
+      if (await addCode.count()) {
+        await addCode.click()
+        await page.waitForTimeout(600)
+        await snapDialog(page, 'settings-action-hooks-code-dialog.png')
         await page.keyboard.press('Escape')
       }
     }
@@ -473,6 +593,9 @@ async function main() {
   }
   if (only === 'request-hooks') {
     await captureRequestHooks(page)
+  }
+  if (only === 'action-hooks') {
+    await captureActionHooks(page)
   }
 
   await browser.close()

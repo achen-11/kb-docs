@@ -1,6 +1,6 @@
 # 站点设置
 
-> 菜单：左侧 **站点设置** 分组（须在 **编辑菜单** 中勾选显示）  
+> 菜单：左侧 **站点设置** 分组（须在 **编辑菜单** 中勾选显示）
 > 路由前缀：`/_Admin/system/...?SiteId={站点GUID}`
 
 **站点设置**用于配置站点运行所需的基础信息、域名、第三方 **服务集成**、后台用户与权限、Hook 与 Cookie 等。与 [运维中心](../operations/index.md) 共用 `/system` 路径前缀，但 **左侧菜单分组不同**（本分组 `menu.name` 为 `system`，文案为「站点设置」）。
@@ -19,7 +19,7 @@
 
 ## 如何打开
 
-1. 在 [编辑菜单](../navigation.md#权限与编辑菜单) 中勾选 **站点设置** 及其需要的子项。  
+1. 在 [编辑菜单](../navigation.md#权限与编辑菜单) 中勾选 **站点设置** 及其需要的子项。
 2. 左侧展开 **站点设置**。
 
 ## 子菜单（与后台顺序一致）
@@ -32,7 +32,7 @@
 | 用户管理 | `/system/siteuser` | `siteUser` | [站点用户](./site-users.md) | ✅ |
 | 角色权限 | `/system/roles` | `role` | [角色权限](./roles.md) | ✅ |
 | 请求 Hook | `/system/front-events` | `frontEvents` | [请求 Hook](./request-hooks.md) | ✅ |
-| 操作 Hook | `/system/backend-events` | `backendEvents` | [操作 Hook](./action-hooks.md) | ⬜ |
+| 操作 Hook | `/system/backend-events` | `backendEvents` | [操作 Hook](./action-hooks.md) | ✅ |
 | Cookie 管理 | `/system/cookie` | `site·edit` | [Cookie](./cookie.md) | ⬜ |
 | AI 服务 | `/system/ai-service` | `ai` | [AI 服务](./ai-service.md) | ⬜ |
 
@@ -41,7 +41,8 @@
 ```text
 /_Admin/system/settings?SiteId={站点GUID}&name=basic
 /_Admin/system/config?SiteId={站点GUID}&group=Database
-/_Admin/system/front-events/edit?SiteId={站点GUID}&id={HookId}
+/_Admin/system/front-events/edit?SiteId={站点GUID}&name=RouteFinding&display=RouteFinding
+/_Admin/system/backend-events/edit?SiteId={站点GUID}&name=ContentUpdated&display=ContentUpdated
 ```
 
 ## 无侧栏菜单的子路由
@@ -84,13 +85,13 @@
 
 与实施常见路径一致，建议按下列顺序逐篇补充后台步骤与配图（`scripts/cms-settings-screenshots.mjs`，产出 `docs/public/cms/settings/`）：
 
-1. **[基础设置](./basic/)** — 六 Tab 子篇（含多语言、SQL 日志开关等）  
-2. **[域名管理](./domains.md)** — 绑定、主域名、SSL  
-3. **[服务集成](./integrations/)** — 各 Group 子篇；Database / Payment 与 API 交叉链接  
-4. **[站点用户](./site-users.md)** · **[角色权限](./roles.md)** — 后台账号与 feature 权限  
-5. **[Cookie](./cookie.md)**  
-6. **[请求 Hook](./request-hooks.md)** · **[操作 Hook](./action-hooks.md)** — 含 edit 子页  
-7. **[AI 服务](./ai-service.md)** — 与 [运维中心](../operations/index.md) 互链  
+1. **[基础设置](./basic/)** — 六 Tab 子篇（含多语言、SQL 日志开关等）
+2. **[域名管理](./domains.md)** — 绑定、主域名、SSL
+3. **[服务集成](./integrations/)** — 各 Group 子篇；Database / Payment 与 API 交叉链接
+4. **[站点用户](./site-users.md)** · **[角色权限](./roles.md)** — 后台账号与 feature 权限
+5. **[请求 Hook](./request-hooks.md)** · **[操作 Hook](./action-hooks.md)** — 含 edit 子页
+6. **[Cookie](./cookie.md)**
+7. **[AI 服务](./ai-service.md)** — 与 [运维中心](../operations/index.md) 互链
 
 ## 开发参考（KScript / API）
 
