@@ -79,11 +79,11 @@
 | 页面树、发布、富文本/设计器 | **站点 → 页面** | [页面](../site/pages.md) |
 | 在线改 HTML、绑定 View/Layout | 页面列表 **在线编辑** | [在线编辑](../site/pages-inline-edit.md) |
 | 直接改页面代码文件 | 页面 **编辑代码** | [编辑代码](../site/pages-edit-code.md) |
-| 站点级 View/Layout 库 | **开发 → Views / Layouts** | 本系列（待逐篇编写） |
+| 站点级 View/Layout 库 | **开发 → Views / Layouts** | [Layouts](./layouts.md) · [Views](./views.md) |
 
 页面设计器路由（如 `/_Admin/page/edit`、`/_Admin/page/design`）从 **页面** 列表进入，不在开发分组下列出。
 
-## 建议阅读 / 编写顺序
+## 建议阅读顺序
 
 若从站点搭建角度使用开发能力，常见顺序为：
 
@@ -94,7 +94,7 @@
 5. **Forms / Menus / Authentication** — 表单、后台菜单与登录方式（按项目需要）  
 6. **Open API / SPA 多语言 / 模块 / 定时任务** — 集成与扩展  
 
-具体步骤以各子篇文档为准（编写中）。
+具体步骤以各子篇文档为准。
 
 ## 相关
 

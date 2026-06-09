@@ -1,6 +1,6 @@
 # 后台菜单总览
 
-> 归纳自 Kooboo Frontend `src/router/site.ts` 与 `locales/zh.yml`（`common.*`）。界面文案以你登录后的中文界面为准。
+> 按 Kooboo 站点后台左侧菜单归纳。界面文案以你登录后的中文界面为准。
 
 ::: tip 先完成外层步骤
 若你仍在 **我的站点** 列表（`/_Admin/`），请先阅读 [登录与站点列表](./getting-started/login-and-site-list.md)，点击某一站点的 **管理** 后再使用下文菜单。
@@ -81,15 +81,15 @@
 | 菜单 | 路径 | 文档 |
 |------|------|------|
 | 访问统计 | `/system/visitor-logs` | [访问统计](./operations/visitor-logs.md) |
-| 行为分析 | `/system/user-behavior-analysis` | *待编写* |
+| 行为分析 | `/system/user-behavior-analysis` | 暂未单独成篇 |
 | 资源守护 | `/system/resource-guardian` | [资源守护](./operations/resource-guardian.md) |
 | 页面交互 | `/system/page-interaction` | [页面交互](./operations/page-interaction.md) |
 | AB 测试 | `/system/ab-testing` | [AB 测试](./operations/ab-testing.md) |
-| 错误监控 | `/system/error-monitoring` | *待编写* |
+| 错误监控 | `/system/error-monitoring` | 暂未单独成篇 |
 | 操作日志 | `/system/site-logs` | [操作日志](./operations/site-logs.md) |
 | 协作同步 | `/system/sync` | [协作同步](./operations/sync.md) |
-| 搜索 | `/system/search` | *待编写* |
-| 自动化 | `/system/automation` | *待编写* |
+| 搜索 | `/system/search` | 暂未单独成篇 |
+| 自动化 | `/system/automation` | 暂未单独成篇 |
 | AI 服务 | `/system/ai-service` | [AI 服务](./settings/ai-service.md) |
 
 概述：[运维中心](./operations/index.md)
@@ -180,7 +180,3 @@
 <DocImage src="/cms/navigation-edit-menu.png" alt="编辑菜单：勾选要在侧栏显示的内容、站点设置等子项" width="1120" />
 
 勾选 **内容 → 文件**、**HTML 片段** 等后，即可在左侧 **内容** 分组下看到对应入口，详见各子文档。
-
-## 维护说明
-
-菜单变更时请同步更新本文与 `.trellis/spec/cms-documentation-backlog.md`。权威路由文件：`Kooboo/Frontend/src/router/site.ts`。

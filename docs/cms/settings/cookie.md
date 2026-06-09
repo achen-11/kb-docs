@@ -262,7 +262,7 @@ Cookie 项字段：
 
 | 文档 | 说明 |
 |------|------|
-| [站点设置概述](./index.md) | 站点设置菜单与建议编写顺序 |
+| [站点设置概述](./index.md) | 站点设置菜单与建议配置顺序 |
 | [基础设置](./basic/) | Base URL、多语言、站点基础开关 |
 | [域名管理](./domains.md) | 多域名与语言绑定 |
 | [k.cookie](/api/cookie/) | KScript Cookie 读写 |

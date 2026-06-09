@@ -12,14 +12,14 @@
 |------|------|
 | 打开 **AI 服务** 页面 | `ai` |
 | 查看自定义 AI 函数列表 | `ai·view` |
-| 新增、编辑、删除 AI 函数 | Frontend 按钮检查 `mcp·edit`；后端 `mcp/PostTool`、`mcp/DeleteTools` 检查 `ai·edit` |
-| 运行自定义 AI 函数 | Frontend 按钮检查 `mcp·view` |
+| 新增、编辑、删除 AI 函数 | 界面按钮检查 `mcp·edit`；后端 `mcp/PostTool`、`mcp/DeleteTools` 检查 `ai·edit` |
+| 运行自定义 AI 函数 | 界面按钮检查 `mcp·view` |
 | 保存 **MCP 服务** 与 **向量搜索** 设置 | 页面底部保存按钮检查 `mcp·edit`，并保存站点 AI 设置 |
 | 保存 `llms.txt`、Markdown、JSON-LD 配置 | 需能进入本页；其中 Markdown / JSON-LD 开关会保存站点 AI 设置 |
 :::
 
 ::: info 支持范围
-当前后台页面已展示并有服务端接口的 Tab 包括 **MCP / AI 函数**、**llms.txt 生成器**、**自动 Markdown 引擎**、**全局 JSON-LD 映射**。Pay-per-crawl 相关 Tab 在 Frontend 中仍为注释状态，本篇不写。
+当前后台页面已开放并有服务端接口的 Tab 包括 **MCP / AI 函数**、**llms.txt 生成器**、**自动 Markdown 引擎**、**全局 JSON-LD 映射**。Pay-per-crawl 相关能力当前界面未开放，本篇不写。
 :::
 
 ## 如何打开

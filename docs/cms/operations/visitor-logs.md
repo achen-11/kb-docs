@@ -162,11 +162,11 @@
 <DocImage src="/cms/operations/visitor-logs-top-browsers-panel.png" alt="浏览器排行子页" width="1120" />
 
 ::: tip 封禁与限速
-子页与主屏表格中的封禁/限速与 **站点设置 → 基础设置** 中的访问限制、限速策略联动；详见站点设置文档（待编写）或 Frontend `accessLimitSettings` / `rateLimitSettings`。
+子页与主屏表格中的封禁/限速与 **站点设置 → 基础设置** 中的访问限制、限速策略联动；详见 [基础设置 · 访问控制](../settings/basic/access.md)。
 :::
 
 ## 相关
 
 - [运维中心概述](./index.md)  
 - [控制面板](../site/dashboard.md) — 概览 PV  
-- 下一菜单项：**行为分析**（文档待编写）
+- 下一菜单项：**行为分析**

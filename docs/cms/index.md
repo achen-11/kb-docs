@@ -7,7 +7,7 @@
 你可能已经看过 [模板引擎](/templateEngine/) 或 [KScript API](/api/)，但不确定**在后台先点哪里**。本系列按 Kooboo 站点后台的真实菜单，说明配置步骤，并链到开发文档。
 
 ::: tip 菜单以产品为准
-侧边栏结构来自 Kooboo 前端工程（`Frontend/src/router/site.ts`）。产品升级后若菜单有变，以你登录后的界面为准；我们也会随版本更新本文档。
+产品升级后若菜单有变，以你登录后的后台界面为准。
 :::
 
 ## 建议学习顺序
@@ -34,7 +34,7 @@ flowchart LR
 | 6 | [电商](./commerce/index.md)（按需） | 商品、订单；见 [k.commerce](/api/commerce/commerce.md) |
 | 7 | [开发](./development/index.md) | Layout、View、Code、模块等；见 [模板引擎](/templateEngine/) |
 | 8 | [数据库](./database/index.md) | IndexedDB、KV、SQLite/MySQL/SQL Server、SQL 日志 |
-| 9 | [站点设置](./settings/index.md)（编写中） | 基础、域名、服务集成、用户/角色、Hook、Cookie、AI |
+| 9 | [站点设置](./settings/index.md) | 基础、域名、服务集成、用户/角色、Hook、Cookie、AI |
 
 ## 与开发文档的关系
 
@@ -61,10 +61,6 @@ flowchart LR
 ```
 
 详见 [菜单总览](./navigation.md)。
-
-## 文档怎么配图
-
-重要步骤会配图（仓库 `docs/public/cms/...`，文中 `/cms/...`）。截图未齐时，以**菜单路径 + 步骤文字**为准仍可完成操作。约定见仓库 `.trellis/spec/documentation-images.md`。
 
 ## 相关
 

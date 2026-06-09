@@ -14,7 +14,7 @@
 | **新建 Hook**、编辑规则并 **保存** | `backendEvents·edit` |
 | 多选 **删除** 某事件下全部规则 | `backendEvents·edit` |
 
-当前 Frontend 中 **新建 Hook** 与编辑页底部 **保存** 按钮仍检查 `frontEvents·edit`，实施角色权限时请同时核对该项。
+当前界面中 **新建 Hook** 与编辑页底部 **保存** 按钮仍检查 `frontEvents·edit`，实施角色权限时请同时核对该项。
 :::
 
 ::: info 总开关

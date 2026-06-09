@@ -19,15 +19,15 @@
 | 菜单 | 路径 | 文档 |
 |------|------|------|
 | 访问统计 | `/system/visitor-logs` | [访问统计](./visitor-logs.md) |
-| 行为分析 | `/system/user-behavior-analysis` | *待编写* |
+| 行为分析 | `/system/user-behavior-analysis` | 暂未单独成篇 |
 | 资源守护 | `/system/resource-guardian` | [资源守护](./resource-guardian.md) |
 | 页面交互 | `/system/page-interaction` | [页面交互](./page-interaction.md) |
 | AB 测试 | `/system/ab-testing` | [AB 测试](./ab-testing.md) |
-| 错误监控 | `/system/error-monitoring` | *待编写* |
+| 错误监控 | `/system/error-monitoring` | 暂未单独成篇 |
 | 操作日志 | `/system/site-logs` | [操作日志](./site-logs.md) |
 | 协作同步 | `/system/sync` | [协作同步](./sync.md) |
-| 搜索 | `/system/search` | *待编写* |
-| 自动化 | `/system/automation` | *待编写* |
+| 搜索 | `/system/search` | 暂未单独成篇 |
+| 自动化 | `/system/automation` | 暂未单独成篇 |
 | AI 服务 | `/system/ai-service` | [AI 服务](../settings/ai-service.md) |
 
 ::: info AI 服务与站点设置
@@ -36,7 +36,7 @@
 
 ## 建议阅读顺序
 
-按菜单顺序编写/阅读即可；若刚开通站点，常见路径为：
+按菜单顺序阅读即可；若刚开通站点，常见路径为：
 
 1. [访问统计](./visitor-logs.md) — 确认已启用采集并查看流量  
 2. 错误监控、操作日志 — 排障  
