@@ -18,21 +18,21 @@
 
 | 页面 | 用途 |
 |------|------|
-| 余额 | 查看账户余额并充值 |
-| 订单 | 查看订单记录，进入订单检查页 |
-| 续费 | 统一管理域名、会员等到期项目 |
-| 会员 | 查看会员计划并续费 |
+| [余额](./console/balance.md) | 查看账户余额并充值 |
+| [订单](./console/orders.md) | 查看订单记录，进入订单检查页 |
+| [续费](./console/renewals.md) | 统一管理域名、会员等到期项目 |
+| [会员](./console/membership.md) | 查看会员计划并续费 |
 | 带宽中心 | 查看带宽或进入带宽充值 |
 
 ## 常见工作流
 
 | 场景 | 顺序 |
 |------|------|
-| 给账户充值 | 顶部充值 -> 余额 -> 选择金额 -> 支付 |
-| 核对费用 | 控制台 -> 订单 -> 查看订单状态 |
-| 续费域名 | 顶部充值面板 -> 域名服务 -> 域名续费 |
-| 续费会员 | 顶部充值面板 -> 会员计划 -> 会员页续费 |
-| AI 使用前准备 | 余额 -> 控制台 AI 配置 -> 站点 [AI 服务](/cms/settings/ai-service.md) |
+| 给账户充值 | 顶部充值 -> [余额](./console/balance.md) -> 选择金额 -> 支付 |
+| 核对费用 | 控制台 -> [订单](./console/orders.md) -> 查看订单状态 |
+| 续费域名 | 顶部充值面板 -> 域名服务 -> [域名续费](./console/renewals.md) |
+| 续费会员 | 顶部充值面板 -> 会员计划 -> [会员](./console/membership.md) |
+| AI 使用前准备 | [余额](./console/balance.md) -> [AI 配置](./console/ai-config.md) -> 站点 [AI 服务](/cms/settings/ai-service.md) |
 
 ## 与控制台的关系
 
@@ -48,5 +48,8 @@
 | 文档 | 说明 |
 |------|------|
 | [控制台](./console.md) | 账户级管理总览 |
+| [余额](./console/balance.md) | 当前余额、充值、收支记录 |
+| [订单](./console/orders.md) | 订单列表与结账页 |
+| [续费](./console/renewals.md) | 域名和会员续费 |
 | [CMS：AI 服务](/cms/settings/ai-service.md) | 站点 AI 能力可能依赖账户配置与余额 |
 | [CMS：服务集成](/cms/settings/integrations/) | 支付、存储、OAuth、短信等站点集成 |

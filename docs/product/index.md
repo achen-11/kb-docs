@@ -27,8 +27,8 @@
 
 | 目标 | 阅读 |
 |------|------|
-| 准备账户、域名、余额与组织 | [控制台](./console.md) -> [充值与账单](./billing.md) |
+| 准备账户、域名、余额与组织 | [控制台](./console.md) -> [组织](./console/organization.md) -> [余额](./console/balance.md) -> [域名](./console/domains.md) |
 | 准备站点与模板 | [市场](./market.md) -> [快速开始](/quick-start/) |
 | 日常开发站点资源 | [开发者模式](./developer-mode.md) -> [模板引擎](/templateEngine/) |
 | 配置邮件通知或收发邮件 | [邮箱](./mail.md) -> [k.mail](/api/mail/) |
-| 使用 AI 辅助建站或管理 | [AI Claw / AI Chat](./ai-chat.md) -> [AI 悬浮助手](./ai-floating-assistant.md) -> [AI 服务](/cms/settings/ai-service.md) |
+| 使用 AI 辅助建站或管理 | [AI 配置](./console/ai-config.md) -> [AI Claw / AI Chat](./ai-chat.md) -> [AI 悬浮助手](./ai-floating-assistant.md) -> [AI 服务](/cms/settings/ai-service.md) |

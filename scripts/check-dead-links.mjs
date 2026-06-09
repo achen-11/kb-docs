@@ -47,6 +47,7 @@ function resolveInternal(href, fromFile) {
     return null
   }
   if (href.startsWith('/')) {
+    if (href === '/') return 'index.md'
     let rel = href.slice(1)
     if (rel.endsWith('/')) rel = `${rel}index.md`
     else if (!rel.endsWith('.md') && !rel.includes('.')) rel = `${rel}.md`

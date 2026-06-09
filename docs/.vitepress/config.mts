@@ -318,7 +318,22 @@ const productSidebar = [
     text: '产品功能',
     items: [
       { text: '总览', link: '/product/' },
-      { text: '控制台', link: '/product/console' },
+      {
+        text: '控制台',
+        collapsed: false,
+        items: [
+          { text: '概述', link: '/product/console' },
+          { text: '域名', link: '/product/console/domains' },
+          { text: '组织', link: '/product/console/organization' },
+          { text: '数据中心', link: '/product/console/data-centers' },
+          { text: 'Google SC', link: '/product/console/google-search-console' },
+          { text: '会员', link: '/product/console/membership' },
+          { text: 'AI 配置', link: '/product/console/ai-config' },
+          { text: '订单', link: '/product/console/orders' },
+          { text: '余额', link: '/product/console/balance' },
+          { text: '续费', link: '/product/console/renewals' },
+        ],
+      },
       { text: '邮箱', link: '/product/mail' },
       { text: '市场', link: '/product/market' },
       { text: '开发者模式', link: '/product/developer-mode' },
