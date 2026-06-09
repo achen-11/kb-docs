@@ -7,7 +7,12 @@ import {
   injectPageRouteComment,
   toKoobooPageRoute
 } from './export-vitepress-to-kooboo.mjs'
+import {
+  getCmsScreenshotLocaleConfig,
+  resolveCmsScreenshotOutputDir
+} from './cms-screenshot-locale.mjs'
 import { isDocImagePath } from './sync-doc-images-to-kooboo.mjs'
+import { resolveLocalizedDocImageSrc } from '../docs/.vitepress/theme/doc-image-path.mjs'
 
 test('toKoobooPageRoute keeps index.html in path for Kooboo Page API', () => {
   assert.equal(toKoobooPageRoute('index.html'), '/index.html')
@@ -32,8 +37,49 @@ test('injectJsRouteComment replaces existing js route comment', () => {
 
 test('isDocImagePath matches cms images only', () => {
   assert.equal(isDocImagePath('cms/getting-started/01.png'), true)
+  assert.equal(isDocImagePath('en/cms/getting-started/01.png'), true)
   assert.equal(isDocImagePath('assets/style.abc.css'), false)
   assert.equal(isDocImagePath('cms/readme.txt'), false)
+})
+
+test('resolveLocalizedDocImageSrc switches CMS screenshots for English docs', () => {
+  assert.equal(
+    resolveLocalizedDocImageSrc('/cms/content/content-types-list.png', '/en/cms/content/content-types'),
+    '/en/cms/content/content-types-list.png'
+  )
+  assert.equal(
+    resolveLocalizedDocImageSrc('/cms/content/content-types-list.png', '/cms/content/content-types'),
+    '/cms/content/content-types-list.png'
+  )
+  assert.equal(
+    resolveLocalizedDocImageSrc('/en/cms/content/content-types-list.png', '/en/cms/content/content-types'),
+    '/en/cms/content/content-types-list.png'
+  )
+  assert.equal(
+    resolveLocalizedDocImageSrc('/logo.svg', '/en/cms/content/content-types'),
+    '/logo.svg'
+  )
+})
+
+test('getCmsScreenshotLocaleConfig returns English screenshot settings', () => {
+  assert.deepEqual(getCmsScreenshotLocaleConfig('en'), {
+    locale: 'en',
+    browserLocale: 'en-US',
+    acceptLanguage: 'en-US,en;q=0.9',
+    cmsLangCookieValue: 'en',
+    publicDirSegments: ['docs', 'public', 'en', 'cms'],
+  })
+})
+
+test('resolveCmsScreenshotOutputDir places English screenshots under docs/public/en/cms', () => {
+  assert.equal(
+    resolveCmsScreenshotOutputDir('/repo', 'content', 'en'),
+    '/repo/docs/public/en/cms/content'
+  )
+  assert.equal(
+    resolveCmsScreenshotOutputDir('/repo', 'site', 'zh'),
+    '/repo/docs/public/cms/site'
+  )
 })
 
 test('injectCssRouteComment replaces existing css route comment', () => {

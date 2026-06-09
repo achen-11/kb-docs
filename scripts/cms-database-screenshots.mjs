@@ -13,11 +13,18 @@ import './load-env.mjs'
 import { chromium } from 'playwright'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import {
+  applyCmsUiLanguage,
+  getCmsBrowserContextOptions,
+  restoreCmsUiLanguage,
+  resolveCmsScreenshotOutputDir,
+} from './cms-screenshot-locale.mjs'
 
 const REPO_ROOT =
   process.env.KOOBOO_DOCS_ROOT ||
   path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
-const OUT_DIR = path.join(REPO_ROOT, 'docs/public/cms/database')
+const DOC_LOCALE = process.env.KOOBOO_DOC_LOCALE || 'zh'
+const OUT_DIR = resolveCmsScreenshotOutputDir(REPO_ROOT, 'database', DOC_LOCALE)
 
 const BASE = process.env.KOOBOO_BASE || 'https://www.redev.cn'
 const SITE_ID =
@@ -625,33 +632,42 @@ async function main() {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 900 },
     deviceScaleFactor: 2,
+    ...getCmsBrowserContextOptions(DOC_LOCALE),
   })
   const page = await context.newPage()
-  await login(page)
+  let previousLanguage = null
 
-  if (only === 'table') {
-    await captureIndexedDbTable(page)
-  }
-  if (only === 'table-relation') {
-    await captureTableRelation(page)
-  }
-  if (only === 'key-value') {
-    await captureKeyValue(page)
-  }
-  if (only === 'sqlite-table') {
-    await captureSqliteTable(page)
-  }
-  if (only === 'sql-logs') {
-    await captureSqlLogs(page)
-  }
-  if (only === 'mysql-table') {
-    await captureMysqlTable(page)
-  }
-  if (only === 'sqlserver-table') {
-    await captureSqlServerTable(page)
-  }
+  try {
+    await login(page)
+    previousLanguage = await applyCmsUiLanguage(page, context, BASE, DOC_LOCALE)
 
-  await browser.close()
+    if (only === 'table') {
+      await captureIndexedDbTable(page)
+    }
+    if (only === 'table-relation') {
+      await captureTableRelation(page)
+    }
+    if (only === 'key-value') {
+      await captureKeyValue(page)
+    }
+    if (only === 'sqlite-table') {
+      await captureSqliteTable(page)
+    }
+    if (only === 'sql-logs') {
+      await captureSqlLogs(page)
+    }
+    if (only === 'mysql-table') {
+      await captureMysqlTable(page)
+    }
+    if (only === 'sqlserver-table') {
+      await captureSqlServerTable(page)
+    }
+  } finally {
+    await restoreCmsUiLanguage(page, context, BASE, previousLanguage).catch((error) => {
+      console.warn('restore cms language failed:', error)
+    })
+    await browser.close()
+  }
   console.log('done →', OUT_DIR)
 }
 

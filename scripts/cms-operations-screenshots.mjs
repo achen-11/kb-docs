@@ -17,11 +17,18 @@ import { chromium } from 'playwright'
 import { mkdir } from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import {
+  applyCmsUiLanguage,
+  getCmsBrowserContextOptions,
+  restoreCmsUiLanguage,
+  resolveCmsScreenshotOutputDir,
+} from './cms-screenshot-locale.mjs'
 
 const REPO_ROOT =
   process.env.KOOBOO_DOCS_ROOT ||
   path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
-const OUT_DIR = path.join(REPO_ROOT, 'docs/public/cms/operations')
+const DOC_LOCALE = process.env.KOOBOO_DOC_LOCALE || 'zh'
+const OUT_DIR = resolveCmsScreenshotOutputDir(REPO_ROOT, 'operations', DOC_LOCALE)
 
 const BASE = process.env.KOOBOO_BASE || 'https://www.redev.cn'
 const SITE_ID =
@@ -249,7 +256,7 @@ async function captureResourceGuardian(page) {
     await snapLocator(statCards, 'resource-guardian-stat-cards.png')
   }
 
-  const bandwidth = page.getByText(/带宽分析区块/).first()
+  const bandwidth = page.getByText(/带宽分析区块|bandwidth analysis/i).first()
   if (await bandwidth.count()) {
     const block = bandwidth.locator(
       'xpath=ancestor::div[contains(@class,"rounded-8px")][1]'
@@ -264,7 +271,7 @@ async function captureResourceGuardian(page) {
     await snapLocator(twoCol, 'resource-guardian-composition-ranking.png')
   }
 
-  const liveLog = page.getByText(/实时资源清单/).first()
+  const liveLog = page.getByText(/实时资源清单|live resource log|live resource list/i).first()
   if (await liveLog.count()) {
     const block = liveLog.locator(
       'xpath=ancestor::div[contains(@class,"rounded-8px")][1]'
@@ -274,7 +281,7 @@ async function captureResourceGuardian(page) {
     }
   }
 
-  const botTitle = page.getByText(/机器人情报分析/).first()
+  const botTitle = page.getByText(/机器人情报分析|bot intelligence/i).first()
   if (await botTitle.count()) {
     const block = botTitle.locator(
       'xpath=ancestor::div[contains(@class,"rounded-8px")][1]'
@@ -285,7 +292,7 @@ async function captureResourceGuardian(page) {
   }
 
   const external = page
-    .getByText(/正在使用你资源的外部站点/)
+    .getByText(/正在使用你资源的外部站点|external domains|using your resources/i)
     .first()
   if (await external.count()) {
     const block = external.locator(
@@ -327,7 +334,7 @@ async function captureResourceGuardian(page) {
   if (await rulesMain.count()) {
     await snapLocator(rulesMain, 'resource-guardian-protection-rules.png')
   }
-  const addRule = page.getByRole('button', { name: /添加规则/ }).first()
+  const addRule = page.getByRole('button', { name: /添加规则|add rule/i }).first()
   if (await addRule.count()) {
     await addRule.click()
     await snapDialog(page, 'resource-guardian-rule-dialog.png')
@@ -460,7 +467,7 @@ async function capturePageInteraction(page, context) {
     await snapLocator(editEntry, 'page-interaction-edit-entry.png')
   }
 
-  const overviewTitle = page.getByText(/页面锚点点击总览/).first()
+  const overviewTitle = page.getByText(/页面锚点点击总览|page anchor click overview/i).first()
   if (await overviewTitle.count()) {
     const block = overviewTitle.locator(
       'xpath=ancestor::div[contains(@class,"rounded-normal")][1]'
@@ -940,31 +947,39 @@ async function main() {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 900 },
     deviceScaleFactor: 2,
+    ...getCmsBrowserContextOptions(DOC_LOCALE),
   })
   const page = await context.newPage()
+  let previousLanguage = null
 
-  await login(page)
+  try {
+    await login(page)
+    previousLanguage = await applyCmsUiLanguage(page, context, BASE, DOC_LOCALE)
 
-  if (!only || only === 'visitor-logs') {
-    await captureVisitorLogs(page)
+    if (!only || only === 'visitor-logs') {
+      await captureVisitorLogs(page)
+    }
+    if (!only || only === 'resource-guardian') {
+      await captureResourceGuardian(page)
+    }
+    if (!only || only === 'page-interaction') {
+      await capturePageInteraction(page, context)
+    }
+    if (!only || only === 'ab-testing') {
+      await captureAbTesting(page)
+    }
+    if (!only || only === 'site-logs') {
+      await captureSiteLogs(page, context)
+    }
+    if (!only || only === 'sync') {
+      await captureSync(page)
+    }
+  } finally {
+    await restoreCmsUiLanguage(page, context, BASE, previousLanguage).catch((error) => {
+      console.warn('restore cms language failed:', error)
+    })
+    await browser.close()
   }
-  if (!only || only === 'resource-guardian') {
-    await captureResourceGuardian(page)
-  }
-  if (!only || only === 'page-interaction') {
-    await capturePageInteraction(page, context)
-  }
-  if (!only || only === 'ab-testing') {
-    await captureAbTesting(page)
-  }
-  if (!only || only === 'site-logs') {
-    await captureSiteLogs(page, context)
-  }
-  if (!only || only === 'sync') {
-    await captureSync(page)
-  }
-
-  await browser.close()
   console.log('done →', OUT_DIR)
 }
 

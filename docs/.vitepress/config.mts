@@ -1,5 +1,10 @@
 import { defineConfig } from 'vitepress'
 import { diagramPlugin } from 'vitepress-plugin-mermaid-diagram'
+import { existsSync, readFileSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const DOCS_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 /** VitePress 左侧栏：路径前缀须匹配 `cms/**` 下的页面 */
 const cmsSidebar = [
@@ -355,15 +360,382 @@ const productSidebar = [
       { text: '开发者模式', link: '/product/developer-mode' },
       { text: 'AI Claw / AI Chat', link: '/product/ai-chat' },
       { text: 'AI 悬浮助手', link: '/product/ai-floating-assistant' },
-      { text: '充值与账单', link: '/product/billing' },
     ],
   },
 ]
 
+function prefixLocalePath(pathname: string, localePrefix: string) {
+  if (!pathname.startsWith('/')) return pathname
+  if (pathname === '/') return `${localePrefix}/`
+  if (pathname === localePrefix || pathname.startsWith(`${localePrefix}/`)) return pathname
+  return `${localePrefix}${pathname}`.replace(/\/{2,}/g, '/')
+}
+
+function prefixLocaleNav(
+  nav: Array<{ text: string; link?: string; items?: Array<{ text: string; link: string }> }>,
+  localePrefix: string
+) {
+  return nav.map((item) => ({
+    ...item,
+    link: item.link ? prefixLocalePath(item.link, localePrefix) : undefined,
+    items: item.items
+      ? item.items.map((navItem) => ({
+          ...navItem,
+          link: prefixLocalePath(navItem.link, localePrefix),
+        }))
+      : undefined,
+  }))
+}
+
+function prefixLocaleSidebarItems(items: any[], localePrefix: string): any[] {
+  return items.map((item) => ({
+    ...item,
+    link: item.link ? prefixLocalePath(item.link, localePrefix) : undefined,
+    items: item.items ? prefixLocaleSidebarItems(item.items, localePrefix) : undefined,
+  }))
+}
+
+function prefixLocaleSidebarMap(sidebar: Record<string, any[]>, localePrefix: string) {
+  return Object.fromEntries(
+    Object.entries(sidebar).map(([pathname, items]) => [
+      prefixLocalePath(pathname, localePrefix),
+      prefixLocaleSidebarItems(items, localePrefix),
+    ])
+  )
+}
+
+function resolveDocPath(pathname: string) {
+  const normalized = pathname.replace(/^\/+/, '')
+  const candidates = normalized.endsWith('.md')
+    ? [path.join(DOCS_ROOT, normalized)]
+    : [
+        path.join(DOCS_ROOT, normalized, 'index.md'),
+        path.join(DOCS_ROOT, `${normalized}.md`),
+      ]
+
+  return candidates.find((candidate) => existsSync(candidate)) || null
+}
+
+function readDocTitle(pathname: string) {
+  const file = resolveDocPath(pathname)
+  if (!file) return null
+
+  const match = readFileSync(file, 'utf8').match(/^#\s+(.+)$/m)
+  return match?.[1]?.trim() || null
+}
+
+function containsChinese(text: string) {
+  return /[\u3400-\u9fff]/.test(text)
+}
+
+function shouldKeepOriginalSidebarText(text: string) {
+  return !containsChinese(text)
+}
+
+function buildEnglishSidebarItems(
+  items: any[],
+  localePrefix: string,
+  textMap: Record<string, string>
+): any[] {
+  return items.map((item) => {
+    const localizedLink = item.link ? prefixLocalePath(item.link, localePrefix) : undefined
+    const localizedItems = item.items
+      ? buildEnglishSidebarItems(item.items, localePrefix, textMap)
+      : undefined
+    const mappedText = textMap[item.text]
+    const titleFromDoc =
+      localizedLink && !shouldKeepOriginalSidebarText(item.text)
+        ? readDocTitle(localizedLink)
+        : null
+
+    return {
+      ...item,
+      text: mappedText || titleFromDoc || item.text,
+      link: localizedLink,
+      items: localizedItems,
+    }
+  })
+}
+
+function buildEnglishSidebarMap(
+  sidebar: Record<string, any[]>,
+  localePrefix: string,
+  textMap: Record<string, string>
+) {
+  return Object.fromEntries(
+    Object.entries(sidebar).map(([pathname, items]) => [
+      prefixLocalePath(pathname, localePrefix),
+      buildEnglishSidebarItems(items, localePrefix, textMap),
+    ])
+  )
+}
+
+const templateEngineSidebar = [
+  {
+    text: '模板引擎',
+    items: [
+      { text: '概述', link: '/templateEngine/' },
+      {
+        text: '站点资源',
+        collapsed: false,
+        items: [
+          { text: 'Layout（布局）', link: '/templateEngine/layout/' },
+          { text: 'Page（页面）', link: '/templateEngine/page/' },
+          { text: 'View（视图）', link: '/templateEngine/view/' },
+          { text: 'Script（脚本）', link: '/templateEngine/js/' },
+          { text: 'Style（样式）', link: '/templateEngine/css/' },
+        ]
+      },
+      {
+        text: '语法与数据',
+        collapsed: false,
+        items: [
+          { text: '模板绑定语法', link: '/templateEngine/binding/' },
+          {
+            text: 'k-data',
+            collapsed: false,
+            items: [
+              { text: '概述', link: '/templateEngine/k-data/' },
+              { text: '标签语法', link: '/templateEngine/k-data/tags.md' },
+              { text: 'query 数据源', link: '/templateEngine/k-data/query.md' },
+              { text: '内置函数', link: '/templateEngine/k-data/functions.md' },
+              { text: '条件表达式', link: '/templateEngine/k-data/condition.md' },
+            ]
+          },
+        ]
+      },
+    ]
+  }
+]
+
+const apiSidebar = [
+  {
+    text: '入门',
+    items: [
+      { text: '快速开始', link: '/api/getting-started/' },
+      { text: '认证与授权', link: '/api/getting-started/auth.md' }
+    ]
+  },
+  {
+    text: 'KScript API（A–Z）',
+    items: [
+      {
+        text: 'k.account',
+        collapsed: true,
+        items: [
+          { text: '概述', link: '/api/account/' },
+          { text: 'login', link: '/api/account/login.md' },
+          { text: 'OAuth', link: '/api/account/oauth.md' },
+          { text: 'organization', link: '/api/account/organization.md' },
+          { text: 'user', link: '/api/account/user.md' },
+        ]
+      },
+      { text: 'k.api', link: '/api/api/' },
+      { text: 'k.cache', link: '/api/cache/' },
+      {
+        text: 'k.commerce',
+        collapsed: true,
+        items: [
+          { text: '概述', link: '/api/commerce/commerce.md' },
+          { text: 'address', link: '/api/commerce/address.md' },
+          { text: 'cart', link: '/api/commerce/cart.md' },
+          { text: 'category', link: '/api/commerce/category.md' },
+          { text: 'currency', link: '/api/commerce/currency.md' },
+          { text: 'customer', link: '/api/commerce/customer.md' },
+          { text: 'discount', link: '/api/commerce/discount.md' },
+          { text: 'loyalty', link: '/api/commerce/loyalty.md' },
+          { text: 'membership', link: '/api/commerce/membership.md' },
+          { text: 'order', link: '/api/commerce/order.md' },
+          { text: 'product', link: '/api/commerce/product.md' },
+          { text: 'settings', link: '/api/commerce/settings.md' },
+          { text: 'shipping', link: '/api/commerce/shipping.md' },
+          { text: 'wishlist', link: '/api/commerce/wishlist.md' },
+        ]
+      },
+      { text: 'k.content', link: '/api/content/' },
+      { text: 'k.cookie', link: '/api/cookie/' },
+      {
+        text: 'k.DB',
+        collapsed: true,
+        items: [
+          { text: '概述', link: '/api/database/' },
+          { text: 'indexedDb', link: '/api/indexed-db/' },
+          { text: 'keyValue', link: '/api/key-value/' },
+          { text: 'sqlite', link: '/api/sqlite/' },
+        ]
+      },
+      {
+        text: 'k.file',
+        collapsed: true,
+        items: [
+          { text: '概述', link: '/api/file/file.md' },
+          { text: 'folder', link: '/api/file/file-folder.md' },
+          { text: 'resumable', link: '/api/file/file-resumable.md' },
+          { text: '数据结构', link: '/api/file/file-info.md' },
+        ]
+      },
+      { text: 'k.label', link: '/api/label/' },
+      { text: 'k.logger', link: '/api/logger/' },
+      { text: 'k.mail', link: '/api/mail/' },
+      { text: 'k.media', link: '/api/media/' },
+      { text: 'k.module', link: '/api/module/' },
+      { text: 'k.openApi', link: '/api/openapi/' },
+      {
+        text: 'k.net',
+        collapsed: true,
+        items: [
+          { text: '概述', link: '/api/net/' },
+          { text: 'DNS', link: '/api/net/dns.md' },
+          { text: 'httpClient', link: '/api/net/httpclient.md' },
+          { text: 'IP', link: '/api/net/ip.md' },
+          { text: 'url', link: '/api/net/url.md' },
+          { text: 'webSocket', link: '/api/net/websocket.md' },
+        ]
+      },
+      { text: 'k.page', link: '/api/page/' },
+      { text: 'k.paramConfig', link: '/api/param-config/' },
+      {
+        text: 'k.payment',
+        collapsed: true,
+        items: [
+          { text: '概述', link: '/api/payment/' },
+          { text: 'Alipay', link: '/api/payment/alipay.md' },
+          { text: 'MoneyBoxs', link: '/api/payment/moneyboxs.md' },
+          { text: 'Pay.NL', link: '/api/payment/paynl.md' },
+          { text: 'PayPal', link: '/api/payment/paypal.md' },
+          { text: 'Square', link: '/api/payment/square.md' },
+          { text: 'Stripe', link: '/api/payment/stripe.md' },
+          { text: 'TwoCheckout', link: '/api/payment/two-checkout.md' },
+          { text: 'Wechat', link: '/api/payment/wechat.md' },
+          { text: 'Wechat H5 Flow', link: '/api/payment/wechat-h5-flow.md' },
+        ]
+      },
+      { text: 'k.request', link: '/api/request/' },
+      { text: 'k.response', link: '/api/response/' },
+      { text: 'k.security', link: '/api/security/' },
+      { text: 'k.session', link: '/api/session/' },
+      { text: 'SPA 多语言', link: '/api/spa-multilingual/' },
+      {
+        text: 'k.site',
+        collapsed: true,
+        items: [
+          { text: '概述', link: '/api/site/' },
+          { text: 'codes', link: '/api/site/code.md' },
+          { text: 'css', link: '/api/site/css.md' },
+          { text: 'runJob', link: '/api/site/job.md' },
+          { text: 'js', link: '/api/site/js.md' },
+          { text: 'layouts', link: '/api/site/layout.md' },
+          { text: 'menus', link: '/api/site/menu.md' },
+          { text: 'pages', link: '/api/site/page.md' },
+          { text: 'views', link: '/api/site/view.md' },
+        ]
+      },
+      { text: 'k.state', link: '/api/state/' },
+      { text: 'k.storage', link: '/api/storage/' },
+      {
+        text: 'k.utils',
+        collapsed: true,
+        items: [
+          { text: '概述', link: '/api/utils/' },
+          { text: 'CDN', link: '/api/utils/cdn.md' },
+          { text: 'clientJS', link: '/api/utils/clientJS.md' },
+          { text: 'community', link: '/api/utils/community.md' },
+          { text: 'compression', link: '/api/utils/compression.md' },
+          { text: 'converter', link: '/api/utils/converter.md' },
+          { text: 'CRM', link: '/api/utils/crm.md' },
+          { text: 'date', link: '/api/utils/date.md' },
+          { text: 'dom', link: '/api/utils/dom.md' },
+          { text: 'google', link: '/api/utils/google.md' },
+          { text: 'image', link: '/api/utils/image.md' },
+          { text: 'inlineHtml', link: '/api/utils/inlineHtml.md' },
+          { text: 'IP', link: '/api/utils/ip.md' },
+          { text: 'mime', link: '/api/utils/mime.md' },
+          { text: 'ninjible', link: '/api/utils/ninjible.md' },
+          { text: 'office', link: '/api/utils/office.md' },
+          { text: 'puppeteer', link: '/api/utils/puppeteer.md' },
+          { text: 'screenShot', link: '/api/utils/screenShot.md' },
+          { text: 'sftpClient', link: '/api/utils/sftpClient.md' },
+          { text: 'sitemap', link: '/api/utils/sitemap.md' },
+          { text: 'sms', link: '/api/utils/sms.md' },
+          { text: 'sshClient', link: '/api/utils/sshClient.md' },
+          { text: 'string', link: '/api/utils/string.md' },
+          { text: 'telnetClient', link: '/api/utils/telnetClient.md' },
+          { text: 'template', link: '/api/utils/template.md' },
+          { text: 'uri', link: '/api/utils/uri.md' },
+          { text: 'xml', link: '/api/utils/xml.md' },
+        ]
+      },
+    ]
+  }
+]
+
+const zhNav = [
+  { text: '快速开始', link: '/quick-start/' },
+  { text: '产品功能', link: '/product/' },
+  { text: '后台 CMS', link: '/cms/' },
+  { text: '模板引擎', link: '/templateEngine/' },
+  { text: 'API 详情', link: '/api/' },
+  { text: '最佳实践', link: '/guide/' }
+]
+
+const enNav = [
+  { text: 'Home', link: '/' },
+  { text: 'Admin CMS', link: '/cms/' },
+  { text: 'Template Engine', link: '/templateEngine/' },
+  { text: 'API Details', link: '/api/' },
+]
+
+const englishSidebarTextMap = {
+  '后台 CMS': 'Admin CMS',
+  '模板引擎': 'Template Engine',
+  '快速开始': 'Quick Start',
+  '入门': 'Getting Started',
+  '概述': 'Overview',
+  '总览': 'Overview',
+  '站点': 'Site',
+  '页面': 'Pages',
+  '内容': 'Content',
+  '电商': 'Commerce',
+  '商品管理': 'Product Management',
+  '运维中心': 'Operations',
+  '开发': 'Development',
+  '数据库': 'Database',
+  '站点设置': 'Site Settings',
+  '基础设置': 'Basic Settings',
+  '服务集成': 'Integrations',
+  '站点资源': 'Site Resources',
+  '语法与数据': 'Syntax and Data',
+  'KScript API（A–Z）': 'KScript API (A-Z)',
+}
+
+const zhSidebar = {
+  '/quick-start/': quickStartSidebar,
+  '/quick-start': quickStartSidebar,
+  '/product/': productSidebar,
+  '/product': productSidebar,
+  '/guide/': guideSidebar,
+  '/guide': guideSidebar,
+  '/cms/': cmsSidebar,
+  '/cms': cmsSidebar,
+  '/templateEngine/': templateEngineSidebar,
+  '/api/': apiSidebar,
+}
+
+const enSidebar = {
+  ...buildEnglishSidebarMap(
+    {
+      '/cms/': cmsSidebar,
+      '/cms': cmsSidebar,
+      '/templateEngine/': templateEngineSidebar,
+      '/api/': apiSidebar,
+      '/api': apiSidebar,
+    },
+    '/en',
+    englishSidebarTextMap
+  ),
+}
+
 export default defineConfig({
-  title: 'Kooboo',
-  description: 'Kooboo Documentation',
-  lang: 'zh-CN',
   ignoreDeadLinks: true,
   markdown: {
     config(md) {
@@ -400,227 +772,38 @@ export default defineConfig({
     'templateEngine/template-binding-syntax.md': 'templateEngine/binding/index.md',
   },
   themeConfig: {
-    siteTitle: 'Kooboo',
-    nav: [
-      { text: '快速开始', link: '/quick-start/' },
-      { text: '产品功能', link: '/product/' },
-      { text: '后台 CMS', link: '/cms/' },
-      { text: '模板引擎', link: '/templateEngine/' },
-      { text: 'API 详情', link: '/api/' },
-      { text: '最佳实践', link: '/guide/' }
-    ],
-    sidebar: {
-      '/quick-start/': quickStartSidebar,
-      '/quick-start': quickStartSidebar,
-      '/product/': productSidebar,
-      '/product': productSidebar,
-      '/guide/': guideSidebar,
-      '/guide': guideSidebar,
-      '/cms/': cmsSidebar,
-      '/cms': cmsSidebar,
-      '/templateEngine/': [
-        {
-          text: '模板引擎',
-          items: [
-            { text: '概述', link: '/templateEngine/' },
-            {
-              text: '站点资源',
-              collapsed: false,
-              items: [
-                { text: 'Layout（布局）', link: '/templateEngine/layout/' },
-                { text: 'Page（页面）', link: '/templateEngine/page/' },
-                { text: 'View（视图）', link: '/templateEngine/view/' },
-                { text: 'Script（脚本）', link: '/templateEngine/js/' },
-                { text: 'Style（样式）', link: '/templateEngine/css/' },
-              ]
-            },
-            {
-              text: '语法与数据',
-              collapsed: false,
-              items: [
-                { text: '模板绑定语法', link: '/templateEngine/binding/' },
-                {
-                  text: 'k-data',
-                  collapsed: false,
-                  items: [
-                    { text: '概述', link: '/templateEngine/k-data/' },
-                    { text: '标签语法', link: '/templateEngine/k-data/tags.md' },
-                    { text: 'query 数据源', link: '/templateEngine/k-data/query.md' },
-                    { text: '内置函数', link: '/templateEngine/k-data/functions.md' },
-                    { text: '条件表达式', link: '/templateEngine/k-data/condition.md' },
-                  ]
-                },
-              ]
-            },
-          ]
-        }
-      ],
-      '/api/': [
-        {
-          text: '入门',
-          items: [
-            { text: '快速开始', link: '/api/getting-started/' },
-            { text: '认证与授权', link: '/api/getting-started/auth.md' }
-          ]
-        },
-        {
-          text: 'KScript API（A–Z）',
-          items: [
-            {
-              text: 'k.account',
-              collapsed: true,
-              items: [
-                { text: '概述', link: '/api/account/' },
-                { text: 'login', link: '/api/account/login.md' },
-                { text: 'OAuth', link: '/api/account/oauth.md' },
-                { text: 'organization', link: '/api/account/organization.md' },
-                { text: 'user', link: '/api/account/user.md' },
-              ]
-            },
-            { text: 'k.api', link: '/api/api/' },
-            { text: 'k.cache', link: '/api/cache/' },
-            {
-              text: 'k.commerce',
-              collapsed: true,
-              items: [
-                { text: '概述', link: '/api/commerce/commerce.md' },
-                { text: 'address', link: '/api/commerce/address.md' },
-                { text: 'cart', link: '/api/commerce/cart.md' },
-                { text: 'category', link: '/api/commerce/category.md' },
-                { text: 'currency', link: '/api/commerce/currency.md' },
-                { text: 'customer', link: '/api/commerce/customer.md' },
-                { text: 'discount', link: '/api/commerce/discount.md' },
-                { text: 'loyalty', link: '/api/commerce/loyalty.md' },
-                { text: 'membership', link: '/api/commerce/membership.md' },
-                { text: 'order', link: '/api/commerce/order.md' },
-                { text: 'product', link: '/api/commerce/product.md' },
-                { text: 'settings', link: '/api/commerce/settings.md' },
-                { text: 'shipping', link: '/api/commerce/shipping.md' },
-                { text: 'wishlist', link: '/api/commerce/wishlist.md' },
-              ]
-            },
-            { text: 'k.content', link: '/api/content/' },
-            { text: 'k.cookie', link: '/api/cookie/' },
-            {
-              text: 'k.DB',
-              collapsed: true,
-              items: [
-                { text: '概述', link: '/api/database/' },
-                { text: 'indexedDb', link: '/api/indexed-db/' },
-                { text: 'keyValue', link: '/api/key-value/' },
-                { text: 'sqlite', link: '/api/sqlite/' },
-              ]
-            },
-            {
-              text: 'k.file',
-              collapsed: true,
-              items: [
-                { text: '概述', link: '/api/file/file.md' },
-                { text: 'folder', link: '/api/file/file-folder.md' },
-                { text: 'resumable', link: '/api/file/file-resumable.md' },
-                { text: '数据结构', link: '/api/file/file-info.md' },
-              ]
-            },
-            { text: 'k.label', link: '/api/label/' },
-            { text: 'k.logger', link: '/api/logger/' },
-            { text: 'k.mail', link: '/api/mail/' },
-            { text: 'k.media', link: '/api/media/' },
-            { text: 'k.module', link: '/api/module/' },
-            { text: 'k.openApi', link: '/api/openapi/' },
-            {
-              text: 'k.net',
-              collapsed: true,
-              items: [
-                { text: '概述', link: '/api/net/' },
-                { text: 'DNS', link: '/api/net/dns.md' },
-                { text: 'httpClient', link: '/api/net/httpclient.md' },
-                { text: 'IP', link: '/api/net/ip.md' },
-                { text: 'url', link: '/api/net/url.md' },
-                { text: 'webSocket', link: '/api/net/websocket.md' },
-              ]
-            },
-            { text: 'k.page', link: '/api/page/' },
-            { text: 'k.paramConfig', link: '/api/param-config/' },
-            {
-              text: 'k.payment',
-              collapsed: true,
-              items: [
-                { text: '概述', link: '/api/payment/' },
-                { text: 'Alipay', link: '/api/payment/alipay.md' },
-                { text: 'MoneyBoxs', link: '/api/payment/moneyboxs.md' },
-                { text: 'Pay.NL', link: '/api/payment/paynl.md' },
-                { text: 'PayPal', link: '/api/payment/paypal.md' },
-                { text: 'Square', link: '/api/payment/square.md' },
-                { text: 'Stripe', link: '/api/payment/stripe.md' },
-                { text: 'TwoCheckout', link: '/api/payment/two-checkout.md' },
-                { text: 'Wechat', link: '/api/payment/wechat.md' },
-                { text: 'Wechat H5 Flow', link: '/api/payment/wechat-h5-flow.md' },
-              ]
-            },
-            { text: 'k.request', link: '/api/request/' },
-            { text: 'k.response', link: '/api/response/' },
-            { text: 'k.security', link: '/api/security/' },
-            { text: 'k.session', link: '/api/session/' },
-            { text: 'SPA 多语言', link: '/api/spa-multilingual/' },
-            {
-              text: 'k.site',
-              collapsed: true,
-              items: [
-                { text: '概述', link: '/api/site/' },
-                { text: 'codes', link: '/api/site/code.md' },
-                { text: 'css', link: '/api/site/css.md' },
-                { text: 'runJob', link: '/api/site/job.md' },
-                { text: 'js', link: '/api/site/js.md' },
-                { text: 'layouts', link: '/api/site/layout.md' },
-                { text: 'menus', link: '/api/site/menu.md' },
-                { text: 'pages', link: '/api/site/page.md' },
-                { text: 'views', link: '/api/site/view.md' },
-              ]
-            },
-            { text: 'k.state', link: '/api/state/' },
-            { text: 'k.storage', link: '/api/storage/' },
-            {
-              text: 'k.utils',
-              collapsed: true,
-              items: [
-                { text: '概述', link: '/api/utils/' },
-                { text: 'CDN', link: '/api/utils/cdn.md' },
-                { text: 'clientJS', link: '/api/utils/clientJS.md' },
-                { text: 'community', link: '/api/utils/community.md' },
-                { text: 'compression', link: '/api/utils/compression.md' },
-                { text: 'converter', link: '/api/utils/converter.md' },
-                { text: 'CRM', link: '/api/utils/crm.md' },
-                { text: 'date', link: '/api/utils/date.md' },
-                { text: 'dom', link: '/api/utils/dom.md' },
-                { text: 'google', link: '/api/utils/google.md' },
-                { text: 'image', link: '/api/utils/image.md' },
-                { text: 'inlineHtml', link: '/api/utils/inlineHtml.md' },
-                { text: 'IP', link: '/api/utils/ip.md' },
-                { text: 'mime', link: '/api/utils/mime.md' },
-                { text: 'ninjible', link: '/api/utils/ninjible.md' },
-                { text: 'office', link: '/api/utils/office.md' },
-                { text: 'puppeteer', link: '/api/utils/puppeteer.md' },
-                { text: 'screenShot', link: '/api/utils/screenShot.md' },
-                { text: 'sftpClient', link: '/api/utils/sftpClient.md' },
-                { text: 'sitemap', link: '/api/utils/sitemap.md' },
-                { text: 'sms', link: '/api/utils/sms.md' },
-                { text: 'sshClient', link: '/api/utils/sshClient.md' },
-                { text: 'string', link: '/api/utils/string.md' },
-                { text: 'telnetClient', link: '/api/utils/telnetClient.md' },
-                { text: 'template', link: '/api/utils/template.md' },
-                { text: 'uri', link: '/api/utils/uri.md' },
-                { text: 'xml', link: '/api/utils/xml.md' },
-              ]
-            },
-          ]
-        }
-      ]
-    },
     search: {
       provider: 'local'
     },
     outline: {
       level: 'deep'
-    }
+    },
+  },
+  locales: {
+    root: {
+      label: '简体中文',
+      lang: 'zh-CN',
+      title: 'Kooboo',
+      description: 'Kooboo Documentation',
+      themeConfig: {
+        siteTitle: 'Kooboo',
+        nav: zhNav,
+        sidebar: zhSidebar,
+        langMenuLabel: '语言',
+      },
+    },
+    en: {
+      label: 'English',
+      lang: 'en-US',
+      link: '/en/',
+      title: 'Kooboo',
+      description: 'Kooboo Documentation',
+      themeConfig: {
+        siteTitle: 'Kooboo',
+        nav: prefixLocaleNav(enNav, '/en'),
+        sidebar: enSidebar,
+        langMenuLabel: 'Languages',
+      },
+    },
   }
 })

@@ -23,11 +23,18 @@ import { chromium } from 'playwright'
 import { mkdir } from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import {
+  applyCmsUiLanguage,
+  getCmsBrowserContextOptions,
+  restoreCmsUiLanguage,
+  resolveCmsScreenshotOutputDir,
+} from './cms-screenshot-locale.mjs'
 
 const REPO_ROOT =
   process.env.KOOBOO_DOCS_ROOT ||
   path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
-const OUT_DIR = path.join(REPO_ROOT, 'docs/public/cms/development')
+const DOC_LOCALE = process.env.KOOBOO_DOC_LOCALE || 'zh'
+const OUT_DIR = resolveCmsScreenshotOutputDir(REPO_ROOT, 'development', DOC_LOCALE)
 
 const BASE = process.env.KOOBOO_BASE || 'https://www.redev.cn'
 const SITE_ID =
@@ -683,6 +690,11 @@ async function captureCodeLog(page) {
     await snapLocator(table, 'code-log-table.png')
   }
 
+  const firstRow = page.locator('.el-table__body tr').first()
+  if (await firstRow.count()) {
+    await firstRow.hover().catch(() => {})
+    await page.waitForTimeout(300)
+  }
   const detailIcon = page.locator('.icon-eyes').first()
   if (await detailIcon.count()) {
     await detailIcon.click()
@@ -1440,61 +1452,69 @@ async function main() {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 900 },
     deviceScaleFactor: 2,
+    ...getCmsBrowserContextOptions(DOC_LOCALE),
   })
   const page = await context.newPage()
+  let previousLanguage = null
 
-  await login(page)
+  try {
+    await login(page)
+    previousLanguage = await applyCmsUiLanguage(page, context, BASE, DOC_LOCALE)
 
-  if (only === 'views') {
-    await captureViews(page)
+    if (only === 'views') {
+      await captureViews(page)
+    }
+    if (only === 'layouts') {
+      await captureLayouts(page)
+    }
+    if (only === 'scripts') {
+      await captureScripts(page)
+    }
+    if (only === 'styles') {
+      await captureStyles(page)
+    }
+    if (only === 'styles-inline') {
+      await captureStylesInline(page)
+    }
+    if (only === 'code') {
+      await captureCode(page)
+    }
+    if (only === 'code-log') {
+      await captureCodeLog(page)
+    }
+    if (only === 'code-search') {
+      await captureCodeSearch(page)
+    }
+    if (only === 'urls') {
+      await captureUrls(page)
+    }
+    if (only === 'forms') {
+      await captureForms(page)
+    }
+    if (only === 'menus') {
+      await captureMenus(page)
+    }
+    if (only === 'authentication') {
+      await captureAuthentication(page)
+    }
+    if (only === 'openapis') {
+      await captureOpenapis(page)
+    }
+    if (only === 'spamultilingual') {
+      await captureSpaMultilingual(page)
+    }
+    if (only === 'modules') {
+      await captureModules(page)
+    }
+    if (only === 'jobs') {
+      await captureJobs(page)
+    }
+  } finally {
+    await restoreCmsUiLanguage(page, context, BASE, previousLanguage).catch((error) => {
+      console.warn('restore cms language failed:', error)
+    })
+    await browser.close()
   }
-  if (only === 'layouts') {
-    await captureLayouts(page)
-  }
-  if (only === 'scripts') {
-    await captureScripts(page)
-  }
-  if (only === 'styles') {
-    await captureStyles(page)
-  }
-  if (only === 'styles-inline') {
-    await captureStylesInline(page)
-  }
-  if (only === 'code') {
-    await captureCode(page)
-  }
-  if (only === 'code-log') {
-    await captureCodeLog(page)
-  }
-  if (only === 'code-search') {
-    await captureCodeSearch(page)
-  }
-  if (only === 'urls') {
-    await captureUrls(page)
-  }
-  if (only === 'forms') {
-    await captureForms(page)
-  }
-  if (only === 'menus') {
-    await captureMenus(page)
-  }
-  if (only === 'authentication') {
-    await captureAuthentication(page)
-  }
-  if (only === 'openapis') {
-    await captureOpenapis(page)
-  }
-  if (only === 'spamultilingual') {
-    await captureSpaMultilingual(page)
-  }
-  if (only === 'modules') {
-    await captureModules(page)
-  }
-  if (only === 'jobs') {
-    await captureJobs(page)
-  }
-
-  await browser.close()
   console.log('done →', OUT_DIR)
 }
 

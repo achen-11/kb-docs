@@ -17,11 +17,18 @@ import { chromium } from 'playwright'
 import { mkdir } from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import {
+  applyCmsUiLanguage,
+  getCmsBrowserContextOptions,
+  restoreCmsUiLanguage,
+  resolveCmsScreenshotOutputDir,
+} from './cms-screenshot-locale.mjs'
 
 const REPO_ROOT =
   process.env.KOOBOO_DOCS_ROOT ||
   path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
-const OUT_DIR = path.join(REPO_ROOT, 'docs/public/cms/settings')
+const DOC_LOCALE = process.env.KOOBOO_DOC_LOCALE || 'zh'
+const OUT_DIR = resolveCmsScreenshotOutputDir(REPO_ROOT, 'settings', DOC_LOCALE)
 
 const BASE = process.env.KOOBOO_BASE || 'https://www.redev.cn'
 const SITE_ID =
@@ -42,6 +49,7 @@ const BASIC_TABS = [
   ['editor', 'editor'],
   ['advance', 'advanced'],
 ]
+const MULTILINGUAL_SELECTOR = '[data-cy="多语言"], [data-cy="Multilingual"]'
 
 async function login(page) {
   await page.goto(`${BASE}/_Admin/login`, {
@@ -82,7 +90,7 @@ async function snapLocator(locator, name) {
 }
 
 async function ensureMultilingualExpanded(page) {
-  const multiSwitch = page.locator('[data-cy="多语言"]').first()
+  const multiSwitch = page.locator(MULTILINGUAL_SELECTOR).first()
   if (!(await multiSwitch.count())) return false
 
   const checked = await multiSwitch.evaluate((el) => {
@@ -107,13 +115,13 @@ async function captureMultilingual(page) {
 
   const panel = page
     .locator('.bg-\\[\\#fafafa\\], .dark\\:bg-\\[\\#333\\]')
-    .filter({ hasText: /默认语言|defaultLanguage/i })
+    .filter({ hasText: /默认语言|default\s*language/i })
     .first()
 
   if (await panel.count()) {
     const header = page
       .locator('.el-form-item')
-      .filter({ has: page.locator('[data-cy="多语言"]') })
+      .filter({ has: page.locator(MULTILINGUAL_SELECTOR) })
       .first()
     if (await header.count()) {
       await header.scrollIntoViewIfNeeded()
@@ -259,10 +267,15 @@ function configUrl(group) {
 async function captureIntegrationGroup(page, group, file) {
   await page.goto(configUrl(group), { waitUntil: 'networkidle', timeout: 90000 })
   await page.waitForTimeout(1500)
-  const panel = page.locator('.el-collapse-item').filter({ hasText: group }).first()
-  if (await panel.count()) {
+  const panel = page
+    .locator('.el-collapse-item')
+    .filter({ hasText: new RegExp(group, 'i') })
+    .first()
+  if ((await panel.count()) && (await panel.isVisible().catch(() => false))) {
     await snapLocator(panel, `settings-integrations-${file}.png`)
+    return
   }
+  await snap(page, `settings-integrations-${file}.png`, { fullPage: true })
 }
 
 function siteUsersUrl() {
@@ -766,6 +779,7 @@ async function captureIntegrations(page) {
 
   const groups = [
     ['Database', 'database'],
+    ['Payment', 'payment'],
     ['SMS', 'sms'],
     ['OAuth2', 'oauth2'],
     ['Storage', 'storage'],
@@ -774,7 +788,6 @@ async function captureIntegrations(page) {
   for (const [group, file] of groups) {
     await captureIntegrationGroup(page, group, file)
   }
-  // Payment: use manually masked screenshot (settings-integrations-payment.png)
 
   await page.goto(configUrl('Database'), {
     waitUntil: 'networkidle',
@@ -802,42 +815,51 @@ async function main() {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 900 },
     deviceScaleFactor: 2,
+    ...getCmsBrowserContextOptions(DOC_LOCALE),
   })
   const page = await context.newPage()
-  await login(page)
+  let previousLanguage = null
 
-  if (only === 'basic') {
-    await captureBasicSettings(page)
-  }
-  if (only === 'multilingual') {
-    await captureMultilingual(page)
-  }
-  if (only === 'domains') {
-    await captureDomains(page)
-  }
-  if (only === 'integrations') {
-    await captureIntegrations(page)
-  }
-  if (only === 'site-users') {
-    await captureSiteUsers(page)
-  }
-  if (only === 'roles') {
-    await captureRoles(page)
-  }
-  if (only === 'request-hooks') {
-    await captureRequestHooks(page)
-  }
-  if (only === 'action-hooks') {
-    await captureActionHooks(page)
-  }
-  if (only === 'cookie') {
-    await captureCookie(page)
-  }
-  if (only === 'ai-service') {
-    await captureAiService(page)
-  }
+  try {
+    await login(page)
+    previousLanguage = await applyCmsUiLanguage(page, context, BASE, DOC_LOCALE)
 
-  await browser.close()
+    if (only === 'basic') {
+      await captureBasicSettings(page)
+    }
+    if (only === 'multilingual') {
+      await captureMultilingual(page)
+    }
+    if (only === 'domains') {
+      await captureDomains(page)
+    }
+    if (only === 'integrations') {
+      await captureIntegrations(page)
+    }
+    if (only === 'site-users') {
+      await captureSiteUsers(page)
+    }
+    if (only === 'roles') {
+      await captureRoles(page)
+    }
+    if (only === 'request-hooks') {
+      await captureRequestHooks(page)
+    }
+    if (only === 'action-hooks') {
+      await captureActionHooks(page)
+    }
+    if (only === 'cookie') {
+      await captureCookie(page)
+    }
+    if (only === 'ai-service') {
+      await captureAiService(page)
+    }
+  } finally {
+    await restoreCmsUiLanguage(page, context, BASE, previousLanguage).catch((error) => {
+      console.warn('restore cms language failed:', error)
+    })
+    await browser.close()
+  }
   console.log('done →', OUT_DIR)
 }
 

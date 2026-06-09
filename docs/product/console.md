@@ -76,7 +76,9 @@
 
 | 文档 | 说明 |
 |------|------|
-| [充值与账单](./billing.md) | 余额、充值、订单、续费的账务总览 |
+| [余额](./console/balance.md) | 当前余额、充值入口与最近收支记录 |
+| [订单](./console/orders.md) | 订单列表、未支付订单与结账页 |
+| [续费](./console/renewals.md) | 域名和会员续费项 |
 | [CMS：域名管理](/cms/settings/domains.md) | 某个站点的域名绑定与访问入口 |
 | [CMS：AI 服务](/cms/settings/ai-service.md) | 站点级 AI 服务、MCP、AI 函数 |
 | [CMS：站点用户](/cms/settings/site-users.md) | 站点内部账号 |

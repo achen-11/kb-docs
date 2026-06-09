@@ -17,10 +17,12 @@
     "screenshots:cms:development": "node scripts/cms-development-screenshots.mjs",
     "screenshots:cms:database": "node scripts/cms-database-screenshots.mjs",
     "screenshots:cms:settings": "node scripts/cms-settings-screenshots.mjs",
+    "screenshots:cms:operations": "node scripts/cms-operations-screenshots.mjs",
     "screenshots:product:console": "node scripts/product-console-screenshots.mjs",
     "screenshots:product:mail": "node scripts/product-mail-screenshots.mjs",
     "screenshots:product:market": "node scripts/product-market-screenshots.mjs",
-    "screenshots:product:developer-mode": "node scripts/product-developer-mode-screenshots.mjs"
+    "screenshots:product:developer-mode": "node scripts/product-developer-mode-screenshots.mjs",
+    "screenshots:product:ai": "node scripts/product-ai-screenshots.mjs"
   },
   "devDependencies": {
     "playwright": "1.58.2",

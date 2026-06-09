@@ -8,11 +8,19 @@ import { chromium } from 'playwright'
 import { mkdir } from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import {
+  applyCmsUiLanguage,
+  createTextPattern,
+  getCmsBrowserContextOptions,
+  restoreCmsUiLanguage,
+  resolveCmsScreenshotOutputDir,
+} from './cms-screenshot-locale.mjs'
 
 const REPO_ROOT =
   process.env.KOOBOO_DOCS_ROOT ||
   path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
-const OUT_DIR = path.join(REPO_ROOT, 'docs/public/cms/content')
+const DOC_LOCALE = process.env.KOOBOO_DOC_LOCALE || 'zh'
+const OUT_DIR = resolveCmsScreenshotOutputDir(REPO_ROOT, 'content', DOC_LOCALE)
 
 const BASE = 'https://www.redev.cn'
 const SITE_ID = '552e81ab-eb2a-cb82-1458-aa61512cedd2'
@@ -54,8 +62,20 @@ async function snapDialog(page, name) {
   console.log('saved', file)
 }
 
-async function clickFieldTab(page, label) {
-  await page.locator('.el-dialog .el-tabs__item').filter({ hasText: label }).click()
+const FIELD_TAB_TEXT = {
+  relation: ['关联数据', 'Relation Data', 'Related Data', 'Relation Folders'],
+  fields: ['字段', 'Fields'],
+  advanced: ['高级', 'Advanced'],
+  validation: ['验证', 'Validation'],
+  select: ['选择框', 'Select'],
+}
+
+async function clickFieldTab(page, labels) {
+  await page
+    .locator('.el-dialog .el-tabs__item')
+    .filter({ hasText: createTextPattern(labels) })
+    .first()
+    .click()
   await page.waitForTimeout(600)
 }
 
@@ -90,9 +110,9 @@ async function captureFolderSettings(page) {
   await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
   await page.waitForTimeout(800)
   await snapDialog(page, 'contents-folder-settings-basic.png')
-  await clickFieldTab(page, '关联数据')
+  await clickFieldTab(page, FIELD_TAB_TEXT.relation)
   await snapDialog(page, 'contents-folder-settings-relation.png')
-  await clickFieldTab(page, '字段')
+  await clickFieldTab(page, FIELD_TAB_TEXT.fields)
   await snapDialog(page, 'contents-folder-settings-fields.png')
   await page.keyboard.press('Escape')
   await page.waitForTimeout(500)
@@ -103,7 +123,11 @@ async function captureFieldEditor(page) {
   await snapDialog(page, 'field-editor-basic.png')
 
   await page.locator('[data-cy="control-type-dropdown"]').click()
-  await page.locator('[data-cy="control-type-opt"]').filter({ hasText: '选择框' }).click()
+  await page
+    .locator('[data-cy="control-type-opt"]')
+    .filter({ hasText: createTextPattern(FIELD_TAB_TEXT.select) })
+    .first()
+    .click()
   await page.waitForTimeout(600)
   await snapDialog(page, 'field-editor-selection-fixed.png')
 
@@ -114,12 +138,12 @@ async function captureFieldEditor(page) {
   await closeFieldEditor(page)
 
   await openFieldEditor(page)
-  await clickFieldTab(page, '高级')
+  await clickFieldTab(page, FIELD_TAB_TEXT.advanced)
   await snapDialog(page, 'field-editor-advanced.png')
   await closeFieldEditor(page)
 
   await openFieldEditor(page)
-  await clickFieldTab(page, '验证')
+  await clickFieldTab(page, FIELD_TAB_TEXT.validation)
   await page.locator('[data-cy="validation-rules-dropdown"]').waitFor({
     state: 'visible',
     timeout: 15000,
@@ -135,50 +159,54 @@ async function main() {
   const browser = await chromium.launch({ headless: true })
   const context = await browser.newContext({
     viewport: { width: 1440, height: 900 },
+    ...getCmsBrowserContextOptions(DOC_LOCALE),
   })
   const page = await context.newPage()
+  let previousLanguage = null
 
-  await login(page)
+  try {
+    await login(page)
+    previousLanguage = await applyCmsUiLanguage(page, context, BASE, DOC_LOCALE)
 
-  const typesUrl = `${BASE}/_Admin/content/contentTypes?SiteId=${SITE_ID}`
-  await page.goto(typesUrl, { waitUntil: 'networkidle', timeout: 60000 })
-  await page.waitForTimeout(2500)
-  await snap(page, 'content-types-list.png')
+    const typesUrl = `${BASE}/_Admin/content/contentTypes?SiteId=${SITE_ID}`
+    await page.goto(typesUrl, { waitUntil: 'networkidle', timeout: 60000 })
+    await page.waitForTimeout(2500)
+    await snap(page, 'content-types-list.png')
 
-  const typeEdit = page.locator('[data-cy="edit"]').first()
-  const typeCreate = page.locator('[data-cy="create"]')
-  if (await typeEdit.count()) {
-    await typeEdit.click()
-  } else {
-    await typeCreate.click()
-  }
-  await page.waitForURL(/contentType/, { timeout: 60000 })
-  await page.waitForTimeout(3000)
-  await snap(page, 'content-type-fields.png')
-
-  await captureFieldEditor(page)
-
-  await captureFolderSettings(page)
-
-  const contentsUrl = `${BASE}/_Admin/content/contents?SiteId=${SITE_ID}`
-  await page.goto(contentsUrl, { waitUntil: 'networkidle', timeout: 60000 })
-  await page.waitForTimeout(2500)
-  await snap(page, 'contents-folders.png')
-
-  const folderLink = page.locator('[data-cy="name"]').first()
-  await folderLink.waitFor({ state: 'visible', timeout: 30000 })
-  await folderLink.click()
-  await page.waitForURL(/textContentsByFolder|\/content\/content/, { timeout: 60000 })
-  await page.waitForTimeout(3000)
-  await snap(page, 'contents-entry.png')
-
-  const newBtn = page.locator('[data-cy="new-text-content"]').first()
-  if (await newBtn.count()) {
-    await newBtn.click()
-    await page.waitForURL(/\/content\/content/, { timeout: 60000 })
+    const typeEdit = page.locator('[data-cy="edit"]').first()
+    const typeCreate = page.locator('[data-cy="create"]')
+    if (await typeEdit.count()) {
+      await typeEdit.click()
+    } else {
+      await typeCreate.click()
+    }
+    await page.waitForURL(/contentType/, { timeout: 60000 })
     await page.waitForTimeout(3000)
-    await snap(page, 'contents-entry-edit.png')
-  }
+    await snap(page, 'content-type-fields.png')
+
+    await captureFieldEditor(page)
+
+    await captureFolderSettings(page)
+
+    const contentsUrl = `${BASE}/_Admin/content/contents?SiteId=${SITE_ID}`
+    await page.goto(contentsUrl, { waitUntil: 'networkidle', timeout: 60000 })
+    await page.waitForTimeout(2500)
+    await snap(page, 'contents-folders.png')
+
+    const folderLink = page.locator('[data-cy="name"]').first()
+    await folderLink.waitFor({ state: 'visible', timeout: 30000 })
+    await folderLink.click()
+    await page.waitForURL(/textContentsByFolder|\/content\/content/, { timeout: 60000 })
+    await page.waitForTimeout(3000)
+    await snap(page, 'contents-entry.png')
+
+    const newBtn = page.locator('[data-cy="new-text-content"]').first()
+    if (await newBtn.count()) {
+      await newBtn.click()
+      await page.waitForURL(/\/content\/content/, { timeout: 60000 })
+      await page.waitForTimeout(3000)
+      await snap(page, 'contents-entry-edit.png')
+    }
 
   const labelsUrl = `${BASE}/_Admin/content/labels?SiteId=${SITE_ID}`
   await page.goto(labelsUrl, { waitUntil: 'networkidle', timeout: 60000 })
@@ -267,7 +295,12 @@ async function main() {
     }
   }
 
-  await browser.close()
+  } finally {
+    await restoreCmsUiLanguage(page, context, BASE, previousLanguage).catch((error) => {
+      console.warn('restore cms language failed:', error)
+    })
+    await browser.close()
+  }
   console.log('done')
 }
 

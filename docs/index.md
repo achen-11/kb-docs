@@ -59,7 +59,7 @@ title: Kooboo 文档中心
 <a href="/product/developer-mode"><span>DEV</span><strong>开发者模式</strong><em>类 VS Code 的多资源编辑体验</em></a>
 <a href="/product/ai-chat"><span>AI</span><strong>AI Claw</strong><em>自然语言管理站点、任务与进度</em></a>
 <a href="/product/market"><span>APP</span><strong>市场</strong><em>模板市场、模板详情、我的分享</em></a>
-<a href="/product/billing"><span>PAY</span><strong>充值与账单</strong><em>余额、会员、续费、订单与带宽充值</em></a>
+<a href="/product/console"><span>OPS</span><strong>控制台</strong><em>域名、组织、余额、订单、续费与 AI 配置</em></a>
 </div>
 </section>
 
@@ -73,7 +73,7 @@ title: Kooboo 文档中心
 <li><span>01</span><strong>体验</strong><em>创建站点、发布页面</em></li>
 <li><span>02</span><strong>配置</strong><em>内容模型、用户、域名</em></li>
 <li><span>03</span><strong>开发</strong><em>模板引擎、脚本、API</em></li>
-<li><span>04</span><strong>产品化</strong><em>邮箱、市场、AI 与账单</em></li>
+<li><span>04</span><strong>产品化</strong><em>邮箱、市场与 AI</em></li>
 </ol>
 </div>
 <div class="kb-doc-ai-band__links">
@@ -91,7 +91,7 @@ title: Kooboo 文档中心
 <a href="/product/market"><span>Marketplace</span><strong>市场</strong><em>模板市场、模板详情、我的分享</em></a>
 <a href="/product/developer-mode"><span>Dev Tools</span><strong>开发者模式</strong><em>同时编辑页面、布局、视图、脚本、样式与代码</em></a>
 <a href="/product/ai-chat"><span>ChatBot</span><strong>AI Claw / AI Chat</strong><em>自然语言管理站点、查看任务与进度</em></a>
-<a href="/product/billing"><span>Price</span><strong>充值与账单</strong><em>账户余额、会员、续费、订单与带宽充值</em></a>
+<a href="/product/console/balance"><span>Balance</span><strong>余额与订单</strong><em>充值、订单、会员续费在控制台完成</em></a>
 </div>
 </section>
 </main>

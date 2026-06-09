@@ -6,7 +6,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '..')
 
 /** docs/public/{name} → kb-remote-site/images/{name} */
-export const DOC_IMAGE_PUBLIC_DIRS = ['cms', 'product']
+export const DOC_IMAGE_PUBLIC_DIRS = ['cms', 'product', 'en/cms']
 
 const docsPublicDir = path.join(projectRoot, 'docs', 'public')
 const koobooImagesDir = path.join(projectRoot, 'kb-remote-site', 'images')
@@ -22,9 +22,11 @@ const IMAGE_EXT = new Set([
 ])
 
 export function isDocImagePath(relativePath) {
-  const normalized = relativePath.replace(/\\/g, '/')
-  const segment = normalized.split('/')[0]
-  if (!DOC_IMAGE_PUBLIC_DIRS.includes(segment)) {
+  const normalized = relativePath.replace(/\\/g, '/').replace(/^\/+/, '')
+  const matchedRoot = DOC_IMAGE_PUBLIC_DIRS.find(
+    (root) => normalized === root || normalized.startsWith(`${root}/`)
+  )
+  if (!matchedRoot) {
     return false
   }
   const ext = path.extname(normalized).toLowerCase()
@@ -55,11 +57,11 @@ async function walkFiles(rootDir) {
   return files.flat()
 }
 
-async function copyTree(sourceDir, targetDir) {
+async function copyTree(sourceDir, targetDir, docImageRoot) {
   const files = await walkFiles(sourceDir)
   for (const filePath of files) {
     const relative = path.relative(sourceDir, filePath).replace(/\\/g, '/')
-    if (!isDocImagePath(`${path.basename(sourceDir)}/${relative}`)) {
+    if (!isDocImagePath(`${docImageRoot}/${relative}`)) {
       continue
     }
     const targetPath = path.join(targetDir, relative)
@@ -90,7 +92,7 @@ export async function syncPublicImagesToKooboo() {
 
     await rm(target, { recursive: true, force: true })
     await mkdir(path.join(koobooImagesDir), { recursive: true })
-    await copyTree(source, target)
+    await copyTree(source, target, name)
     copied.push(name)
   }
 

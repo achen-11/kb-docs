@@ -11,11 +11,18 @@ import { chromium } from 'playwright'
 import { mkdir } from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import {
+  applyCmsUiLanguage,
+  getCmsBrowserContextOptions,
+  restoreCmsUiLanguage,
+  resolveCmsScreenshotOutputDir,
+} from './cms-screenshot-locale.mjs'
 
 const REPO_ROOT =
   process.env.KOOBOO_DOCS_ROOT ||
   path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
-const OUT_DIR = path.join(REPO_ROOT, 'docs/public/cms/commerce')
+const DOC_LOCALE = process.env.KOOBOO_DOC_LOCALE || 'zh'
+const OUT_DIR = resolveCmsScreenshotOutputDir(REPO_ROOT, 'commerce', DOC_LOCALE)
 
 const BASE = process.env.KOOBOO_BASE || 'https://www.redev.cn'
 const SITE_ID =
@@ -105,7 +112,7 @@ async function snapDialog(page, name) {
 }
 
 function variantCard(page) {
-  return page.locator('.rounded-normal.bg-fff').filter({ hasText: '规格选项' })
+  return page.locator('.rounded-normal.bg-fff').filter({ hasText: /规格选项|variant options/i })
 }
 
 async function snapBasicSection(page) {
@@ -127,7 +134,7 @@ async function snapVariantSections(page) {
   await card.scrollIntoViewIfNeeded()
   await page.waitForTimeout(600)
 
-  const optionsItem = card.locator('.el-form-item').filter({ hasText: '规格选项' })
+  const optionsItem = card.locator('.el-form-item').filter({ hasText: /规格选项|variant options/i })
   if (await optionsItem.count()) {
     await snapLocator(optionsItem, 'product-management-detail-variant-options.png')
   }
@@ -139,7 +146,7 @@ async function snapVariantSections(page) {
 }
 
 async function ensureOptionGroup(page) {
-  const addVariant = page.getByRole('button', { name: /添加变体|添加规格/ })
+  const addVariant = page.getByRole('button', { name: /添加变体|添加规格|add variant|add option/i })
   if (await addVariant.count()) return
 
   const card = variantCard(page)
@@ -164,7 +171,7 @@ async function ensureOptionGroup(page) {
     await page.waitForTimeout(500)
   }
 
-  const done = card.getByRole('button', { name: /完成/ }).first()
+  const done = card.getByRole('button', { name: /完成|done|finish/i }).first()
   if (await done.count()) {
     await done.click()
     await page.waitForTimeout(1500)
@@ -183,7 +190,7 @@ async function captureEditVariantDialog(page) {
 async function captureCreateVariantDialog(page) {
   try {
     await ensureOptionGroup(page)
-    const addVariant = page.getByRole('button', { name: /添加变体|添加规格/ })
+    const addVariant = page.getByRole('button', { name: /添加变体|添加规格|add variant|add option/i })
     await addVariant.waitFor({ state: 'visible', timeout: 20000 })
     await addVariant.click()
     await snapDialog(page, 'product-management-detail-variant-create-dialog.png')
@@ -262,11 +269,13 @@ async function captureNotification(page, overviewOnly = false) {
   }
 
   const koobooRadio = page.locator('.el-radio-button').filter({ hasText: /^Kooboo$/ })
-  const customRadio = page.locator('.el-radio-button').filter({ hasText: /自定义/ })
+  const customRadio = page.locator('.el-radio-button').filter({ hasText: /自定义|custom/i })
   if (await customRadio.count()) {
     await customRadio.click()
     await page.waitForTimeout(400)
-    const smtpBtn = page.getByRole('button', { name: /设置服务器|服务器信息/ }).first()
+    const smtpBtn = page
+      .getByRole('button', { name: /设置服务器|服务器信息|set server|server info/i })
+      .first()
     if (await smtpBtn.count()) {
       await smtpBtn.click()
       await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
@@ -280,7 +289,7 @@ async function captureNotification(page, overviewOnly = false) {
     console.warn('skip notification-smtp-dialog.png: 未找到自定义邮件服务器选项')
   }
 
-  const emailLog = page.getByRole('button', { name: /^日志$/ }).first()
+  const emailLog = page.getByRole('button', { name: /^日志$|^log$/i }).first()
   if (await emailLog.count()) {
     await emailLog.click()
     await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
@@ -300,7 +309,7 @@ async function captureNotification(page, overviewOnly = false) {
     await page.waitForTimeout(400)
   }
 
-  const webhookLog = page.getByRole('button', { name: /^日志$/ }).nth(1)
+  const webhookLog = page.getByRole('button', { name: /^日志$|^log$/i }).nth(1)
   if (await webhookLog.count()) {
     await webhookLog.click()
     await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
@@ -421,7 +430,7 @@ async function captureCurrencies(page) {
   if (await editIcon.count()) {
     await editIcon.click()
   } else {
-    const addBtn = page.getByRole('button', { name: /添加货币/ }).first()
+    const addBtn = page.getByRole('button', { name: /添加货币|add currency/i }).first()
     if (await addBtn.count()) {
       await addBtn.click()
       await page.waitForTimeout(600)
@@ -476,7 +485,7 @@ async function captureOrders(page) {
   }
 
   async function snapDeliveryIfPossible() {
-    const deliverBtn = page.locator('button').filter({ hasText: /^发货$/ }).first()
+    const deliverBtn = page.locator('button').filter({ hasText: /^发货$|^deliver$|^fulfill$/i }).first()
     if (!(await deliverBtn.count())) return false
     await deliverBtn.click()
     await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
@@ -492,7 +501,7 @@ async function captureOrders(page) {
     await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
     await page.waitForTimeout(1000)
     const eyes = page.locator('.el-table .icon-eyes')
-    const n = Math.min(await eyes.count(), 8)
+    const n = Math.min(await eyes.count(), 20)
     for (let i = 1; i < n; i++) {
       await eyes.nth(i).click()
       await page.waitForURL(/order-detail/, { timeout: 60000 })
@@ -509,14 +518,35 @@ async function captureOrders(page) {
     )
   }
 
-  const cancelBtn = page.getByRole('button', { name: /^取消$/ }).first()
-  if (await cancelBtn.count()) {
+  async function snapCancelIfPossible() {
+    const cancelBtn = page.getByRole('button', { name: /^取消$|^cancel$/i }).first()
+    if (!(await cancelBtn.count())) return false
     await cancelBtn.click()
     await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
     await page.waitForTimeout(500)
     await snapDialog(page, 'orders-cancel-dialog.png')
     await page.keyboard.press('Escape')
-  } else {
+    await page.waitForTimeout(400)
+    return true
+  }
+
+  let cancelCaptured = await snapCancelIfPossible()
+  if (!cancelCaptured && !orderId) {
+    await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
+    await page.waitForTimeout(1000)
+    const eyes = page.locator('.el-table .icon-eyes')
+    const n = Math.min(await eyes.count(), 20)
+    for (let i = 1; i < n; i++) {
+      await eyes.nth(i).click()
+      await page.waitForURL(/order-detail/, { timeout: 60000 })
+      await page.waitForTimeout(1500)
+      cancelCaptured = await snapCancelIfPossible()
+      if (cancelCaptured) break
+      await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
+      await page.waitForTimeout(800)
+    }
+  }
+  if (!cancelCaptured) {
     console.warn('skip orders-cancel-dialog.png: 订单已取消或无取消按钮')
   }
 }
@@ -558,7 +588,7 @@ async function captureCarts(page) {
   await page.waitForTimeout(2000)
   await snap(page, 'carts-create.png')
 
-  const addProduct = page.getByRole('button', { name: /添加商品/ })
+  const addProduct = page.getByRole('button', { name: /添加商品|add product/i })
   if (await addProduct.count()) {
     await addProduct.click()
     await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
@@ -620,7 +650,7 @@ async function captureCustomers(page) {
     const addAddr = page
       .locator('.el-dialog')
       .last()
-      .getByRole('button', { name: /添加地址/ })
+      .getByRole('button', { name: /添加地址|add address/i })
     if (await addAddr.count()) {
       await addAddr.click()
       await page.locator('.el-dialog').last().waitFor({ state: 'visible', timeout: 30000 })
@@ -638,14 +668,14 @@ async function captureShippings(page) {
   await page.waitForTimeout(2500)
   await snap(page, 'shippings-express-list.png')
 
-  const digitalTab = page.getByRole('tab', { name: /数字产品/ })
+  const digitalTab = page.getByRole('tab', { name: /数字产品|digital products?/i })
   if (await digitalTab.count()) {
     await digitalTab.click()
     await page.waitForTimeout(2000)
     await snap(page, 'shippings-digital-list.png')
   }
 
-  await page.getByRole('tab', { name: /实体产品/ }).click().catch(() => {})
+  await page.getByRole('tab', { name: /实体产品|physical products?/i }).click().catch(() => {})
   await page.waitForTimeout(800)
 
   const editLink = page.locator('a .icon-a-writein').first()
@@ -760,7 +790,7 @@ async function captureProductTypes(page) {
 
   const dialog = page.locator('.el-dialog').last()
   await dialog.locator('input').first().fill('Doc 示例类型')
-  await dialog.getByRole('button', { name: /保存|确定|confirm/i }).click()
+  await dialog.getByRole('button', { name: /保存|确定|confirm|save/i }).click()
   await page.waitForTimeout(2000)
 
   const row = page.locator('tbody tr').first()
@@ -778,88 +808,96 @@ async function main() {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 900 },
     deviceScaleFactor: 2,
+    ...getCmsBrowserContextOptions(DOC_LOCALE),
   })
   const page = await context.newPage()
+  let previousLanguage = null
 
-  await login(page)
+  try {
+    await login(page)
+    previousLanguage = await applyCmsUiLanguage(page, context, BASE, DOC_LOCALE)
 
-  if (!only || only === 'product-management') {
-    const listUrl = `${BASE}/_Admin/commerce/product-management?SiteId=${SITE_ID}`
-    await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
-    await page.waitForTimeout(3000)
-    await snap(page, 'product-management-list.png')
+    if (!only || only === 'product-management') {
+      const listUrl = `${BASE}/_Admin/commerce/product-management?SiteId=${SITE_ID}`
+      await page.goto(listUrl, { waitUntil: 'networkidle', timeout: 60000 })
+      await page.waitForTimeout(3000)
+      await snap(page, 'product-management-list.png')
 
-    const editUrl = `${BASE}/_Admin/commerce/product-management/edit?id=${PRODUCT_ID}&SiteId=${SITE_ID}`
-    await page.goto(editUrl, { waitUntil: 'networkidle', timeout: 60000 })
-    await page.getByRole('button', { name: /保存并返回/ }).waitFor({
-      state: 'visible',
-      timeout: 60000,
+      const editUrl = `${BASE}/_Admin/commerce/product-management/edit?id=${PRODUCT_ID}&SiteId=${SITE_ID}`
+      await page.goto(editUrl, { waitUntil: 'networkidle', timeout: 60000 })
+      await page.getByRole('button', { name: /保存并返回|save\s*&\s*return/i }).waitFor({
+        state: 'visible',
+        timeout: 60000,
+      })
+      await page.waitForTimeout(2500)
+
+      await snapBasicSection(page)
+      await snapVariantSections(page)
+      await captureEditVariantDialog(page)
+      await captureCreateVariantDialog(page)
+    }
+
+    if (!only || only === 'product-types') {
+      await captureProductTypes(page)
+    }
+
+    if (!only || only === 'product-categories') {
+      await captureProductCategories(page)
+    }
+
+    if (!only || only === 'settings') {
+      await captureCommerceSettings(page)
+    }
+
+    if (!only || only === 'shippings') {
+      await captureShippings(page)
+    }
+
+    if (!only || only === 'customers') {
+      await captureCustomers(page)
+    }
+
+    if (!only || only === 'carts') {
+      await captureCarts(page)
+    }
+
+    if (!only || only === 'discounts') {
+      await captureDiscounts(page)
+    }
+
+    if (!only || only === 'orders') {
+      await captureOrders(page)
+    }
+
+    if (!only || only === 'currencies') {
+      await captureCurrencies(page)
+    }
+
+    if (!only || only === 'taxes') {
+      await captureTaxes(page)
+    }
+
+    if (!only || only === 'loyalty') {
+      await captureLoyalty(page)
+    }
+
+    if (!only || only === 'notification') {
+      await captureNotification(page)
+    }
+
+    if (only === 'notification-overview') {
+      await captureNotificationOverview(page)
+    }
+
+    if (!only || only === 'sale-stats') {
+      await captureSaleStats(page)
+    }
+  } finally {
+    await restoreCmsUiLanguage(page, context, BASE, previousLanguage).catch((error) => {
+      console.warn('restore cms language failed:', error)
     })
-    await page.waitForTimeout(2500)
-
-    await snapBasicSection(page)
-    await snapVariantSections(page)
-    await captureEditVariantDialog(page)
-    await captureCreateVariantDialog(page)
+    await browser.close()
   }
-
-  if (!only || only === 'product-types') {
-    await captureProductTypes(page)
-  }
-
-  if (!only || only === 'product-categories') {
-    await captureProductCategories(page)
-  }
-
-  if (!only || only === 'settings') {
-    await captureCommerceSettings(page)
-  }
-
-  if (!only || only === 'shippings') {
-    await captureShippings(page)
-  }
-
-  if (!only || only === 'customers') {
-    await captureCustomers(page)
-  }
-
-  if (!only || only === 'carts') {
-    await captureCarts(page)
-  }
-
-  if (!only || only === 'discounts') {
-    await captureDiscounts(page)
-  }
-
-  if (!only || only === 'orders') {
-    await captureOrders(page)
-  }
-
-  if (!only || only === 'currencies') {
-    await captureCurrencies(page)
-  }
-
-  if (!only || only === 'taxes') {
-    await captureTaxes(page)
-  }
-
-  if (!only || only === 'loyalty') {
-    await captureLoyalty(page)
-  }
-
-  if (!only || only === 'notification') {
-    await captureNotification(page)
-  }
-
-  if (only === 'notification-overview') {
-    await captureNotificationOverview(page)
-  }
-
-  if (!only || only === 'sale-stats') {
-    await captureSaleStats(page)
-  }
-
-  await browser.close()
   console.log('done →', OUT_DIR)
 }
 
