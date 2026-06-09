@@ -177,6 +177,128 @@ const cmsSidebar = [
   },
 ]
 
+const guideSidebar = [
+  {
+    text: '最佳实践',
+    items: [
+      { text: '总览', link: '/guide/' },
+      {
+        text: '账号与权限',
+        collapsed: false,
+        items: [
+          { text: '登录鉴权总览', link: '/guide/auth/' },
+          { text: '密码登录 / 登出', link: '/guide/auth/password-login' },
+          { text: '邮箱注册与找回密码', link: '/guide/auth/email-register-reset' },
+          { text: '短信验证码登录', link: '/guide/auth/sms-login' },
+          { text: '会话、角色与权限', link: '/guide/auth/sessions-and-roles' },
+        ],
+      },
+      {
+        text: '内容与站点',
+        collapsed: false,
+        items: [
+          { text: '内容驱动列表/详情页', link: '/guide/content/content-driven-pages' },
+          { text: '表单提交与服务端校验', link: '/guide/content/forms' },
+          { text: '动态菜单与导航', link: '/guide/content/dynamic-navigation' },
+          { text: '文件上传', link: '/guide/content/file-upload' },
+          { text: '多语言站点', link: '/guide/content/multilingual-site' },
+        ],
+      },
+      {
+        text: '电商',
+        collapsed: false,
+        items: [
+          { text: '购物车到结算', link: '/guide/commerce/checkout' },
+          { text: '支付发起与回调', link: '/guide/commerce/payment-callbacks' },
+          { text: '订单履约与通知', link: '/guide/commerce/order-fulfillment' },
+        ],
+      },
+      {
+        text: '性能',
+        collapsed: false,
+        items: [
+          { text: 'API 响应缓存', link: '/guide/performance/api-cache' },
+          { text: '页面片段缓存', link: '/guide/performance/page-fragment-cache' },
+        ],
+      },
+      {
+        text: '实时通信',
+        collapsed: false,
+        items: [
+          { text: 'WebSocket 实时通信', link: '/guide/realtime/websocket' },
+        ],
+      },
+      {
+        text: '安全',
+        collapsed: false,
+        items: [
+          { text: 'URL 解析与安全跳转', link: '/guide/security/safe-redirect' },
+          { text: 'CSRF 与重复提交防护', link: '/guide/security/csrf-idempotency' },
+          { text: '密码哈希与敏感信息保护', link: '/guide/security/password-hash' },
+          { text: '访问控制与 API 防越权', link: '/guide/security/access-control' },
+        ],
+      },
+      {
+        text: '数据',
+        collapsed: false,
+        items: [
+          { text: 'KeyValue 配置与缓存', link: '/guide/data/keyvalue-config' },
+          { text: 'SQLite 业务模块 CRUD', link: '/guide/data/sqlite-crud' },
+        ],
+      },
+      {
+        text: '媒体与文件',
+        collapsed: false,
+        items: [
+          { text: '媒体库选择与前台展示', link: '/guide/media/media-gallery' },
+        ],
+      },
+      {
+        text: '搜索与筛选',
+        collapsed: false,
+        items: [
+          { text: '内容搜索页', link: '/guide/search/content-search' },
+        ],
+      },
+      {
+        text: '站点资源',
+        collapsed: false,
+        items: [
+          { text: '代码生成资源与回滚', link: '/guide/site-resources/resource-rollback' },
+        ],
+      },
+      {
+        text: '通知与集成',
+        collapsed: false,
+        items: [
+          { text: 'HTTPClient 调用第三方接口', link: '/guide/integrations/httpclient-services' },
+          { text: '邮件与短信通知', link: '/guide/integrations/email-sms-notifications' },
+          { text: 'OpenAPI 外部服务', link: '/guide/integrations/openapi-services' },
+          { text: 'Webhook 接收与验签', link: '/guide/integrations/webhook-signature' },
+          { text: '定时任务', link: '/guide/integrations/scheduled-jobs' },
+        ],
+      },
+      {
+        text: '日志与排错',
+        collapsed: false,
+        items: [
+          { text: '业务日志与错误追踪', link: '/guide/troubleshooting/business-logging' },
+          { text: '统一 API 响应与错误结构', link: '/guide/troubleshooting/api-error-contract' },
+        ],
+      },
+      {
+        text: '运营',
+        collapsed: false,
+        items: [
+          { text: '页面交互埋点', link: '/guide/operations/interaction-tracking' },
+          { text: 'AB 测试落地', link: '/guide/operations/ab-testing' },
+          { text: 'Sitemap / SEO 自动化', link: '/guide/operations/sitemap-seo' },
+        ],
+      },
+    ],
+  },
+]
+
 export default defineConfig({
   title: 'Kooboo',
   description: 'Kooboo Documentation',
@@ -225,6 +347,8 @@ export default defineConfig({
       { text: 'API 详情', link: '/api/' }
     ],
     sidebar: {
+      '/guide/': guideSidebar,
+      '/guide': guideSidebar,
       '/cms/': cmsSidebar,
       '/cms': cmsSidebar,
       '/templateEngine/': [
