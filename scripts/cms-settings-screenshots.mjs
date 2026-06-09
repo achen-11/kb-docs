@@ -10,6 +10,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=request-hooks node scripts/cms-settings-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=action-hooks node scripts/cms-settings-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=cookie node scripts/cms-settings-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=ai-service node scripts/cms-settings-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -357,6 +358,45 @@ function cookieUrl(tab) {
   return `${BASE}/_Admin/system/cookie?SiteId=${SITE_ID}${q}`
 }
 
+function aiServiceUrl(tab) {
+  const q = tab ? `&name=${encodeURIComponent(tab)}` : ''
+  return `${BASE}/_Admin/system/ai-service?SiteId=${SITE_ID}${q}`
+}
+
+async function maskAiServiceSecrets(page) {
+  await page.evaluate(() => {
+    const descriptions = Array.from(
+      document.querySelectorAll('.el-descriptions__cell')
+    )
+    for (const cell of descriptions) {
+      if (cell.textContent?.includes('Authorization Header')) {
+        const content = cell.parentElement?.querySelector(
+          '.el-descriptions__content'
+        )
+        if (content) content.textContent = 'Bearer ********'
+      }
+    }
+  })
+}
+
+async function hideUnsupportedAiServiceTabs(page) {
+  await page.evaluate(() => {
+    const unsupported = [
+      '最近 AI 爬虫活动',
+      '机器人覆盖规则',
+      '钱包定价规则',
+      'Recent Crawler Activities',
+      'Robots Coverage Rules',
+      'Wallet Pricing Rules',
+    ]
+    for (const tab of document.querySelectorAll('.el-tabs__item')) {
+      if (unsupported.some((text) => tab.textContent?.includes(text))) {
+        tab.style.display = 'none'
+      }
+    }
+  })
+}
+
 async function captureRequestHooks(page) {
   await page.goto(frontEventsUrl(), { waitUntil: 'networkidle', timeout: 90000 })
   await page
@@ -604,6 +644,121 @@ async function captureCookie(page) {
   }
 }
 
+async function captureAiService(page) {
+  await page.goto(aiServiceUrl('settings'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await page
+    .waitForResponse((r) => r.url().includes('AI/Providers') && r.status() === 200, {
+      timeout: 60000,
+    })
+    .catch(() => {})
+  await page.waitForTimeout(1500)
+  await hideUnsupportedAiServiceTabs(page)
+  await maskAiServiceSecrets(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const tabs = page.locator('.el-tabs__header').first()
+  if (await tabs.count()) {
+    await snapLocator(tabs, 'settings-ai-service-tabs.png')
+  }
+  await snap(page, 'settings-ai-service-overview.png', { fullPage: true })
+  await snap(page, 'settings-ai-service-settings.png', { fullPage: true })
+
+  await page.goto(aiServiceUrl('functions'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await page
+    .waitForResponse((r) => r.url().includes('mcp/GetTools') && r.status() === 200, {
+      timeout: 60000,
+    })
+    .catch(() => {})
+  await page.waitForTimeout(1500)
+  await hideUnsupportedAiServiceTabs(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await snap(page, 'settings-ai-service-functions.png', { fullPage: true })
+
+  const addTool = page.getByRole('button', { name: /添加工具|add tool/i }).first()
+  if ((await addTool.count()) && (await addTool.isEnabled())) {
+    await addTool.click()
+    await page.waitForTimeout(800)
+    await snapExpandedDialog(page, 'settings-ai-service-add-tool-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const builtInTab = page
+    .locator('.el-radio-button')
+    .filter({ hasText: /内置|built-in|built in/i })
+    .first()
+  if (await builtInTab.count()) {
+    await builtInTab.click()
+    await page.waitForTimeout(800)
+    await snap(page, 'settings-ai-service-built-in-tools.png', { fullPage: true })
+  }
+
+  await page.goto(aiServiceUrl('vectorSearch'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await page.waitForTimeout(1500)
+  await hideUnsupportedAiServiceTabs(page)
+  if (await page.locator('.el-table').count()) {
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await snap(page, 'settings-ai-service-vector-search.png', { fullPage: true })
+  }
+
+  await page.goto(aiServiceUrl('llms'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await page
+    .waitForResponse((r) => r.url().includes('llms/GetConfig') && r.status() === 200, {
+      timeout: 60000,
+    })
+    .catch(() => {})
+  await page.waitForTimeout(1500)
+  await hideUnsupportedAiServiceTabs(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await snap(page, 'settings-ai-service-llms.png', { fullPage: true })
+
+  await page.goto(aiServiceUrl('markdown'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await page.waitForTimeout(1500)
+  await hideUnsupportedAiServiceTabs(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await snap(page, 'settings-ai-service-markdown.png', { fullPage: true })
+
+  const addRule = page.getByRole('button', {
+    name: /新增覆盖规则|add rule/i,
+  }).first()
+  if (await addRule.count()) {
+    await addRule.click()
+    await page.waitForTimeout(600)
+    await snapDialog(page, 'settings-ai-service-markdown-rule-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  await page.goto(aiServiceUrl('jsonld'), {
+    waitUntil: 'networkidle',
+    timeout: 90000,
+  })
+  await page
+    .waitForResponse((r) => r.url().includes('jsonld/Sources') && r.status() === 200, {
+      timeout: 60000,
+    })
+    .catch(() => {})
+  await page.waitForTimeout(1500)
+  await hideUnsupportedAiServiceTabs(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await snap(page, 'settings-ai-service-jsonld.png', { fullPage: true })
+}
+
 async function captureIntegrations(page) {
   await page.goto(configUrl(), { waitUntil: 'networkidle', timeout: 90000 })
   await page.waitForTimeout(2000)
@@ -677,6 +832,9 @@ async function main() {
   }
   if (only === 'cookie') {
     await captureCookie(page)
+  }
+  if (only === 'ai-service') {
+    await captureAiService(page)
   }
 
   await browser.close()
