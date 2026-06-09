@@ -9,6 +9,7 @@
  *   KOOBOO_SCREENSHOT_SCOPE=roles node scripts/cms-settings-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=request-hooks node scripts/cms-settings-screenshots.mjs
  *   KOOBOO_SCREENSHOT_SCOPE=action-hooks node scripts/cms-settings-screenshots.mjs
+ *   KOOBOO_SCREENSHOT_SCOPE=cookie node scripts/cms-settings-screenshots.mjs
  */
 import './load-env.mjs'
 import { chromium } from 'playwright'
@@ -351,6 +352,11 @@ function backendEventsEditUrl(name, display) {
   return `${BASE}/_Admin/system/backend-events/edit?SiteId=${SITE_ID}&name=${name}${q}`
 }
 
+function cookieUrl(tab) {
+  const q = tab ? `&tab=${encodeURIComponent(tab)}` : ''
+  return `${BASE}/_Admin/system/cookie?SiteId=${SITE_ID}${q}`
+}
+
 async function captureRequestHooks(page) {
   await page.goto(frontEventsUrl(), { waitUntil: 'networkidle', timeout: 90000 })
   await page
@@ -526,6 +532,78 @@ async function captureSiteUsers(page) {
   }
 }
 
+async function captureCookie(page) {
+  const configResponse = page
+    .waitForResponse(
+      (r) => r.url().includes('CookieConsent/GetConfig') && r.status() === 200,
+      { timeout: 60000 }
+    )
+    .catch(() => {})
+  await page.goto(cookieUrl('basic'), { waitUntil: 'networkidle', timeout: 90000 })
+  await configResponse
+  await page.waitForTimeout(1500)
+  await page.evaluate(() => window.scrollTo(0, 0))
+
+  const tabs = page.locator('.el-tabs__header').first()
+  if (await tabs.count()) {
+    await snapLocator(tabs, 'settings-cookie-tabs.png')
+  }
+  await snap(page, 'settings-cookie-overview.png', { fullPage: true })
+  await snap(page, 'settings-cookie-basic.png', { fullPage: true })
+
+  await page.goto(cookieUrl('categories'), { waitUntil: 'networkidle', timeout: 90000 })
+  await page.waitForTimeout(1500)
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await snap(page, 'settings-cookie-categories.png', { fullPage: true })
+  const addCategory = page.getByRole('button', {
+    name: /添加分类|add category/i,
+  }).first()
+  if (await addCategory.count()) {
+    await addCategory.click()
+    await page.waitForTimeout(600)
+    await snapDialog(page, 'settings-cookie-add-category-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  await page.goto(cookieUrl('content'), { waitUntil: 'networkidle', timeout: 90000 })
+  await page.waitForTimeout(1500)
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await snap(page, 'settings-cookie-content.png', { fullPage: true })
+
+  await page.goto(cookieUrl('scripts'), { waitUntil: 'networkidle', timeout: 90000 })
+  await page.waitForTimeout(1500)
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await snap(page, 'settings-cookie-scripts.png', { fullPage: true })
+  const addResource = page.getByRole('button', {
+    name: /添加资源|add resource/i,
+  }).first()
+  if (await addResource.count()) {
+    await addResource.click()
+    await page.waitForTimeout(1200)
+    await snapExpandedDialog(page, 'settings-cookie-add-resource-dialog.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+  }
+
+  const reportsTab = page.getByRole('tab', {
+    name: /数据报表|reports/i,
+  }).first()
+  if (await reportsTab.count()) {
+    const statsResponse = page
+      .waitForResponse(
+        (r) => r.url().includes('cj/GetStats') && r.status() === 200,
+        { timeout: 60000 }
+      )
+      .catch(() => {})
+    await reportsTab.click()
+    await statsResponse
+    await page.waitForTimeout(1500)
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await snap(page, 'settings-cookie-reports.png', { fullPage: true })
+  }
+}
+
 async function captureIntegrations(page) {
   await page.goto(configUrl(), { waitUntil: 'networkidle', timeout: 90000 })
   await page.waitForTimeout(2000)
@@ -596,6 +674,9 @@ async function main() {
   }
   if (only === 'action-hooks') {
     await captureActionHooks(page)
+  }
+  if (only === 'cookie') {
+    await captureCookie(page)
   }
 
   await browser.close()

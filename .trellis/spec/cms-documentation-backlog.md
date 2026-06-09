@@ -80,7 +80,7 @@
 | ✅ | `settings/roles.md` | `/system/roles` | `advanced` |
 | ✅ | `settings/request-hooks.md` | `/system/front-events` | 含 `/front-events/edit` |
 | ✅ | `settings/action-hooks.md` | `/system/backend-events` | 含 `/backend-events/edit` |
-| ⬜ | `settings/cookie.md` | `/system/cookie` | |
+| ✅ | `settings/cookie.md` | `/system/cookie` | 含基础设置 / 分类 / 内容 / 资源 / 报表 |
 | ⬜ | `settings/ai-service.md` | `/system/ai-service` | 与运维中心同一页；运维 [operations/index.md](../docs/cms/operations/index.md) 互链 |
 
 子路由无独立菜单：`settings?name=*` → `basic.md`；Hook `edit` → 对应 Hook 篇目。
