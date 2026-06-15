@@ -737,6 +737,17 @@ const enSidebar = {
 
 export default defineConfig({
   ignoreDeadLinks: true,
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          // 勿改 entryFileNames：VitePress SSR 阶段依赖 .temp/app.js
+          chunkFileNames: 'assets/[name].js',
+          assetFileNames: 'assets/[name].[ext]',
+        },
+      },
+    },
+  },
   markdown: {
     config(md) {
       md.use(diagramPlugin, { preview: true })
