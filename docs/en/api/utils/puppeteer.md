@@ -21,11 +21,22 @@ k.utils.puppeteer.screenshot("https://example.com", "shots/page.png", {
 })
 ```
 
-| parameter | illustrate |
-|------|------|
-| `url` | destination address |
-| `savePath` | Save path within site |
-| `options` | Optional: `delaySeconds`, `width`, `height`, `fullPage` |
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `url` | `string` | Yes | Target URL |
+| `savePath` | `string` | Yes | Save path inside the site |
+| `options` | `ScreenshotOptions` | No | Screenshot options |
+
+### ScreenshotOptions
+
+| Property | Type | Description |
+|------|------|------|
+| `delaySeconds` | `number` | Wait time in seconds, default 3 |
+| `width` | `number` | Viewport width, default 1366 |
+| `height` | `number` | Viewport height, default 768 |
+| `fullPage` | `boolean` | Whether to capture the full page |
+
+**Returns:** `void`; the screenshot is written to `savePath`.
 
 ## Related Docs
 

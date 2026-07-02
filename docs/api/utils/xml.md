@@ -10,6 +10,12 @@
 
 解析 XML 字符串为 `Document`。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `xml` | `string` | 是 | XML 字符串 |
+
+**返回：** `Document`。
+
 ```ts
 const doc = k.utils.xml.parse("<root><item id=\"1\">a</item></root>")
 const xml = doc.stringify()
@@ -18,6 +24,12 @@ const xml = doc.stringify()
 ## create()
 
 创建以指定根元素名开头的新文档。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `rootName` | `string` | 是 | 根元素名称 |
+
+**返回：** `Document`。
 
 ```ts
 const doc = k.utils.xml.create("root")
@@ -42,6 +54,24 @@ doc.root.addChild("item")
 | `addAttribute(name, value)` | 添加属性 |
 | `addCData(content)` | 添加 CDATA |
 | `removeChild(name)` / `removeAttribute(name)` | 删除 |
+
+| 方法 | 参数 | 返回 |
+|------|------|------|
+| `addChild(name)` | `string` | `Element` |
+| `addAttribute(name, value)` | `string, string` | `Attribute` |
+| `addCData(content)` | `string` | `void` |
+| `removeChild(name)` | `string` | `void` |
+| `removeAttribute(name)` | `string` | `void` |
+
+```ts
+const doc = k.utils.xml.create("items")
+const item = doc.root.addChild("item")
+item.addAttribute("id", "1001")
+item.value = "Kooboo"
+doc.root.addCData("raw <xml> content")
+doc.root.removeAttribute("draft")
+const xml = doc.stringify()
+```
 
 ## 相关文档
 

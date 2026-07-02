@@ -12,16 +12,20 @@
 const list = k.utils.CRM.getCustomers(startDate, crmKey)
 ```
 
+**Returns:** `CRMCustomer[]`.
+
 ## getOrders()
 
 ```ts
 const orders = k.utils.CRM.getOrders(startDate, crmKey)
 ```
 
-| parameter | type | illustrate |
-|------|------|------|
-| `startDate` | `DateTime` | start date |
-| `crmKey` | `string` | CRM key |
+**Returns:** `CRMOrder[]`.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `startDate` | `Date` | Yes | Start date; submitted as local time |
+| `crmKey` | `string` | Yes | CRM key |
 
 ## Related Docs
 

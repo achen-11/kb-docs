@@ -10,6 +10,12 @@
 
 Convert by **Page Name**.
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `pageName` | `string` | Yes | Page name |
+
+**Returns:** `string \| null`, HTML with resources inlined; returns `null` when the page does not exist.
+
 ```ts
 const html = k.utils.inlineHtml.convertPageInline("Home")
 ```
@@ -17,6 +23,12 @@ const html = k.utils.inlineHtml.convertPageInline("Home")
 ## convertPageUrlInline()
 
 Convert by **Page Relative URL**.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `pageRelativeUrl` | `string` | Yes | Page relative URL, such as `/about` |
+
+**Returns:** `string \| null`, HTML with resources inlined; returns `null` when the page does not exist.
 
 ```ts
 const html = k.utils.inlineHtml.convertPageUrlInline("/about")

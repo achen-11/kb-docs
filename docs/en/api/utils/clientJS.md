@@ -19,13 +19,43 @@ k.utils.clientJS.setVariable("pageData", data)
 | `key` | `string` | global variable name |
 | `obj` | `any` | JSON serializable objects |
 
+**Returns:** `void`; writes directly to the current HTML response.
+
 ## monacoResource()
 
 Returns the resource tag HTML fragment required by the Monaco editor for use by callback `onload`.
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `callback` | `string` | Yes | Global function name called after the Monaco main script loads |
+
+**Returns:** `string`, an HTML fragment containing `<script>` / `<link>` tags.
+
+```ts
+const resources = k.utils.clientJS.monacoResource("initEditor")
+k.response.write(resources)
+k.response.write(`
+<div id="editor"></div>
+<script>
+function initEditor() {
+    monaco.editor.create(document.getElementById("editor"), {
+        value: "console.log('Kooboo')",
+        language: "javascript"
+    })
+}
+</script>
+`)
+```
+
 ## i18n()
 
 Returns the current site multi-language configuration object.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `all` | `boolean` | No | Whether to return all language configuration |
+
+**Returns:** `any`, the current site i18n configuration object.
 
 ```ts
 const cfg = k.utils.clientJS.i18n()

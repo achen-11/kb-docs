@@ -15,12 +15,26 @@
 
 当前请求的客户端 IP。
 
+**类型：** `string`。
+
+```ts
+const ip = k.utils.IP.myIP
+```
+
 ## getCity() / getCountry() / getCityOrCountry()
 
 传入 IP 字符串，返回 `IPInfo`（`city`、`state`、`countryCode`、`latitude`、`longitude` 等）。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `ipAddress` | `string` | 是 | 要查询的 IP 地址 |
+
+**返回：** `IPInfo`。
+
 ```ts
 const info = k.utils.IP.getCountry("8.8.8.8")
+const city = k.utils.IP.getCity("8.8.8.8")
+const best = k.utils.IP.getCityOrCountry("8.8.8.8")
 ```
 
 完整字段说明见 [k.net.IP](../net/ip.md)。

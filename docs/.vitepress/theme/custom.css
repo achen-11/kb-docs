@@ -142,7 +142,7 @@ body.doc-image-preview-open {
 .vp-doc table td:first-child {
   white-space: nowrap;
   width: 1%;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 /* 首列故意需要折行的表格，在表格外包一层 <div class="table-wrap-first">（HTML 块） */

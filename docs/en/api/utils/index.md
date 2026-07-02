@@ -15,9 +15,36 @@
 | `bytesToString(bytes, encoding)` | Convert byte array to string according to encoding |
 | `stringToBytes(content, encoding)` | Convert string to byte array according to encoding |
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `ms` | `number` | Yes | Sleep duration in milliseconds |
+| `host` | `string` | Yes | Host name or IP to ping |
+| `bytes` | `number[]` | Yes | Byte array to convert |
+| `content` | `string` | Yes | Text to convert |
+| `encoding` | `string` | Yes | Character encoding, such as `utf-8` |
+
+| Method | Return |
+|------|------|
+| `sleep(ms)` | `void` |
+| `ping(host)` | `{ ip: string, time: number, success: boolean }` |
+| `bytesToString(bytes, encoding)` | `string` |
+| `stringToBytes(content, encoding)` | `number[]` |
+
 ```ts
 k.utils.sleep(100)
 const result = k.utils.ping("kooboo.com")
+```
+
+Encoding conversion is useful when you work with downloaded files, ZIP entries, or text stored as bytes:
+
+```ts
+const bytes = k.utils.stringToBytes("Hello Kooboo", "utf-8")
+k.file.writeBinary("exports/hello.txt", bytes)
+
+const saved = k.file.readBinary("exports/hello.txt")
+const text = k.utils.bytesToString(saved, "utf-8")
+
+return { text }
 ```
 
 ## Submodules (alphabetical order)

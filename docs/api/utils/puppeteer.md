@@ -21,11 +21,22 @@ k.utils.puppeteer.screenshot("https://example.com", "shots/page.png", {
 })
 ```
 
-| 参数 | 说明 |
-|------|------|
-| `url` | 目标地址 |
-| `savePath` | 站点内保存路径 |
-| `options` | 可选：`delaySeconds`、`width`、`height`、`fullPage` |
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `url` | `string` | 是 | 目标地址 |
+| `savePath` | `string` | 是 | 站点内保存路径 |
+| `options` | `ScreenshotOptions` | 否 | 截图选项 |
+
+### ScreenshotOptions
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `delaySeconds` | `number` | 等待秒数，默认 3 |
+| `width` | `number` | 视口宽度，默认 1366 |
+| `height` | `number` | 视口高度，默认 768 |
+| `fullPage` | `boolean` | 是否截取完整页面 |
+
+**返回：** `void`，截图会写入 `savePath`。
 
 ## 相关文档
 

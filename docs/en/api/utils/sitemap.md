@@ -10,6 +10,8 @@
 
 Returns a builder that can be `append`.
 
+**Returns:** `Sitemap` builder.
+
 ```ts
 const xml = k.utils.sitemap.create()
     .append("https://www.example.com/page1", {
@@ -25,14 +27,27 @@ const xml = k.utils.sitemap.create()
 
 ## append()
 
-| parameter | illustrate |
-|------|------|
-| `loc` | Page absolute URL |
-| `options` | Optional: `lastmod`, `changefreq`, `priority` (0.0–1.0), `alternates` (language → URL) |
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `loc` | `string` | Yes | Page absolute URL |
+| `options` | `AppendOptions` | No | Sitemap entry options |
+
+### AppendOptions
+
+| Property | Type | Description |
+|------|------|------|
+| `lastmod` | `string` | Last modified date |
+| `changefreq` | `string` | Update frequency: `always`, `hourly`, `daily`, `weekly`, `monthly`, `yearly`, `never` |
+| `priority` | `number` | Priority, from `0.0` to `1.0` |
+| `alternates` | `Record<string, string>` | Mapping from language to URL |
+
+**Returns:** `Sitemap`, allowing chained calls.
 
 ## build()
 
 Output XML string.
+
+**Returns:** `string`.
 
 ## Related Docs
 

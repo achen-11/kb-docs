@@ -10,6 +10,8 @@
 
 返回可 `append` 的构建器。
 
+**返回：** `Sitemap` 构建器。
+
 ```ts
 const xml = k.utils.sitemap.create()
     .append("https://www.example.com/page1", {
@@ -25,14 +27,27 @@ const xml = k.utils.sitemap.create()
 
 ## append()
 
-| 参数 | 说明 |
-|------|------|
-| `loc` | 页面绝对 URL |
-| `options` | 可选：`lastmod`、`changefreq`、`priority`（0.0–1.0）、`alternates`（语言 → URL） |
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `loc` | `string` | 是 | 页面绝对 URL |
+| `options` | `AppendOptions` | 否 | Sitemap 条目配置 |
+
+### AppendOptions
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `lastmod` | `string` | 最后修改日期 |
+| `changefreq` | `string` | 更新频率：`always`、`hourly`、`daily`、`weekly`、`monthly`、`yearly`、`never` |
+| `priority` | `number` | 优先级，范围 `0.0` 到 `1.0` |
+| `alternates` | `Record<string, string>` | 语言到 URL 的映射 |
+
+**返回：** `Sitemap`，可继续链式调用。
 
 ## build()
 
 输出 XML 字符串。
+
+**返回：** `string`。
 
 ## 相关文档
 

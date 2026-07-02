@@ -12,16 +12,20 @@
 const list = k.utils.CRM.getCustomers(startDate, crmKey)
 ```
 
+**返回：** `CRMCustomer[]`。
+
 ## getOrders()
 
 ```ts
 const orders = k.utils.CRM.getOrders(startDate, crmKey)
 ```
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| `startDate` | `DateTime` | 起始日期 |
-| `crmKey` | `string` | CRM 密钥 |
+**返回：** `CRMOrder[]`。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `startDate` | `Date` | 是 | 起始日期，运行时会按本地时间提交 |
+| `crmKey` | `string` | 是 | CRM 密钥 |
 
 ## 相关文档
 

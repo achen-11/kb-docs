@@ -10,6 +10,12 @@
 
 Parses the XML string as `Document`.
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `xml` | `string` | Yes | XML string |
+
+**Returns:** `Document`.
+
 ```ts
 const doc = k.utils.xml.parse("<root><item id=\"1\">a</item></root>")
 const xml = doc.stringify()
@@ -18,6 +24,12 @@ const xml = doc.stringify()
 ## create()
 
 Creates a new document starting with the specified root element name.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `rootName` | `string` | Yes | Root element name |
+
+**Returns:** `Document`.
 
 ```ts
 const doc = k.utils.xml.create("root")
@@ -42,6 +54,24 @@ doc.root.addChild("item")
 | `addAttribute(name, value)` | Add properties |
 | `addCData(content)` | Add CDATA |
 | `removeChild(name)` / `removeAttribute(name)` | delete |
+
+| Method | Parameter | Return |
+|------|------|------|
+| `addChild(name)` | `string` | `Element` |
+| `addAttribute(name, value)` | `string, string` | `Attribute` |
+| `addCData(content)` | `string` | `void` |
+| `removeChild(name)` | `string` | `void` |
+| `removeAttribute(name)` | `string` | `void` |
+
+```ts
+const doc = k.utils.xml.create("items")
+const item = doc.root.addChild("item")
+item.addAttribute("id", "1001")
+item.value = "Kooboo"
+doc.root.addCData("raw <xml> content")
+doc.root.removeAttribute("draft")
+const xml = doc.stringify()
+```
 
 ## Related Docs
 
