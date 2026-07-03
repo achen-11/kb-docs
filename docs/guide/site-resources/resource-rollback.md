@@ -50,7 +50,7 @@ k.site.pages / styles / scripts / codes 创建资源
 下面示例生成一套落地页资源：
 
 ```ts
-// @k-url /api/resource-rollback/{action}
+// Example route: /api/resource-rollback/{action}
 
 k.site.styles.add({
   name: "guide-generated-resource.css",

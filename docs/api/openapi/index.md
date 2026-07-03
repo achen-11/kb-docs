@@ -103,6 +103,10 @@ k.api.get(() => {
 
 返回所有 `authorizeName` 字符串数组。
 
+**参数**：无。
+
+**返回值**：`string[]`。当前 Open API 定义下的授权名称列表。
+
 ```ts
 const names = k.openApi.myService.authorize.list()
 ```
@@ -116,6 +120,14 @@ const names = k.openApi.myService.authorize.list()
 | HTTP Basic | `username`, `password` |
 | Bearer / API Key | `accessToken`, `name` |
 | OAuth2 | `clientId`, `clientSecret`, `accessToken`, `refreshToken`, `expiresIn` |
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `name` | `string` | 是 | 授权配置名称。 |
+| `securityKey` | `string` | 是 | OpenAPI `securitySchemes` 中的键名。 |
+| `data` | `object` | 是 | 凭据数据，字段取决于安全方案类型。 |
+
+**返回值**：`void`。
 
 ```ts
 k.openApi.myService.authorize.addOrUpdate("sandbox", "bearer_auth", {
@@ -137,6 +149,16 @@ k.openApi.myService.authorize.addOrUpdate_bearer_auth("sandbox", {
 ### delete(name)
 
 删除名为 `name` 的授权配置。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `name` | `string` | 是 | 要删除的授权配置名称。 |
+
+**返回值**：`void`。
+
+```ts
+k.openApi.myService.authorize.delete("sandbox")
+```
 
 ### getAuthorizationUrl_{securityKey}(name, clientId, clientSecret)
 
@@ -168,7 +190,7 @@ OAuth2 **authorizationCode** 流：生成授权页 URL（并暂存 clientId/secr
 
 每个 Open API **名称** 会生成 `OpenApi` 命名空间下的接口与 `k.openApi.{name}` 上的方法签名。重新保存定义后刷新类型缓存即可更新补全。
 
-安全相关数据模型见生成定义中的 `Kooboo.Sites.Models.Security.*`（如 `Token`、`OAuth2`、`HttpBasic`）。
+安全相关数据模型会随 OpenAPI 定义生成，例如 `Token`、`OAuth2`、`HttpBasic` 等类型。
 
 ## 相关文档
 

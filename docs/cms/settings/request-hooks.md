@@ -140,7 +140,7 @@
 2. 请求进入对应 FrontEvent（如 `RouteFinding`）。  
 3. 按列表顺序执行该事件下各规则；IF-ELSE-THEN 先判条件再走 THEN/ELSE；DO 顺序执行 Code。  
 
-具体引擎见 `Kooboo.Sites.FrontEvent.Manager`。
+具体执行由站点前台请求 Hook 引擎负责，按本页配置顺序运行。
 
 ## 典型工作流
 

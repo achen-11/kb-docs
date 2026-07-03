@@ -40,11 +40,13 @@ interface StyleInput {
 
 创建样式并注册路由。未传 `url` 时默认为 `/{name}`，且若路径不含扩展名会自动追加样式扩展名（通常为 `.css`）。
 
-| 字段 | 类型 | 必填 | 说明 |
+| 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| name | `string` | 是 | 样式名称（唯一） |
-| body | `string` | 是 | CSS 内容 |
-| url | `string` | 否 | 访问路径，如 `/assets/theme.css` |
+| `style.name` | `string` | 是 | 样式名称（唯一） |
+| `style.body` | `string` | 是 | CSS 内容 |
+| `style.url` | `string` | 否 | 访问路径，如 `/assets/theme.css` |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -71,6 +73,10 @@ k.api.post(() => {
 
 返回全部样式。
 
+**参数：** 无。
+
+**返回：** `Style[]`。
+
 ```ts
 k.api.get(() => {
     const styles = k.site.styles.all()
@@ -81,6 +87,12 @@ k.api.get(() => {
 ## get()
 
 按名称或 Id 获取样式。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 样式名称或 Id |
+
+**返回：** `Style | null`。
 
 ```ts
 k.api.get(() => {
@@ -93,6 +105,12 @@ k.api.get(() => {
 
 按 **路由 URL** 获取样式（例如 `/main.css`）。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `url` | `string` | 是 | 样式路由 URL |
+
+**返回：** `Style | null`。
+
 ```ts
 k.api.get(() => {
     const style = k.site.styles.getByUrl("/main.css")
@@ -103,6 +121,12 @@ k.api.get(() => {
 ## update()
 
 更新完整样式对象（通常先 `get` / `getByUrl` 再改 `body`）。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `style` | `Style` | 是 | 修改后的完整样式对象 |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -127,6 +151,13 @@ k.api.post(() => {
 
 仅更新 `body`。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 样式名称或 Id |
+| `body` | `string` | 是 | 新 CSS 内容 |
+
+**返回：** `void`。
+
 ```ts
 k.api.post(() => {
     const stamp = Date.now().toString()
@@ -144,6 +175,12 @@ k.api.post(() => {
 ## delete()
 
 按名称或 Id 删除。删除后用 `get(name)` 验证，勿在删除后依赖 `getByUrl`。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 样式名称或 Id |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -166,6 +203,11 @@ k.api.post(() => {
 
 ## getUrl() / getAbsUrl()
 
+| 方法 | 参数 | 返回 | 说明 |
+|------|------|------|------|
+| `getUrl(id)` | `id: string` | `string | null` | 获取相对 URL |
+| `getAbsUrl(id)` | `id: string` | `string | null` | 获取绝对 URL |
+
 ```ts
 k.api.get(() => {
     const styles = k.site.styles.all()
@@ -182,6 +224,11 @@ k.api.get(() => {
 仅注册了路由的样式能返回 URL；页面内嵌样式可能没有独立路由。
 
 ## getLogs() / getByLog()
+
+| 方法 | 参数 | 返回 | 说明 |
+|------|------|------|------|
+| `getLogs(nameOrId)` | `nameOrId: string` | `ChangeLog[] | null` | 获取版本日志 |
+| `getByLog(logId)` | `logId: number` | `Style | null` | 按日志 Id 获取历史版本 |
 
 ```ts
 k.api.get(() => {

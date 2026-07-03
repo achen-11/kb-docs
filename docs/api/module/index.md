@@ -30,7 +30,7 @@ import { helper } from "module:myModule/code/utils"
 import api from "ModuleApi:myModule/api/hello"
 ```
 
-解析规则见 `ModuleLoader`（`code/`、`api/` 目录）。
+模块路径按模块内的 `code/`、`api/` 等目录解析。
 :::
 
 ## 模块内常用成员
@@ -69,7 +69,7 @@ k.module.task
   })
 ```
 
-也可使用 `minute(n)`。调度由模块任务运行时读取 `RenderContext` 中的函数与计划。
+也可使用 `minute(n)`。调度器会按链式计划执行传入的函数。
 
 ### localFile / openFileStream
 
@@ -86,7 +86,7 @@ k.module.task
 
 或使用 `k.module.openFileStream("api")` 等（`fileType` 为 `css`、`js`、`view`、`api`、`img`、`file` 之一）。
 
-`KModuleFiles` 提供读写、列举等（见 `kooboo.d.ts` 中 `Kooboo.Sites.ScriptModules.KModuleApi.KModuleFiles`）。
+`KModuleFiles` 提供读写、列举等文件操作，具体方法以站点 IDE 补全为准。
 
 ### localDatabase / localSqlite
 
@@ -105,6 +105,10 @@ k.module.task
 
 返回站点内全部 `ScriptModule` 对象数组。
 
+**参数**：无。
+
+**返回值**：`ScriptModule[]`。当前站点内全部模块。
+
 ```ts
 k.api.get(() => {
   return k.module.list().map((m) => ({ id: m.id, name: m.name, online: m.online }))
@@ -115,29 +119,130 @@ k.api.get(() => {
 
 创建空模块并注册路由，返回 `ScriptModule`。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `name` | `string` | 是 | 新模块名称。 |
+
+**返回值**：`ScriptModule`。创建后的模块对象。
+
+```ts
+k.api.post(() => {
+  const module = k.module.createModule(k.request.form.name)
+  return { id: module.id, name: module.name }
+})
+```
+
 ### remove(idOrName) / remove(idOrName, destinationSiteUrl)
 
 删除模块；两参数重载可指定目标站点域名删除远程站点上的同名模块。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `idOrName` | `string` | 是 | 模块 ID 或模块名称。 |
+| `destinationSiteUrl` | `string` | 否 | 目标站点域名；省略时删除当前站点模块。 |
+
+**返回值**：`void`。
+
+```ts
+k.api.post(() => {
+  k.module.remove(k.request.form.name)
+  return { ok: true }
+})
+```
 
 ### isNameExists(name)
 
 检查模块名是否已占用。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `name` | `string` | 是 | 要检查的模块名称。 |
+
+**返回值**：`boolean`。名称已存在时返回 `true`。
+
+```ts
+k.api.get(() => {
+  return { exists: k.module.isNameExists(k.request.queryString.name) }
+})
+```
+
 ### importZip(name, binary)
 
 从 zip 二进制创建模块并解压到模块目录，返回新模块 Id 字符串。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `name` | `string` | 是 | 导入后的模块名称。 |
+| `binary` | `number[]` | 是 | zip 文件二进制内容。 |
+
+**返回值**：`string`。新模块 ID。
+
+```ts
+k.api.post(() => {
+  const file = k.request.files[0]
+  const id = k.module.importZip(k.request.form.name, file.bytes)
+  return { id }
+})
+```
 
 ### exportAsZip(nameOrId)
 
 导出模块为 zip 字节数组。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 模块名称或模块 ID。 |
+
+**返回值**：`number[]`。模块 zip 包二进制内容。
+
+```ts
+k.api.get(() => {
+  const bytes = k.module.exportAsZip(k.request.queryString.name)
+  return { size: bytes.length }
+})
+```
+
 ### importFromUrl(siteUrl, moduleId, newModuleName[, destinationSiteUrl])
 
 从其它 Kooboo 站点的分享 URL（`/_api/PublicModuleFiles/PrivateShare?ModuleId=...`）拉取 zip 并安装。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `siteUrl` | `string` | 是 | 来源站点 URL。 |
+| `moduleId` | `string` | 是 | 来源模块 ID。 |
+| `newModuleName` | `string` | 是 | 安装后的模块名称。 |
+| `destinationSiteUrl` | `string` | 否 | 目标站点 URL；省略时安装到当前站点。 |
+
+**返回值**：`string`。安装后的模块 ID。
+
+```ts
+k.api.post(() => {
+  const id = k.module.importFromUrl(
+    k.request.form.siteUrl,
+    k.request.form.moduleId,
+    k.request.form.name
+  )
+  return { id }
+})
+```
+
 ### searchRepository(keyword) / installFromRepository(packageId, name)
 
 搜索 Kooboo 应用商店模块包、下载安装（与后台 **搜索** 按钮同源）。
+
+| 方法 | 参数 | 返回值 | 说明 |
+|------|------|--------|------|
+| `searchRepository(keyword)` | `keyword: string` | `ModuleSearchResult[]` | 按关键字搜索模块包。 |
+| `installFromRepository(packageId, name)` | `packageId: string`, `name: string` | `string` | 安装指定包并返回模块 ID。 |
+
+```ts
+k.api.post(() => {
+  const results = k.module.searchRepository(k.request.form.keyword)
+  if (!results.length) return { installed: false }
+  const id = k.module.installFromRepository(results[0].id, k.request.form.name)
+  return { installed: true, id }
+})
+```
 
 ## TypeScript 定义（节选）
 

@@ -71,6 +71,12 @@ k.api.post(() => {
 
 Check payment status.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `requestId` | `string` | Yes | `requestId` returned by `charge()`. |
+
 ```ts
 k.api.get(() => {
     const status = k.payment.twoCheckout.checkStatus('request-id')
@@ -83,6 +89,12 @@ k.api.get(() => {
 ## updateOrder()
 
 Handle the TwoCheckout callback and update the order.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `context` | `object` | Yes | Current payment callback context, usually `k.payment.twoCheckout.context`. |
 
 ```ts
 k.api.post(() => {

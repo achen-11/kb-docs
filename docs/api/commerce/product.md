@@ -44,11 +44,14 @@ k.api.get(() => {
 ```
 **参数：**
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| query.categories | `string[]` | 按分类 ID 筛选 |
-| query.includeOffline | `boolean` | 是否包含下架产品，默认 `false` |
-| query.includeSubCategory | `boolean` | 是否包含子分类产品，默认 `false` |
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `query` | `ProductQueryParams` | 否 | 产品列表筛选条件。 |
+| `query.categories` | `string[]` | 否 | 按分类 ID 筛选。 |
+| `query.includeOffline` | `boolean` | 否 | 是否包含下架产品，默认 `false`。 |
+| `query.includeSubCategory` | `boolean` | 否 | 是否包含子分类产品，默认 `false`。 |
+
+**返回值**：`Product[]`。匹配条件的产品列表。
 
 ### get()
 
@@ -57,6 +60,14 @@ k.api.get(() => {
 ::: tip 异常处理
 get 方法查询不到产品时会抛出异常 `"Product not found"`
 :::
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `seoNameOrId` | `string` | 是 | 产品 SEO 名称或产品 ID。 |
+
+**返回值**：`Product`。产品详情，包含变体信息。
 
 ```ts
 k.api.get(() => {
@@ -78,6 +89,14 @@ k.api.get(() => {
 
 创建产品。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `product` | `NewProduct` | 是 | 新产品数据。 |
+
+**返回值**：`Product`。创建后的产品对象。
+
 ```ts
 k.api.post(() => {
     const product = k.commerce.product.create({
@@ -94,14 +113,23 @@ k.api.post(() => {
 
 为产品创建变体。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `productId` | `string` | 是 | 产品 ID。 |
+| `variant` | `NewVariant` | 是 | 新变体数据。 |
+
+**返回值**：`Product`。更新后的产品对象。
+
 ```ts
 k.api.post(() => {
-    k.commerce.product.createVariant(productId, {
+    const product = k.commerce.product.createVariant(productId, {
         sku: 'SKU-001',
         price: 88,
         inventory: 100
     })
-    return { success: true }
+    return { variantCount: product.variants.length }
 })
 ```
 
@@ -111,12 +139,15 @@ k.api.post(() => {
 
 **参数：**
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| keyword | `string` | 搜索关键词 |
-| options.categories | `string[]` | 按分类 ID 筛选 |
-| options.includeOffline | `boolean` | 是否包含下架产品，默认 `false` |
-| options.includeSubCategory | `boolean` | 是否包含子分类产品，默认 `false` |
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `keyword` | `string` | 是 | 搜索关键词。 |
+| `options` | `SearchOptions` | 否 | 搜索筛选条件。 |
+| `options.categories` | `string[]` | 否 | 按分类 ID 筛选。 |
+| `options.includeOffline` | `boolean` | 否 | 是否包含下架产品，默认 `false`。 |
+| `options.includeSubCategory` | `boolean` | 否 | 是否包含子分类产品，默认 `false`。 |
+
+**返回值**：`SearchResult`。搜索结果和聚合信息。
 
 ```ts
 k.api.get(() => {
@@ -140,12 +171,14 @@ k.api.get(() => {
 
 **参数：**
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| productId | `string` | 产品 ID |
-| field | `string` | 字段名 |
-| value | `any` | 字段值 |
-| lang | `string` | 语言代码（可选，用于指定多语言） |
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `productId` | `string` | 是 | 产品 ID。 |
+| `field` | `string` | 是 | 字段名。 |
+| `value` | `any` | 是 | 字段值。 |
+| `lang` | `string` | 否 | 语言代码，用于指定多语言字段。 |
+
+**返回值**：`void`。
 
 ```ts
 k.api.post(() => {
@@ -165,6 +198,18 @@ k.api.post(() => {
 
 批量更新字段。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `productId` | `string` | 是 | 产品 ID。 |
+| `updateContents` | `UpdateContent[]` | 是 | 要批量更新的字段列表。 |
+| `updateContents[].property` | `string` | 是 | 字段名。 |
+| `updateContents[].value` | `any` | 是 | 字段值。 |
+| `updateContents[].lang` | `string` | 否 | 语言代码，用于指定多语言字段。 |
+
+**返回值**：`void`。
+
 ```ts
 k.api.post(() => {
     k.commerce.product.updateFields(productId, [
@@ -179,6 +224,16 @@ k.api.post(() => {
 
 更新变体字段。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `variantId` | `string` | 是 | 变体 ID。 |
+| `field` | `string` | 是 | 字段名。 |
+| `value` | `any` | 是 | 字段值。 |
+
+**返回值**：`void`。
+
 ```ts
 k.api.post(() => {
     k.commerce.product.updateVariantField(variantId, "sku", "NEW-SKU")
@@ -189,6 +244,18 @@ k.api.post(() => {
 ### updateVariantFields()
 
 批量更新变体字段。
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `variantId` | `string` | 是 | 变体 ID。 |
+| `updateContents` | `UpdateContent[]` | 是 | 要批量更新的字段列表。 |
+| `updateContents[].property` | `string` | 是 | 字段名。 |
+| `updateContents[].value` | `any` | 是 | 字段值。 |
+| `updateContents[].lang` | `string` | 否 | 语言代码，用于指定多语言字段。 |
+
+**返回值**：`void`。
 
 ```ts
 k.api.post(() => {
@@ -203,6 +270,15 @@ k.api.post(() => {
 
 获取折扣价格。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `variantId` | `string` | 是 | 变体 ID。 |
+| `options` | `DiscountOptions` | 否 | 折扣计算选项。 |
+
+**返回值**：`number`。应用折扣后的价格。
+
 ```ts
 k.api.get(() => {
     const price = k.commerce.product.getDiscountPrice(variantId)
@@ -214,10 +290,18 @@ k.api.get(() => {
 
 删除产品。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `productId` | `string` | 是 | 要删除的产品 ID。 |
+
+**返回值**：`boolean`。删除成功时返回 `true`。
+
 ```ts
 k.api.post(() => {
-    k.commerce.product.delete(productId)
-    return { success: true }
+    const success = k.commerce.product.delete(productId)
+    return { success }
 })
 ```
 

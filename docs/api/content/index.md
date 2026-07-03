@@ -63,6 +63,10 @@ interface QueryOptions {
 
 获取查询操作符，用于构建复杂的查询条件。
 
+**参数：** 无。
+
+**返回：** 查询操作符字典。
+
 ```ts
 k.api.get(() => {
     const ops = k.content.operators();
@@ -74,6 +78,10 @@ k.api.get(() => {
 ### k.content.getFolders()
 
 获取站点中所有内容文件夹的名称列表。
+
+**参数：** 无。
+
+**返回：** `string[]`。
 
 ```ts
 k.api.get(() => {
@@ -102,6 +110,8 @@ k.api.get(() => {
 |------|------|------|
 | excludeEmpty | `boolean` | 是否排除空值记录，默认 `false` |
 | includeOfflineData | `boolean` | 是否包含离线数据，默认 `false` |
+
+**返回：** `Content[]`。
 
 ```ts
 // 排除空值
@@ -132,9 +142,18 @@ k.api.get(() => {
 |------|------|------|
 | nameOrId | `string` | 内容的 ID 或 UserKey |
 
+**返回：** `Content | null`。
+
 ### find()
 
 查询单条内容，支持字符串查询和对象查询两种方式。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `query` | `string | object` | 是 | 字符串条件或对象查询条件 |
+| `options` | `QueryOptions` | 否 | 查询选项 |
+
+**返回：** `Content | null`。
 
 **字符串查询：**
 
@@ -203,6 +222,13 @@ k.api.get(() => {
 
 查询多条内容，用法与 `find()` 相同，但返回数组。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `query` | `string | object` | 是 | 字符串条件或对象查询条件 |
+| `options` | `QueryOptions` | 否 | 查询选项 |
+
+**返回：** `Content[]`。
+
 ```ts
 k.api.get(() => {
     const articles = k.content.Article.findAll({ category: "news" });
@@ -247,6 +273,8 @@ k.api.post(() => {
 |------|------|------|
 | content | `object` | 内容对象，键为字段名，值为字段值 |
 
+**返回：** `Content`，创建后的内容对象。
+
 **系统字段（可选）：**
 
 | 字段 | 类型 | 说明 |
@@ -258,6 +286,12 @@ k.api.post(() => {
 ### update()
 
 更新已有内容。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `content` | `Content` | 是 | 从 `find`、`get`、`all` 等方法取得并修改后的完整内容对象 |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -282,6 +316,12 @@ update 方法需要传入从 `find`、`get`、`all` 等方法获取的完整内�
 ### delete()
 
 删除内容。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `contentOrId` | `string | Content` | 是 | 内容 Id 或完整内容对象 |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -330,6 +370,8 @@ k.api.post(() => {
 | source | `string` | 要移动的内容 ID |
 | prev | `string` | 参考元素 ID（插入到此元素之后） |
 | next | `string` | 可选，插入到这个 ID 之后 |
+
+**返回：** `void`。
 
 ## 多语言支持
 

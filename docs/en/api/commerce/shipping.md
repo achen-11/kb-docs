@@ -29,6 +29,8 @@ k.api.get(() => {
 
 Get a list of shipping methods for digital products.
 
+**Parameters**: none.
+
 ```ts
 k.api.get(() => {
     const digitalShippings = k.commerce.shipping.digitalList()

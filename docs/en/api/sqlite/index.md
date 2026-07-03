@@ -6,7 +6,7 @@
 
 `k.DB.sqlite` provides SQLite database access capabilities out of the box, without the need to manually configure the connection string. Commonly used for lightweight data storage, query and scripted data processing within the site.
 
-## TypeScript definition
+## TypeScript Definition
 
 ```ts
 interface SQLiteDB {
@@ -24,6 +24,8 @@ interface SQLiteDB {
 ### getTables()
 
 Returns all table names in the current SQLite database.
+
+**Parameters**: none.
 
 **return**
 
@@ -120,6 +122,12 @@ k.api.post(() => {
 
 Returns a set of query condition operators (`Operators`), used to dynamically construct conditional expressions.
 
+**Parameters**: none.
+
+**return**
+
+- `Operators` query condition operator set
+
 ```ts
 k.api.get(() => {
     const ops = k.DB.sqlite.operators()
@@ -130,6 +138,14 @@ k.api.get(() => {
 ### transaction(action)
 
 A set of database operations is performed within a transaction, with statements within `action` running within the same transaction context.
+
+**parameter**
+
+- `action: Function` callback function to execute within the transaction
+
+**return**
+
+- `void`
 
 ```ts
 k.api.post(() => {

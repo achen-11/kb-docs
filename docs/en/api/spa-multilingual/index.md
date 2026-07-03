@@ -78,7 +78,7 @@ const dict = await fetch(`/_spa/lang/${lang}`).then((r) => r.json())
 document.querySelector("h1").textContent = dict.welcome ?? "welcome"
 ```
 
-### Vue 3 (indicative)
+### Vue 3 Example
 
 ```javascript
 import { createApp, ref } from "vue"
@@ -106,9 +106,7 @@ The actual project can be encapsulated as a plug-in and re-installed when switch
 
 If the site also enables Kooboo **routing-level multilingual** (URL prefix or `?lang=`), it is recommended that the `{lang}` used by the SPA be **unified** with the current UI language code (both use `zh-cn` or both use `zh`) to avoid inconsistency between the dictionary language and routing culture.
 
----
-
-## Import JSON format (consistent with the backend)
+## Import JSON Format
 
 During batch maintenance, files can be prepared according to this structure and imported into CMS:
 

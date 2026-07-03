@@ -24,10 +24,12 @@ k.DB.keyValue[key]          // Equivalent to get(), returns KeyValueObject
 
 Write or update a key value.
 
-| Parameter | Type | Description |
-|------|------|------|
-| `key` | `string` | Non-empty key name |
-| `value` | `string` | Value; `null` is treated as null. UTF-8 encoding length must not exceed approximately **4096 bytes**, otherwise a length error will be thrown |
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `key` | `string` | yes | Non-empty key name |
+| `value` | `string` | yes | Value; `null` is treated as empty. UTF-8 encoding length must not exceed approximately **4096 bytes**, otherwise a length error is thrown |
+
+**Returns:** `void`.
 
 ```typescript
 k.DB.keyValue.set("featureFlags", JSON.stringify({ beta: true }))
@@ -42,6 +44,12 @@ const raw = k.DB.keyValue.get("featureFlags")
 const text = raw ? raw.toString() : "{}"
 ```
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `key` | `string` | yes | Key name |
+
+**Returns:** `KeyValueObject | null`.
+
 ## Dictionary usage
 
 `kKeyValue` implements the key-value dictionary interface and can be traversed:
@@ -54,7 +62,7 @@ for (const entry of k.DB.keyValue) {
 
 `Count` / `length` represents the current number of keys. `Remove(key)` deletes the specified key.
 
-## TypeScript shapes (excerpt)
+## TypeScript Shapes
 
 ```ts
 interface KDB {

@@ -1,6 +1,6 @@
 # 微信 H5 支付流程
 
-> 面向 AI 与开发者的微信 **H5** 支付指南。内容与 Kooboo 官方 `kooboo-coding` 支付参考及 `kb-doc` ai-check 一致。
+> 面向 AI 与开发者的微信 **H5** 支付指南，说明从创建支付请求到回调验证的完整接入流程。
 
 ## 先选对 API
 
@@ -91,9 +91,9 @@ k.logger.information("Payment.WeChatH5", `requestId: ${charge.requestId}`)
 // 手机浏览器：redirect(charge.nextAction.redirectUrl)
 ```
 
-## 手动验证（kb-doc 测试站）
+## 手动验证
 
-测试站提供 H5 验证页与 ai-check API（部署在 `old-source/kb-doc`，经 `kb push` 同步）：
+测试站提供 H5 验证页与接口，可用于手动验证支付创建与回调流程：
 
 | 用途 | 路径 |
 |------|------|

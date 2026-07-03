@@ -22,6 +22,11 @@
 
 ## createMessage() / createSmtpServer()
 
+| 方法 | 参数 | 返回值 | 说明 |
+|------|------|--------|------|
+| `createMessage()` | 无 | `MailMessage` | 创建邮件消息对象。 |
+| `createSmtpServer()` | 无 | `SmtpServer` | 创建外部 SMTP 服务器配置对象。 |
+
 ```ts
 const msg = k.mail.createMessage()
 msg.from = "sender@example.com"
@@ -68,6 +73,11 @@ msg.cc = "carol@example.com; dave@example.com" // 「; 」会被规范为逗号
 使用站点默认通道 `k.mail.smtp.send(msg)` 时，组织邮件额度按解析出的**收件人个数**扣减（`to` 中每个有效地址计一次）。外部 SMTP 的 `k.mail.smtp.send(server, msg)` 由 MailKit 按 MIME 中的 To/Cc/Bcc 一并投递。
 
 ## smtp.send()
+
+| 方法 | 参数 | 返回值 | 说明 |
+|------|------|--------|------|
+| `smtp.send(message)` | `message: MailMessage | object` | `void` | 使用站点默认发信通道发送邮件。 |
+| `smtp.send(server, message)` | `server: SmtpServer`, `message: MailMessage | object` | `void` | 使用指定外部 SMTP 服务器发送邮件。 |
 
 ### 使用站点默认发信通道
 

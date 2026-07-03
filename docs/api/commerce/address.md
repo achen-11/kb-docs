@@ -6,9 +6,11 @@
 
 `k.commerce.address` 提供地址相关操作，用于获取国家、省份、城市等地理信息。
 
-## counties()
+## countries()
 
 获取所有国家信息。
+
+**参数**：无。
 
 ```ts
 k.api.get(() => {

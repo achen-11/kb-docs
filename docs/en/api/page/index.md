@@ -18,7 +18,7 @@
 
 Must be called in a script that will participate in the HTML rendering of the page (such as the CodeBlock and layout script associated with the page). Pure API returns JSON and does not use page template requests, and the call usually does not affect the response body.
 
-## TypeScript definition (excerpt)
+## TypeScript Definition
 
 ```ts
 interface KPage {
@@ -42,6 +42,8 @@ k.page.setTitle("Product Details - My Site")
 |------|------|------|------|
 | `value` | `string` | yes | title text |
 
+**Returns:** `void`.
+
 ## setCharsetMeta()
 
 Set document character set meta (write `charset` binding).
@@ -53,6 +55,8 @@ k.page.setCharsetMeta("utf-8")
 | Parameter | Type | Required | Description |
 |------|------|------|------|
 | `value` | `string` | yes | Character set, ignored when empty string |
+
+**Returns:** `void`.
 
 ## setNameMeta()
 
@@ -67,6 +71,8 @@ k.page.setNameMeta("keywords", "kooboo, cms")
 |------|------|------|------|
 | `name` | `string` | yes | `name` attribute |
 | `content` | `string` | yes | `content` attribute |
+
+**Returns:** `void`.
 
 If the `name` with the same name already exists, the content will be **updated**, otherwise the binding will be appended.
 
@@ -84,6 +90,8 @@ k.page.setPropertyMeta("og:image", "https://example.com/cover.jpg")
 | `property` | `string` | yes | `property` attribute |
 | `content` | `string` | yes | `content` attribute |
 
+**Returns:** `void`.
+
 ## setHttpEquivMeta()
 
 Set `<meta http-equiv="…" content="…">`.
@@ -97,6 +105,8 @@ k.page.setHttpEquivMeta("X-UA-Compatible", "IE=edge")
 |------|------|------|------|
 | `equiv` | `string` | yes | `http-equiv` attribute |
 | `content` | `string` | yes | `content` attribute |
+
+**Returns:** `void`.
 
 ## Example: Setting up SEO by routing parameters
 

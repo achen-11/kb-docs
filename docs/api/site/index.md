@@ -31,9 +31,31 @@
 
 列出当前用户可访问的站点摘要（多站点场景）。
 
+**参数：** 无。
+
+**返回：** `Site[]` 或站点摘要数组（以运行时返回为准）。
+
+```ts
+k.api.get("sites", () => {
+    return k.site.List()
+})
+```
+
 ### createSite() / Get()
 
 创建或按名称获取站点数据库实例（多站点管理场景；日常业务通常直接使用当前站点的 `k.site`）。
+
+| 方法 | 参数 | 返回 | 说明 |
+|------|------|------|------|
+| `createSite(name)` | `name: string` | `any` | 创建站点数据库实例 |
+| `Get(name)` | `name: string` | `any` | 按名称获取站点数据库实例 |
+
+```ts
+k.api.get("site", () => {
+    const name = k.request.queryString.get("name")
+    return k.site.Get(name)
+})
+```
 
 ### diskSpace
 

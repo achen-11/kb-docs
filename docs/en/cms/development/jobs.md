@@ -3,7 +3,7 @@
 > Menu: **Development → Jobs**  
 > Deep link: `/_Admin/development/jobs?SiteId={siteGuid}`
 
-**Jobs** run **KScript / TypeScript** on the Kooboo server on a schedule: configure **one-time** or **recurring** runs for sync, cache cleanup, batch notifications, etc. Task scripts run in site **RenderContext** with `k.content`, `k.DB`, `k.mail`, etc. (similar to Code in [Development → Code](./code.md), but triggered by the scheduler, not HTTP).
+**Jobs** run **KScript / TypeScript** on the Kooboo server on a schedule: configure **one-time** or **recurring** runs for sync, cache cleanup, batch notifications, etc. Task scripts run in the site's server-side script context with `k.content`, `k.DB`, `k.mail`, etc. (similar to Code in [Development → Code](./code.md), but triggered by the scheduler, not HTTP).
 
 ::: tip Permissions
 View list and logs: `job` (view). **Add task**, edit, save, **Run** require `job·edit`; multi-select **Delete** requires `job·delete`.

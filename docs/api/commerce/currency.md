@@ -22,6 +22,8 @@ k.api.get(() => {
 
 获取支持的货币列表。
 
+**参数**：无。
+
 ```ts
 k.api.get(() => {
     return k.commerce.currency.list()

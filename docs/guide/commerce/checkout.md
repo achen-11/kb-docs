@@ -45,7 +45,7 @@ API 预览：服务端重新计算价格、优惠、配送、税费
 真实项目优先使用 `k.commerce.product`、`k.commerce.cart`、`k.commerce.order`、`k.commerce.discount` 和 `k.commerce.shipping`。下面示例保留关键结构，用 KeyValue 模拟商品、购物车、订单和幂等记录，便于本地验证核心边界。
 
 ```ts
-// @k-url /api/checkout/{action}
+// Example route: /api/checkout/{action}
 
 type CartLine = {
   productId: string;
@@ -168,7 +168,7 @@ const order = k.commerce.order.create(cartId, {
 页面只负责生成一次性的幂等键、收集结算参数、调用预览或创建订单接口，并把错误展示给用户：
 
 ```html
-<!-- @k-url /checkout -->
+<!-- Example route: /checkout -->
 <button type="button" id="preview">结算预览</button>
 <button type="button" id="createOrder">创建订单</button>
 <button type="button" id="repeatOrder">重复创建</button>

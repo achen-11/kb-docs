@@ -12,7 +12,7 @@
 
 The sidebar entry "css" is this API.
 
-## TypeScript definition (excerpt)
+## TypeScript Definition
 
 ```ts
 interface StyleRepository {
@@ -40,11 +40,13 @@ interface StyleInput {
 
 Create styles and register routes. If `url` is not passed, it defaults to `/{name}`, and if the path does not contain an extension, the style extension (usually `.css`) will be added automatically.
 
-| Field | Type | Required | Description |
+| Parameter | Type | Required | Description |
 |------|------|------|------|
-| name | `string` | yes | Style name (unique) |
-| body | `string` | yes | CSS content |
-| url | `string` | no | Access path, such as `/assets/theme.css` |
+| `style.name` | `string` | yes | Style name (unique) |
+| `style.body` | `string` | yes | CSS content |
+| `style.url` | `string` | no | Access path, such as `/assets/theme.css` |
+
+**Returns:** `void`.
 
 ```ts
 k.api.post(() => {
@@ -71,6 +73,10 @@ k.api.post(() => {
 
 Return all styles.
 
+**Parameters:** None.
+
+**Returns:** `Style[]`.
+
 ```ts
 k.api.get(() => {
     const styles = k.site.styles.all()
@@ -81,6 +87,12 @@ k.api.get(() => {
 ## get()
 
 Get a style by name or Id.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `nameOrId` | `string` | yes | Style name or ID |
+
+**Returns:** `Style | null`.
 
 ```ts
 k.api.get(() => {
@@ -93,6 +105,12 @@ k.api.get(() => {
 
 Get the style by **routing URL** (e.g. `/main.css`).
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `url` | `string` | yes | Style route URL |
+
+**Returns:** `Style | null`.
+
 ```ts
 k.api.get(() => {
     const style = k.site.styles.getByUrl("/main.css")
@@ -103,6 +121,12 @@ k.api.get(() => {
 ## update()
 
 Update the complete style object (usually `get` / `getByUrl` first and then `body`).
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `style` | `Style` | yes | Modified full Style object |
+
+**Returns:** `void`.
 
 ```ts
 k.api.post(() => {
@@ -127,6 +151,13 @@ k.api.post(() => {
 
 Only updates `body`.
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `nameOrId` | `string` | yes | Style name or ID |
+| `body` | `string` | yes | New CSS content |
+
+**Returns:** `void`.
+
 ```ts
 k.api.post(() => {
     const stamp = Date.now().toString()
@@ -144,6 +175,12 @@ k.api.post(() => {
 ## delete()
 
 Delete by Name or Id. Use `get(name)` for verification after deletion. Do not rely on `getByUrl` after deletion.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `nameOrId` | `string` | yes | Style name or ID |
+
+**Returns:** `void`.
 
 ```ts
 k.api.post(() => {
@@ -166,6 +203,11 @@ k.api.post(() => {
 
 ## getUrl() / getAbsUrl()
 
+| Method | Parameters | Returns | Description |
+|------|------|------|------|
+| `getUrl(id)` | `id: string` | `string | null` | Gets the relative URL |
+| `getAbsUrl(id)` | `id: string` | `string | null` | Gets the absolute URL |
+
 ```ts
 k.api.get(() => {
     const styles = k.site.styles.all()
@@ -183,6 +225,11 @@ Only styles with registered routes can return URLs; styles embedded in the page 
 
 ## getLogs() / getByLog()
 
+| Method | Parameters | Returns | Description |
+|------|------|------|------|
+| `getLogs(nameOrId)` | `nameOrId: string` | `ChangeLog[] | null` | Gets version logs |
+| `getByLog(logId)` | `logId: number` | `Style | null` | Gets a historical version by log ID |
+
 ```ts
 k.api.get(() => {
     const styles = k.site.styles.all()
@@ -196,7 +243,7 @@ k.api.get(() => {
 })
 ```
 
-## Style object (common fields)
+## Common Style Fields
 
 | Field | Type | Description |
 |------|------|------|

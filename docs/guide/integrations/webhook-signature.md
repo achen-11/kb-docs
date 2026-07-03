@@ -47,7 +47,7 @@ Webhook 入口要把验签、幂等和业务处理分开：
 下面的 `sign` 接口只用于本地验证和文档示例，真实项目中由第三方生成签名，Kooboo 只负责验签。
 
 ```ts
-// @k-url /api/webhook-signature/{action}
+// Example route: /api/webhook-signature/{action}
 
 const signingSecret = "guide-webhook-demo-secret";
 const toleranceSeconds = 300;
@@ -148,7 +148,7 @@ k.api.post("receive", () => {
 验证页面可以先调用 `sign` 生成签名，再用相同 raw body 发送 `receive`：
 
 ```html
-<!-- @k-url /webhook-signature -->
+<!-- Example route: /webhook-signature -->
 <button id="valid" type="button">合法 Webhook</button>
 <button id="duplicate" type="button">重复事件</button>
 <button id="invalid-signature" type="button">错误签名</button>

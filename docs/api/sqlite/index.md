@@ -25,6 +25,8 @@ interface SQLiteDB {
 
 返回当前 SQLite 数据库中的所有表名。
 
+**参数**：无。
+
 **返回**
 
 - `string[]` 表名数组
@@ -120,6 +122,12 @@ k.api.post(() => {
 
 返回查询条件运算符集合（`Operators`），用于动态构建条件表达式。
 
+**参数**：无。
+
+**返回**
+
+- `Operators` 查询条件运算符集合
+
 ```ts
 k.api.get(() => {
     const ops = k.DB.sqlite.operators()
@@ -130,6 +138,14 @@ k.api.get(() => {
 ### transaction(action)
 
 在事务中执行一组数据库操作，`action` 内的语句在同一事务上下文中运行。
+
+**参数**
+
+- `action: Function` 事务中执行的回调函数
+
+**返回**
+
+- `void`
 
 ```ts
 k.api.post(() => {
@@ -217,4 +233,3 @@ k.api.get(() => {
 - [CMS：SQLite 表](/cms/database/sqlite-table) - 后台表结构与 CSV 导入
 - [k.DB.indexedDb](../indexed-db/) - IndexedDB 动态表
 - [k.content](../content/) - 内容管理 API
-

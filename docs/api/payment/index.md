@@ -97,7 +97,7 @@ k.api.get(() => {
 | icon | `string` | 图标地址或内容 |
 | iconType | `string` | 图标类型 |
 | supportedCurrency | `string[]` | 支持的货币 |
-| context | `RenderContext` | 当前渲染上下文 |
+| context | `object` | 当前支付上下文 |
 | setting | `object` | 该支付方式的站点配置 |
 
 ## 通用流程

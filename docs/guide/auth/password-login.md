@@ -64,7 +64,7 @@ GET /api/password-login/logout
 注册接口只接收邮箱、显示名和密码。保存记录时写入 `passwordHash`，响应只返回公开字段：
 
 ```ts
-// @k-url /api/password-login/{action}
+// Example route: /api/password-login/{action}
 
 type CredentialBody = {
   email?: string;
@@ -253,7 +253,7 @@ k.api.get("logout", () => {
 前台页面只负责收集输入、调用 API 和展示结果：
 
 ```html
-<!-- @k-url /password-login -->
+<!-- Example route: /password-login -->
 <input id="email" value="member@example.com" autocomplete="email">
 <input id="displayName" value="Demo Member" autocomplete="name">
 <input id="password" type="password" value="CorrectHorse1!" autocomplete="current-password">

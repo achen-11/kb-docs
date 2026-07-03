@@ -6,7 +6,7 @@
 
 `k.account.organization.current` corresponds to `OrganizationModel` of the current site-bound organization; `get(nameOrId)` reads other organizations by name or Id.
 
-## TypeScript definition (excerpt)
+## TypeScript Definition
 
 ```ts
 interface KOrganization {
@@ -82,6 +82,12 @@ k.api.get(() => {
 
 ## get()
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `nameOrId` | `string` | Yes | Organization name or organization ID. |
+
+**Returns**: `OrganizationModel | null`. Matching organization, or an empty value when it does not exist.
+
 ```ts
 k.api.get(() => {
     const org = k.account.organization.get("org-name-or-id")
@@ -92,6 +98,13 @@ k.api.get(() => {
 ## addDepartment()
 
 Add a new department under the current organization (requires corresponding permissions).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | `string` | Yes | Department name. |
+| `displayName` | `string` | Yes | Department display name. |
+
+**Returns**: `void`.
 
 ```ts
 k.api.post(() => {
@@ -107,6 +120,14 @@ k.api.post(() => {
 
 Create or update an organization sub-account (the username is generally in the form `name@OrganizationId`).
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | `string` | Yes | Organization sub-account name. |
+| `password` | `string` | Yes | Login password. |
+| `isAdmin` | `boolean` | Yes | Whether the user is an organization administrator. |
+
+**Returns**: `User | null`. Created or updated user information.
+
 ```ts
 k.api.post(() => {
     const user = k.account.organization.current.addOrUpdateOrganizationUser(
@@ -119,6 +140,11 @@ k.api.post(() => {
 ```
 
 ## deleteOrganizationUser() / getOrganizationUser()
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `deleteOrganizationUser(name)` | `name: string` | `boolean` | Delete the organization sub-account. Returns `true` on success. |
+| `getOrganizationUser(name)` | `name: string` | `User | null` | Read the organization sub-account, or an empty value when it does not exist. |
 
 ```ts
 k.api.post(() => {

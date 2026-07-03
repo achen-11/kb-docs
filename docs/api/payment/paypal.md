@@ -109,6 +109,12 @@ k.api.get(() => {
 
 处理支付回调并更新订单。`paypalCheckout` 提供该方法。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `context` | `object` | 是 | 当前支付回调上下文，通常传入 `k.payment.paypalCheckout.context`。 |
+
 ```ts
 k.api.post(() => {
     const callback = k.payment.paypalCheckout.updateOrder(k.payment.paypalCheckout.context)
@@ -121,6 +127,12 @@ k.api.post(() => {
 ## nofityUrl()
 
 处理 PayPal Form 通知回调。方法名在当前类型定义中为 `nofityUrl`。
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `context` | `object` | 是 | 当前 PayPal Form 通知上下文，通常传入 `k.payment.paypalForm.context`。 |
 
 ```ts
 k.api.post(() => {

@@ -25,6 +25,11 @@ k.api.get("resolve", () => {
 | `getIPs(host)` | Use system DNS |
 | `getIPs(nsServer, host)` | Specify NS server to query A records |
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `host` | `string` | Yes | Hostname or domain to resolve. |
+| `nsServer` | `string` | No | DNS server to query. |
+
 **Returns:** `KIPAddress[]` or `null`
 
 ### KIPAddress
@@ -44,11 +49,26 @@ Query MX records.
 | `getMXs(host)` | Default parsing |
 | `getMXs(nsServer, host)` | Specify NS |
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `host` | `string` | Yes | Domain to query MX records for. |
+| `nsServer` | `string` | No | DNS server to query. |
+
 **Returns:** `string[]` or `null`
+
+```ts
+const records = k.net.DNS.getMXs("kooboo.com")
+```
 
 ## getNsServers()
 
 Get the NS server list of the domain name.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `host` | `string` | Yes | Domain to query NS records for. |
+
+**Returns**: `string[] | null`. NS server list.
 
 ```ts
 const ns = k.net.DNS.getNsServers("kooboo.com")
@@ -58,6 +78,12 @@ const ns = k.net.DNS.getNsServers("kooboo.com")
 
 Do reverse DNS on the IP.
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `ip` | `string` | Yes | IP address to reverse resolve. |
+
+**Returns**: `string | null`. Resolved hostname.
+
 ```ts
 const host = k.net.DNS.getReverseDNS("8.8.8.8")
 ```
@@ -65,6 +91,12 @@ const host = k.net.DNS.getReverseDNS("8.8.8.8")
 ## whoisInfo()
 
 Returns the original Whois record text for a domain name.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `domain` | `string` | Yes | Domain to query Whois for. |
+
+**Returns**: `string | null`. Raw Whois text.
 
 ```ts
 const raw = k.net.DNS.whoisInfo("kooboo.com")

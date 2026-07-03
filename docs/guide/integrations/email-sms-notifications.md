@@ -46,7 +46,7 @@
 下面示例用 KeyValue 模拟模板和 outbox，便于本地验证。生产项目可把 outbox 放在 SQLite 或业务通知表中。
 
 ```ts
-// @k-url /api/notifications/{action}
+// Example route: /api/notifications/{action}
 
 type NotificationMessage = {
   id: string;

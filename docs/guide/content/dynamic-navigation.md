@@ -37,7 +37,7 @@ CMS 菜单只负责结构和 URL；API 负责把菜单转换成前台需要的�
 下面示例用 `k.site.menus` 读取菜单，并按 `audience` 过滤会员入口。真实项目中，`audience` 应来自 session、cookie 或账号角色，而不是前端传参。
 
 ```ts
-// @k-url /api/navigation/{action}
+// Example route: /api/navigation/{action}
 
 const menuName = "main_nav";
 const restrictedUrls = ["/account", "/orders"];
@@ -87,7 +87,7 @@ k.api.get("menu", () => {
 页面或 Layout 只消费 API，不直接写死菜单规则：
 
 ```html
-<!-- @k-url /navigation-demo -->
+<!-- Example route: /navigation-demo -->
 <nav id="navigation" aria-label="主导航"></nav>
 
 <script>

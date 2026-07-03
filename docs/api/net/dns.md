@@ -25,6 +25,11 @@ k.api.get("resolve", () => {
 | `getIPs(host)` | 使用系统 DNS |
 | `getIPs(nsServer, host)` | 指定 NS 服务器查询 A 记录 |
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `host` | `string` | 是 | 要解析的主机名或域名。 |
+| `nsServer` | `string` | 否 | 指定的 DNS 服务器。 |
+
 **返回：** `KIPAddress[]` 或 `null`
 
 ### KIPAddress
@@ -44,11 +49,26 @@ k.api.get("resolve", () => {
 | `getMXs(host)` | 默认解析 |
 | `getMXs(nsServer, host)` | 指定 NS |
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `host` | `string` | 是 | 要查询 MX 记录的域名。 |
+| `nsServer` | `string` | 否 | 指定的 DNS 服务器。 |
+
 **返回：** `string[]` 或 `null`
+
+```ts
+const records = k.net.DNS.getMXs("kooboo.com")
+```
 
 ## getNsServers()
 
 获取域名的 NS 服务器列表。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `host` | `string` | 是 | 要查询 NS 记录的域名。 |
+
+**返回值**：`string[] | null`。NS 服务器列表。
 
 ```ts
 const ns = k.net.DNS.getNsServers("kooboo.com")
@@ -58,6 +78,12 @@ const ns = k.net.DNS.getNsServers("kooboo.com")
 
 对 IP 做反向 DNS。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `ip` | `string` | 是 | 要反向解析的 IP 地址。 |
+
+**返回值**：`string | null`。解析到的主机名。
+
 ```ts
 const host = k.net.DNS.getReverseDNS("8.8.8.8")
 ```
@@ -65,6 +91,12 @@ const host = k.net.DNS.getReverseDNS("8.8.8.8")
 ## whoisInfo()
 
 返回域名的 Whois 原始记录文本。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `domain` | `string` | 是 | 要查询 Whois 的域名。 |
+
+**返回值**：`string | null`。Whois 原始文本。
 
 ```ts
 const raw = k.net.DNS.whoisInfo("kooboo.com")

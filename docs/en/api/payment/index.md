@@ -97,7 +97,7 @@ Each payment method object contains the following basic properties.
 | icon | `string` | Icon URL or inline content |
 | iconType | `string` | Icon type |
 | supportedCurrency | `string[]` | Supported currencies |
-| context | `RenderContext` | Current render context |
+| context | `object` | Current payment context |
 | setting | `object` | Site configuration for this payment method |
 
 ## General process

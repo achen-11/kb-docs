@@ -12,7 +12,7 @@
 
 The sidebar entry "js" is this API.
 
-## TypeScript definition (excerpt)
+## TypeScript Definition
 
 ```ts
 interface ScriptRepository {
@@ -42,13 +42,15 @@ interface ScriptInput {
 
 Create the script and register the route. If `url` is not passed, it defaults to `/{name}`, and if the path does not contain an extension, the script extension (usually `.js`) will be added automatically.
 
-| Field | type | Required | illustrate |
+| Parameter | Type | Required | Description |
 |------|------|------|------|
-| name | `string` | yes | Script name (unique) |
-| body | `string` | yes | JavaScript content |
-| url | `string` | no | Access path, such as `/assets/app.js` |
-| async | `boolean` | no | Whether to async load |
-| defer | `boolean` | no | Whether to defer loading |
+| `script.name` | `string` | yes | Script name (unique) |
+| `script.body` | `string` | yes | JavaScript content |
+| `script.url` | `string` | no | Access path, such as `/assets/app.js` |
+| `script.async` | `boolean` | no | Whether to load with `async` |
+| `script.defer` | `boolean` | no | Whether to load with `defer` |
+
+**Returns:** `void`.
 
 ```ts
 k.api.post(() => {
@@ -75,6 +77,10 @@ k.api.post(() => {
 
 Return all scripts.
 
+**Parameters:** None.
+
+**Returns:** `Script[]`.
+
 ```ts
 k.api.get(() => {
     const scripts = k.site.scripts.all()
@@ -85,6 +91,12 @@ k.api.get(() => {
 ## get()
 
 Get the script by name or Id.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `nameOrId` | `string` | yes | Script name or ID |
+
+**Returns:** `Script | null`.
 
 ```ts
 k.api.get(() => {
@@ -97,6 +109,12 @@ k.api.get(() => {
 
 Get the script by **routing URL** (e.g. `/main.js`).
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `url` | `string` | yes | Script route URL |
+
+**Returns:** `Script | null`.
+
 ```ts
 k.api.get(() => {
     const script = k.site.scripts.getByUrl("/main.js")
@@ -107,6 +125,12 @@ k.api.get(() => {
 ## update()
 
 Update the complete script object.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `script` | `Script` | yes | Modified full Script object |
+
+**Returns:** `void`.
 
 ```ts
 k.api.post(() => {
@@ -131,6 +155,13 @@ k.api.post(() => {
 
 Only updates `body`.
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `nameOrId` | `string` | yes | Script name or ID |
+| `body` | `string` | yes | New JavaScript content |
+
+**Returns:** `void`.
+
 ```ts
 k.api.post(() => {
     const stamp = Date.now().toString()
@@ -148,6 +179,12 @@ k.api.post(() => {
 ## delete()
 
 Delete by Name or Id. Verify with `get(name)` after deletion.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `nameOrId` | `string` | yes | Script name or ID |
+
+**Returns:** `void`.
 
 ```ts
 k.api.post(() => {
@@ -170,6 +207,11 @@ k.api.post(() => {
 
 ## getUrl() / getAbsUrl()
 
+| Method | Parameters | Returns | Description |
+|------|------|------|------|
+| `getUrl(id)` | `id: string` | `string | null` | Gets the relative URL |
+| `getAbsUrl(id)` | `id: string` | `string | null` | Gets the absolute URL |
+
 ```ts
 k.api.get(() => {
     const scripts = k.site.scripts.all()
@@ -187,6 +229,11 @@ Only scripts with registered routes can return URLs.
 
 ## getLogs() / getByLog()
 
+| Method | Parameters | Returns | Description |
+|------|------|------|------|
+| `getLogs(nameOrId)` | `nameOrId: string` | `ChangeLog[] | null` | Gets version logs |
+| `getByLog(logId)` | `logId: number` | `Script | null` | Gets a historical version by log ID |
+
 ```ts
 k.api.get(() => {
     const scripts = k.site.scripts.all()
@@ -200,9 +247,9 @@ k.api.get(() => {
 })
 ```
 
-## Script object (common fields)
+## Common Script Fields
 
-| Field | type | illustrate |
+| Field | Type | Description |
 |------|------|------|
 | ID | `string` | ScriptId |
 | name | `string` | name |

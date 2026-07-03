@@ -16,7 +16,7 @@
 
 Must be used in the process involved in **HTML page rendering** (page CodeBlock, layout script, etc.). In requests where pure `k.api` returns JSON and does not render templates, `set`/`get` are usually only visible to the current script and will not appear in the response HTML.
 
-## TypeScript definition (excerpt)
+## TypeScript Definition
 
 ```ts
 interface KState {
@@ -40,6 +40,8 @@ k.state.set("product", product)
 | `key` | `string` | yes | Key names used in templates |
 | `value` | `any` | yes | any serializable object or value |
 
+**Returns:** `void`.
+
 ## setCurrent()
 
 Writes or overwrites the key on the top frame of the current stack; if the stack is empty, the behavior is the same as `set`.
@@ -53,6 +55,8 @@ k.state.setCurrent("items", updatedList)
 |------|------|------|------|
 | `key` | `string` | yes | Key name |
 | `value` | `any` | yes | new value |
+
+**Returns:** `void`.
 
 ## get()
 

@@ -8,24 +8,43 @@
 
 ## getCustomers()
 
-```ts
-const list = k.utils.CRM.getCustomers(startDate, crmKey)
-```
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `startDate` | `Date` | Yes | Start date; submitted as local time |
+| `crmKey` | `string` | Yes | CRM key |
 
 **Returns:** `CRMCustomer[]`.
 
-## getOrders()
-
 ```ts
-const orders = k.utils.CRM.getOrders(startDate, crmKey)
+const startDate = new Date("2024-01-01")
+const crmKey = k.request.queryString.get("crmKey")
+const list = k.utils.CRM.getCustomers(startDate, crmKey)
+
+return {
+    count: list.length,
+    customers: list.slice(0, 10)
+}
 ```
 
-**Returns:** `CRMOrder[]`.
+## getOrders()
 
 | Parameter | Type | Required | Description |
 |------|------|------|------|
 | `startDate` | `Date` | Yes | Start date; submitted as local time |
 | `crmKey` | `string` | Yes | CRM key |
+
+**Returns:** `CRMOrder[]`.
+
+```ts
+const startDate = new Date("2024-01-01")
+const crmKey = k.request.queryString.get("crmKey")
+const orders = k.utils.CRM.getOrders(startDate, crmKey)
+
+return {
+    count: orders.length,
+    orders: orders.slice(0, 10)
+}
+```
 
 ## Related Docs
 

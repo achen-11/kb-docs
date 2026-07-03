@@ -30,9 +30,12 @@ interface KCategory {
 
 **参数：**
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| query.includeOffline | `boolean` | 是否包含下架分类，默认 `false` |
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `query` | `CategoryQueryParams` | 否 | 分类列表筛选条件。 |
+| `query.includeOffline` | `boolean` | 否 | 是否包含下架分类，默认 `false`。 |
+
+**返回值**：`Category[]`。匹配条件的分类列表。
 
 ```ts
 k.api.get(() => {
@@ -50,9 +53,19 @@ k.api.get(() => {
 ### get()
 
 获取分类详情。
+
 :::tip 未找到分类
 查询不到分类时返回 `null`
 :::
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `seoNameOrId` | `string` | 是 | 分类 SEO 名称或分类 ID。 |
+
+**返回值**：`Category | null`。匹配到的分类；不存在时返回 `null`。
+
 ```ts
 k.api.get(() => {
     const category = k.commerce.category.get('category-seo-name')
@@ -66,6 +79,14 @@ k.api.get(() => {
 ### create()
 
 创建分类。
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `category` | `NewCategory` | 是 | 新分类数据。 |
+
+**返回值**：`Category`。创建后的分类对象。
 
 ```ts
 k.api.post(() => {
@@ -85,12 +106,14 @@ k.api.post(() => {
 
 **参数：**
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| categoryId | `string` | 分类 ID |
-| field | `string` | 字段名 |
-| value | `any` | 字段值 |
-| lang | `string` | 语言代码（可选，用于指定多语言） |
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `categoryId` | `string` | 是 | 分类 ID。 |
+| `field` | `string` | 是 | 字段名。 |
+| `value` | `any` | 是 | 字段值。 |
+| `lang` | `string` | 否 | 语言代码，用于指定多语言字段。 |
+
+**返回值**：`void`。
 
 ```ts
 k.api.post(() => {
@@ -109,6 +132,18 @@ k.api.post(() => {
 
 批量更新字段。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `categoryId` | `string` | 是 | 分类 ID。 |
+| `updateContents` | `UpdateContent[]` | 是 | 要批量更新的字段列表。 |
+| `updateContents[].property` | `string` | 是 | 字段名。 |
+| `updateContents[].value` | `any` | 是 | 字段值。 |
+| `updateContents[].lang` | `string` | 否 | 语言代码，用于指定多语言字段。 |
+
+**返回值**：`void`。
+
 ```ts
 k.api.post(() => {
     k.commerce.category.updateFields(categoryId, [
@@ -123,6 +158,14 @@ k.api.post(() => {
 
 删除分类。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `categoryId` | `string` | 是 | 要删除的分类 ID。 |
+
+**返回值**：`void`。
+
 ```ts
 k.api.post(() => {
     k.commerce.category.delete(categoryId)
@@ -133,6 +176,14 @@ k.api.post(() => {
 ### getParents()
 
 获取父级分类链。
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `seoNameOrId` | `string` | 是 | 分类 SEO 名称或分类 ID。 |
+
+**返回值**：`Category[]`。从当前分类向上的父级分类链。
 
 ```ts
 k.api.get(() => {
@@ -145,6 +196,15 @@ k.api.get(() => {
 
 给分类添加产品。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `categoryId` | `string` | 是 | 分类 ID。 |
+| `productId` | `string` | 是 | 产品 ID。 |
+
+**返回值**：`void`。
+
 ```ts
 k.api.post(() => {
     k.commerce.category.addProduct(categoryId, productId)
@@ -155,6 +215,15 @@ k.api.post(() => {
 ### removeProduct()
 
 从分类中移除产品。
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `categoryId` | `string` | 是 | 分类 ID。 |
+| `productId` | `string` | 是 | 产品 ID。 |
+
+**返回值**：`void`。
 
 ```ts
 k.api.post(() => {

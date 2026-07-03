@@ -34,10 +34,12 @@ interface ViewInput {
 
 创建视图。
 
-| 字段 | 类型 | 必填 | 说明 |
+| 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| name | `string` | 是 | 视图名称，页面中用 `<view id="name">` 引用 |
-| body | `string` | 是 | HTML 片段 |
+| `view.name` | `string` | 是 | 视图名称，页面中用 `<view id="name">` 引用 |
+| `view.body` | `string` | 是 | HTML 片段 |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -61,6 +63,10 @@ k.api.post(() => {
 
 返回全部视图。
 
+**参数：** 无。
+
+**返回：** `View[]`。
+
 ```ts
 k.api.get(() => {
     const views = k.site.views.all()
@@ -72,6 +78,12 @@ k.api.get(() => {
 
 按名称或 Id 获取视图。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 视图名称或 Id |
+
+**返回：** `View | null`。
+
 ```ts
 k.api.get(() => {
     const view = k.site.views.get("hero")
@@ -82,6 +94,12 @@ k.api.get(() => {
 ## update()
 
 更新完整视图对象。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `view` | `View` | 是 | 修改后的完整视图对象 |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -105,6 +123,13 @@ k.api.post(() => {
 
 仅更新 `body`。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 视图名称或 Id |
+| `body` | `string` | 是 | 新视图 HTML |
+
+**返回：** `void`。
+
 ```ts
 k.api.post(() => {
     const stamp = Date.now().toString()
@@ -121,6 +146,12 @@ k.api.post(() => {
 ## delete()
 
 按名称或 Id 删除视图。删除后用 `get(name)` 验证。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 视图名称或 Id |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -141,6 +172,11 @@ k.api.post(() => {
 ```
 
 ## getLogs() / getByLog()
+
+| 方法 | 参数 | 返回 | 说明 |
+|------|------|------|------|
+| `getLogs(nameOrId)` | `nameOrId: string` | `ChangeLog[] | null` | 获取版本日志 |
+| `getByLog(logId)` | `logId: number` | `View | null` | 按日志 Id 获取历史版本 |
 
 ```ts
 k.api.get(() => {

@@ -42,7 +42,7 @@ k.response.redirect(站内安全路径)
 下面示例只允许站内相对路径，并拦截绝对 URL、协议相对 URL、反斜杠和控制字符：
 
 ```ts
-// @k-url /api/safe-redirect/{action}
+// Example route: /api/safe-redirect/{action}
 
 const fallbackPath = "/login?blocked=1";
 
@@ -110,7 +110,7 @@ k.api.get("go", () => {
 页面只负责把用户输入传给 API，并在被拦截时展示提示：
 
 ```html
-<!-- @k-url /safe-redirect-demo -->
+<!-- Example route: /safe-redirect-demo -->
 <input id="target" value="/account?tab=orders">
 <button id="check" type="button">检查目标</button>
 <a id="go" href="/api/safe-redirect/go?target=%2Faccount">执行跳转</a>

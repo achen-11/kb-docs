@@ -39,7 +39,7 @@ Page / View 注入片段
 下面示例用版本号模拟内容发布。`v1` 和 `v2` 使用不同缓存 key，避免发布后读到旧片段：
 
 ```ts
-// @k-url /api/page-fragment-cache/{action}
+// Example route: /api/page-fragment-cache/{action}
 
 type FragmentData = {
   html: string;
@@ -132,7 +132,7 @@ k.api.post("clear", () => {
 页面可以通过 API 拉取片段并注入到容器中：
 
 ```html
-<!-- @k-url /fragment-cache-demo -->
+<!-- Example route: /fragment-cache-demo -->
 <button id="load-twice" type="button">连续加载片段</button>
 <button id="publish-v2" type="button">发布 v2 并重载</button>
 <div id="fragment"></div>

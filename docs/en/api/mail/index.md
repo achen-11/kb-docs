@@ -22,6 +22,11 @@
 
 ## createMessage() / createSmtpServer()
 
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `createMessage()` | none | `MailMessage` | Create a mail message object. |
+| `createSmtpServer()` | none | `SmtpServer` | Create an external SMTP server configuration object. |
+
 ```ts
 const msg = k.mail.createMessage()
 msg.from = "sender@example.com"
@@ -68,6 +73,11 @@ msg.cc = "carol@example.com; dave@example.com" // semicolons are normalized to c
 When using the site's default channel `k.mail.smtp.send(msg)`, the organization's email quota is deducted based on the parsed **number of recipients** (counted once for each valid address in `to`). External SMTP's `k.mail.smtp.send(server, msg)` is delivered by MailKit as To/Cc/Bcc in MIME.
 
 ## smtp.send()
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `smtp.send(message)` | `message: MailMessage | object` | `void` | Send mail through the site default mail channel. |
+| `smtp.send(server, message)` | `server: SmtpServer`, `message: MailMessage | object` | `void` | Send mail through the specified external SMTP server. |
 
 ### Use the Site Default Mail Channel
 

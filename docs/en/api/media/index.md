@@ -66,6 +66,8 @@ k.api.get("folderFiles", () => {
 |------|------|------|------|
 | `folder` | `string` | yes | folder path |
 
+**Return:** `void`
+
 **Returns:** `MediaFileViewModel[]` (in descending order of `lastModified`)
 
 ## createFolder()
@@ -100,6 +102,8 @@ k.api.post("deleteFolder", () => {
 | Parameter | Type | Required | Description |
 |------|------|------|------|
 | `folder` | `string` | yes | folder path |
+
+**Return:** `void`
 
 ## get()
 
@@ -170,6 +174,8 @@ k.api.post("delete", () => {
 | Parameter | Type | Required | Description |
 |------|------|------|------|
 | `idOrFilePath` | `string` | yes | GUID or file path |
+
+**Return:** `void`
 
 ## Example: List and upload
 

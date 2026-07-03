@@ -172,7 +172,7 @@ Bottom **KBottomBar**: **Back** returns to the list; **Save** calls `BackendRule
 2. A backend resource operation fires the matching BackendEvent (e.g. `PageCreating`, `ContentUpdated`).
 3. Rules for that event run in list order; IF-ELSE-THEN evaluates conditions then THEN/ELSE; DO runs Code in sequence.
 
-See `Kooboo.Sites.BackendEvent.Manager` for the engine.
+Execution is handled by the site's backend action hook engine, in the order configured on this page.
 
 ## Typical Workflow
 

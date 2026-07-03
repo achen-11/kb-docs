@@ -42,7 +42,11 @@ k.api.get(() => {
 
 插入一条记录。若对象含有表中 **尚未定义的字段**，会 **自动更新表结构** 增加列。
 
-**返回**：新记录 Id（`Guid` 字符串）；失败时为 `null`。
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `value` | `object` | 是 | 要写入的记录对象。对象字段对应表列；未定义字段会触发表结构扩展。 |
+
+**返回值**：`string | null`。新记录 Id（`Guid` 字符串）；失败时为 `null`。
 
 ```ts
 const id = k.DB.indexedDb.orders.add({
@@ -55,6 +59,12 @@ const id = k.DB.indexedDb.orders.add({
 
 与 `add` 类似，但 **不会** 因新字段而修改表结构；未定义字段可能被忽略或导致写入失败，取决于表结构。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `value` | `object` | 是 | 要写入的记录对象。字段应已在后台表结构中声明。 |
+
+**返回值**：`string | null`。新记录 Id（`Guid` 字符串）；失败时为 `null`。
+
 ```ts
 const id = k.DB.indexedDb.orders.append({ orderNo: "A1002", amount: 120 })
 ```
@@ -63,6 +73,13 @@ const id = k.DB.indexedDb.orders.append({ orderNo: "A1002", amount: 120 })
 
 - `update(id, newValue)`：`id` 为系统 `_id` 或业务主键值。  
 - `update(newValue)`：对象须含 `_id`，或走内部 `UpdateOrAdd` 逻辑。
+
+| 方法 | 参数 | 说明 |
+|------|------|------|
+| `update(id, value)` | `id: string`, `value: object` | 按 `_id` 或主键定位记录，并用 `value` 更新。 |
+| `update(value)` | `value: object` | 使用对象中的 `_id` 更新；没有 `_id` 时按运行时的更新或新增逻辑处理。 |
+
+**返回值**：`void`。
 
 ```ts
 const table = k.DB.indexedDb.orders
@@ -78,6 +95,12 @@ table.update(row)
 
 按 `_id` 或主键删除。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `id` | `string` | 是 | 要删除记录的 `_id` 或主键值。 |
+
+**返回值**：`void`。
+
 ```ts
 k.DB.indexedDb.orders.delete(id)
 ```
@@ -87,6 +110,17 @@ k.DB.indexedDb.orders.delete(id)
 ### get(id)
 
 按 Id 或主键取单条，不存在时返回 `null` / `undefined`（以运行时为准）。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `id` | `string` | 是 | 要读取记录的 `_id` 或主键值。 |
+
+**返回值**：`object | null | undefined`。匹配到的记录对象；不存在时为空值。
+
+```ts
+const row = k.DB.indexedDb.orders.get(id)
+return row ? { id: row._id, orderNo: row.orderNo } : null
+```
 
 ### find / findAll
 
@@ -122,6 +156,10 @@ const many = k.DB.indexedDb.orders.findAll({
 
 返回表中全部记录（慎用大表）。
 
+**参数**：无。
+
+**返回值**：`object[]`。表中的全部记录。
+
 ```ts
 const all = k.DB.indexedDb.orders.all()
 ```
@@ -129,6 +167,13 @@ const all = k.DB.indexedDb.orders.all()
 ### Count(query) / Count(filter)
 
 符合条件的条数。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `query` | `string` | 否 | 条件字符串，例如 `status == 'paid'`。 |
+| `filter` | `object` | 否 | 过滤器对象，通常配合 `operators()` 使用。 |
+
+**返回值**：`number`。符合条件的记录数。
 
 ```ts
 const n = k.DB.indexedDb.orders.Count("status == 'paid'")
@@ -158,6 +203,14 @@ const rows = k.DB.indexedDb.orders
 
 分页封装，返回对象形如：
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `pageIndex` | `number` | 是 | 页码，从 **1** 开始。 |
+| `pageSize` | `number` | 是 | 每页记录数。 |
+| `where` | `string` | 否 | 条件字符串，例如 `status == 'paid'`。 |
+
+**返回值**：分页对象，包含总数、总页数、当前页码、页大小和当前页记录列表。
+
 ```ts
 {
   totalCount: number
@@ -178,6 +231,12 @@ k.response.json(page)
 ## createIndex(fieldName)
 
 为列创建额外索引（后台列设置中的「索引」与之配合）。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `fieldName` | `string` | 是 | 要建立索引的列名。 |
+
+**返回值**：`void`。
 
 ```ts
 k.DB.indexedDb.orders.createIndex("orderNo")

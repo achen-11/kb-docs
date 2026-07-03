@@ -53,7 +53,7 @@ k.logger 写入结构化 JSON 日志
 下面示例模拟结算 API。成功写 `Information`，校验失败写 `Warning`，捕获异常写 `Error`。日志中保留 traceId 和业务字段，但对邮箱、密码、token 做脱敏。
 
 ```ts
-// @k-url /api/business-logging/{action}
+// Example route: /api/business-logging/{action}
 
 type CheckoutBody = {
   traceId?: string;
@@ -207,7 +207,7 @@ k.api.get("logs", () => {
 前台页面只需要把 `traceId` 展示给用户或客服，并提供最小回查入口：
 
 ```html
-<!-- @k-url /business-logging -->
+<!-- Example route: /business-logging -->
 <button id="success" type="button">成功结算</button>
 <button id="validation" type="button">触发校验失败</button>
 <button id="exception" type="button">触发异常</button>

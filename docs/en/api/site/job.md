@@ -16,9 +16,11 @@ After **adding a task** on [Scheduled Jobs](/en/cms/development/jobs.md) and sav
 
 Execute the specified task asynchronously once (equivalent to list **Run**, the log description is `Manual trigger from kscript`).
 
-| Parameter | Type | Description |
-|------|------|------|
-| `name` | `string` | Task **name** or taskId (GUID string) |
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `name` | `string` | yes | Task **name** or task ID (GUID string) |
+
+**Returns:** `void`.
 
 ```typescript
 k.site.runJob("nightly_sync")
@@ -26,13 +28,13 @@ k.site.runJob("nightly_sync")
 
 Throws `Job not found` if the task does not exist.
 
-::: The relationship between warning and scheduler
+::: warning Relationship with the scheduler
 `runJob` **does not** replace periodic scheduling; recurring tasks are still automatically executed according to the background **start time** and **interval**. Manual running can be used for debugging when the site is not published.
 :::
 
 ## execution environment
 
-- Use the current site's `RenderContext` (`RenderContextProvider.CreateFromSite`).
+- Uses the current site's server-side execution context.
 - Code comes from `SiteJob.Code` field (backend Monaco save), executed with **Module** script type, **Long Task** option.
 - You can use the same `k.*` API as other server-side codes (`k.DB`, `k.content`, `k.mail`, etc.).
 

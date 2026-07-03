@@ -10,6 +10,8 @@
 
 Returns a builder that can be `append`.
 
+**Parameters:** None.
+
 **Returns:** `Sitemap` builder.
 
 ```ts
@@ -43,11 +45,33 @@ const xml = k.utils.sitemap.create()
 
 **Returns:** `Sitemap`, allowing chained calls.
 
+```ts
+const sitemap = k.utils.sitemap.create()
+sitemap.append("https://www.example.com/blog/hello", {
+    lastmod: "2024-01-01",
+    changefreq: "weekly",
+    priority: 0.7
+})
+
+return sitemap.build()
+```
+
 ## build()
 
 Output XML string.
 
+**Parameters:** None.
+
 **Returns:** `string`.
+
+```ts
+const xml = k.utils.sitemap.create()
+    .append("https://www.example.com/", { priority: 1 })
+    .build()
+
+k.response.setHeader("Content-Type", "application/xml")
+return xml
+```
 
 ## Related Docs
 

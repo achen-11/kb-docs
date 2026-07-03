@@ -68,7 +68,7 @@ token 明文只出现在一次性链接里，服务端存储用哈希。这样�
 下面示例用 KeyValue 保存用户和 token。验证站点为了可复现，用 `outbox` 模拟邮件发送、失败和重试；真实项目可把 `enqueueMail()` 的成功分支替换为 `k.mail.smtp.send()`。
 
 ```ts
-// @k-url /api/email-register-reset/{action}
+// Example route: /api/email-register-reset/{action}
 
 type TokenPurpose = "verify-email" | "reset-password";
 
@@ -278,7 +278,7 @@ function sendVerificationMail(email: string, link: string) {
 页面只负责提交请求和展示结果：
 
 ```html
-<!-- @k-url /email-register-reset -->
+<!-- Example route: /email-register-reset -->
 <input id="email" value="member@example.com" autocomplete="email">
 <input id="password" type="password" value="CorrectHorse1!" autocomplete="current-password">
 <input id="newPassword" type="password" value="NewHorse1!" autocomplete="new-password">

@@ -46,6 +46,18 @@ k.utils.sshClient.privateKeyConnect(host, user, privateKey, client => {
 
 **返回：** `string`，命令输出。
 
+```ts
+k.utils.sshClient.passwordConnect(host, user, password, client => {
+    const disk = client.runCommand("df -h /", 10)
+    const kernel = client.runCommand("uname -a")
+
+    k.logger.information("SSH health", {
+        disk,
+        kernel
+    })
+})
+```
+
 ## 相关文档
 
 - [k.utils.sftpClient](./sftpClient.md)

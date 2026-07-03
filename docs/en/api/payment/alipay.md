@@ -145,7 +145,7 @@ k.api.post(() => {
 
 | parameter | type | Required | illustrate |
 |------|------|------|------|
-| context | `RenderContext` | yes | current request context |
+| context | `object` | yes | Current payment callback context |
 
 **Return:** `PaymentCallback`
 

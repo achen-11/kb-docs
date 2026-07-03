@@ -117,6 +117,13 @@ k.api.post("upload", () => {
 
 复制对象到新键。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `sourceKey` | `string` | 是 | 源对象键。 |
+| `destinationKey` | `string` | 是 | 目标对象键。 |
+
+**返回值**：`void`。
+
 ```ts
 client.copyObject("/media/a.png", "/media/backup/a.png")
 ```
@@ -124,6 +131,12 @@ client.copyObject("/media/a.png", "/media/backup/a.png")
 ## createFolder()
 
 创建文件夹（逻辑前缀）。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `path` | `string` | 是 | 文件夹路径，通常以 `/` 结尾。 |
+
+**返回值**：`void`。
 
 ```ts
 client.createFolder("/media/my-folder/")
@@ -133,6 +146,12 @@ client.createFolder("/media/my-folder/")
 
 检查键是否尚未使用。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `key` | `string` | 是 | 要检查的对象键。 |
+
+**返回值**：`boolean`。对象键未被占用时返回 `true`。
+
 ```ts
 if (!client.isUniqueKey(key)) {
     throw new Error("Duplicated key: " + key)
@@ -140,6 +159,11 @@ if (!client.isUniqueKey(key)) {
 ```
 
 ## deleteObjects() / deleteFolders()
+
+| 方法 | 参数 | 返回值 | 说明 |
+|------|------|--------|------|
+| `deleteObjects(keys)` | `keys: string[]` | `void` | 批量删除对象。 |
+| `deleteFolders(paths)` | `paths: string[]` | `void` | 批量删除文件夹前缀。 |
 
 ```ts
 client.deleteObjects(["/media/a.png", "/media/b.png"])
@@ -150,11 +174,22 @@ client.deleteFolders(["/media/old-folder/"])
 
 生成对象的临时下载 URL。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `key` | `string` | 是 | 要下载的对象键。 |
+
+**返回值**：`string`。临时下载 URL。
+
 ```ts
 const url = client.generateDownloadUrl("/media/report.pdf")
 ```
 
 ## getMetadata() / putMetadata()
+
+| 方法 | 参数 | 返回值 | 说明 |
+|------|------|--------|------|
+| `getMetadata(key)` | `key: string` | `object` | 读取对象元数据。 |
+| `putMetadata(key, metas)` | `key: string`, `metas: object` | `void` | 写入或覆盖对象元数据。 |
 
 ```ts
 const meta = client.getMetadata("/media/photo.jpg")

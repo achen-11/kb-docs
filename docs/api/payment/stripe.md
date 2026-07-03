@@ -98,6 +98,12 @@ k.api.post(() => {
 
 检查支付状态。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `requestId` | `string` | 是 | `charge()` 返回的 `requestId`。 |
+
 ```ts
 k.api.get(() => {
     const status = k.payment.stripeCheckout.checkStatus('request-id')
@@ -129,6 +135,13 @@ k.api.get(() => {
 
 为客户创建卡。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `customer` | `string` | 是 | Stripe Customer ID。 |
+| `card` | `Card` | 是 | 要保存的卡信息。 |
+
 ```ts
 k.api.post(() => {
     return k.payment.stripe.createCard('customer-id', {
@@ -147,6 +160,12 @@ k.api.post(() => {
 
 从客户上移除卡。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `cardId` | `string` | 是 | 要移除的 Stripe 卡 ID。 |
+
 ```ts
 k.api.post(() => {
     k.payment.stripe.removeCard('card-id')
@@ -159,6 +178,12 @@ k.api.post(() => {
 ## updateOrder()
 
 处理 Stripe Checkout 回调并更新订单。
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `context` | `object` | 是 | 当前支付回调上下文，通常传入 `k.payment.stripeCheckout.context`。 |
 
 ```ts
 k.api.post(() => {

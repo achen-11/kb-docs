@@ -135,6 +135,8 @@ k.api.get(() => {
 
 获取会员信息列表。
 
+**参数**：无。
+
 ```ts
 k.api.get(() => {
     const memberships = k.commerce.loyalty.memberships()

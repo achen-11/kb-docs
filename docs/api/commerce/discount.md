@@ -10,6 +10,8 @@
 
 获取优惠折扣列表。
 
+**参数**：无。
+
 ```ts
 k.api.get(() => {
     const discounts = k.commerce.discount.list()

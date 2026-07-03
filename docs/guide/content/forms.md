@@ -37,7 +37,7 @@ src/
 Page 负责渲染表单，并把用户输入提交到 API：
 
 ```html
-<!-- @k-url /contact -->
+<!-- Example route: /contact -->
 <form id="contact-form" novalidate>
   <input name="name" autocomplete="name" />
   <input name="email" autocomplete="email" />
@@ -78,7 +78,7 @@ Page 负责渲染表单，并把用户输入提交到 API：
 API 使用 `{action}` 子路由承载提交动作：
 
 ```ts
-// @k-url /api/contact-submit/{action}
+// Example route: /api/contact-submit/{action}
 
 type ContactFormBody = {
   name?: string;

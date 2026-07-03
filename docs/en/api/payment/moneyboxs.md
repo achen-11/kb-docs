@@ -83,6 +83,12 @@ k.api.post(() => {
 
 Check payment status.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `requestId` | `string` | Yes | `requestId` returned by `charge()`. |
+
 ```ts
 k.api.get(() => {
     const status = k.payment.moneyBoxs.checkStatus('request-id')
@@ -95,6 +101,12 @@ k.api.get(() => {
 ## updateOrder()
 
 Handle MoneyBoxs callbacks and update orders.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `context` | `object` | Yes | Current payment callback context, usually `k.payment.moneyBoxs.context`. |
 
 ```ts
 k.api.post(() => {
@@ -154,4 +166,3 @@ k.api.post(() => {
 | key | `string` | key |
 | transactionURL | `string` | Transaction address |
 | type | `string` | type |
-e |

@@ -42,13 +42,16 @@ k.api.get(() => {
     return { count: products.length, products }
 })
 ```
-**parameter:**
+**Parameters:**
 
-| Parameter | Type | Description |
-|------|------|------|
-| query.categories | `string[]` | Filter by category ID |
-| query.includeOffline | `boolean` | Whether to include delisted products, default `false` |
-| query.includeSubCategory | `boolean` | Whether to include subcategory products, default `false` |
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | `ProductQueryParams` | No | Product list filters. |
+| `query.categories` | `string[]` | No | Filter by category ID. |
+| `query.includeOffline` | `boolean` | No | Whether to include offline products. Default is `false`. |
+| `query.includeSubCategory` | `boolean` | No | Whether to include products from child categories. Default is `false`. |
+
+**Returns**: `Product[]`. Product list matching the filters.
 
 ### get()
 
@@ -57,6 +60,14 @@ Get product details (including variations).
 ::: tip exception handling
 When the get method cannot query the product, it will throw an exception `"Product not found"`
 :::
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `seoNameOrId` | `string` | Yes | Product SEO name or product ID. |
+
+**Returns**: `Product`. Product detail, including variants.
 
 ```ts
 k.api.get(() => {
@@ -78,6 +89,14 @@ k.api.get(() => {
 
 Create products.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `product` | `NewProduct` | Yes | New product data. |
+
+**Returns**: `Product`. Created product object.
+
 ```ts
 k.api.post(() => {
     const product = k.commerce.product.create({
@@ -94,14 +113,23 @@ k.api.post(() => {
 
 Create variations for your product.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `productId` | `string` | Yes | Product ID. |
+| `variant` | `NewVariant` | Yes | New variant data. |
+
+**Returns**: `Product`. Updated product object.
+
 ```ts
 k.api.post(() => {
-    k.commerce.product.createVariant(productId, {
+    const product = k.commerce.product.createVariant(productId, {
         sku: 'SKU-001',
         price: 88,
         inventory: 100
     })
-    return { success: true }
+    return { variantCount: product.variants.length }
 })
 ```
 
@@ -109,14 +137,17 @@ k.api.post(() => {
 
 Search for products.
 
-**parameter:**
+**Parameters:**
 
-| Parameter | Type | Description |
-|------|------|------|
-| keyword | `string` | Search keywords |
-| options.categories | `string[]` | Filter by category ID |
-| options.includeOffline | `boolean` | Whether to include delisted products, default `false` |
-| options.includeSubCategory | `boolean` | Whether to include subcategory products, default `false` |
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `keyword` | `string` | Yes | Search keyword. |
+| `options` | `SearchOptions` | No | Search filters. |
+| `options.categories` | `string[]` | No | Filter by category ID. |
+| `options.includeOffline` | `boolean` | No | Whether to include offline products. Default is `false`. |
+| `options.includeSubCategory` | `boolean` | No | Whether to include products from child categories. Default is `false`. |
+
+**Returns**: `SearchResult`. Search result and facet data.
 
 ```ts
 k.api.get(() => {
@@ -138,14 +169,16 @@ k.api.get(() => {
 
 Update a single field.
 
-**parameter:**
+**Parameters:**
 
-| Parameter | Type | Description |
-|------|------|------|
-| productId | `string` | Product ID |
-| Field | `string` | Field name |
-| value | `any` | field value |
-| lang | `string` | Language code (optional, used to specify multiple languages) |
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `productId` | `string` | Yes | Product ID. |
+| `field` | `string` | Yes | Field name. |
+| `value` | `any` | Yes | Field value. |
+| `lang` | `string` | No | Language code for multilingual fields. |
+
+**Returns**: `void`.
 
 ```ts
 k.api.post(() => {
@@ -165,6 +198,18 @@ k.api.post(() => {
 
 Update fields in batches.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `productId` | `string` | Yes | Product ID. |
+| `updateContents` | `UpdateContent[]` | Yes | List of fields to update. |
+| `updateContents[].property` | `string` | Yes | Field name. |
+| `updateContents[].value` | `any` | Yes | Field value. |
+| `updateContents[].lang` | `string` | No | Language code for multilingual fields. |
+
+**Returns**: `void`.
+
 ```ts
 k.api.post(() => {
     k.commerce.product.updateFields(productId, [
@@ -179,6 +224,16 @@ k.api.post(() => {
 
 Update variant fields.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `variantId` | `string` | Yes | Variant ID. |
+| `field` | `string` | Yes | Field name. |
+| `value` | `any` | Yes | Field value. |
+
+**Returns**: `void`.
+
 ```ts
 k.api.post(() => {
     k.commerce.product.updateVariantField(variantId, "sku", "NEW-SKU")
@@ -189,6 +244,18 @@ k.api.post(() => {
 ### updateVariantFields()
 
 Batch update variant fields.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `variantId` | `string` | Yes | Variant ID. |
+| `updateContents` | `UpdateContent[]` | Yes | List of fields to update. |
+| `updateContents[].property` | `string` | Yes | Field name. |
+| `updateContents[].value` | `any` | Yes | Field value. |
+| `updateContents[].lang` | `string` | No | Language code for multilingual fields. |
+
+**Returns**: `void`.
 
 ```ts
 k.api.post(() => {
@@ -203,6 +270,15 @@ k.api.post(() => {
 
 Get discounted prices.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `variantId` | `string` | Yes | Variant ID. |
+| `options` | `DiscountOptions` | No | Discount calculation options. |
+
+**Returns**: `number`. Discounted price.
+
 ```ts
 k.api.get(() => {
     const price = k.commerce.product.getDiscountPrice(variantId)
@@ -214,10 +290,18 @@ k.api.get(() => {
 
 Delete product.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `productId` | `string` | Yes | Product ID to delete. |
+
+**Returns**: `boolean`. Returns `true` when deletion succeeds.
+
 ```ts
 k.api.post(() => {
-    k.commerce.product.delete(productId)
-    return { success: true }
+    const success = k.commerce.product.delete(productId)
+    return { success }
 })
 ```
 

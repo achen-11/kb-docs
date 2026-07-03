@@ -44,6 +44,12 @@ k.api.get(() => {
 // 输出: hello world1234{ "name": "kooboo" }
 ```
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `value` | `any` | 是 | 要写入响应体的内容 |
+
+**返回：** `void`。
+
 ### json()
 
 以 JSON 格式输出响应。会自动设置 `Content-Type: application/json`。
@@ -57,6 +63,12 @@ k.api.get(() => {
 })
 // 输出: { "success": true, "data": { "id": 1, "name": "test" } }
 ```
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `value` | `any` | 是 | 要序列化为 JSON 的值 |
+
+**返回：** `void`。
 
 ### file()
 
@@ -74,6 +86,14 @@ k.api.get(() => {
 })
 ```
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `path` | `string` | 是 | 站点文件路径 |
+| `contentType` | `string` | 否 | 响应 Content-Type |
+| `fileName` | `string` | 否 | 下载时使用的文件名 |
+
+**返回：** `void`。
+
 ### binary()
 
 返回二进制数据响应。
@@ -85,6 +105,14 @@ k.api.get(() => {
 })
 ```
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `contentType` | `string` | 是 | 响应 Content-Type |
+| `bytes` | `number[]` | 是 | 二进制字节数组 |
+| `filename` | `string` | 否 | 下载文件名 |
+
+**返回：** `void`。
+
 ### statusCode()
 
 设置 HTTP 状态码。
@@ -95,6 +123,12 @@ k.api.get(() => {
     return "Not Found"
 })
 ```
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `code` | `number` | 是 | HTTP 状态码 |
+
+**返回：** `void`。
 
 ### unauthorized()
 
@@ -109,6 +143,10 @@ k.api.get(() => {
 // 消息: "Unauthorized access"
 ```
 
+**参数：** 无。
+
+**返回：** `void`。
+
 ### notFound()
 
 返回 404 未找到响应。
@@ -118,6 +156,10 @@ k.api.get(() => {
     k.response.notFound()
 })
 ```
+
+**参数：** 无。
+
+**返回：** `void`。
 
 ### redirect()
 
@@ -145,6 +187,8 @@ k.api.get(() => {
 | `url` | string | 是 | 目标 URL |
 | `absolute` | boolean | 否 | 是否为绝对路径（包含协议） |
 
+**返回：** `void`。
+
 ### setHeader()
 
 设置自定义响应头。
@@ -157,6 +201,13 @@ k.api.get(() => {
 })
 ```
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `key` | `string` | 是 | 响应头名称 |
+| `value` | `string` | 是 | 响应头值 |
+
+**返回：** `void`。
+
 ### renderView()
 
 在**当前输出位置**渲染一段包含 `<view>` 的 HTML 字符串。常用于 **Layout / Page 的 `<head>`** 中输出 View（head 内不能直接写 `<view id="...">`）。
@@ -166,9 +217,11 @@ k.api.get(() => {
 k.response.renderView("<view id='tailwind'></view>")
 ```
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| `ViewBody` | `string` | 含 `<view id="视图名">` 的标记字符串 |
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `ViewBody` | `string` | 是 | 含 `<view id="视图名">` 的标记字符串 |
+
+**返回：** `void`。
 
 模板中也可用简略写法：`<script env="server" view="tailwind"></script>`（`view` 为 View 资源名）。详见 [模板引擎 — 在 head 中引用 View](/templateEngine/view/#在-head-中引用-view)。
 
@@ -189,6 +242,12 @@ k.api.get("wrapper", () => {
 })
 // 输出: { "base": "data" } appended
 ```
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `url` | `string` | 是 | 要在当前上下文执行的 URL |
+
+**返回：** `void`。
 
 ## 常见用法
 

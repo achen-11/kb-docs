@@ -89,7 +89,7 @@ k.response.write(JSON.stringify(run));
 API 可以给后台按钮、运营工具或验收脚本使用。手动触发时调用 `k.site.runJob`：
 
 ```ts
-// @k-url /api/scheduled-jobs/{action}
+// Example route: /api/scheduled-jobs/{action}
 
 const jobName = "cleanupExpiredTokens";
 
@@ -135,7 +135,7 @@ k.api.get("state", () => {
 前台验证页只需要四个动作：
 
 ```html
-<!-- @k-url /scheduled-jobs -->
+<!-- Example route: /scheduled-jobs -->
 <button id="seed" type="button">生成测试 token</button>
 <button id="run" type="button">运行清理任务</button>
 <button id="state" type="button">查看状态</button>

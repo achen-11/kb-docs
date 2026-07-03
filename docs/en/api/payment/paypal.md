@@ -109,6 +109,12 @@ k.api.get(() => {
 
 Handle payment callbacks and update orders. `paypalCheckout` provides this method.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `context` | `object` | Yes | Current payment callback context, usually `k.payment.paypalCheckout.context`. |
+
 ```ts
 k.api.post(() => {
     const callback = k.payment.paypalCheckout.updateOrder(k.payment.paypalCheckout.context)
@@ -121,6 +127,12 @@ k.api.post(() => {
 ## nofityUrl()
 
 Handle PayPal Form notification callbacks. The method name is `nofityUrl` in the current type definition.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `context` | `object` | Yes | Current PayPal Form notification context, usually `k.payment.paypalForm.context`. |
 
 ```ts
 k.api.post(() => {

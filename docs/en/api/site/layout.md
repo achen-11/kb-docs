@@ -34,10 +34,12 @@ interface LayoutInput {
 
 Creates a Layout.
 
-| Field | Type | Required | Description |
+| Parameter | Type | Required | Description |
 |------|------|------|------|
-| name | `string` | Yes | Layout name; use the `layout id` when referencing it from a page |
-| body | `string` | Yes | HTML that includes `k-placeholder` or placeholder `div` elements |
+| `layout.name` | `string` | Yes | Layout name; use the `layout id` when referencing it from a page |
+| `layout.body` | `string` | Yes | HTML that includes `k-placeholder` or placeholder `div` elements |
+
+**Returns:** `void`.
 
 ```ts
 k.api.post(() => {
@@ -61,6 +63,10 @@ k.api.post(() => {
 
 Returns all Layout resources.
 
+**Parameters:** None.
+
+**Returns:** `Layout[]`.
+
 ```ts
 k.api.get(() => {
     const layouts = k.site.layouts.all()
@@ -72,6 +78,12 @@ k.api.get(() => {
 
 Gets a Layout by name or ID.
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `nameOrId` | `string` | yes | Layout name or ID |
+
+**Returns:** `Layout | null`.
+
 ```ts
 k.api.get(() => {
     const layout = k.site.layouts.get("main")
@@ -82,6 +94,12 @@ k.api.get(() => {
 ## `update()`
 
 Updates the full Layout object.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `layout` | `Layout` | yes | Modified full Layout object |
+
+**Returns:** `void`.
 
 ```ts
 k.api.post(() => {
@@ -109,6 +127,13 @@ k.api.post(() => {
 
 Updates only the `body` field.
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `nameOrId` | `string` | yes | Layout name or ID |
+| `body` | `string` | yes | New Layout HTML |
+
+**Returns:** `void`.
+
 ```ts
 k.api.post(() => {
     const stamp = Date.now().toString()
@@ -125,6 +150,12 @@ k.api.post(() => {
 ## `delete()`
 
 Deletes a Layout by name or ID.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `nameOrId` | `string` | yes | Layout name or ID |
+
+**Returns:** `void`.
 
 ::: warning
 After deleting, confirm with `get(nameOrId)`. Do not depend on a nonexistent `getByUrl`.
@@ -149,6 +180,11 @@ k.api.post(() => {
 ```
 
 ## `getLogs()` / `getByLog()`
+
+| Method | Parameters | Returns | Description |
+|------|------|------|------|
+| `getLogs(nameOrId)` | `nameOrId: string` | `ChangeLog[] | null` | Gets version logs |
+| `getByLog(logId)` | `logId: number` | `Layout | null` | Gets a historical version by log ID |
 
 ```ts
 k.api.get(() => {

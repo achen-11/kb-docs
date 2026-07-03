@@ -42,7 +42,7 @@ Page / SPA / API 返回当前语言和 fallback 信息
 下面示例用 KeyValue 保存最小字典和内容清单。真实项目可以把 `dictionary` 换成 Label、把 `articles` 换成 CMS 内容或 SQLite 表，但语言归一化和 fallback 逻辑应保持集中。
 
 ```ts
-// @k-url /api/multilingual-site/{action}
+// Example route: /api/multilingual-site/{action}
 
 type Lang = "zh" | "en";
 
@@ -166,7 +166,7 @@ GET /_spa/lang/{lang}
 页面只关心当前语言和 API 返回的数据，不自己硬编码 fallback 规则：
 
 ```html
-<!-- @k-url /multilingual-site -->
+<!-- Example route: /multilingual-site -->
 <nav>
   <span data-i18n="nav.home">首页</span>
   <span data-i18n="nav.docs">文档</span>

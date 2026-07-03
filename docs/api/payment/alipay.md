@@ -145,7 +145,7 @@ k.api.post(() => {
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| context | `RenderContext` | 是 | 当前请求上下文 |
+| context | `object` | 是 | 当前支付回调上下文 |
 
 **返回：** `PaymentCallback`
 

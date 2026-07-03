@@ -31,9 +31,31 @@
 
 Lists sites accessible to the current user. This is mainly useful in multi-site automation scenarios.
 
+**Parameters:** None.
+
+**Returns:** `Site[]` or a site summary array, depending on runtime output.
+
+```ts
+k.api.get("sites", () => {
+    return k.site.List()
+})
+```
+
 ### createSite() / Get()
 
 Creates or gets a site database instance by name. Most business logic uses the current site's `k.site` directly.
+
+| Method | Parameters | Returns | Description |
+|------|------|------|------|
+| `createSite(name)` | `name: string` | `any` | Creates a site database instance |
+| `Get(name)` | `name: string` | `any` | Gets a site database instance by name |
+
+```ts
+k.api.get("site", () => {
+    const name = k.request.queryString.get("name")
+    return k.site.Get(name)
+})
+```
 
 ### diskSpace
 

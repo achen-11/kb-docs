@@ -10,6 +10,8 @@
 
 返回可 `append` 的构建器。
 
+**参数：** 无。
+
 **返回：** `Sitemap` 构建器。
 
 ```ts
@@ -43,11 +45,33 @@ const xml = k.utils.sitemap.create()
 
 **返回：** `Sitemap`，可继续链式调用。
 
+```ts
+const sitemap = k.utils.sitemap.create()
+sitemap.append("https://www.example.com/blog/hello", {
+    lastmod: "2024-01-01",
+    changefreq: "weekly",
+    priority: 0.7
+})
+
+return sitemap.build()
+```
+
 ## build()
 
 输出 XML 字符串。
 
+**参数：** 无。
+
 **返回：** `string`。
+
+```ts
+const xml = k.utils.sitemap.create()
+    .append("https://www.example.com/", { priority: 1 })
+    .build()
+
+k.response.setHeader("Content-Type", "application/xml")
+return xml
+```
 
 ## 相关文档
 

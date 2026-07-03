@@ -30,7 +30,7 @@ import { helper } from "module:myModule/code/utils"
 import api from "ModuleApi:myModule/api/hello"
 ```
 
-See `ModuleLoader` (`code/`, `api/` directories) for parsing rules.
+Module paths are resolved from directories such as `code/` and `api/` inside the module.
 :::
 
 ## Common Members Inside a Module
@@ -69,7 +69,7 @@ k.module.task
   })
 ```
 
-`minute(n)` can also be used. Scheduling is performed by reading the functions and plans in `RenderContext` when the module task is running.
+`minute(n)` can also be used. The scheduler executes the supplied function according to the chained plan.
 
 ### localFile/openFileStream
 
@@ -86,7 +86,7 @@ Access files in the module disk directory (divided into folders by type):
 
 Or use `k.module.openFileStream("api")` etc. (`fileType` is one of `css`, `js`, `view`, `api`, `img`, `file`).
 
-`KModuleFiles` provides reading, writing, enumeration, etc. (see `Kooboo.Sites.ScriptModules.KModuleApi.KModuleFiles` in `kooboo.d.ts`).
+`KModuleFiles` provides file operations such as reading, writing, and enumeration. Use site IDE completion for the exact method list.
 
 ### localDatabase/localSqlite
 
@@ -105,6 +105,10 @@ The following methods can be called in **Site Code/API** (requires corresponding
 
 Returns an array of all `ScriptModule` objects in the site.
 
+**Parameters**: none.
+
+**Returns**: `ScriptModule[]`. All modules in the current site.
+
 ```ts
 k.api.get(() => {
   return k.module.list().map((m) => ({ id: m.id, name: m.name, online: m.online }))
@@ -115,31 +119,132 @@ k.api.get(() => {
 
 Create an empty module and register the route, returning `ScriptModule`.
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | `string` | Yes | New module name. |
+
+**Returns**: `ScriptModule`. Created module object.
+
+```ts
+k.api.post(() => {
+  const module = k.module.createModule(k.request.form.name)
+  return { id: module.id, name: module.name }
+})
+```
+
 ### remove(idOrName) / remove(idOrName, destinationSiteUrl)
 
 Delete module; two-parameter overload can specify the target site domain name to delete the module with the same name on the remote site.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `idOrName` | `string` | Yes | Module ID or module name. |
+| `destinationSiteUrl` | `string` | No | Target site domain. Omit it to remove the module from the current site. |
+
+**Returns**: `void`.
+
+```ts
+k.api.post(() => {
+  k.module.remove(k.request.form.name)
+  return { ok: true }
+})
+```
 
 ### isNameExists(name)
 
 Check whether the module name is already occupied.
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | `string` | Yes | Module name to check. |
+
+**Returns**: `boolean`. Returns `true` when the name already exists.
+
+```ts
+k.api.get(() => {
+  return { exists: k.module.isNameExists(k.request.queryString.name) }
+})
+```
+
 ### importZip(name, binary)
 
 Creates a module from a zip binary and extracts it to the modules directory, returning the new module Id string.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | `string` | Yes | Imported module name. |
+| `binary` | `number[]` | Yes | Zip file bytes. |
+
+**Returns**: `string`. New module ID.
+
+```ts
+k.api.post(() => {
+  const file = k.request.files[0]
+  const id = k.module.importZip(k.request.form.name, file.bytes)
+  return { id }
+})
+```
 
 ### exportAsZip(nameOrId)
 
 Export the module as a zip byte array.
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `nameOrId` | `string` | Yes | Module name or module ID. |
+
+**Returns**: `number[]`. Module zip package bytes.
+
+```ts
+k.api.get(() => {
+  const bytes = k.module.exportAsZip(k.request.queryString.name)
+  return { size: bytes.length }
+})
+```
+
 ### importFromUrl(siteUrl, moduleId, newModuleName[, destinationSiteUrl])
 
 Pull the zip from the shared URL (`/_api/PublicModuleFiles/PrivateShare?ModuleId=...`) of other Kooboo sites and install it.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `siteUrl` | `string` | Yes | Source site URL. |
+| `moduleId` | `string` | Yes | Source module ID. |
+| `newModuleName` | `string` | Yes | Module name after installation. |
+| `destinationSiteUrl` | `string` | No | Target site URL. Omit it to install into the current site. |
+
+**Returns**: `string`. Installed module ID.
+
+```ts
+k.api.post(() => {
+  const id = k.module.importFromUrl(
+    k.request.form.siteUrl,
+    k.request.form.moduleId,
+    k.request.form.name
+  )
+  return { id }
+})
+```
 
 ### searchRepository(keyword) / installFromRepository(packageId, name)
 
 Search the Kooboo app store module package, download and install it (same origin as the **Search** button in the background).
 
-## TypeScript definition (excerpt)
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `searchRepository(keyword)` | `keyword: string` | `ModuleSearchResult[]` | Search module packages by keyword. |
+| `installFromRepository(packageId, name)` | `packageId: string`, `name: string` | `string` | Install the package and return the module ID. |
+
+```ts
+k.api.post(() => {
+  const results = k.module.searchRepository(k.request.form.keyword)
+  if (!results.length) return { installed: false }
+  const id = k.module.installFromRepository(results[0].id, k.request.form.name)
+  return { installed: true, id }
+})
+```
+
+## TypeScript Definition
 
 ```ts
 interface KModule {
@@ -175,7 +280,7 @@ Module root directory **`module.config`** (JSON) common fields:
 | `settingDefines` | Backend **Settings** form definition (`name`, `type`, `defaultValue`, `display`, etc.) |
 | `menu` | Mounted to [the left sidebar in the site admin](/en/cms/development/modules); only **online** modules take effect |
 
-### `menu` (Backstage sidebar)
+### Menu Configuration
 
 When the site is loaded, the `Site` API reads the `module.config` of each online module. If `menu` exists, it is merged into `moduleMenus` and rendered to the left menu (see CMS documentation for details).
 

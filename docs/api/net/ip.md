@@ -36,6 +36,10 @@ k.api.get("geo", () => {
 | `getCountry(ip)` | 国家级信息 |
 | `getCityOrCountry(ip)` | 优先城市，无城市时回退国家 |
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `ip` | `string` | 是 | 要查询地理信息的 IP 地址。 |
+
 **返回：** `IPInfo` 或 `null`
 
 ### IPInfo 常用字段

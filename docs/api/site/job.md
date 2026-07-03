@@ -16,9 +16,11 @@
 
 异步执行指定任务一次（与列表 **运行** 等效，日志说明为 `Manual trigger from kscript`）。
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| `name` | `string` | 任务 **名称** 或任务 Id（GUID 字符串） |
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `name` | `string` | 是 | 任务 **名称** 或任务 Id（GUID 字符串） |
+
+**返回：** `void`。
 
 ```typescript
 k.site.runJob("nightly_sync")
@@ -32,7 +34,7 @@ k.site.runJob("nightly_sync")
 
 ## 执行环境
 
-- 使用当前站点的 `RenderContext`（`RenderContextProvider.CreateFromSite`）。
+- 使用当前站点的服务端执行上下文。
 - 代码来自 `SiteJob.Code` 字段（后台 Monaco 保存），以 **Module** 脚本类型、**长任务** 选项执行。
 - 可使用与其它服务端 Code 相同的 `k.*` API（`k.DB`、`k.content`、`k.mail` 等）。
 

@@ -50,7 +50,7 @@ Page 读取 me 决定显示哪些入口
 下面示例用固定测试用户和 KeyValue 项目列表验证角色规则。真实项目可以把用户换成站点用户、业务会员、客户表或组织成员表。
 
 ```ts
-// @k-url /api/sessions-and-roles/{action}
+// Example route: /api/sessions-and-roles/{action}
 
 type Role = "member" | "manager" | "admin";
 
@@ -212,7 +212,7 @@ k.api.get("project", () => {
 页面可以根据 `me` 的结果展示不同按钮：
 
 ```html
-<!-- @k-url /sessions-and-roles -->
+<!-- Example route: /sessions-and-roles -->
 <button id="alice" type="button">登录 Alice</button>
 <button id="manager" type="button">登录组织经理</button>
 <button id="admin" type="button">登录管理员</button>

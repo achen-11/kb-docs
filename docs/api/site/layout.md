@@ -34,10 +34,12 @@ interface LayoutInput {
 
 创建布局。
 
-| 字段 | 类型 | 必填 | 说明 |
+| 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| name | `string` | 是 | 布局名称，页面引用时用 `layout id` |
-| body | `string` | 是 | HTML，含 `k-placeholder` 或占位 div |
+| `layout.name` | `string` | 是 | 布局名称，页面引用时用 `layout id` |
+| `layout.body` | `string` | 是 | HTML，含 `k-placeholder` 或占位 div |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -61,6 +63,10 @@ k.api.post(() => {
 
 返回全部布局。
 
+**参数：** 无。
+
+**返回：** `Layout[]`。
+
 ```ts
 k.api.get(() => {
     const layouts = k.site.layouts.all()
@@ -72,6 +78,12 @@ k.api.get(() => {
 
 按名称或 Id 获取布局。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 布局名称或 Id |
+
+**返回：** `Layout | null`。
+
 ```ts
 k.api.get(() => {
     const layout = k.site.layouts.get("main")
@@ -82,6 +94,12 @@ k.api.get(() => {
 ## update()
 
 更新完整布局对象（通常先 `get` 再改 `body`）。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `layout` | `Layout` | 是 | 修改后的完整布局对象 |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -109,6 +127,13 @@ k.api.post(() => {
 
 仅更新 `body` 字段。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 布局名称或 Id |
+| `body` | `string` | 是 | 新布局 HTML |
+
+**返回：** `void`。
+
 ```ts
 k.api.post(() => {
     const stamp = Date.now().toString()
@@ -125,6 +150,12 @@ k.api.post(() => {
 ## delete()
 
 按名称或 Id 删除布局。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 布局名称或 Id |
+
+**返回：** `void`。
 
 ::: warning
 删除后用 `get(nameOrId)` 确认即可，不要依赖不存在的 `getByUrl`。
@@ -149,6 +180,11 @@ k.api.post(() => {
 ```
 
 ## getLogs() / getByLog()
+
+| 方法 | 参数 | 返回 | 说明 |
+|------|------|------|------|
+| `getLogs(nameOrId)` | `nameOrId: string` | `ChangeLog[] | null` | 获取版本日志 |
+| `getByLog(logId)` | `logId: number` | `Layout | null` | 按日志 Id 获取历史版本 |
 
 ```ts
 k.api.get(() => {

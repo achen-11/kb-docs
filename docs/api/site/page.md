@@ -44,12 +44,14 @@ interface PageInput {
 
 创建页面并注册路由。未传 `url` 时默认 `/{name}`。
 
-| 字段 | 类型 | 必填 | 说明 |
+| 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| name | `string` | 是 | 页面名称（唯一） |
-| body | `string` | 是 | 页面内容，可为 `<layout>` 占位结构 |
-| url | `string` | 是 | 访问路径，如 `/about` |
-| layoutName | `string` | 否 | 关联布局名称 |
+| `page.name` | `string` | 是 | 页面名称（唯一） |
+| `page.body` | `string` | 是 | 页面内容，可为 `<layout>` 占位结构 |
+| `page.url` | `string` | 是 | 访问路径，如 `/about` |
+| `page.layoutName` | `string` | 否 | 关联布局名称 |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -77,6 +79,10 @@ k.api.post(() => {
 
 返回站点全部页面对象数组。
 
+**参数：** 无。
+
+**返回：** `Page[]`。
+
 ```ts
 k.api.get(() => {
     const pages = k.site.pages.all()
@@ -87,6 +93,12 @@ k.api.get(() => {
 ## get()
 
 按 **名称** 或 **Id**（GUID 字符串）获取页面。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 页面名称或 Id |
+
+**返回：** `Page | null`。
 
 ```ts
 k.api.get(() => {
@@ -99,6 +111,12 @@ k.api.get(() => {
 
 按 **路由 URL** 获取页面（会解析路由别名）。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `url` | `string` | 是 | 页面路由 URL |
+
+**返回：** `Page | null`。
+
 ```ts
 k.api.get(() => {
     const page = k.site.pages.getByUrl("/")
@@ -109,6 +127,12 @@ k.api.get(() => {
 ## update()
 
 用完整页面对象更新（通常先 `get` / `getByUrl` 再改字段）。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `page` | `Page` | 是 | 修改后的完整页面对象 |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -136,6 +160,13 @@ k.api.post(() => {
 
 仅更新 `body` 字段。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 页面名称或 Id |
+| `body` | `string` | 是 | 新页面主体 HTML |
+
+**返回：** `void`。
+
 ```ts
 k.api.post(() => {
     const stamp = Date.now().toString()
@@ -159,6 +190,12 @@ k.api.post(() => {
 ## delete()
 
 按名称或 Id 删除页面。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 页面名称或 Id |
+
+**返回：** `void`。
 
 ::: warning
 删除后请用 `get(nameOrId)` 确认；对已删页面调用 `getByUrl` 在部分站点上可能因路由残留触发运行时错误。
@@ -187,6 +224,11 @@ k.api.post(() => {
 
 根据页面 **Id** 获取相对路径或绝对 URL。
 
+| 方法 | 参数 | 返回 | 说明 |
+|------|------|------|------|
+| `getUrl(id)` | `id: string` | `string | null` | 获取相对 URL |
+| `getAbsUrl(id)` | `id: string` | `string | null` | 获取绝对 URL |
+
 ```ts
 k.api.get(() => {
     const page = k.site.pages.all()[0]
@@ -203,6 +245,11 @@ k.api.get(() => {
 
 `getLogs` 返回指定页面的变更日志；`getByLog` 按日志 Id 还原该版本对象。
 
+| 方法 | 参数 | 返回 | 说明 |
+|------|------|------|------|
+| `getLogs(nameOrId)` | `nameOrId: string` | `ChangeLog[] | null` | 获取版本日志 |
+| `getByLog(logId)` | `logId: number` | `Page | null` | 按日志 Id 获取历史版本 |
+
 ```ts
 k.api.get(() => {
     const page = k.site.pages.all()[0]
@@ -216,6 +263,12 @@ k.api.get(() => {
 
 返回页面在各文化下的路由路径字典。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 页面名称或 Id |
+
+**返回：** `Record<string, string>`。
+
 ```ts
 k.api.get(() => {
     const page = k.site.pages.all()[0]
@@ -228,11 +281,13 @@ k.api.get(() => {
 
 更新页面在指定文化下的路由路径。
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| id | `string` | 页面 Id |
-| url | `string` | 新路径 |
-| culture | `string` | 可选，默认站点主文化 |
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| id | `string` | 是 | 页面 Id |
+| url | `string` | 是 | 新路径 |
+| culture | `string` | 否 | 文化代码，默认站点主文化 |
+
+**返回：** `void`。
 
 ```ts
 // 多语言站点中调整某语言下的 URL

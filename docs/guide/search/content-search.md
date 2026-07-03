@@ -124,7 +124,7 @@ export function searchContent(options) {
 API 负责把 URL 查询参数转换成服务端搜索选项：
 
 ```ts
-// @k-url /api/content-search/{action}
+// Example route: /api/content-search/{action}
 
 import { searchContent, seedIndex, clearIndex } from "code/services/contentSearch";
 
@@ -149,7 +149,7 @@ k.api.get("search", () => {
 前台页面只调用 API，不直接读取存储：
 
 ```html
-<!-- @k-url /content-search -->
+<!-- Example route: /content-search -->
 <input id="q" type="search" placeholder="关键词">
 <select id="category">
   <option value="">全部分类</option>

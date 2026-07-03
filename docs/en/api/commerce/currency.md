@@ -22,6 +22,8 @@ k.api.get(() => {
 
 Get a list of supported currencies.
 
+**Parameters**: none.
+
 ```ts
 k.api.get(() => {
     return k.commerce.currency.list()

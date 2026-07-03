@@ -10,7 +10,7 @@
 Column types, primary keys/unique/indexes, etc. must be maintained in the background **Column Settings**; script `add` can automatically expand undeclared fields, while `append` will not change the table structure. See [CMS: IndexedDB Tables](/en/cms/database/table).
 :::
 
-::: The difference between info and k.DB.sqlite
+::: info Difference from k.DB.sqlite
 | | **k.DB.indexedDb** | **k.DB.sqlite** |
 |--|--------------------------|------------------|
 | Modeling | Background table creation + object CRUD | SQL + `query` / `execute` |
@@ -42,7 +42,11 @@ k.api.get(() => {
 
 Insert a record. If the object contains **undefined fields** in the table, it will **automatically update the table structure** and add columns.
 
-**Returns**: New record Id (`Guid` string); `null` on failure.
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `value` | `object` | Yes | Record object to insert. Object fields map to table columns; undeclared fields trigger schema expansion. |
+
+**Returns**: `string | null`. New record Id (`Guid` string); `null` on failure.
 
 ```ts
 const id = k.DB.indexedDb.orders.add({
@@ -55,6 +59,12 @@ const id = k.DB.indexedDb.orders.add({
 
 Similar to `add`, but does not modify the table structure due to new fields; undefined fields may be ignored or cause writes to fail, depending on the table structure.
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `value` | `object` | Yes | Record object to insert. Fields should already be declared in the table schema. |
+
+**Returns**: `string | null`. New record Id (`Guid` string); `null` on failure.
+
 ```ts
 const id = k.DB.indexedDb.orders.append({ orderNo: "A1002", amount: 120 })
 ```
@@ -63,6 +73,13 @@ const id = k.DB.indexedDb.orders.append({ orderNo: "A1002", amount: 120 })
 
 - `update(id, newValue)`: `id` is the system `_id` or business primary key value.
 - `update(newValue)`: The object must contain `_id`, or use internal `UpdateOrAdd` logic.
+
+| Method | Parameters | Description |
+|--------|------------|-------------|
+| `update(id, value)` | `id: string`, `value: object` | Locate the record by `_id` or primary key and update it with `value`. |
+| `update(value)` | `value: object` | Update using `_id` in the object; when `_id` is missing, runtime update-or-add behavior applies. |
+
+**Returns**: `void`.
 
 ```ts
 const table = k.DB.indexedDb.orders
@@ -78,6 +95,12 @@ table.update(row)
 
 Delete by `_id` or primary key.
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | `string` | Yes | `_id` or primary key value of the record to delete. |
+
+**Returns**: `void`.
+
 ```ts
 k.DB.indexedDb.orders.delete(id)
 ```
@@ -87,6 +110,17 @@ k.DB.indexedDb.orders.delete(id)
 ### get(id)
 
 Get a single item by Id or primary key, and return `null` / `undefined` if it does not exist (subject to runtime).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | `string` | Yes | `_id` or primary key value of the record to read. |
+
+**Returns**: `object | null | undefined`. Matching record object, or an empty value when no record exists.
+
+```ts
+const row = k.DB.indexedDb.orders.get(id)
+return row ? { id: row._id, orderNo: row.orderNo } : null
+```
 
 ### find/findAll
 
@@ -122,6 +156,10 @@ const many = k.DB.indexedDb.orders.findAll({
 
 Return all records in the table (use large tables with caution).
 
+**Parameters**: none.
+
+**Returns**: `object[]`. All records in the table.
+
 ```ts
 const all = k.DB.indexedDb.orders.all()
 ```
@@ -129,6 +167,13 @@ const all = k.DB.indexedDb.orders.all()
 ### Count(query) / Count(filter)
 
 The number of items that meet the conditions.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | `string` | No | Condition string, for example `status == 'paid'`. |
+| `filter` | `object` | No | Filter object, usually used with `operators()`. |
+
+**Returns**: `number`. Number of matching records.
 
 ```ts
 const n = k.DB.indexedDb.orders.Count("status == 'paid'")
@@ -158,6 +203,14 @@ const rows = k.DB.indexedDb.orders
 
 Paging encapsulation, the returned object looks like:
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `pageIndex` | `number` | Yes | Page number, starting at **1**. |
+| `pageSize` | `number` | Yes | Records per page. |
+| `where` | `string` | No | Condition string, for example `status == 'paid'`. |
+
+**Returns**: pagination object with total count, total pages, current page, page size, and current page records.
+
 ```ts
 {
   totalCount: number
@@ -179,6 +232,12 @@ k.response.json(page)
 
 Create an additional index for the column (the "Index" in the background column settings works with this).
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `fieldName` | `string` | Yes | Column name to index. |
+
+**Returns**: `void`.
+
 ```ts
 k.DB.indexedDb.orders.createIndex("orderNo")
 ```
@@ -192,7 +251,7 @@ k.DB.indexedDb.orders.createIndex("orderNo")
 
 Whether logs are kept in the background depends on the site/table configuration; `null` may be returned if there are no logs.
 
-## TypeScript shapes (excerpt)
+## TypeScript Shapes
 
 ```ts
 interface IDatabase {
@@ -236,7 +295,7 @@ interface ITable {
 4. **Server-side execution**: Called in `env="server"`'s Code, API, scheduled tasks and other environments.
 5. **Large table**: Avoid `all()` for large tables; give priority to `pagination` or `Query().skip().take()`.
 
-## Association table (table relationship)
+## Association Table
 
 After being configured in the background [IndexedDB Table Relations](/en/cms/database/table-relation), when reading the main table records, you can use the **relationship name** to access the related table data (one-to-many/many-to-many as an array). For example `const items = order.lineItems`.
 

@@ -9,4 +9,4 @@
 正文内图片支持点击放大。也可使用 Markdown 图片语法或带 `bordered-image` 的 `<img>`。
 
 - 本地：`pnpm docs:dev` 可直接预览。
-- 发布：`pnpm docs:build:kooboo` 会复制到 `kb-remote-site/images/cms/`，再 `kb push images/cms`。
+- 发布：随文档站构建流程同步到站点静态资源。

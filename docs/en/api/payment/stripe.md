@@ -98,6 +98,12 @@ k.api.post(() => {
 
 Check payment status.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `requestId` | `string` | Yes | `requestId` returned by `charge()`. |
+
 ```ts
 k.api.get(() => {
     const status = k.payment.stripeCheckout.checkStatus('request-id')
@@ -129,6 +135,13 @@ k.api.get(() => {
 
 Create cards for customers.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `customer` | `string` | Yes | Stripe Customer ID. |
+| `card` | `Card` | Yes | Card information to save. |
+
 ```ts
 k.api.post(() => {
     return k.payment.stripe.createCard('customer-id', {
@@ -147,6 +160,12 @@ k.api.post(() => {
 
 Remove the card from the customer.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `cardId` | `string` | Yes | Stripe card ID to remove. |
+
 ```ts
 k.api.post(() => {
     k.payment.stripe.removeCard('card-id')
@@ -159,6 +178,12 @@ k.api.post(() => {
 ## updateOrder()
 
 Handle Stripe Checkout callbacks and update orders.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `context` | `object` | Yes | Current payment callback context, usually `k.payment.stripeCheckout.context`. |
 
 ```ts
 k.api.post(() => {

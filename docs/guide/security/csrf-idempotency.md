@@ -46,7 +46,7 @@ CSRF token 表示“这个请求来自当前会话”；幂等键表示“这个
 下面示例用 `k.session` 保存当前会话 token 和已处理的幂等键。真实项目中，`order` 部分应替换为订单、支付、表单等业务写入。
 
 ```ts
-// @k-url /api/guide-csrf-idempotency/{action}
+// Example route: /api/guide-csrf-idempotency/{action}
 
 type OrderSubmitBody = {
   csrfToken?: string;
@@ -146,7 +146,7 @@ k.api.post("submit", (body: OrderSubmitBody) => {
 页面进入时可以先取 token；每次用户发起新的业务动作时生成新的幂等键。重复提交测试则故意使用同一个幂等键提交两次：
 
 ```html
-<!-- @k-url /guide-csrf-idempotency -->
+<!-- Example route: /guide-csrf-idempotency -->
 <button id="load-token" type="button">获取 token</button>
 <button id="submit" type="button">合法提交</button>
 <button id="duplicate" type="button">重复提交同一幂等键</button>

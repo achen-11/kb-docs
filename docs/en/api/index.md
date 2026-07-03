@@ -9,7 +9,7 @@ Complete reference for Kooboo server-side `k.*` APIs. The English structure mirr
 | [API Getting Started](./getting-started/) | KScript basics and the shape of the global `k` object |
 | [Authentication and Authorization](./getting-started/auth.md) | Login, sessions, cookies, and access control |
 
-## KScript APIs (A-Z)
+## KScript APIs
 
 | Module | Doc | Description |
 |--------|-----|-------------|

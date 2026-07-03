@@ -29,6 +29,8 @@ k.api.get(() => {
 
 获取数字产品配送方式列表。
 
+**参数**：无。
+
 ```ts
 k.api.get(() => {
     const digitalShippings = k.commerce.shipping.digitalList()

@@ -17,6 +17,8 @@
 | `id` | `string` | 连接标识，同站点内唯一，供 `get` / `list` 使用 |
 | `receive` | `function` | 收到消息回调，参数 `ctx` 含 `text` / `binary` |
 
+**返回值**：`void`。连接关闭前当前脚本会保持运行。
+
 ```ts
 k.api.get("ws", () => {
     k.net.webSocket.accept("user_1", (ctx) => {
@@ -36,6 +38,10 @@ k.api.get("ws", () => {
 
 返回当前站点已注册连接 id 列表。
 
+**参数**：无。
+
+**返回值**：`string[]`。当前站点已注册连接 ID 列表。
+
 ```ts
 const ids = k.net.webSocket.list()
 ```
@@ -43,6 +49,12 @@ const ids = k.net.webSocket.list()
 ## get()
 
 按 id 获取连接，用于服务端主动推送。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `id` | `string` | 是 | 连接 ID。 |
+
+**返回值**：`WebSocketConnection | null`。匹配到的连接；不存在时为空值。
 
 ```ts
 const conn = k.net.webSocket.get("user_1")

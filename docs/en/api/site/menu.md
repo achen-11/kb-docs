@@ -6,7 +6,7 @@
 
 `k.site.menus` manages Kooboo **Menu** resources: menu groups, multi-level menu items created in the backend [Develop -> Menus](/en/cms/development/menus), and HTML templates for output. The definition itself **will not** automatically appear on the page and must be referenced through this API or the `<menu>` component in **Layout / Page / View**.
 
-::: The difference between tip and "Edit Menu"
+::: tip Difference from "Edit Menu"
 | object | Entrance | effect |
 |------|------|------|
 | **Develop → Menu** (this article API) | `/_Admin/development/menus` | Site navigation as seen by visitors |
@@ -15,7 +15,7 @@
 See [Site Admin Menu Overview](/en/cms/navigation.md#edit-menu) for details.
 :::
 
-::: The difference between warning and k.site.pages
+::: warning Difference from k.site.pages
 | API | Purpose |
 |-----|------|
 | `k.site.menus` | Navigation menu tree (name, URL, sub-items, rendering template) |
@@ -24,7 +24,7 @@ See [Site Admin Menu Overview](/en/cms/navigation.md#edit-menu) for details.
 
 Menu item URLs usually point to a [Pages](/en/cms/site/pages.md) route; multilingual names are maintained by language in the background and read with `getName(culture)` on the script side.
 
-## TypeScript definition (excerpt)
+## TypeScript Definition
 
 ```ts
 interface KMenus {
@@ -56,6 +56,12 @@ interface Menu {
 
 Get the root menu object (with `children` tree) by menu **Name** or **Id** (GUID string).
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `nameOrId` | `string` | yes | Root menu name or ID |
+
+**Returns:** `Menu | null`.
+
 ```ts
 k.api.get(() => {
     const menu = k.site.menus.get("main")
@@ -78,6 +84,10 @@ k.api.get(() => {
 
 Returns an array of all root menu objects of the site (excluding flat lists other than individually expanded subtrees).
 
+**Parameters:** None.
+
+**Returns:** `Menu[]`.
+
 ```ts
 k.api.get(() => {
     const menus = k.site.menus.list()
@@ -88,6 +98,12 @@ k.api.get(() => {
 ## create()
 
 Creates a new root menu; throws exception if name already exists.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `name` | `string` | yes | Root menu name |
+
+**Returns:** `Menu`.
 
 ```ts
 k.api.post(() => {
@@ -100,6 +116,12 @@ k.api.post(() => {
 ## remove()
 
 Delete the entire menu by root menu **Id** (GUID string).
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `id` | `string` | yes | Root menu ID |
+
+**Returns:** `void`.
 
 ```ts
 k.api.post(() => {
@@ -126,6 +148,13 @@ For objects returned by `get()` / `create()` / `list()`, fields can be read and 
 
 Add a new sub-item under the current node and save it.
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `name` | `string` | yes | Submenu display name |
+| `url` | `string` | yes | Submenu link |
+
+**Returns:** `void`.
+
 ```ts
 k.api.post(() => {
     const root = k.site.menus.get("main")
@@ -138,15 +167,48 @@ k.api.post(() => {
 
 Updates the name or URL by subkeyId; passing in `culture` only updates `Values` for that language, and also updates `name` for the default language.
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `subMenuId` | `string` | yes | Submenu ID |
+| `name` | `string` | yes | New display name |
+| `url` | `string` | yes | New link |
+| `culture` | `string` | no | Culture code |
+
+**Returns:** `void`.
+
+```ts
+k.api.post(() => {
+    const root = k.site.menus.get("main")
+    const child = root.children[0]
+    root.updateSubMenu(child.id, "Updated", "/updated")
+    return { updated: true }
+})
+```
+
 ### removeSubMenu(subMenuId)
 
 Delete a submenu item by subitemId.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `subMenuId` | `string` | yes | Submenu ID |
+
+**Returns:** `void`.
+
+```ts
+k.api.post(() => {
+    const root = k.site.menus.get("main")
+    const child = root.children[0]
+    root.removeSubMenu(child.id)
+    return { removed: true }
+})
+```
 
 ## How to use the front desk
 
 After the menu is configured in the background, choose any method in the template to output it (can be combined: components for the top bar and scripts for the footer).
 
-### Method 1: `<menu>` component (recommended, use the background template)
+### Render with the `<menu>` Component
 
 Insert the Kooboo **Menu** component in **Layout** or **Page**: the tag name is `menu`, and `id` is the background menu **name**. Use the HTML templates and placeholders (`{href}`, `{anchortext}`, `{items}`, etc.) configured in [Develop -> Menus](/en/cms/development/menus) when rendering, and automatically handle current-page highlighting and multilingual URLs.
 
@@ -160,7 +222,7 @@ Insert the Kooboo **Menu** component in **Layout** or **Page**: the tag name is 
 
 Dragging **Menu** into the components panel of the layout/page designer has the same effect. `id` On error or when the menu does not exist, the output at this location is empty.
 
-### Method 2: `k.site.menus` + `k-for` (custom HTML)
+### Render with `k.site.menus` and `k-for`
 
 Read the menu in the server script and use [Template Binding Syntax](/en/templateEngine/binding/)'s `k-for` to render it. The structure is completely controlled by the template.
 

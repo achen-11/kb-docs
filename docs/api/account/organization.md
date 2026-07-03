@@ -82,6 +82,12 @@ k.api.get(() => {
 
 ## get()
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 组织名称或组织 ID。 |
+
+**返回值**：`OrganizationModel | null`。匹配到的组织；不存在时为空值。
+
 ```ts
 k.api.get(() => {
     const org = k.account.organization.get("org-name-or-id")
@@ -92,6 +98,13 @@ k.api.get(() => {
 ## addDepartment()
 
 在当前组织下新增部门（需相应权限）。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `name` | `string` | 是 | 部门名称。 |
+| `displayName` | `string` | 是 | 部门显示名称。 |
+
+**返回值**：`void`。
 
 ```ts
 k.api.post(() => {
@@ -107,6 +120,14 @@ k.api.post(() => {
 
 创建或更新组织子账号（用户名一般为 `name@组织Id` 形式）。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `name` | `string` | 是 | 组织子账号名称。 |
+| `password` | `string` | 是 | 登录密码。 |
+| `isAdmin` | `boolean` | 是 | 是否为组织管理员。 |
+
+**返回值**：`User | null`。创建或更新后的用户信息。
+
 ```ts
 k.api.post(() => {
     const user = k.account.organization.current.addOrUpdateOrganizationUser(
@@ -119,6 +140,11 @@ k.api.post(() => {
 ```
 
 ## deleteOrganizationUser() / getOrganizationUser()
+
+| 方法 | 参数 | 返回值 | 说明 |
+|------|------|--------|------|
+| `deleteOrganizationUser(name)` | `name: string` | `boolean` | 删除指定组织子账号，成功时返回 `true`。 |
+| `getOrganizationUser(name)` | `name: string` | `User | null` | 读取指定组织子账号；不存在时为空值。 |
 
 ```ts
 k.api.post(() => {

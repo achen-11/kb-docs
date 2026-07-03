@@ -50,7 +50,7 @@
 真实项目发起支付时应调用具体 provider，例如 `k.payment.alipayForm.charge()`、`k.payment.weChatH5.charge()`、`k.payment.stripeCheckout.charge()`。下面示例用 KeyValue 模拟订单和支付请求，便于稳定验证流程边界。
 
 ```ts
-// @k-url /api/payment-callbacks/{action}
+// Example route: /api/payment-callbacks/{action}
 
 type StartPaymentBody = {
   orderId?: string;
@@ -173,7 +173,7 @@ k.api.post("callback", () => {
 支付返回页只做查询和提示，不直接判定成功：
 
 ```html
-<!-- @k-url /payment-return -->
+<!-- Example route: /payment-return -->
 <p id="status">正在确认支付结果...</p>
 
 <script>

@@ -56,6 +56,26 @@ interface CacheCascade {
 
 键名最长 **1024** 字符；`set(key, value, seconds)` 的秒数受服务端 `Cache:MaxExpireSeconds` 配置上限（默认约 2 小时）。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `key` | `string` | 是 | 缓存键 |
+| `value` | `any` | 是 | 要缓存的值 |
+| `seconds` | `number` | 否 | 过期秒数 |
+| `options` | `CacheOptions` | 否 | 过期与级联失效配置 |
+
+**返回：** `void`。
+
+```ts
+k.api.post(() => {
+    const key = "summary-" + Date.now()
+    k.cache.set(key, { ok: true }, 60)
+    return {
+        stored: k.cache.containsKey(key),
+        value: k.cache.get(key)
+    }
+})
+```
+
 ## Options 重载（`set` / `getOrCreate`）
 
 第三参数传入 **`options`** 时，可分别设置绝对过期、滑动过期，以及 **级联键（`cascades`）**：当某级联键被 `remove` / `CascadeRemove` 触发时，关联缓存项一并失效。`removeAll()` 即对当前站点 Id 做级联清理。
@@ -94,6 +114,12 @@ k.api.get(() => {
 })
 ```
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `key` | `string` | 是 | 缓存键 |
+
+**返回：** `any`，缓存值；不存在时返回 `undefined`。
+
 ## getOrCreate()
 
 不存在时执行 `factory` 写入缓存并返回值。
@@ -102,6 +128,15 @@ k.api.get(() => {
 |------|------|
 | `getOrCreate(key, factory, seconds)` | 秒数过期（常用） |
 | `getOrCreate(key, factory, options?)` | 使用 `CacheOptions` |
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `key` | `string` | 是 | 缓存键 |
+| `factory` | `() => any` | 是 | 未命中时执行并返回要缓存的值 |
+| `seconds` | `number` | 否 | 过期秒数 |
+| `options` | `CacheOptions` | 否 | 过期与级联失效配置 |
+
+**返回：** `any`，命中的缓存值或 `factory` 生成的新值。
 
 ```ts
 k.api.get(() => {
@@ -119,11 +154,19 @@ k.api.get(() => {
 
 ## containsKey()
 
+检查指定缓存键是否存在。
+
 ```ts
 k.api.get(() => {
     return { exists: k.cache.containsKey("my-key") }
 })
 ```
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `key` | `string` | 是 | 缓存键 |
+
+**返回：** `boolean`。
 
 ## remove() / removeAll()
 
@@ -138,6 +181,11 @@ k.api.post(() => {
 })
 ```
 
+| 方法 | 参数 | 返回 | 说明 |
+|------|------|------|------|
+| `remove(key)` | `key: string` | `void` | 删除指定缓存项 |
+| `removeAll()` | 无 | `void` | 清除当前站点缓存分组 |
+
 ## localCache()
 
 将外部 URL 资源缓存到站点本地，返回可访问的本地 URL。
@@ -149,6 +197,13 @@ k.api.get(() => {
 })
 ```
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `externalUrl` | `string` | 是 | 外部资源 URL |
+| `hours` | `number` | 是 | 本地缓存小时数 |
+
+**返回：** `string`，站点内可访问的本地 URL。
+
 ## getOrSet()
 
 未命中时执行一行 KScript（`scriptOrFunctionName`），将结果写入缓存。
@@ -158,6 +213,8 @@ k.api.get(() => {
 | key | 缓存键 |
 | scriptOrFunctionName | 要执行的脚本片段 |
 | timeOutMinutes | 过期分钟数 |
+
+**返回：** `any`，命中的缓存值或脚本执行结果。
 
 ```ts
 k.api.get(() => {

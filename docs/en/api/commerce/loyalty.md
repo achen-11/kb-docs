@@ -135,6 +135,8 @@ k.api.get(() => {
 
 Get a list of member information.
 
+**Parameters**: none.
+
 ```ts
 k.api.get(() => {
     const memberships = k.commerce.loyalty.memberships()

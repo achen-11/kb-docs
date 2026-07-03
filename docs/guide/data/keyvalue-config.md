@@ -39,7 +39,7 @@ Page / View / 业务 API 读取配置
 下面示例保存一个活动配置。KeyValue 中存 JSON 字符串，读取时缓存解析后的对象：
 
 ```ts
-// @k-url /api/promo-config/{action}
+// Example route: /api/promo-config/{action}
 
 type PromoConfig = {
   enabled: boolean;
@@ -141,7 +141,7 @@ k.api.post("clear", () => {
 页面可以连续读取两次，用第二次响应确认缓存命中：
 
 ```html
-<!-- @k-url /promo-config-demo -->
+<!-- Example route: /promo-config-demo -->
 <button id="read-twice" type="button">连续读取两次</button>
 <button id="update" type="button">更新活动配置</button>
 <pre id="result">等待操作。</pre>

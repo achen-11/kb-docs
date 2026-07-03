@@ -42,13 +42,15 @@ interface ScriptInput {
 
 创建脚本并注册路由。未传 `url` 时默认为 `/{name}`，且若路径不含扩展名会自动追加脚本扩展名（通常为 `.js`）。
 
-| 字段 | 类型 | 必填 | 说明 |
+| 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| name | `string` | 是 | 脚本名称（唯一） |
-| body | `string` | 是 | JavaScript 内容 |
-| url | `string` | 否 | 访问路径，如 `/assets/app.js` |
-| async | `boolean` | 否 | 是否 async 加载 |
-| defer | `boolean` | 否 | 是否 defer 加载 |
+| `script.name` | `string` | 是 | 脚本名称（唯一） |
+| `script.body` | `string` | 是 | JavaScript 内容 |
+| `script.url` | `string` | 否 | 访问路径，如 `/assets/app.js` |
+| `script.async` | `boolean` | 否 | 是否 async 加载 |
+| `script.defer` | `boolean` | 否 | 是否 defer 加载 |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -75,6 +77,10 @@ k.api.post(() => {
 
 返回全部脚本。
 
+**参数：** 无。
+
+**返回：** `Script[]`。
+
 ```ts
 k.api.get(() => {
     const scripts = k.site.scripts.all()
@@ -85,6 +91,12 @@ k.api.get(() => {
 ## get()
 
 按名称或 Id 获取脚本。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 脚本名称或 Id |
+
+**返回：** `Script | null`。
 
 ```ts
 k.api.get(() => {
@@ -97,6 +109,12 @@ k.api.get(() => {
 
 按 **路由 URL** 获取脚本（例如 `/main.js`）。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `url` | `string` | 是 | 脚本路由 URL |
+
+**返回：** `Script | null`。
+
 ```ts
 k.api.get(() => {
     const script = k.site.scripts.getByUrl("/main.js")
@@ -107,6 +125,12 @@ k.api.get(() => {
 ## update()
 
 更新完整脚本对象。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `script` | `Script` | 是 | 修改后的完整脚本对象 |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -131,6 +155,13 @@ k.api.post(() => {
 
 仅更新 `body`。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 脚本名称或 Id |
+| `body` | `string` | 是 | 新 JavaScript 内容 |
+
+**返回：** `void`。
+
 ```ts
 k.api.post(() => {
     const stamp = Date.now().toString()
@@ -148,6 +179,12 @@ k.api.post(() => {
 ## delete()
 
 按名称或 Id 删除。删除后用 `get(name)` 验证。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 脚本名称或 Id |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -170,6 +207,11 @@ k.api.post(() => {
 
 ## getUrl() / getAbsUrl()
 
+| 方法 | 参数 | 返回 | 说明 |
+|------|------|------|------|
+| `getUrl(id)` | `id: string` | `string | null` | 获取相对 URL |
+| `getAbsUrl(id)` | `id: string` | `string | null` | 获取绝对 URL |
+
 ```ts
 k.api.get(() => {
     const scripts = k.site.scripts.all()
@@ -186,6 +228,11 @@ k.api.get(() => {
 仅注册了路由的脚本能返回 URL。
 
 ## getLogs() / getByLog()
+
+| 方法 | 参数 | 返回 | 说明 |
+|------|------|------|------|
+| `getLogs(nameOrId)` | `nameOrId: string` | `ChangeLog[] | null` | 获取版本日志 |
+| `getByLog(logId)` | `logId: number` | `Script | null` | 按日志 Id 获取历史版本 |
 
 ```ts
 k.api.get(() => {

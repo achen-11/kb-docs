@@ -57,6 +57,8 @@ k.api.get(() => {
 | `days` | number | 是 | - | 过期天数 |
 | `domain` | string | 否 | 当前域 | 可设置的域名 |
 
+**返回：** `void`。
+
 ### setByMinutes()
 
 设置 Cookie（按分钟过期）。
@@ -75,6 +77,8 @@ k.api.get(() => {
 | `value` | string | 是 | Cookie 值 |
 | `mins` | number | 是 | 过期分钟数 |
 
+**返回：** `void`。
+
 ### get()
 
 获取 Cookie 值。
@@ -85,6 +89,12 @@ k.api.get(() => {
     return { username }
 })
 ```
+
+| 参数 | 类型 | 必填 | 描述 |
+|------|------|------|------|
+| `name` | string | 是 | Cookie 名称 |
+
+**返回：** `string`，Cookie 值；不存在时为空字符串或 `undefined`（以运行时为准）。
 
 ### containsKey()
 
@@ -97,6 +107,12 @@ k.api.get(() => {
 })
 ```
 
+| 参数 | 类型 | 必填 | 描述 |
+|------|------|------|------|
+| `name` | string | 是 | Cookie 名称 |
+
+**返回：** `boolean`。
+
 ### remove()
 
 删除指定 Cookie。
@@ -108,6 +124,12 @@ k.api.get(() => {
 })
 ```
 
+| 参数 | 类型 | 必填 | 描述 |
+|------|------|------|------|
+| `name` | string | 是 | Cookie 名称 |
+
+**返回：** `boolean`，表示是否删除成功。
+
 ### clear()
 
 清除所有 Cookie。
@@ -118,6 +140,10 @@ k.api.get(() => {
     return "all cookies cleared"
 })
 ```
+
+**参数：** 无。
+
+**返回：** `void`。
 
 ## 属性
 

@@ -52,6 +52,12 @@ k.api.get(() => {
 
 检查支付状态。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `requestId` | `string` | 是 | `charge()` 返回的 `requestId`。 |
+
 ```ts
 k.api.get(() => {
     const status = k.payment.paynlCheckout.checkStatus('request-id')
@@ -64,6 +70,12 @@ k.api.get(() => {
 ## updateOrder()
 
 处理 Pay.NL 回调并更新订单。
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `context` | `object` | 是 | 当前支付回调上下文，通常传入 `k.payment.paynlCheckout.context`。 |
 
 ```ts
 k.api.post(() => {

@@ -14,6 +14,8 @@ Membership levels need to be created manually in the Kooboo backend: **E-commerc
 
 Get a list of membership levels.
 
+**Parameters**: none.
+
 ```ts
 k.api.get(() => {
     const memberships = k.commerce.membership.list()

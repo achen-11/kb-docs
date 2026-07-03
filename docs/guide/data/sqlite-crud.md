@@ -46,7 +46,7 @@ k.DB.sqlite.execute / query / transaction
 下面示例使用任务模块作为业务对象。ID 由 API 生成字符串，避免依赖自增 ID 的返回语义：
 
 ```ts
-// @k-url /api/tasks/{action}
+// Example route: /api/tasks/{action}
 
 const tableName = "guide_tasks";
 
@@ -171,7 +171,7 @@ k.api.post("remove", () => {
 页面负责采集字段、调用 API，并在列表中展示结果：
 
 ```html
-<!-- @k-url /tasks -->
+<!-- Example route: /tasks -->
 <input id="title" value="跟进企业客户演示">
 <select id="status">
   <option value="open">open</option>

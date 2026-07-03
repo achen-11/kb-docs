@@ -42,6 +42,8 @@ k.page.setTitle("产品详情 - 我的站点")
 |------|------|------|------|
 | `value` | `string` | 是 | 标题文本 |
 
+**返回：** `void`。
+
 ## setCharsetMeta()
 
 设置文档字符集 meta（写入 `charset` 绑定）。
@@ -53,6 +55,8 @@ k.page.setCharsetMeta("utf-8")
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | `value` | `string` | 是 | 字符集，空字符串时忽略 |
+
+**返回：** `void`。
 
 ## setNameMeta()
 
@@ -67,6 +71,8 @@ k.page.setNameMeta("keywords", "kooboo, cms")
 |------|------|------|------|
 | `name` | `string` | 是 | `name` 属性 |
 | `content` | `string` | 是 | `content` 属性 |
+
+**返回：** `void`。
 
 同名 `name` 已存在时会**更新** content，否则追加绑定。
 
@@ -84,6 +90,8 @@ k.page.setPropertyMeta("og:image", "https://example.com/cover.jpg")
 | `property` | `string` | 是 | `property` 属性 |
 | `content` | `string` | 是 | `content` 属性 |
 
+**返回：** `void`。
+
 ## setHttpEquivMeta()
 
 设置 `<meta http-equiv="…" content="…">`。
@@ -97,6 +105,8 @@ k.page.setHttpEquivMeta("X-UA-Compatible", "IE=edge")
 |------|------|------|------|
 | `equiv` | `string` | 是 | `http-equiv` 属性 |
 | `content` | `string` | 是 | `content` 属性 |
+
+**返回：** `void`。
 
 ## 示例：按路由参数设置 SEO
 

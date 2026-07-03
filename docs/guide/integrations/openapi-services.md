@@ -93,7 +93,7 @@ k.openApi.guidePartner._api_partner_shipment_Post({ orderId: "EXT-1001", trackin
 业务 API 先检查 OpenAPI client 和授权，再调用生成方法：
 
 ```ts
-// @k-url /api/openapi-services/{action}
+// Example route: /api/openapi-services/{action}
 
 const openApiName = "guidePartner";
 const apiKeySecret = "sandbox-key";
@@ -163,7 +163,7 @@ k.api.post("orders", (body: { status?: string; page?: number }) => {
 前台页面只需要触发业务 API：
 
 ```html
-<!-- @k-url /openapi-services -->
+<!-- Example route: /openapi-services -->
 <button id="setup" type="button">检查定义</button>
 <button id="ordersWithoutAuth" type="button">未授权调用</button>
 <button id="authorize" type="button">写入授权</button>

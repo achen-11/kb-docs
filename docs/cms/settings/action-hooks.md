@@ -172,7 +172,7 @@ Hook 列表按资源分组。显示名由服务端 `Hardcoded` 本地化；以 `
 2. 后台资源操作触发对应 BackendEvent（如 `PageCreating`、`ContentUpdated`）。
 3. 按列表顺序执行该事件下各规则；IF-ELSE-THEN 先判条件再走 THEN/ELSE；DO 顺序执行 Code。
 
-具体引擎见 `Kooboo.Sites.BackendEvent.Manager`。
+具体执行由站点后台操作 Hook 引擎负责，按本页配置顺序运行。
 
 ## 典型工作流
 

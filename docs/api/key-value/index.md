@@ -24,10 +24,12 @@ k.DB.keyValue[key]          // 与 get 等价，返回 KeyValueObject
 
 写入或更新一条键值。
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| `key` | `string` | 非空键名 |
-| `value` | `string` | 值；`null` 按空处理。UTF-8 编码长度不得超过约 **4096 字节**，否则抛出长度错误 |
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `key` | `string` | 是 | 非空键名 |
+| `value` | `string` | 是 | 值；`null` 按空处理。UTF-8 编码长度不得超过约 **4096 字节**，否则抛出长度错误 |
+
+**返回：** `void`。
 
 ```typescript
 k.DB.keyValue.set("featureFlags", JSON.stringify({ beta: true }))
@@ -41,6 +43,12 @@ k.DB.keyValue.set("featureFlags", JSON.stringify({ beta: true }))
 const raw = k.DB.keyValue.get("featureFlags")
 const text = raw ? raw.toString() : "{}"
 ```
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `key` | `string` | 是 | 键名 |
+
+**返回：** `KeyValueObject | null`。
 
 ## 字典式用法
 

@@ -44,6 +44,12 @@ k.api.get(() => {
 
 检查支付状态。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `requestId` | `string` | 是 | `charge()` 返回的 `requestId`。 |
+
 ```ts
 k.api.get(() => {
     const status = k.payment.square.checkStatus('request-id')
@@ -57,6 +63,12 @@ k.api.get(() => {
 
 处理 Square 通知回调。
 
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `context` | `object` | 是 | 当前支付通知上下文，通常传入 `k.payment.square.context`。 |
+
 ```ts
 k.api.post(() => {
     const callback = k.payment.square.notify(k.payment.square.context)
@@ -69,6 +81,12 @@ k.api.post(() => {
 ## updateOrder()
 
 处理 Square 回调并更新订单。
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `context` | `object` | 是 | 当前支付回调上下文，通常传入 `k.payment.square.context`。 |
 
 ```ts
 k.api.post(() => {

@@ -44,6 +44,12 @@ k.api.get(() => {
 // Output: hello world1234{ "name": "kooboo" }
 ```
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `value` | `any` | yes | Content to write to the response body |
+
+**Returns:** `void`.
+
 ### json()
 
 Output the response in JSON format. `Content-Type: application/json` is automatically set.
@@ -57,6 +63,12 @@ k.api.get(() => {
 })
 // Output: { "success": true, "data": { "id": 1, "name": "test" } }
 ```
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `value` | `any` | yes | Value to serialize as JSON |
+
+**Returns:** `void`.
 
 ### file()
 
@@ -74,6 +86,14 @@ k.api.get(() => {
 })
 ```
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `path` | `string` | yes | Site file path |
+| `contentType` | `string` | no | Response Content-Type |
+| `fileName` | `string` | no | File name used for download |
+
+**Returns:** `void`.
+
 ### binary()
 
 Returns a binary data response.
@@ -85,6 +105,14 @@ k.api.get(() => {
 })
 ```
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `contentType` | `string` | yes | Response Content-Type |
+| `bytes` | `number[]` | yes | Binary byte array |
+| `filename` | `string` | no | Download file name |
+
+**Returns:** `void`.
+
 ### statusCode()
 
 Set HTTP status code.
@@ -95,6 +123,12 @@ k.api.get(() => {
     return "Not Found"
 })
 ```
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `code` | `number` | yes | HTTP status code |
+
+**Returns:** `void`.
 
 ### unauthorized()
 
@@ -109,6 +143,10 @@ k.api.get(() => {
 // Message: "Unauthorized access"
 ```
 
+**Parameters:** None.
+
+**Returns:** `void`.
+
 ### notFound()
 
 Returns 404 Response Not Found.
@@ -118,6 +156,10 @@ k.api.get(() => {
     k.response.notFound()
 })
 ```
+
+**Parameters:** None.
+
+**Returns:** `void`.
 
 ### redirect()
 
@@ -140,10 +182,12 @@ k.api.get(() => {
 })
 ```
 
-| parameter | type | Required | describe |
+| Parameter | Type | Required | Description |
 |------|------|------|------|
 | `url` | string | yes | Target URL |
 | `absolute` | boolean | no | Whether it is an absolute path (including protocol) |
+
+**Returns:** `void`.
 
 ### setHeader()
 
@@ -157,6 +201,13 @@ k.api.get(() => {
 })
 ```
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `key` | `string` | yes | Response header name |
+| `value` | `string` | yes | Response header value |
+
+**Returns:** `void`.
+
 ### renderView()
 
 Renders an HTML string containing `<view>` at the current output position. Commonly used to output View in `<head>`** of **Layout/Page (`<view id="...">` cannot be written directly in the head).
@@ -166,9 +217,11 @@ Renders an HTML string containing `<view>` at the current output position. Commo
 k.response.renderView("<view id='tailwind'></view>")
 ```
 
-| parameter | type | illustrate |
-|------|------|------|
-| `ViewBody` | `string` | Tagged string containing `<view id="view name">` |
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `ViewBody` | `string` | yes | Tagged string containing `<view id="view name">` |
+
+**Returns:** `void`.
 
 The abbreviation can also be used in the template: `<script env="server" view="tailwind"></script>` (`view` is the View resource name). See [Template Engine - Referencing a View Inside `<head>`](/en/templateEngine/view/#referencing-a-view-inside-head) for details.
 
@@ -189,6 +242,12 @@ k.api.get("wrapper", () => {
 })
 // Output: { "base": "data" } appended
 ```
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `url` | `string` | yes | URL to execute in the current context |
+
+**Returns:** `void`.
 
 ## Common usage
 

@@ -1,6 +1,6 @@
 # WeChat H5 payment process
 
-> WeChat **H5** Payment Guide for AI and Developers. The content is consistent with Kooboo’s official `kooboo-coding` payment reference and `kb-doc` ai-check.
+> WeChat **H5** payment guide for AI and developers, covering the full flow from creating a payment request to callback verification.
 
 ## Choose the right API first
 
@@ -91,9 +91,9 @@ k.logger.information("Payment.WeChatH5", `requestId: ${charge.requestId}`)
 k.response.redirect(charge.nextAction.redirectUrl)
 ```
 
-## Manual verification (kb-doc test station)
+## Manual Verification
 
-The test site provides H5 verification page and ai-check API (deployed in `old-source/kb-doc`, synchronized by `kb push`):
+The test site provides an H5 verification page and API endpoints for manually checking payment creation and callback behavior:
 
 | use | path |
 |------|------|

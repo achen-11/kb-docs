@@ -6,7 +6,7 @@
 
 `k.storage` Access the object storage provider enabled and configured in Kooboo **Console → Settings**. Each enabled provider corresponds to a client for enumerating, uploading, copying, deleting objects, and reading and writing metadata.
 
-::: The difference between tip and k.media, k.file
+::: tip Difference from k.media and k.file
 | API | storage location | Typical uses |
 |-----|----------|----------|
 | **`k.storage`** | Alibaba Cloud OSS, Amazon S3, Azure Blob, etc. | Large files, CDN origin, bucket consistent with cloud console |
@@ -117,6 +117,13 @@ k.api.post("upload", () => {
 
 Copies the object to the new key.
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sourceKey` | `string` | Yes | Source object key. |
+| `destinationKey` | `string` | Yes | Destination object key. |
+
+**Returns**: `void`.
+
 ```ts
 client.copyObject("/media/a.png", "/media/backup/a.png")
 ```
@@ -124,6 +131,12 @@ client.copyObject("/media/a.png", "/media/backup/a.png")
 ## createFolder()
 
 Create folder (logical prefix).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `path` | `string` | Yes | Folder path, usually ending with `/`. |
+
+**Returns**: `void`.
 
 ```ts
 client.createFolder("/media/my-folder/")
@@ -133,6 +146,12 @@ client.createFolder("/media/my-folder/")
 
 Check if the key has not been used yet.
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `key` | `string` | Yes | Object key to check. |
+
+**Returns**: `boolean`. Returns `true` when the key is not used.
+
 ```ts
 if (!client.isUniqueKey(key)) {
     throw new Error("Duplicated key: " + key)
@@ -140,6 +159,11 @@ if (!client.isUniqueKey(key)) {
 ```
 
 ## deleteObjects() / deleteFolders()
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `deleteObjects(keys)` | `keys: string[]` | `void` | Delete objects in batches. |
+| `deleteFolders(paths)` | `paths: string[]` | `void` | Delete folder prefixes in batches. |
 
 ```ts
 client.deleteObjects(["/media/a.png", "/media/b.png"])
@@ -150,18 +174,29 @@ client.deleteFolders(["/media/old-folder/"])
 
 Generates a temporary download URL for the object.
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `key` | `string` | Yes | Object key to download. |
+
+**Returns**: `string`. Temporary download URL.
+
 ```ts
 const url = client.generateDownloadUrl("/media/report.pdf")
 ```
 
 ## getMetadata() / putMetadata()
 
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `getMetadata(key)` | `key: string` | `object` | Read object metadata. |
+| `putMetadata(key, metas)` | `key: string`, `metas: object` | `void` | Write or replace object metadata. |
+
 ```ts
 const meta = client.getMetadata("/media/photo.jpg")
 client.putMetadata("/media/photo.jpg", { alt: "cover" })
 ```
 
-## RawStorageObjectModel (common fields)
+## RawStorageObjectModel Fields
 
 | Field | illustrate |
 |------|------|

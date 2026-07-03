@@ -44,6 +44,12 @@ k.api.get(() => {
 
 Check payment status.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `requestId` | `string` | Yes | `requestId` returned by `charge()`. |
+
 ```ts
 k.api.get(() => {
     const status = k.payment.square.checkStatus('request-id')
@@ -57,6 +63,12 @@ k.api.get(() => {
 
 Handle Square notification callbacks.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `context` | `object` | Yes | Current payment notification context, usually `k.payment.square.context`. |
+
 ```ts
 k.api.post(() => {
     const callback = k.payment.square.notify(k.payment.square.context)
@@ -69,6 +81,12 @@ k.api.post(() => {
 ## updateOrder()
 
 Handle Square callbacks and update orders.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `context` | `object` | Yes | Current payment callback context, usually `k.payment.square.context`. |
 
 ```ts
 k.api.post(() => {

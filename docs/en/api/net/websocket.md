@@ -17,6 +17,8 @@ Upgrade the current HTTP request to a WebSocket and block the current script unt
 | `id` | `string` | Connection ID, unique within the same site, for use by `get` / `list` |
 | `receive` | `function` | Message callback received, parameter `ctx` contains `text` / `binary` |
 
+**Returns**: `void`. The current script stays running until the connection is closed.
+
 ```ts
 k.api.get("ws", () => {
     k.net.webSocket.accept("user_1", (ctx) => {
@@ -36,6 +38,10 @@ Subject to site WebSocket configuration restrictions (maximum number of connecti
 
 Returns the list of registered connection ids for the current site.
 
+**Parameters**: none.
+
+**Returns**: `string[]`. Registered connection IDs for the current site.
+
 ```ts
 const ids = k.net.webSocket.list()
 ```
@@ -43,6 +49,12 @@ const ids = k.net.webSocket.list()
 ## get()
 
 Get the connection by id for active push by the server.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | `string` | Yes | Connection ID. |
+
+**Returns**: `WebSocketConnection | null`. Matching connection, or an empty value when it does not exist.
 
 ```ts
 const conn = k.net.webSocket.get("user_1")

@@ -57,6 +57,8 @@ k.api.get(() => {
 | `days` | number | yes | - | Expiration days |
 | `domain` | string | no | current domain | Configurable domain name |
 
+**Returns:** `void`.
+
 ### setByMinutes()
 
 Set cookie (expires by minutes).
@@ -75,6 +77,8 @@ k.api.get(() => {
 | `value` | string | yes | Cookie value |
 | `mins` | number | yes | Expiration minutes |
 
+**Returns:** `void`.
+
 ### get()
 
 Get the cookie value.
@@ -85,6 +89,12 @@ k.api.get(() => {
     return { username }
 })
 ```
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `name` | string | yes | Cookie name |
+
+**Returns:** `string`, the cookie value; when missing, an empty string or `undefined` depending on the runtime.
 
 ### containsKey()
 
@@ -97,6 +107,12 @@ k.api.get(() => {
 })
 ```
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `name` | string | yes | Cookie name |
+
+**Returns:** `boolean`.
+
 ### remove()
 
 Delete the specified cookie.
@@ -108,6 +124,12 @@ k.api.get(() => {
 })
 ```
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `name` | string | yes | Cookie name |
+
+**Returns:** `boolean`, whether the cookie was removed successfully.
+
 ### clear()
 
 Clear all cookies.
@@ -118,6 +140,10 @@ k.api.get(() => {
     return "all cookies cleared"
 })
 ```
+
+**Parameters:** None.
+
+**Returns:** `void`.
 
 ## Properties
 

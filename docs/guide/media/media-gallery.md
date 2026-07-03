@@ -47,7 +47,7 @@ Page 渲染图库
 先限制一个业务目录，例如 `/guide-gallery`：
 
 ```ts
-// @k-url /api/media-gallery/{action}
+// Example route: /api/media-gallery/{action}
 
 const folderPath = "/guide-gallery";
 
@@ -126,7 +126,7 @@ k.api.get("select", () => {
 页面只关心 API 返回的稳定字段：
 
 ```html
-<!-- @k-url /media-gallery -->
+<!-- Example route: /media-gallery -->
 <button id="list" type="button">刷新图库</button>
 <div id="gallery"></div>
 <aside id="selected">尚未选择图片</aside>

@@ -77,6 +77,10 @@ const text4 = k.label("Welcome {name}", { name: "Alice" });
 
 Get a list of all tags.
 
+**Parameters**: none.
+
+**Returns**: `object[]`. Each object contains key-value pairs for every language version.
+
 ```ts
 const labels = k.site.labels.all();
 // Returns: [{ zh: "Cancel", en: "Cancel" }, ...]
@@ -87,6 +91,12 @@ Each returned label object contains key-value pairs for each language version.
 ### get(nameOrId)
 
 Get a single tag based on its name.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `nameOrId` | `string` | Yes | Label name or label ID. |
+
+**Returns**: `object | null`. Matching label object, or an empty value when it does not exist.
 
 ```ts
 const label = k.site.labels.get("Cancel");

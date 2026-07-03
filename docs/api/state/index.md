@@ -40,6 +40,8 @@ k.state.set("product", product)
 | `key` | `string` | 是 | 模板中使用的键名 |
 | `value` | `any` | 是 | 任意可序列化对象或值 |
 
+**返回：** `void`。
+
 ## setCurrent()
 
 写入或覆盖**当前栈顶**帧上的键；若栈为空，行为与 `set` 相同。
@@ -53,6 +55,8 @@ k.state.setCurrent("items", updatedList)
 |------|------|------|------|
 | `key` | `string` | 是 | 键名 |
 | `value` | `any` | 是 | 新值 |
+
+**返回：** `void`。
 
 ## get()
 

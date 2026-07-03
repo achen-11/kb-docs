@@ -2,7 +2,7 @@
 
 > `k.account` Login status, login/logout and token-related APIs on the root object
 
-## TypeScript definition (excerpt)
+## TypeScript Definition
 
 ```ts
 interface KAccount {
@@ -62,6 +62,13 @@ Use the **Organization User** form to log in: internally process the user name a
 
 Applicable to scenarios where the site is bound to an organization and uses organization sub-accounts.
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `username` | `string` | Yes | Organization sub-account username, without the organization suffix. |
+| `password` | `string` | Yes | Password. |
+
+**Returns**: `User | null`. User object on success; `null` on failure.
+
 ```ts
 k.api.post(() => {
     const username = k.request.form.username
@@ -89,9 +96,17 @@ k.api.get(() => {
 })
 ```
 
+**Returns**: `void`.
+
 ## ensureLogin()
 
 If not logged in, **302 redirect** to `redirectUrl` and end the response; if logged in, no operation. Commonly used for pages or APIs that must be logged in to access.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `redirectUrl` | `string` | Yes | URL to redirect to when the user is not logged in. |
+
+**Returns**: `void`.
 
 ```ts
 k.api.get(() => {
@@ -104,10 +119,12 @@ k.api.get(() => {
 
 Generate a JWT login token for the specified platform user (usually required to have corresponding administrative rights and request the Account service internally).
 
-| Parameter | Type | Description |
-|------|------|------|
-| userName | `string` | target username |
-| expireIn | `number` | Valid number of seconds, e.g. `86400` is 1 day |
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `userName` | `string` | Yes | Target username. |
+| `expireIn` | `number` | Yes | Valid seconds, for example `86400` is 1 day. |
+
+**Returns**: `string`. Generated JWT login token.
 
 ```ts
 k.api.post(() => {
@@ -121,6 +138,10 @@ k.api.post(() => {
 ## getAccessToken()
 
 Read the JWT string in the current request context (if logged in).
+
+**Parameters**: none.
+
+**Returns**: `string | null`. JWT for the current request, or an empty value when not logged in or no token is available.
 
 ```ts
 k.api.get(() => {
@@ -136,6 +157,12 @@ k.api.get(() => {
 
 Set the incoming JWT to the `Authorization: Bearer …` of the current request, which is used in subsequent logic to access login-dependent APIs as that identity.
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `token` | `string` | Yes | JWT login token. |
+
+**Returns**: `void`.
+
 ```ts
 k.api.post(() => {
     const token = k.request.form.token
@@ -148,10 +175,12 @@ k.api.post(() => {
 
 Obtain the third-party login information from the Account service based on the third-party name and user name (the process used to interface with the external IdP).
 
-| Parameter | Type | Description |
-|------|------|------|
-| thirdPartyName | `string` | Third Party Identification |
-| userName | `string` | associated username |
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `thirdPartyName` | `string` | Yes | Third-party identifier. |
+| `userName` | `string` | Yes | Associated username. |
+
+**Returns**: `ThirdPartyLoginInfo`. Third-party login information.
 
 ```ts
 k.api.post(() => {
@@ -166,6 +195,10 @@ k.api.post(() => {
 ## renewInfo()
 
 Obtain current account/site renewal related information (to call the Account service, you need to be logged in and have permission).
+
+**Parameters**: none.
+
+**Returns**: `RenewInfo`. Current account or site renewal information.
 
 ```ts
 k.api.get(() => {

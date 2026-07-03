@@ -53,6 +53,10 @@ interface QueryOptions {
 
 Gets the query operators used to build complex query conditions.
 
+**Parameters:** None.
+
+**Returns:** Query operator dictionary.
+
 ```ts
 k.api.get(() => {
     const ops = k.content.operators();
@@ -64,6 +68,10 @@ k.api.get(() => {
 ### `k.content.getFolders()`
 
 Gets the names of all content folders in the site.
+
+**Parameters:** None.
+
+**Returns:** `string[]`.
 
 ```ts
 k.api.get(() => {
@@ -92,6 +100,8 @@ k.api.get(() => {
 |------|------|------|
 | excludeEmpty | `boolean` | Whether to exclude empty records, default `false` |
 | includeOfflineData | `boolean` | Whether to include offline data, default `false` |
+
+**Returns:** `Content[]`.
 
 ```ts
 // Exclude empty records
@@ -122,9 +132,18 @@ k.api.get(() => {
 |------|------|------|
 | nameOrId | `string` | Content ID or UserKey |
 
+**Returns:** `Content | null`.
+
 ### `find()`
 
 Queries a single content item. Both string queries and object queries are supported.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `query` | `string | object` | yes | String condition or object query condition |
+| `options` | `QueryOptions` | no | Query options |
+
+**Returns:** `Content | null`.
 
 **String query:**
 
@@ -193,6 +212,13 @@ k.api.get(() => {
 
 Queries multiple content items. The usage is the same as `find()`, but it returns an array.
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `query` | `string | object` | yes | String condition or object query condition |
+| `options` | `QueryOptions` | no | Query options |
+
+**Returns:** `Content[]`.
+
 ```ts
 k.api.get(() => {
     const articles = k.content.Article.findAll({ category: "news" });
@@ -237,6 +263,8 @@ k.api.post(() => {
 |------|------|------|
 | content | `object` | Content object, where keys are field names and values are field values |
 
+**Returns:** `Content`, the created content object.
+
 **System fields (optional):**
 
 | Field | Type | Description |
@@ -248,6 +276,12 @@ k.api.post(() => {
 ### `update()`
 
 Updates existing content.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `content` | `Content` | yes | Full content object fetched and modified from `find`, `get`, `all`, or similar methods |
+
+**Returns:** `void`.
 
 ```ts
 k.api.post(() => {
@@ -272,6 +306,12 @@ The `update` method requires the full content object returned by `find`, `get`, 
 ### `delete()`
 
 Deletes content.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `contentOrId` | `string | Content` | yes | Content ID or full content object |
+
+**Returns:** `void`.
 
 ```ts
 k.api.post(() => {
@@ -320,6 +360,8 @@ k.api.post(() => {
 | source | `string` | Content ID to move |
 | prev | `string` | Reference element ID (insert after this element) |
 | next | `string` | Optional; insert after this ID |
+
+**Returns:** `void`.
 
 ## Multilingual Support
 

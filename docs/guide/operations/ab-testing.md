@@ -59,7 +59,7 @@ KeyValue 增加 conversion
 示例用 `guide_ab_variant` Cookie 固定访客实验组，用 KeyValue 保存 A/B 两组的曝光和转化计数：
 
 ```ts
-// @k-url /api/ab-test/{action}
+// Example route: /api/ab-test/{action}
 
 const summaryKey = "guide-ab-test:summary";
 const variantCookie = "guide_ab_variant";
@@ -137,7 +137,7 @@ k.api.post("convert", () => {
 页面只负责调用 API 和渲染结果，不直接决定实验组：
 
 ```html
-<!-- @k-url /ab-test -->
+<!-- Example route: /ab-test -->
 <button id="assign" type="button">分配实验组</button>
 <button id="convert" type="button">记录转化</button>
 <pre id="result">等待操作。</pre>

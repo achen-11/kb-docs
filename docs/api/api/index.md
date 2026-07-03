@@ -8,6 +8,14 @@
 
 创建当前路由下的 GET API。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `action` | `Function` | 是 | GET 请求命中时执行的回调；回调参数可按名称匹配 query string |
+| `metas` | `RootMeta[]` | 否 | 参数来源与类型定义 |
+| `resultHandler` | `Function` | 否 | 统一处理回调返回结果的函数 |
+
+**返回：** `void`。回调函数的返回值会作为 API 响应。
+
 ### 基本用法
 
 ```ts
@@ -76,11 +84,17 @@ k.api.get(() => {
 
 :::
 
----
-
 ## k.api.post()
 
 创建当前路由下的 POST API。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `action` | `Function` | 是 | POST 请求命中时执行的回调；可接收 query、form 或 body 参数 |
+| `metas` | `RootMeta[]` | 否 | 参数来源与类型定义 |
+| `resultHandler` | `Function` | 否 | 统一处理回调返回结果的函数 |
+
+**返回：** `void`。回调函数的返回值会作为 API 响应。
 
 ### 基本用法
 
@@ -124,13 +138,19 @@ k.api.post("create", () => {
 })
 ```
 
----
-
 ## k.api.put()
 
 创建当前路由下的 PUT API。
 
 使用方法与 `POST` 请求相同。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `action` | `Function` | 是 | PUT 请求命中时执行的回调 |
+| `metas` | `RootMeta[]` | 否 | 参数来源与类型定义 |
+| `resultHandler` | `Function` | 否 | 统一处理回调返回结果的函数 |
+
+**返回：** `void`。回调函数的返回值会作为 API 响应。
 
 ```ts
 k.api.put(() => {
@@ -139,13 +159,19 @@ k.api.put(() => {
 })
 ```
 
----
-
 ## k.api.delete()
 
 创建当前路由下的 DELETE API。
 
 使用方法与 `GET` 请求相同。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `action` | `Function` | 是 | DELETE 请求命中时执行的回调 |
+| `metas` | `RootMeta[]` | 否 | 参数来源与类型定义 |
+| `resultHandler` | `Function` | 否 | 统一处理回调返回结果的函数 |
+
+**返回：** `void`。回调函数的返回值会作为 API 响应。
 
 ```ts
 k.api.delete((id) => {
@@ -153,11 +179,16 @@ k.api.delete((id) => {
 })
 ```
 
----
-
 ## k.api.httpCode()
 
 设置 API 的 HTTP 状态码，通常用于异常处理。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `code` | `number` | 是 | HTTP 状态码 |
+| `data` | `any` | 否 | 可选响应体数据 |
+
+**返回：** `KApiResponse`。
 
 ```ts
 k.api.get(() => {
@@ -170,8 +201,6 @@ k.api.get(() => {
 })
 ```
 
----
-
 ## 快捷方法
 
 内置的 HTTP 状态码快捷方法：
@@ -179,6 +208,10 @@ k.api.get(() => {
 ### k.api.ok()
 
 返回 200 OK。
+
+**参数：** 可选 `data: any`。
+
+**返回：** `KApiResponse`。
 
 ```ts
 k.api.get((id) => {
@@ -190,6 +223,10 @@ k.api.get((id) => {
 
 返回 400 Bad Request。
 
+**参数：** 无。
+
+**返回：** `KApiResponse`。
+
 ```ts
 k.api.post(() => {
     return k.api.badRequest()
@@ -199,6 +236,10 @@ k.api.post(() => {
 ### k.api.unauthorized()
 
 返回 401 Unauthorized。
+
+**参数：** 无。
+
+**返回：** `KApiResponse`。
 
 ```ts
 k.api.get((id) => {
@@ -210,6 +251,10 @@ k.api.get((id) => {
 
 返回 403 Forbidden。
 
+**参数：** 无。
+
+**返回：** `KApiResponse`。
+
 ```ts
 k.api.get((id) => {
     return k.api.forbidden()
@@ -220,13 +265,15 @@ k.api.get((id) => {
 
 返回 404 Not Found。
 
+**参数：** 无。
+
+**返回：** `KApiResponse`。
+
 ```ts
 k.api.get((id) => {
     return k.api.notFound()
 })
 ```
-
----
 
 ## 异常处理封装示例
 
@@ -249,4 +296,3 @@ k.api.get((id) => {
     return item
 })
 ```
-

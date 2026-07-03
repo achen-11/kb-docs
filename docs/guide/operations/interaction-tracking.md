@@ -48,7 +48,7 @@ KeyValue 聚合 + logger 审计
 下面示例用 KeyValue 保存总数、按锚点计数、按事件类型计数和最近事件。真实项目可以换成 SQLite 或外部分析系统。
 
 ```ts
-// @k-url /api/interaction-tracking/{action}
+// Example route: /api/interaction-tracking/{action}
 
 type TrackBody = {
   eventName?: string;
@@ -137,7 +137,7 @@ KeyValue 适合少量聚合。高流量页面应把明细写入更适合追加�
 页面上用 `data-track-anchor` 和 `data-track-event` 标记元素：
 
 ```html
-<!-- @k-url /interaction-tracking -->
+<!-- Example route: /interaction-tracking -->
 <button data-track-anchor="hero-cta" data-track-event="cta_click" type="button">点击主 CTA</button>
 <button data-track-anchor="pricing-card" data-track-event="pricing_click" type="button">点击价格卡片</button>
 <button data-track-anchor="docs-link" data-track-event="docs_click" type="button">点击文档链接</button>

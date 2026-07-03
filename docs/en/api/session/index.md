@@ -54,6 +54,13 @@ k.api.get(() => {
 })
 ```
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `key` | `string` | yes | Session key |
+| `value` | `any` | yes | Value to save |
+
+**Returns:** `void`.
+
 ### get()
 
 Get session value.
@@ -64,6 +71,12 @@ k.api.get(() => {
     return { username }
 })
 ```
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `key` | `string` | yes | Session key |
+
+**Returns:** `any`, the session value for the key; empty or `undefined` when missing depending on the runtime.
 
 ### containsKey()
 
@@ -77,6 +90,12 @@ k.api.get(() => {
 })
 ```
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `key` | `string` | yes | Session key |
+
+**Returns:** `boolean`.
+
 ### remove()
 
 Delete the specified key.
@@ -89,6 +108,12 @@ k.api.get(() => {
 })
 ```
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `key` | `string` | yes | Session key |
+
+**Returns:** `boolean`, whether the key was removed successfully.
+
 ### clear()
 
 Clear all session data.
@@ -100,6 +125,10 @@ k.api.get(() => {
     return "cleared"
 })
 ```
+
+**Parameters:** None.
+
+**Returns:** `void`.
 
 ## Properties
 

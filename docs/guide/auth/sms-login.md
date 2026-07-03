@@ -54,7 +54,7 @@ k.session.set(currentUser)
 下面示例用 KeyValue 保存会员和验证码，用 outbox 模拟短信发送。真实项目把 `enqueueSms()` 的成功分支替换为 `k.utils.sms` 调用。
 
 ```ts
-// @k-url /api/sms-login/{action}
+// Example route: /api/sms-login/{action}
 
 const memberPrefix = "guide-sms:member:";
 const codePrefix = "guide-sms:code:";
@@ -203,7 +203,7 @@ k.utils.sms.chinaMobile.send(phone, `Your login code is ${code}`);
 页面只负责收集手机号、请求发送、提交验证码和展示结果：
 
 ```html
-<!-- @k-url /sms-login -->
+<!-- Example route: /sms-login -->
 <input id="phone" value="13800138000" inputmode="tel" autocomplete="tel">
 <input id="code" inputmode="numeric" autocomplete="one-time-code">
 <button id="send" type="button">发送验证码</button>

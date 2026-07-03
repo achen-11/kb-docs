@@ -66,6 +66,8 @@ k.api.get("folderFiles", () => {
 |------|------|------|------|
 | `folder` | `string` | 是 | 文件夹路径 |
 
+**返回：** `void`
+
 **返回：** `MediaFileViewModel[]`（按 `lastModified` 降序）
 
 ## createFolder()
@@ -100,6 +102,8 @@ k.api.post("deleteFolder", () => {
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | `folder` | `string` | 是 | 文件夹路径 |
+
+**返回：** `void`
 
 ## get()
 
@@ -170,6 +174,8 @@ k.api.post("delete", () => {
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | `idOrFilePath` | `string` | 是 | GUID 或文件路径 |
+
+**返回：** `void`
 
 ## 示例：列出并上传
 

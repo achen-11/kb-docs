@@ -15,7 +15,7 @@
 
 On a miss, `get` returns **`undefined`** (used with `containsKey`).
 
-## TypeScript definition (excerpt)
+## TypeScript Definition
 
 ```ts
 interface KCache {
@@ -56,6 +56,26 @@ Write cache.
 
 The key name can be up to **1024** characters; the number of seconds in `set(key, value, seconds)` is subject to the upper limit of the server's `Cache:MaxExpireSeconds` configuration (default is about 2 hours).
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `key` | `string` | yes | Cache key |
+| `value` | `any` | yes | Value to cache |
+| `seconds` | `number` | no | Expiration in seconds |
+| `options` | `CacheOptions` | no | Expiration and cascade invalidation options |
+
+**Returns:** `void`.
+
+```ts
+k.api.post(() => {
+    const key = "summary-" + Date.now()
+    k.cache.set(key, { ok: true }, 60)
+    return {
+        stored: k.cache.containsKey(key),
+        value: k.cache.get(key)
+    }
+})
+```
+
 ## Options overload (`set` / `getOrCreate`)
 
 When the third parameter is passed in **`options`**, absolute expiration, sliding expiration, and **cascading key (`cascades`)** can be set respectively: When a cascading key is triggered by `remove` / `CascadeRemove`, the associated cache items will be invalidated. `removeAll()` performs cascade cleanup of the current site ID.
@@ -94,6 +114,12 @@ k.api.get(() => {
 })
 ```
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `key` | `string` | yes | Cache key |
+
+**Returns:** `any`, the cached value; returns `undefined` when missing.
+
 ## getOrCreate()
 
 If it does not exist, execute `factory` to write to the cache and return the value.
@@ -102,6 +128,15 @@ If it does not exist, execute `factory` to write to the cache and return the val
 |------|------|
 | `getOrCreate(key, factory, seconds)` | Seconds to expire (commonly used) |
 | `getOrCreate(key, factory, options?)` | Use `CacheOptions` |
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `key` | `string` | yes | Cache key |
+| `factory` | `() => any` | yes | Function executed on a miss; its return value is cached |
+| `seconds` | `number` | no | Expiration in seconds |
+| `options` | `CacheOptions` | no | Expiration and cascade invalidation options |
+
+**Returns:** `any`, the cached value or the new value returned by `factory`.
 
 ```ts
 k.api.get(() => {
@@ -119,11 +154,19 @@ k.api.get(() => {
 
 ## containsKey()
 
+Checks whether a cache key exists.
+
 ```ts
 k.api.get(() => {
     return { exists: k.cache.containsKey("my-key") }
 })
 ```
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `key` | `string` | yes | Cache key |
+
+**Returns:** `boolean`.
 
 ## remove() / removeAll()
 
@@ -138,6 +181,11 @@ k.api.post(() => {
 })
 ```
 
+| Method | Parameters | Returns | Description |
+|------|------|------|------|
+| `remove(key)` | `key: string` | `void` | Deletes one cache item |
+| `removeAll()` | None | `void` | Clears the current site cache group |
+
 ## localCache()
 
 Cache external URL resources locally on the site, returning an accessible local URL.
@@ -149,6 +197,13 @@ k.api.get(() => {
 })
 ```
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `externalUrl` | `string` | yes | External resource URL |
+| `hours` | `number` | yes | Local cache duration in hours |
+
+**Returns:** `string`, the accessible local URL in the site.
+
 ## getOrSet()
 
 On a miss, execute a line of KScript (`scriptOrFunctionName`) and write the result to the cache.
@@ -158,6 +213,8 @@ On a miss, execute a line of KScript (`scriptOrFunctionName`) and write the resu
 | key | cache key |
 | scriptOrFunctionName | script fragment to execute |
 | timeOutMinutes | Expiration minutes |
+
+**Returns:** `any`, the cached value or the script execution result.
 
 ```ts
 k.api.get(() => {

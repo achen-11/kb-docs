@@ -53,7 +53,7 @@ k.security.verifyPassword(password, passwordHash)
 下面示例用 KeyValue 保存最小用户记录。真实项目可以换成 SQLite、客户表或业务用户表，但保存字段的原则一致：只保存 `passwordHash`。
 
 ```ts
-// @k-url /api/password-hash/{action}
+// Example route: /api/password-hash/{action}
 
 type CredentialBody = {
   email?: string;
@@ -186,7 +186,7 @@ k.api.get("audit", () => {
 页面只调用 API，不处理哈希逻辑：
 
 ```html
-<!-- @k-url /password-hash -->
+<!-- Example route: /password-hash -->
 <input id="email" value="hash-demo@example.com">
 <input id="password" type="password" value="CorrectHorse1!">
 <button id="register" type="button">注册并保存哈希</button>

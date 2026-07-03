@@ -114,7 +114,7 @@ export function buildSitemapXml() {
 API 适合给后台操作、定时任务或验证页面使用。下面示例提供四类动作：
 
 ```ts
-// @k-url /api/sitemap/{action}
+// Example route: /api/sitemap/{action}
 
 import {
   buildSitemapXml,
@@ -169,7 +169,7 @@ k.api.post("touch", () => {
 公开 sitemap 要走 Page 路由，并设置 XML Content-Type：
 
 ```html
-<!-- @k-url /sitemap.xml -->
+<!-- Example route: /sitemap.xml -->
 <script env="server">
   const sitemapKey = "guide-seo:sitemap-entries";
   const raw = k.DB.keyValue.get(sitemapKey);

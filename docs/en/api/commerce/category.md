@@ -28,11 +28,14 @@ interface KCategory {
 
 Get a list of categories.
 
-**parameter:**
+**Parameters:**
 
-| Parameter | Type | Description |
-|------|------|------|
-| query.includeOffline | `boolean` | Whether to include delisting categories, the default is `false` |
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | `CategoryQueryParams` | No | Category list filters. |
+| `query.includeOffline` | `boolean` | No | Whether to include offline categories. Default is `false`. |
+
+**Returns**: `Category[]`. Category list matching the filters.
 
 ```ts
 k.api.get(() => {
@@ -50,9 +53,19 @@ k.api.get(() => {
 ### get()
 
 Get category details.
+
 :::tip Category not found
 When the query cannot find a category, `null` is returned.
 :::
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `seoNameOrId` | `string` | Yes | Category SEO name or category ID. |
+
+**Returns**: `Category | null`. Matching category, or `null` when it does not exist.
+
 ```ts
 k.api.get(() => {
     const category = k.commerce.category.get('category-seo-name')
@@ -66,6 +79,14 @@ k.api.get(() => {
 ### create()
 
 Create categories.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `category` | `NewCategory` | Yes | New category data. |
+
+**Returns**: `Category`. Created category object.
 
 ```ts
 k.api.post(() => {
@@ -83,14 +104,16 @@ k.api.post(() => {
 
 Update a single field.
 
-**parameter:**
+**Parameters:**
 
-| Parameter | Type | Description |
-|------|------|------|
-| categoryId | `string` | Category ID |
-| Field | `string` | Field name |
-| value | `any` | field value |
-| lang | `string` | Language code (optional, used to specify multiple languages) |
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `categoryId` | `string` | Yes | Category ID. |
+| `field` | `string` | Yes | Field name. |
+| `value` | `any` | Yes | Field value. |
+| `lang` | `string` | No | Language code for multilingual fields. |
+
+**Returns**: `void`.
 
 ```ts
 k.api.post(() => {
@@ -109,6 +132,18 @@ k.api.post(() => {
 
 Update fields in batches.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `categoryId` | `string` | Yes | Category ID. |
+| `updateContents` | `UpdateContent[]` | Yes | List of fields to update. |
+| `updateContents[].property` | `string` | Yes | Field name. |
+| `updateContents[].value` | `any` | Yes | Field value. |
+| `updateContents[].lang` | `string` | No | Language code for multilingual fields. |
+
+**Returns**: `void`.
+
 ```ts
 k.api.post(() => {
     k.commerce.category.updateFields(categoryId, [
@@ -123,6 +158,14 @@ k.api.post(() => {
 
 Delete categories.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `categoryId` | `string` | Yes | Category ID to delete. |
+
+**Returns**: `void`.
+
 ```ts
 k.api.post(() => {
     k.commerce.category.delete(categoryId)
@@ -133,6 +176,14 @@ k.api.post(() => {
 ### getParents()
 
 Get the parent category chain.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `seoNameOrId` | `string` | Yes | Category SEO name or category ID. |
+
+**Returns**: `Category[]`. Parent category chain from the current category upward.
 
 ```ts
 k.api.get(() => {
@@ -145,6 +196,15 @@ k.api.get(() => {
 
 Add products to categories.
 
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `categoryId` | `string` | Yes | Category ID. |
+| `productId` | `string` | Yes | Product ID. |
+
+**Returns**: `void`.
+
 ```ts
 k.api.post(() => {
     k.commerce.category.addProduct(categoryId, productId)
@@ -155,6 +215,15 @@ k.api.post(() => {
 ### removeProduct()
 
 Remove product from category.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `categoryId` | `string` | Yes | Category ID. |
+| `productId` | `string` | Yes | Product ID. |
+
+**Returns**: `void`.
 
 ```ts
 k.api.post(() => {

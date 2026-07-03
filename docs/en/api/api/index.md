@@ -8,6 +8,14 @@
 
 Create a GET API under the current route.
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `action` | `Function` | yes | Callback executed when the GET request matches; callback parameters can match query string names |
+| `metas` | `RootMeta[]` | no | Parameter source and type definitions |
+| `resultHandler` | `Function` | no | Function for normalizing callback results |
+
+**Returns:** `void`. The callback return value becomes the API response.
+
 ### Basic Usage
 
 ```ts
@@ -76,11 +84,17 @@ k.api.get(() => {
 
 :::
 
----
-
 ## k.api.post()
 
 Create a POST API under the current route.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `action` | `Function` | yes | Callback executed when the POST request matches; can receive query, form, or body parameters |
+| `metas` | `RootMeta[]` | no | Parameter source and type definitions |
+| `resultHandler` | `Function` | no | Function for normalizing callback results |
+
+**Returns:** `void`. The callback return value becomes the API response.
 
 ### Basic Usage
 
@@ -124,13 +138,19 @@ k.api.post("create", () => {
 })
 ```
 
----
-
 ## k.api.put()
 
 Create a PUT API under the current route.
 
 Usage is the same as `POST` request.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `action` | `Function` | yes | Callback executed when the PUT request matches |
+| `metas` | `RootMeta[]` | no | Parameter source and type definitions |
+| `resultHandler` | `Function` | no | Function for normalizing callback results |
+
+**Returns:** `void`. The callback return value becomes the API response.
 
 ```ts
 k.api.put(() => {
@@ -139,13 +159,19 @@ k.api.put(() => {
 })
 ```
 
----
-
 ## k.api.delete()
 
 Create a DELETE API under the current route.
 
 Usage is the same as `GET` request.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `action` | `Function` | yes | Callback executed when the DELETE request matches |
+| `metas` | `RootMeta[]` | no | Parameter source and type definitions |
+| `resultHandler` | `Function` | no | Function for normalizing callback results |
+
+**Returns:** `void`. The callback return value becomes the API response.
 
 ```ts
 k.api.delete((id) => {
@@ -153,11 +179,16 @@ k.api.delete((id) => {
 })
 ```
 
----
-
 ## k.api.httpCode()
 
 Set the HTTP status code of the API, usually used for exception handling.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `code` | `number` | yes | HTTP status code |
+| `data` | `any` | no | Optional response body data |
+
+**Returns:** `KApiResponse`.
 
 ```ts
 k.api.get(() => {
@@ -170,8 +201,6 @@ k.api.get(() => {
 })
 ```
 
----
-
 ## Shortcut Methods
 
 Built-in HTTP status code shortcut methods:
@@ -179,6 +208,10 @@ Built-in HTTP status code shortcut methods:
 ### k.api.ok()
 
 Return 200 OK.
+
+**Parameters:** Optional `data: any`.
+
+**Returns:** `KApiResponse`.
 
 ```ts
 k.api.get((id) => {
@@ -190,6 +223,10 @@ k.api.get((id) => {
 
 Returns 400 Bad Request.
 
+**Parameters:** None.
+
+**Returns:** `KApiResponse`.
+
 ```ts
 k.api.post(() => {
     return k.api.badRequest()
@@ -199,6 +236,10 @@ k.api.post(() => {
 ### k.api.unauthorized()
 
 Returns 401 Unauthorized.
+
+**Parameters:** None.
+
+**Returns:** `KApiResponse`.
 
 ```ts
 k.api.get((id) => {
@@ -210,6 +251,10 @@ k.api.get((id) => {
 
 Returns 403 Forbidden.
 
+**Parameters:** None.
+
+**Returns:** `KApiResponse`.
+
 ```ts
 k.api.get((id) => {
     return k.api.forbidden()
@@ -220,13 +265,15 @@ k.api.get((id) => {
 
 Returns 404 Not Found.
 
+**Parameters:** None.
+
+**Returns:** `KApiResponse`.
+
 ```ts
 k.api.get((id) => {
     return k.api.notFound()
 })
 ```
-
----
 
 ## Error Handling Helper Example
 

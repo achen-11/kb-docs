@@ -14,6 +14,8 @@
 
 获取会员等级列表。
 
+**参数**：无。
+
 ```ts
 k.api.get(() => {
     const memberships = k.commerce.membership.list()

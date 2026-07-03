@@ -56,6 +56,12 @@ interface Menu {
 
 按菜单 **名称** 或 **Id**（GUID 字符串）获取根菜单对象（含 `children` 树）。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 根菜单名称或 Id |
+
+**返回：** `Menu | null`。
+
 ```ts
 k.api.get(() => {
     const menu = k.site.menus.get("main")
@@ -78,6 +84,10 @@ k.api.get(() => {
 
 返回站点全部根菜单对象数组（不含单独展开子树以外的扁平列表）。
 
+**参数：** 无。
+
+**返回：** `Menu[]`。
+
 ```ts
 k.api.get(() => {
     const menus = k.site.menus.list()
@@ -88,6 +98,12 @@ k.api.get(() => {
 ## create()
 
 创建新的根菜单；名称已存在时抛出异常。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `name` | `string` | 是 | 根菜单名称 |
+
+**返回：** `Menu`。
 
 ```ts
 k.api.post(() => {
@@ -100,6 +116,12 @@ k.api.post(() => {
 ## remove()
 
 按根菜单 **Id**（GUID 字符串）删除整棵菜单。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `id` | `string` | 是 | 根菜单 Id |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -126,6 +148,13 @@ k.api.post(() => {
 
 在当前节点下新增子项并保存。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `name` | `string` | 是 | 子菜单显示名称 |
+| `url` | `string` | 是 | 子菜单链接 |
+
+**返回：** `void`。
+
 ```ts
 k.api.post(() => {
     const root = k.site.menus.get("main")
@@ -138,9 +167,42 @@ k.api.post(() => {
 
 按子项 Id 更新名称或 URL；传入 `culture` 时只更新该语言的 `Values`，默认语言同时更新 `name`。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `subMenuId` | `string` | 是 | 子菜单 Id |
+| `name` | `string` | 是 | 新显示名称 |
+| `url` | `string` | 是 | 新链接 |
+| `culture` | `string` | 否 | 文化代码 |
+
+**返回：** `void`。
+
+```ts
+k.api.post(() => {
+    const root = k.site.menus.get("main")
+    const child = root.children[0]
+    root.updateSubMenu(child.id, "Updated", "/updated")
+    return { updated: true }
+})
+```
+
 ### removeSubMenu(subMenuId)
 
 按子项 Id 删除子菜单项。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `subMenuId` | `string` | 是 | 子菜单 Id |
+
+**返回：** `void`。
+
+```ts
+k.api.post(() => {
+    const root = k.site.menus.get("main")
+    const child = root.children[0]
+    root.removeSubMenu(child.id)
+    return { removed: true }
+})
+```
 
 ## 前台使用方式
 

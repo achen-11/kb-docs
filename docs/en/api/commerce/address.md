@@ -10,6 +10,8 @@
 
 Get all country information.
 
+**Parameters**: none.
+
 ```ts
 k.api.get(() => {
     const countries = k.commerce.address.countries()

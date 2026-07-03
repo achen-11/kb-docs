@@ -81,11 +81,13 @@ k.api.get(() => {
 
 创建可复用代码块（无路由）。
 
-| 字段 | 类型 | 必填 | 说明 |
+| 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| name | `string` | 是 | 代码块名称 |
-| body | `string` | 是 | KScript 源码 |
-| codeType | `string` | 是 | 必须为 `"CodeBlock"` |
+| `code.name` | `string` | 是 | 代码块名称 |
+| `code.body` | `string` | 是 | KScript 源码 |
+| `code.codeType` | `string` | 是 | 必须为 `"CodeBlock"` |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -113,12 +115,14 @@ k.api.post(() => {
 
 创建 API 脚本并注册路由。
 
-| 字段 | 类型 | 必填 | 说明 |
+| 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| name | `string` | 是 | API 名称（站点内唯一） |
-| body | `string` | 是 | 含 `k.api.*` 的脚本 |
-| codeType | `string` | 是 | 必须为 `"Api"` |
-| url | `string` | 是 | API 根路径，如 `/api/demo` |
+| `code.name` | `string` | 是 | API 名称（站点内唯一） |
+| `code.body` | `string` | 是 | 含 `k.api.*` 的脚本 |
+| `code.codeType` | `string` | 是 | 必须为 `"Api"` |
+| `code.url` | `string` | 是 | API 根路径，如 `/api/demo` |
+
+**返回：** `void`。
 
 ```ts
 k.api.post(() => {
@@ -146,6 +150,11 @@ k.api.post(() => {
 
 ## all() / get()
 
+| 方法 | 参数 | 返回 | 说明 |
+|------|------|------|------|
+| `all()` | 无 | `Code[]` | 返回全部 Code / CodeBlock |
+| `get(nameOrId)` | `nameOrId: string` | `Code | null` | 按名称或 Id 获取 |
+
 ```ts
 k.api.get(() => {
     const code = k.site.codes.get("my-api")
@@ -159,6 +168,12 @@ k.api.get(() => {
 
 仅对 **Api**（`codeType` 为 `"Api"` 或 `4`）且已注册路由的 Code 有效。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `url` | `string` | 是 | API 路由 URL |
+
+**返回：** `Code | null`。
+
 ```ts
 k.api.get(() => {
     const api = k.site.codes.getByUrl("/api/hello")
@@ -167,6 +182,11 @@ k.api.get(() => {
 ```
 
 ## update() / updateBody()
+
+| 方法 | 参数 | 返回 | 说明 |
+|------|------|------|------|
+| `update(code)` | `code: Code` | `void` | 更新完整 Code 对象 |
+| `updateBody(nameOrId, body)` | `nameOrId: string`, `body: string` | `void` | 仅替换源码正文 |
 
 ```ts
 k.api.post(() => {
@@ -196,6 +216,12 @@ k.api.post(() => {
 
 删除后用 `get(name)` 验证；**不要**在删除 Api 后调用 `getByUrl`（路由残留时可能异常，与 [k.site.pages](./page.md) 相同）。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | Code 名称或 Id |
+
+**返回：** `void`。
+
 ```ts
 k.api.post(() => {
     const stamp = Date.now().toString()
@@ -219,6 +245,11 @@ k.api.post(() => {
 
 ## getUrl() / getAbsUrl()
 
+| 方法 | 参数 | 返回 | 说明 |
+|------|------|------|------|
+| `getUrl(id)` | `id: string` | `string | null` | 获取相对 URL，仅对有路由的 API 有值 |
+| `getAbsUrl(id)` | `id: string` | `string | null` | 获取绝对 URL |
+
 ```ts
 k.api.get(() => {
     const apis = k.site.codes.all().filter((c) => c.codeType === "Api" || c.codeType === 4)
@@ -235,6 +266,21 @@ k.api.get(() => {
 ## getLogs() / getByLog()
 
 与其它 `k.site.*` 文本仓库一致。
+
+| 方法 | 参数 | 返回 | 说明 |
+|------|------|------|------|
+| `getLogs(nameOrId)` | `nameOrId: string` | `ChangeLog[] | null` | 获取版本日志 |
+| `getByLog(logId)` | `logId: number` | `Code | null` | 按日志 Id 获取历史版本 |
+
+```ts
+k.api.get(() => {
+    const codes = k.site.codes.all()
+    if (!codes.length) return { error: "no codes" }
+
+    const logs = k.site.codes.getLogs(codes[0].id)
+    return { logCount: logs ? logs.length : 0 }
+})
+```
 
 ## Code 对象（常用字段）
 

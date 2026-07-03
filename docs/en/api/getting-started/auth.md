@@ -14,6 +14,10 @@ Some attributes on `k.user` have been marked as obsolete, please use `k.account`
 
 Determine whether the current request has been logged in.
 
+**Parameters**: none.
+
+**Returns**: `boolean`. `true` when the current request is logged in.
+
 ```ts
 k.api.get("isLogin", () => {
     return { isLogin: k.account.isLogin }
@@ -24,11 +28,13 @@ k.api.get("isLogin", () => {
 
 Log in using username and password.
 
-| Parameter | Type | Description |
-|------|------|------|
-| username | `string` | username |
-| password | `string` | password |
-| code | `string` | Optional, verification code, etc. |
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `username` | `string` | Yes | Username. |
+| `password` | `string` | Yes | Password. |
+| `code` | `string` | No | Verification code, etc. |
+
+**Returns**: `User | null`. User object on success; `null` on failure.
 
 ```ts
 k.api.post("login", () => {
@@ -43,6 +49,12 @@ k.api.post("login", () => {
 
 Log out, optionally jump to the specified URL.
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `returnUrl` | `string` | No | URL to redirect to after logout. |
+
+**Returns**: `void`.
+
 ```ts
 k.api.get("logout", () => {
     k.account.logout("/")
@@ -53,6 +65,12 @@ k.api.get("logout", () => {
 ## k.account.ensureLogin()
 
 Redirect to the login page when not logged in (commonly used for pages or APIs that require login).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `redirectUrl` | `string` | Yes | URL to redirect to when the user is not logged in. |
+
+**Returns**: `void`.
 
 ```ts
 k.api.get("profile", () => {

@@ -56,7 +56,7 @@
 下面示例用 `k.response.statusCode()` 设置 HTTP 状态，并保证 body 结构稳定：
 
 ```ts
-// @k-url /api/error-contract/{action}
+// Example route: /api/error-contract/{action}
 
 const logCategory = "Guide.ApiErrorContract";
 
@@ -161,7 +161,7 @@ k.api.get("unauthorized", () => {
 浏览器 `fetch()` 遇到 400、500 不会自动抛异常，仍可以读取 JSON body。前台应同时看 HTTP status 和业务 `code`：
 
 ```html
-<!-- @k-url /error-contract -->
+<!-- Example route: /error-contract -->
 <button type="button" data-action="success">成功</button>
 <button type="button" data-action="validation">校验失败</button>
 <button type="button" data-action="exception">服务异常</button>

@@ -47,7 +47,7 @@ const text = k.utils.bytesToString(saved, "utf-8")
 return { text }
 ```
 
-## Submodules (alphabetical order)
+## Submodules
 
 | submodule | document |
 |--------|------|

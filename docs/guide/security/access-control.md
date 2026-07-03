@@ -47,7 +47,7 @@ API 读取 k.session 当前用户
 下面示例用 KeyValue 保存用户和订单，用 session 保存当前用户。真实项目可以替换为 CMS 用户、会员、客户表或组织角色，但 API 校验顺序不变。
 
 ```ts
-// @k-url /api/access-control/{action}
+// Example route: /api/access-control/{action}
 
 type User = {
   id: string;
@@ -146,7 +146,7 @@ k.api.get("order", () => {
 前台页面可以模拟多种身份和访问路径：
 
 ```html
-<!-- @k-url /access-control -->
+<!-- Example route: /access-control -->
 <button id="alice" type="button">登录 Alice</button>
 <button id="bob" type="button">登录 Bob</button>
 <button id="support" type="button">登录客服</button>

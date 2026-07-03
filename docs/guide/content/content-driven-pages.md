@@ -66,7 +66,7 @@ src/page/content-driven-pages.html
 示例假设 CMS 中已经存在 `Article` 内容夹。初始化 API 用 `k.content.Article.add()` 写入测试内容：
 
 ```ts
-// @k-url /api/content-pages/{action}
+// Example route: /api/content-pages/{action}
 
 function ensureFolder() {
   if (!k.content.Article) {
@@ -191,7 +191,7 @@ k.api.get("detail", () => {
 页面可以先做客户端渲染，后续再把首屏列表改成 SSR 或 View：
 
 ```html
-<!-- @k-url /content-driven-pages -->
+<!-- Example route: /content-driven-pages -->
 <button type="button" data-category="">全部</button>
 <button type="button" data-category="operations">运营</button>
 <button type="button" data-category="content">内容</button>

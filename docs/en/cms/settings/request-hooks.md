@@ -140,7 +140,7 @@ Bottom **KBottomBar**: **Back** to list; **Save** calls `BusinessRule/post` (`ev
 2. Request enters FrontEvent (e.g. `RouteFinding`).  
 3. Rules run in list order; IF-ELSE-THEN then DO as described.  
 
-Engine: `Kooboo.Sites.FrontEvent.Manager`.
+Execution is handled by the site's front-end request hook engine, in the order configured on this page.
 
 ## Typical Workflow
 

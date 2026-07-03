@@ -39,7 +39,7 @@ k.net.httpClient.send(...)
 下面示例用物流报价模拟第三方服务。真实项目中，把 `providerUrl` 换成外部接口地址，并从安全配置中读取 token。
 
 ```ts
-// @k-url /api/logistics-quote/{action}
+// Example route: /api/logistics-quote/{action}
 
 type QuoteRequest = {
   orderId?: string;
@@ -99,7 +99,7 @@ k.api.post("quote", (body: QuoteRequest) => {
 页面不需要知道第三方 URL 或 token：
 
 ```html
-<!-- @k-url /logistics-quote-demo -->
+<!-- Example route: /logistics-quote-demo -->
 <button id="quote" type="button">获取物流报价</button>
 <button id="fail" type="button">模拟第三方失败</button>
 <pre id="result">等待操作。</pre>

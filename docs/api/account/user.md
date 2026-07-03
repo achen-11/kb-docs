@@ -57,6 +57,12 @@ k.api.get(() => {
 
 按用户名获取用户（返回对象中密码字段已清空）。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `userName` | `string` | 是 | 平台用户名。 |
+
+**返回值**：`User | null`。匹配到的用户；不存在时返回 `null`。
+
 ```ts
 k.api.get(() => {
     const user = k.account.user.get("some-user")
@@ -65,6 +71,11 @@ k.api.get(() => {
 ```
 
 ## exists() / emailExists()
+
+| 方法 | 参数 | 返回值 | 说明 |
+|------|------|--------|------|
+| `exists(userName)` | `userName: string` | `boolean` | 用户名是否已存在。 |
+| `emailExists(email)` | `email: string` | `boolean` | 邮箱是否已存在。 |
 
 ```ts
 k.api.get(() => {
@@ -79,6 +90,12 @@ k.api.get(() => {
 
 判断当前用户是否属于指定组织（名称或组织 Id 字符串）。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `organizationName` | `string` | 是 | 组织名称或组织 ID。 |
+
+**返回值**：`boolean`。当前用户属于该组织时返回 `true`。
+
 ```ts
 k.api.get(() => {
     return {
@@ -90,6 +107,12 @@ k.api.get(() => {
 ## changeOrganization()
 
 将当前用户切换到指定组织（须有权访问该组织）。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `organizationName` | `string` | 是 | 要切换到的组织名称或组织 ID。 |
+
+**返回值**：`User | null`。切换后的用户信息；失败时为空值。
 
 ```ts
 k.api.post(() => {
@@ -105,6 +128,13 @@ k.api.post(() => {
 ## changePassword()
 
 在 `user.current` 上修改当前用户密码。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `oldPassword` | `string` | 是 | 当前密码。 |
+| `newPassword` | `string` | 是 | 新密码。 |
+
+**返回值**：`boolean`。修改成功时返回 `true`。
 
 ```ts
 k.api.post(() => {

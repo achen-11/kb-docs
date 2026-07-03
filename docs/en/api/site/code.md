@@ -26,7 +26,7 @@ Please pass the string **`"Api"`** / **`"CodeBlock"`** when `add`. On the object
 The **API file** written in the console corresponds to the Code of `codeType === "Api"`; `k.api.get/post` in the file defines the subpath under the API. `k.site.codes` is used to do CRUD on these Codes at runtime, rather than replacing the `k.api` syntax itself.
 :::
 
-## TypeScript definition (excerpt)
+## TypeScript Definition
 
 ```ts
 type CodeType =
@@ -81,11 +81,13 @@ k.api.get(() => {
 
 Create reusable code blocks (without routing).
 
-| Field | Type | Required | Description |
+| Parameter | Type | Required | Description |
 |------|------|------|------|
-| name | `string` | yes | code block name |
-| body | `string` | yes | KScript source code |
-| codeType | `string` | yes | Must be `"CodeBlock"` |
+| `code.name` | `string` | yes | CodeBlock name |
+| `code.body` | `string` | yes | KScript source code |
+| `code.codeType` | `string` | yes | Must be `"CodeBlock"` |
+
+**Returns:** `void`.
 
 ```ts
 k.api.post(() => {
@@ -113,12 +115,14 @@ k.api.post(() => {
 
 Create API scripts and register routes.
 
-| Field | Type | Required | Description |
+| Parameter | Type | Required | Description |
 |------|------|------|------|
-| name | `string` | yes | API name (unique within site) |
-| body | `string` | yes | Scripts containing `k.api.*` |
-| codeType | `string` | yes | Must be `"Api"` |
-| url | `string` | yes | API root path, such as `/api/demo` |
+| `code.name` | `string` | yes | API name (unique within site) |
+| `code.body` | `string` | yes | Script containing `k.api.*` |
+| `code.codeType` | `string` | yes | Must be `"Api"` |
+| `code.url` | `string` | yes | API root path, such as `/api/demo` |
+
+**Returns:** `void`.
 
 ```ts
 k.api.post(() => {
@@ -146,6 +150,11 @@ k.api.post(() => {
 
 ## all()/get()
 
+| Method | Parameters | Returns | Description |
+|------|------|------|------|
+| `all()` | None | `Code[]` | Returns all Code / CodeBlock resources |
+| `get(nameOrId)` | `nameOrId: string` | `Code | null` | Gets a resource by name or ID |
+
 ```ts
 k.api.get(() => {
     const code = k.site.codes.get("my-api")
@@ -159,6 +168,12 @@ k.api.get(() => {
 
 Only valid for **Api** (`codeType` is `"Api"` or `4`) and Code with registered routing.
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `url` | `string` | yes | API route URL |
+
+**Returns:** `Code | null`.
+
 ```ts
 k.api.get(() => {
     const api = k.site.codes.getByUrl("/api/hello")
@@ -167,6 +182,11 @@ k.api.get(() => {
 ```
 
 ## update() / updateBody()
+
+| Method | Parameters | Returns | Description |
+|------|------|------|------|
+| `update(code)` | `code: Code` | `void` | Updates the full Code object |
+| `updateBody(nameOrId, body)` | `nameOrId: string`, `body: string` | `void` | Replaces only the source body |
 
 ```ts
 k.api.post(() => {
@@ -196,6 +216,12 @@ k.api.post(() => {
 
 Use `get(name)` to verify after deletion; **Do not** call `getByUrl` after deleting the API (it may be abnormal when the route remains, the same as [k.site.pages](./page.md)).
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `nameOrId` | `string` | yes | Code name or ID |
+
+**Returns:** `void`.
+
 ```ts
 k.api.post(() => {
     const stamp = Date.now().toString()
@@ -219,6 +245,11 @@ k.api.post(() => {
 
 ## getUrl() / getAbsUrl()
 
+| Method | Parameters | Returns | Description |
+|------|------|------|------|
+| `getUrl(id)` | `id: string` | `string | null` | Gets the relative URL; only APIs with routes have values |
+| `getAbsUrl(id)` | `id: string` | `string | null` | Gets the absolute URL |
+
 ```ts
 k.api.get(() => {
     const apis = k.site.codes.all().filter((c) => c.codeType === "Api" || c.codeType === 4)
@@ -236,7 +267,22 @@ k.api.get(() => {
 
 Consistent with other `k.site.*` text repositories.
 
-## Code object (common fields)
+| Method | Parameters | Returns | Description |
+|------|------|------|------|
+| `getLogs(nameOrId)` | `nameOrId: string` | `ChangeLog[] | null` | Gets version logs |
+| `getByLog(logId)` | `logId: number` | `Code | null` | Gets a historical version by log ID |
+
+```ts
+k.api.get(() => {
+    const codes = k.site.codes.all()
+    if (!codes.length) return { error: "no codes" }
+
+    const logs = k.site.codes.getLogs(codes[0].id)
+    return { logCount: logs ? logs.length : 0 }
+})
+```
+
+## Common Code Fields
 
 | Field | Type | Description |
 |------|------|------|

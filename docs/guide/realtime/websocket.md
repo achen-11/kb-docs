@@ -47,7 +47,7 @@ WebSocket 连接 /api/realtime/ws?token=...&clientId=...
 下面示例用 KeyValue 保存短期 token 和事件日志，用 `k.net.webSocket.accept()` 接收真实 WebSocket 连接：
 
 ```ts
-// @k-url /api/realtime/{action}
+// Example route: /api/realtime/{action}
 
 const tokensKey = "guide-realtime:tokens";
 const eventsKey = "guide-realtime:events";
@@ -139,7 +139,7 @@ k.api.post("push", (body: { connectionId?: string; message?: string }) => {
 ## 前端连接
 
 ```html
-<!-- @k-url /realtime -->
+<!-- Example route: /realtime -->
 <script>
   async function connect() {
     const tokenData = await fetch("/api/realtime/token").then((response) => response.json());

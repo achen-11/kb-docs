@@ -62,6 +62,13 @@ k.api.post(() => {
 
 适用于站点绑定组织、使用组织子账号的场景。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `username` | `string` | 是 | 组织子账号用户名，不包含组织后缀。 |
+| `password` | `string` | 是 | 密码。 |
+
+**返回值**：`User | null`。登录成功时返回用户对象；失败时返回 `null`。
+
 ```ts
 k.api.post(() => {
     const username = k.request.form.username
@@ -89,9 +96,17 @@ k.api.get(() => {
 })
 ```
 
+**返回值**：`void`。
+
 ## ensureLogin()
 
 若未登录，则 **302 重定向** 到 `redirectUrl` 并结束响应；已登录则无操作。常用于必须登录才能访问的页面或 API。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `redirectUrl` | `string` | 是 | 未登录时跳转到的 URL。 |
+
+**返回值**：`void`。
 
 ```ts
 k.api.get(() => {
@@ -104,10 +119,12 @@ k.api.get(() => {
 
 为指定平台用户生成 JWT 登录令牌（通常需具备相应管理权限，内部请求 Account 服务）。
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| userName | `string` | 目标用户名 |
-| expireIn | `number` | 有效秒数，如 `86400` 为 1 天 |
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `userName` | `string` | 是 | 目标用户名。 |
+| `expireIn` | `number` | 是 | 有效秒数，如 `86400` 为 1 天。 |
+
+**返回值**：`string`。生成的 JWT 登录令牌。
 
 ```ts
 k.api.post(() => {
@@ -121,6 +138,10 @@ k.api.post(() => {
 ## getAccessToken()
 
 读取当前请求上下文中的 JWT 字符串（若已登录）。
+
+**参数**：无。
+
+**返回值**：`string | null`。当前请求的 JWT；未登录或没有令牌时为空值。
 
 ```ts
 k.api.get(() => {
@@ -136,6 +157,12 @@ k.api.get(() => {
 
 将传入的 JWT 设为当前请求的 `Authorization: Bearer …`，用于在后续逻辑中以该身份访问依赖登录的 API。
 
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `token` | `string` | 是 | JWT 登录令牌。 |
+
+**返回值**：`void`。
+
 ```ts
 k.api.post(() => {
     const token = k.request.form.token
@@ -148,10 +175,12 @@ k.api.post(() => {
 
 根据第三方名称与用户名，从 Account 服务获取第三方登录信息（用于与外部 IdP 对接的流程）。
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| thirdPartyName | `string` | 第三方标识 |
-| userName | `string` | 关联用户名 |
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `thirdPartyName` | `string` | 是 | 第三方标识。 |
+| `userName` | `string` | 是 | 关联用户名。 |
+
+**返回值**：`ThirdPartyLoginInfo`。第三方登录信息。
 
 ```ts
 k.api.post(() => {
@@ -166,6 +195,10 @@ k.api.post(() => {
 ## renewInfo()
 
 获取当前账户/站点续费相关信息（调用 Account 服务，需已登录且具备权限）。
+
+**参数**：无。
+
+**返回值**：`RenewInfo`。当前账户或站点续费信息。
 
 ```ts
 k.api.get(() => {

@@ -47,7 +47,7 @@ k.media.get(path) 返回 previewUrl
 下面示例只允许图片，并限制到 `/guide-uploads/` 目录：
 
 ```ts
-// @k-url /api/upload/{action}
+// Example route: /api/upload/{action}
 
 const uploadFolder = "/guide-uploads";
 const allowedTypes = ["image/png", "image/jpeg", "image/webp", "image/gif"];
@@ -151,7 +151,7 @@ k.api.post("delete", () => {
 前台页面使用普通 file input，把文件放进 `FormData`：
 
 ```html
-<!-- @k-url /file-upload -->
+<!-- Example route: /file-upload -->
 <input id="file" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
 <button id="upload" type="button">上传图片</button>
 <pre id="result">等待操作。</pre>

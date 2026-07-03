@@ -45,7 +45,7 @@ API 只负责读请求、拼缓存键、调用 service、返回统一结构。
 使用 `containsKey` 判断本次请求是否命中缓存，再用 `getOrCreate` 保证未命中时只执行一次生成逻辑。
 
 ```ts
-// @k-url /api/summary-cache/{action}
+// Example route: /api/summary-cache/{action}
 
 const cacheKey = "summary:home";
 
@@ -98,7 +98,7 @@ k.api.post("clear", () => {
 前台页面不需要知道缓存实现，只需要展示 API 返回的 `cacheHit` 和 `generatedAt`：
 
 ```html
-<!-- @k-url /summary-cache -->
+<!-- Example route: /summary-cache -->
 <button id="load-twice" type="button">连续加载两次</button>
 <button id="clear-cache" type="button">清理缓存</button>
 <pre id="result">等待操作。</pre>

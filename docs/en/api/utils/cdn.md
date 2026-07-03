@@ -15,6 +15,16 @@ Turn off or enable CDN.
 | `disableCDN()` | None | `void` | Do not use CDN for the current response |
 | `enableCDN()` | None | `void` | Allow CDN for the current response |
 
+```ts
+k.api.get("preview", () => {
+    k.utils.CDN.disableCDN()
+    return {
+        draft: k.request.queryString.get("id"),
+        generatedAt: k.utils.date.formate(k.utils.date.now)
+    }
+})
+```
+
 ## setCacheTime()
 
 Set CDN cache minutes.
@@ -30,14 +40,16 @@ k.utils.CDN.enableCDN()
 k.utils.CDN.setCacheTime(60)
 ```
 
-For preview pages or APIs that must bypass CDN, disable CDN on the current response:
+For public content APIs, explicitly enable CDN and set the cache duration:
 
 ```ts
-k.api.get("preview", () => {
-    k.utils.CDN.disableCDN()
+k.api.get("public-summary", () => {
+    k.utils.CDN.enableCDN()
+    k.utils.CDN.setCacheTime(15)
+
     return {
-        now: k.utils.date.formate(k.utils.date.now),
-        draft: k.request.queryString.get("id")
+        title: "Public summary",
+        cachedForMinutes: 15
     }
 })
 ```

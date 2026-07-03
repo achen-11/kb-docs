@@ -36,6 +36,10 @@ k.api.get("geo", () => {
 | `getCountry(ip)` | National level information |
 | `getCityOrCountry(ip)` | Prioritize the city, fall back to the country if there is no city |
 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `ip` | `string` | Yes | IP address to query. |
+
 **Returns:** `IPInfo` or `null`
 
 ### IPInfo common fields

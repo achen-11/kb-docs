@@ -39,7 +39,7 @@ closed + completed
 下面示例用 KeyValue 模拟订单、物流单和通知 outbox，便于本地验证状态边界。真实项目应优先对接 `k.commerce.order` 和后台订单管理能力。
 
 ```ts
-// @k-url /api/order-fulfillment/{action}
+// Example route: /api/order-fulfillment/{action}
 
 type FulfillmentStatus = "unfulfilled" | "shipped" | "delivered" | "completed" | "canceled";
 

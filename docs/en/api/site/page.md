@@ -13,7 +13,7 @@
 | `k.page` | Current page `setTitle` / `setMeta` etc. |
 :::
 
-## TypeScript definition (excerpt)
+## TypeScript Definition
 
 ```ts
 interface PageRepository {
@@ -44,12 +44,14 @@ interface PageInput {
 
 Create a page and register a route. If `url` is not passed, it defaults to `/{name}`.
 
-| Field | Type | Required | Description |
+| Parameter | Type | Required | Description |
 |------|------|------|------|
-| name | `string` | yes | Page name (unique) |
-| body | `string` | yes | Page content, which can be a `<layout>` placeholder structure |
-| url | `string` | yes | Access path, such as `/about` |
-| layoutName | `string` | no | Associated layout name |
+| `page.name` | `string` | yes | Page name (unique) |
+| `page.body` | `string` | yes | Page content, which can be a `<layout>` placeholder structure |
+| `page.url` | `string` | yes | Access path, such as `/about` |
+| `page.layoutName` | `string` | no | Associated layout name |
+
+**Returns:** `void`.
 
 ```ts
 k.api.post(() => {
@@ -77,6 +79,10 @@ k.api.post(() => {
 
 Returns an array of all page objects on the site.
 
+**Parameters:** None.
+
+**Returns:** `Page[]`.
+
 ```ts
 k.api.get(() => {
     const pages = k.site.pages.all()
@@ -87,6 +93,12 @@ k.api.get(() => {
 ## get()
 
 Get the page by **Name** or **Id** (GUID string).
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `nameOrId` | `string` | yes | Page name or ID |
+
+**Returns:** `Page | null`.
 
 ```ts
 k.api.get(() => {
@@ -99,6 +111,12 @@ k.api.get(() => {
 
 Get the page by **routing URL** (routing aliases will be resolved).
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `url` | `string` | yes | Page route URL |
+
+**Returns:** `Page | null`.
+
 ```ts
 k.api.get(() => {
     const page = k.site.pages.getByUrl("/")
@@ -109,6 +127,12 @@ k.api.get(() => {
 ## update()
 
 Update with complete page object (usually `get` / `getByUrl` first and then change fields).
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `page` | `Page` | yes | Modified full page object |
+
+**Returns:** `void`.
 
 ```ts
 k.api.post(() => {
@@ -136,6 +160,13 @@ k.api.post(() => {
 
 Only the `body` field is updated.
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `nameOrId` | `string` | yes | Page name or ID |
+| `body` | `string` | yes | New page body HTML |
+
+**Returns:** `void`.
+
 ```ts
 k.api.post(() => {
     const stamp = Date.now().toString()
@@ -159,6 +190,12 @@ k.api.post(() => {
 ## delete()
 
 Delete pages by name or Id.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `nameOrId` | `string` | yes | Page name or ID |
+
+**Returns:** `void`.
 
 ::: warning
 Please confirm with `get(nameOrId)` after deletion; calling `getByUrl` on the deleted page may trigger a runtime error on some sites due to remaining routing.
@@ -187,6 +224,11 @@ k.api.post(() => {
 
 Get a relative path or absolute URL based on the page **Id**.
 
+| Method | Parameters | Returns | Description |
+|------|------|------|------|
+| `getUrl(id)` | `id: string` | `string | null` | Gets the relative URL |
+| `getAbsUrl(id)` | `id: string` | `string | null` | Gets the absolute URL |
+
 ```ts
 k.api.get(() => {
     const page = k.site.pages.all()[0]
@@ -203,6 +245,11 @@ k.api.get(() => {
 
 `getLogs` returns the change log of the specified page; `getByLog` restores the version object according to the log ID.
 
+| Method | Parameters | Returns | Description |
+|------|------|------|------|
+| `getLogs(nameOrId)` | `nameOrId: string` | `ChangeLog[] | null` | Gets version logs |
+| `getByLog(logId)` | `logId: number` | `Page | null` | Gets a historical version by log ID |
+
 ```ts
 k.api.get(() => {
     const page = k.site.pages.all()[0]
@@ -216,6 +263,12 @@ k.api.get(() => {
 
 Returns the routing path dictionary of the page in each culture.
 
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `nameOrId` | `string` | yes | Page name or ID |
+
+**Returns:** `Record<string, string>`.
+
 ```ts
 k.api.get(() => {
     const page = k.site.pages.all()[0]
@@ -228,11 +281,13 @@ k.api.get(() => {
 
 Update the routing path of the page in the specified culture.
 
-| Parameter | Type | Description |
-|------|------|------|
-| ID | `string` | PageId |
-| url | `string` | new path |
-| culture | `string` | Optional, default site main culture |
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| ID | `string` | yes | Page ID |
+| url | `string` | yes | New path |
+| culture | `string` | no | Culture code; defaults to the site's main culture |
+
+**Returns:** `void`.
 
 ```ts
 // Update the URL for a specific language in a multilingual site
@@ -244,7 +299,7 @@ k.api.post(() => {
 })
 ```
 
-## Page object (common fields)
+## Common Page Fields
 
 | Field | Type | Description |
 |------|------|------|

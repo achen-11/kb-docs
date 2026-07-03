@@ -46,6 +46,18 @@ Execute a shell command and return an output string.
 
 **Returns:** `string`, command output.
 
+```ts
+k.utils.sshClient.passwordConnect(host, user, password, client => {
+    const disk = client.runCommand("df -h /", 10)
+    const kernel = client.runCommand("uname -a")
+
+    k.logger.information("SSH health", {
+        disk,
+        kernel
+    })
+})
+```
+
 ## Related Docs
 
 - [k.utils.sftpClient](./sftpClient.md)

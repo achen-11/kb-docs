@@ -19,7 +19,7 @@ See [Param Config](/en/cms/content/user-options.md) for background maintenance m
 
 ## Access method
 
-### Property access (recommended)
+### Recommended Property Access
 
 The **name** configured in the background is used as the first-level attribute of `k.paramConfig`; the field name in the Schema is used as the attribute below it (objects can continue to be nested).
 

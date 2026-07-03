@@ -289,7 +289,9 @@ def main() -> None:
                 lines.append(f"- **{issue_type}**: {issue_detail}")
             lines.append("")
 
-    out_path = DOCS.parent / "docs" / "en-translation-audit.md"
+    out_dir = DOCS.parent / ".local-review"
+    out_dir.mkdir(exist_ok=True)
+    out_path = out_dir / "en-translation-audit.md"
     report = "\n".join(lines)
     out_path.write_text(report, encoding="utf-8")
     print(f"Report: {out_path} ({len(report)} chars, {len(lines)} lines)")

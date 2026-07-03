@@ -15,6 +15,16 @@
 | `disableCDN()` | 无 | `void` | 当前响应不使用 CDN |
 | `enableCDN()` | 无 | `void` | 当前响应允许使用 CDN |
 
+```ts
+k.api.get("preview", () => {
+    k.utils.CDN.disableCDN()
+    return {
+        draft: k.request.queryString.get("id"),
+        generatedAt: k.utils.date.formate(k.utils.date.now)
+    }
+})
+```
+
 ## setCacheTime()
 
 设置 CDN 缓存分钟数。
@@ -30,14 +40,16 @@ k.utils.CDN.enableCDN()
 k.utils.CDN.setCacheTime(60)
 ```
 
-在需要绕过 CDN 的接口或预览页面中，可对当前响应关闭 CDN：
+在需要缓存公开内容的接口中，可显式启用 CDN 并设置缓存时间：
 
 ```ts
-k.api.get("preview", () => {
-    k.utils.CDN.disableCDN()
+k.api.get("public-summary", () => {
+    k.utils.CDN.enableCDN()
+    k.utils.CDN.setCacheTime(15)
+
     return {
-        now: k.utils.date.formate(k.utils.date.now),
-        draft: k.request.queryString.get("id")
+        title: "Public summary",
+        cachedForMinutes: 15
     }
 })
 ```

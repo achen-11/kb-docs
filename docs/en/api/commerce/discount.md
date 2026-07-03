@@ -10,6 +10,8 @@
 
 Get a list of discounts.
 
+**Parameters**: none.
+
 ```ts
 k.api.get(() => {
     const discounts = k.commerce.discount.list()

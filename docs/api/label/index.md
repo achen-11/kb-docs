@@ -77,6 +77,10 @@ const text4 = k.label("Welcome {name}", { name: "张三" });
 
 获取所有标签列表。
 
+**参数**：无。
+
+**返回值**：`object[]`。每个对象包含各语言版本的键值对。
+
 ```ts
 const labels = k.site.labels.all();
 // 返回: [{ zh: "取消", en: "Cancel" }, ...]
@@ -87,6 +91,12 @@ const labels = k.site.labels.all();
 ### get(nameOrId)
 
 根据名称获取单个标签。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `nameOrId` | `string` | 是 | 标签名称或标签 ID。 |
+
+**返回值**：`object | null`。匹配到的标签对象；不存在时为空值。
 
 ```ts
 const label = k.site.labels.get("Cancel");
