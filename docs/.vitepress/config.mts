@@ -304,6 +304,90 @@ const guideSidebar = [
   },
 ]
 
+const cliSidebar = [
+  {
+    text: 'Kooboo CLI',
+    items: [
+      { text: '总览', link: '/cli/' },
+      {
+        text: '开始使用',
+        collapsed: false,
+        items: [
+          { text: '使用前准备', link: '/cli/getting-started/preparation' },
+          { text: '新建或克隆项目', link: '/cli/getting-started/create-or-clone' },
+        ],
+      },
+      {
+        text: '项目',
+        collapsed: false,
+        items: [
+          { text: '项目资源与目录', link: '/cli/project/resources' },
+        ],
+      },
+      {
+        text: '同步与发布',
+        collapsed: false,
+        items: [
+          { text: '拉取远端资源', link: '/cli/workflows/pull' },
+          { text: '推送本地资源', link: '/cli/workflows/push' },
+          { text: '持续同步', link: '/cli/workflows/sync' },
+        ],
+      },
+      {
+        text: '维护',
+        collapsed: false,
+        items: [
+          { text: '资源对账与远端清理', link: '/cli/workflows/check-and-prune' },
+          { text: '导出站点', link: '/cli/workflows/export' },
+        ],
+      },
+      { text: '常见问题', link: '/cli/troubleshooting' },
+    ],
+  },
+]
+
+const enCliSidebar = [
+  {
+    text: 'Kooboo CLI',
+    items: [
+      { text: 'Overview', link: '/en/cli/' },
+      {
+        text: 'Getting Started',
+        collapsed: false,
+        items: [
+          { text: 'Before You Start', link: '/en/cli/getting-started/preparation' },
+          { text: 'Create or Clone a Project', link: '/en/cli/getting-started/create-or-clone' },
+        ],
+      },
+      {
+        text: 'Project',
+        collapsed: false,
+        items: [
+          { text: 'Project Resources and Folders', link: '/en/cli/project/resources' },
+        ],
+      },
+      {
+        text: 'Synchronization and Deployment',
+        collapsed: false,
+        items: [
+          { text: 'Pull Remote Resources', link: '/en/cli/workflows/pull' },
+          { text: 'Push Local Resources', link: '/en/cli/workflows/push' },
+          { text: 'Continuous Synchronization', link: '/en/cli/workflows/sync' },
+        ],
+      },
+      {
+        text: 'Maintenance',
+        collapsed: false,
+        items: [
+          { text: 'Compare and Clean Remote Resources', link: '/en/cli/workflows/check-and-prune' },
+          { text: 'Export a Site', link: '/en/cli/workflows/export' },
+        ],
+      },
+      { text: 'Troubleshooting', link: '/en/cli/troubleshooting' },
+    ],
+  },
+]
+
 const quickStartSidebar = [
   {
     text: '快速开始',
@@ -674,6 +758,7 @@ const zhNav = [
   { text: '产品功能', link: '/product/' },
   { text: '后台 CMS', link: '/cms/' },
   { text: '模板引擎', link: '/templateEngine/' },
+  { text: 'Kooboo CLI', link: '/cli/' },
   { text: 'API 详情', link: '/api/' },
   { text: '最佳实践', link: '/guide/' }
 ]
@@ -682,6 +767,7 @@ const enNav = [
   { text: 'Home', link: '/' },
   { text: 'Admin CMS', link: '/cms/' },
   { text: 'Template Engine', link: '/templateEngine/' },
+  { text: 'Kooboo CLI', link: '/cli/' },
   { text: 'API Details', link: '/api/' },
 ]
 
@@ -715,6 +801,8 @@ const zhSidebar = {
   '/product': productSidebar,
   '/guide/': guideSidebar,
   '/guide': guideSidebar,
+  '/cli/': cliSidebar,
+  '/cli': cliSidebar,
   '/cms/': cmsSidebar,
   '/cms': cmsSidebar,
   '/templateEngine/': templateEngineSidebar,
@@ -722,6 +810,8 @@ const zhSidebar = {
 }
 
 const enSidebar = {
+  '/en/cli/': enCliSidebar,
+  '/en/cli': enCliSidebar,
   ...buildEnglishSidebarMap(
     {
       '/cms/': cmsSidebar,
