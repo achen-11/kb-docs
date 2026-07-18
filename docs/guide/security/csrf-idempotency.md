@@ -62,11 +62,6 @@ function normalize(value: unknown) {
   return String(value || "").trim();
 }
 
-function sessionKeys() {
-  const keys = k.session.keys;
-  return keys ? Array.from(keys).map((key) => String(key)) : [];
-}
-
 function getOrCreateToken() {
   let token = normalize(k.session.get(csrfSessionKey));
   if (!token) {
@@ -80,7 +75,6 @@ k.api.get("token", () => {
   return {
     success: true,
     csrfToken: getOrCreateToken(),
-    sessionKeys: sessionKeys(),
   };
 });
 ```
@@ -111,6 +105,16 @@ k.api.post("submit", (body: OrderSubmitBody) => {
     };
   }
 
+  const quantity = Number(body?.quantity || 1);
+  if (!quantity || quantity < 1 || quantity > 5 || Math.floor(quantity) !== quantity) {
+    return {
+      success: false,
+      code: "INVALID_QUANTITY",
+      field: "quantity",
+      message: "数量必须是 1 到 5 之间的整数。",
+    };
+  }
+
   const idempotencySessionKey = `${idempotencyPrefix}${idempotencyKey}`;
   if (k.session.containsKey(idempotencySessionKey)) {
     const previous = k.session.get(idempotencySessionKey);
@@ -125,7 +129,7 @@ k.api.post("submit", (body: OrderSubmitBody) => {
   const order = {
     orderId: `ORDER-${Date.now()}`,
     productId: normalize(body?.productId || "SKU-1001"),
-    quantity: Number(body?.quantity || 1),
+    quantity,
     acceptedAt: new Date().toISOString(),
   };
 
@@ -203,6 +207,7 @@ k.api.post("submit", (body: OrderSubmitBody) => {
 |------|----------|
 | 缺少或不匹配 token | 返回 `INVALID_CSRF_TOKEN`，提示刷新页面 |
 | 缺少幂等键 | 返回 `MISSING_IDEMPOTENCY_KEY`，拒绝写入 |
+| 业务输入不合法 | 返回字段级错误，例如 `INVALID_QUANTITY`，不要记录幂等成功结果 |
 | 幂等键已处理 | 返回 `DUPLICATE_SUBMIT` 和上一次处理结果 |
 | token 长时间未刷新 | 重新获取 token 后再提交，不自动重放敏感动作 |
 | 支付/回调幂等 | 使用数据库或订单号保存幂等状态，不依赖 session |

@@ -74,6 +74,20 @@ function userKey(email: string) {
   return `${userPrefix}${email}`;
 }
 
+function maskEmail(email: string) {
+  const at = email.indexOf("@");
+  if (at <= 1) return email ? "***" : "";
+  return `${email.slice(0, 1)}***${email.slice(at)}`;
+}
+
+function publicUser(record: { email: string; createdAt: string; updatedAt?: string }) {
+  return {
+    email: maskEmail(record.email),
+    createdAt: record.createdAt,
+    updatedAt: record.updatedAt || "",
+  };
+}
+
 function passwordPolicy(password: string) {
   if (password.length < 8) return "密码至少需要 8 位。";
   if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) return "密码需要同时包含字母和数字。";
@@ -104,10 +118,7 @@ k.api.post("register", (body: CredentialBody) => {
   return {
     success: true,
     message: "用户已注册，服务端只保存密码哈希。",
-    data: {
-      email,
-      createdAt: record.createdAt,
-    },
+    data: publicUser(record),
   };
 });
 ```
@@ -149,10 +160,7 @@ k.api.post("login", (body: CredentialBody) => {
   return {
     success: true,
     message: "密码校验通过。",
-    data: {
-      email,
-      createdAt: record.createdAt,
-    },
+    data: publicUser(record),
   };
 });
 ```
@@ -161,7 +169,7 @@ k.api.post("login", (body: CredentialBody) => {
 
 ## API：审计敏感字段
 
-可以提供内部审计接口确认存储字段，但不要返回 `passwordHash` 本体：
+可以提供内部审计接口确认凭据保护状态，但不要返回 `passwordHash` 本体、字段名清单或哈希长度：
 
 ```ts
 k.api.get("audit", () => {
@@ -169,17 +177,28 @@ k.api.get("audit", () => {
   const record = readUser(email);
   const raw = JSON.stringify(record || {});
 
+  if (!record) {
+    return {
+      success: false,
+      code: "USER_NOT_FOUND",
+      message: "用户不存在。",
+      field: "email",
+    };
+  }
+
   return {
-    success: Boolean(record),
-    storedFields: record ? Object.keys(record) : [],
-    passwordHashLength: record ? String(record.passwordHash || "").length : 0,
-    containsPlainPassword: raw.includes("CorrectHorse1!") || raw.includes("WrongHorse1!"),
-    returnsPasswordHash: false,
+    success: true,
+    email: maskEmail(email),
+    storedCredential: Boolean(record.passwordHash),
+    publicFields: ["email", "createdAt", "updatedAt"],
+    plainSecretStored: raw.includes("CorrectHorse1!") || raw.includes("WrongHorse1!"),
+    secretReturned: false,
+    safeForClient: true,
   };
 });
 ```
 
-这个接口只适合验证和内部排查。真实后台可以展示“是否已设置密码”“最后修改时间”“失败次数”，不要展示哈希值。
+这个接口只适合验证和内部排查。真实后台可以展示“是否已设置密码”“最后修改时间”“失败次数”这类业务化状态，不要展示哈希值、哈希长度或内部字段名。
 
 ## Page：注册和登录验证
 
@@ -192,6 +211,8 @@ k.api.get("audit", () => {
 <button id="register" type="button">注册并保存哈希</button>
 <button id="login" type="button">正确密码登录</button>
 <button id="wrong" type="button">错误密码登录</button>
+<button id="weak" type="button">弱密码注册</button>
+<button id="unknown" type="button">未知账号登录</button>
 <button id="audit" type="button">查看存储审计</button>
 <pre id="result"></pre>
 

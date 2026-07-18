@@ -39,7 +39,7 @@ Page / View / 业务 API 读取配置
 下面示例保存一个活动配置。KeyValue 中存 JSON 字符串，读取时缓存解析后的对象：
 
 ```ts
-// Example route: /api/promo-config/{action}
+// Example route: /api/guide-keyvalue-config/{action}
 
 type PromoConfig = {
   enabled: boolean;
@@ -48,8 +48,8 @@ type PromoConfig = {
   updatedAt: string;
 };
 
-const configKey = "promo-config";
-const cacheKey = "promo-config:parsed";
+const configKey = "guide:promo-config";
+const cacheKey = "guide:promo-config:parsed";
 
 function defaultConfig(): PromoConfig {
   return {
@@ -67,13 +67,17 @@ function readRaw() {
 
 function parseConfig(raw: string): PromoConfig {
   if (!raw) return defaultConfig();
-  const data = JSON.parse(raw);
-  return {
-    enabled: data.enabled === true,
-    title: String(data.title || "默认活动"),
-    discount: Number(data.discount || 0),
-    updatedAt: String(data.updatedAt || new Date().toISOString()),
-  };
+  try {
+    const data = JSON.parse(raw);
+    return {
+      enabled: data.enabled === true,
+      title: String(data.title || "默认活动"),
+      discount: Number(data.discount || 0),
+      updatedAt: String(data.updatedAt || new Date().toISOString()),
+    };
+  } catch {
+    return defaultConfig();
+  }
 }
 
 function getConfig() {
@@ -86,6 +90,8 @@ k.api.get("config", () => {
 
   return {
     success: true,
+    configKey,
+    cacheKey,
     cacheHit,
     exists: k.DB.keyValue.contains(configKey),
     data,
@@ -101,10 +107,11 @@ k.api.get("config", () => {
 
 ```ts
 k.api.post("update", (body: Partial<PromoConfig>) => {
+  const current = getConfig();
   const next: PromoConfig = {
     enabled: body?.enabled === false ? false : true,
-    title: String(body?.title || "默认活动").trim(),
-    discount: Number(body?.discount || 0),
+    title: String(body?.title || current.title).trim() || current.title,
+    discount: Number(body?.discount ?? current.discount),
     updatedAt: new Date().toISOString(),
   };
 
@@ -113,6 +120,7 @@ k.api.post("update", (body: Partial<PromoConfig>) => {
 
   return {
     success: true,
+    configKey,
     cacheCleared: true,
     data: next,
   };
@@ -141,7 +149,7 @@ k.api.post("clear", () => {
 页面可以连续读取两次，用第二次响应确认缓存命中：
 
 ```html
-<!-- Example route: /promo-config-demo -->
+<!-- Example route: /guide-keyvalue-config -->
 <button id="read-twice" type="button">连续读取两次</button>
 <button id="update" type="button">更新活动配置</button>
 <pre id="result">等待操作。</pre>
@@ -150,12 +158,12 @@ k.api.post("clear", () => {
   const result = document.querySelector("#result");
 
   async function getConfig() {
-    const response = await fetch("/api/promo-config/config");
+    const response = await fetch("/api/guide-keyvalue-config/config");
     return response.json();
   }
 
   async function updateConfig() {
-    const response = await fetch("/api/promo-config/update", {
+    const response = await fetch("/api/guide-keyvalue-config/update", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: "限时加购优惠", discount: 22 }),

@@ -42,9 +42,9 @@ k.response.redirect(站内安全路径)
 下面示例只允许站内相对路径，并拦截绝对 URL、协议相对 URL、反斜杠和控制字符：
 
 ```ts
-// Example route: /api/safe-redirect/{action}
+// Example route: /api/guide-safe-redirect/{action}
 
-const fallbackPath = "/login?blocked=1";
+const fallbackPath = "/safe-redirect-demo?blocked=1";
 
 function decodeOnce(value: string) {
   try {
@@ -93,17 +93,21 @@ function normalizeTarget(value: unknown) {
   };
 }
 
+function requestedTarget() {
+  return k.request.queryString.target || k.request.queryString.returnUrl || "/account";
+}
+
 k.api.get("check", () => {
-  return normalizeTarget(k.request.queryString.target || "/");
+  return normalizeTarget(requestedTarget());
 });
 
 k.api.get("go", () => {
-  const decision = normalizeTarget(k.request.queryString.target || "/");
+  const decision = normalizeTarget(requestedTarget());
   return k.response.redirect(decision.redirectTo);
 });
 ```
 
-`check` 便于前端预览和测试；真实业务完成后调用 `go` 或直接在业务 API 里复用 `normalizeTarget` 的结果。
+`check` 便于前端预览和测试；真实业务完成后调用 `go` 或直接在业务 API 里复用 `normalizeTarget` 的结果。示例同时支持 `target` 和 `returnUrl`，但无论参数名是什么，都必须经过同一个服务端判断。
 
 ## Page：展示拦截结果
 
@@ -113,7 +117,7 @@ k.api.get("go", () => {
 <!-- Example route: /safe-redirect-demo -->
 <input id="target" value="/account?tab=orders">
 <button id="check" type="button">检查目标</button>
-<a id="go" href="/api/safe-redirect/go?target=%2Faccount">执行跳转</a>
+<a id="go" href="/api/guide-safe-redirect/go?target=%2Faccount">执行跳转</a>
 <pre id="result"></pre>
 
 <script>
@@ -122,12 +126,12 @@ k.api.get("go", () => {
   const go = document.querySelector("#go");
 
   function updateGoLink() {
-    go.href = `/api/safe-redirect/go?target=${encodeURIComponent(target.value)}`;
+    go.href = `/api/guide-safe-redirect/go?target=${encodeURIComponent(target.value)}`;
   }
 
   document.querySelector("#check").addEventListener("click", async () => {
     updateGoLink();
-    const response = await fetch(`/api/safe-redirect/check?target=${encodeURIComponent(target.value)}`);
+    const response = await fetch(`/api/guide-safe-redirect/check?target=${encodeURIComponent(target.value)}`);
     result.textContent = JSON.stringify(await response.json(), null, 2);
   });
 

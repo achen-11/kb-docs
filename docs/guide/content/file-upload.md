@@ -1,10 +1,10 @@
 # 文件上传
 
-> 用 Page 的 `FormData` 上传图片，API 读取 `k.request.files`，校验后写入 Kooboo 媒体库并返回可预览 URL。
+> 用 Page 的 `FormData` 上传图片，API 读取 `k.request.files`，校验后写入 Kooboo 站点图片库并返回可预览 URL。
 
 ## 适用场景
 
-这套做法适合头像、活动图片、商品图、报名附件缩略图、资料封面等普通图片上传场景。它强调上传入口的服务端校验、媒体库存储和前台预览。
+这套做法适合头像、活动图片、商品图、报名附件缩略图、资料封面等普通图片上传场景。它强调上传入口的服务端校验、站点图片库存储和前台预览。
 
 不适合直接处理大视频、超大附件、断点续传或私密文件下载。大文件应单独使用断点上传方案；需要权限保护的文件不要只依赖不可猜 URL，应在业务 API 中做访问控制。
 
@@ -14,12 +14,12 @@
 |------|------|----------|
 | Page | 用 file input 和 FormData 提交文件 | [Page](/templateEngine/page/) |
 | Request | 读取 multipart 中的 `k.request.files` 和表单字段 | [k.request](/api/request/) |
-| Media | 写入媒体库、列出文件、返回 previewUrl | [k.media](/api/media/) |
+| Site Images | 写入站点图片库、列出文件、返回预览 URL | [媒体库选择与前台展示](../media/media-gallery.md) |
 | API | 校验文件、限制目录、上传、删除和重置 | [k.api](/api/api/) |
 | CMS | 后台查看媒体库图片资源 | [媒体库](/cms/site/media) |
 
-::: tip `k.media`、`k.file` 和 CMS 文件库不是一回事
-图片上传并要前台展示时，优先使用 `k.media` 写入媒体库。`k.file` 操作的是站点磁盘目录，适合普通文件读写；后台 **内容 → 文件** 是 CMS 文件库，目前不等同于 `k.file`。
+::: tip `k.site.images`、`k.file` 和 CMS 文件库不是一回事
+图片上传并要前台展示时，优先使用 `k.site.images` 写入站点图片库。`k.file` 操作的是站点磁盘目录，适合普通文件读写；后台 **内容 → 文件** 是 CMS 文件库，目前不等同于 `k.file`。
 :::
 
 ## 推荐架构
@@ -35,14 +35,14 @@ Page file input
    ↓
 校验 MIME、扩展名、大小
    ↓
-k.media.writeBinary("/guide-uploads/xxx.png", file.bytes, true)
+k.site.images.addImage("/guide-uploads/xxx.png", file.bytes, "xxx.png")
    ↓
-k.media.get(path) 返回 previewUrl
+k.site.images.getByUrl(path) 返回可预览图片
 ```
 
 不要让前端直接提交完整目标路径，也不要把用户上传文件名原样当作最终路径。服务端应清理文件名、限制目录，并用时间戳或业务 ID 防止覆盖。
 
-## API：上传到媒体库
+## API：上传到站点图片库
 
 下面示例只允许图片，并限制到 `/guide-uploads/` 目录：
 
@@ -61,22 +61,24 @@ function safeName(fileName: string) {
     .replace(/^-+|-+$/g, "") || `upload-${Date.now()}.png`;
 }
 
-function ensureFolder() {
-  const exists = k.media.subFolders("/")
-    .some((folder) => folder.fullPath === uploadFolder || folder.name === "guide-uploads");
+function uploadPath(fileName: string) {
+  return `${uploadFolder}/${Date.now()}-${safeName(fileName)}`;
+}
 
-  if (!exists) {
-    k.media.createFolder("guide-uploads", "/");
-  }
+function imageView(file: any, path: string) {
+  return {
+    id: file?.id || file?.Id || "",
+    name: file?.name || file?.Name || path.split("/").pop(),
+    path,
+    url: file?.url || file?.Url || path,
+  };
 }
 ```
 
-上传接口读取 `k.request.files[0]`，校验后调用 `k.media.writeBinary()`：
+上传接口读取 `k.request.files[0]`，校验后调用 `k.site.images.addImage()`：
 
 ```ts
 k.api.post("image", () => {
-  ensureFolder();
-
   const file = k.request.files[0];
   if (!file) {
     return { success: false, code: "MISSING_FILE", message: "请选择要上传的图片。" };
@@ -91,16 +93,18 @@ k.api.post("image", () => {
   }
 
   const name = safeName(file.fileName);
-  const path = `${uploadFolder}/${Date.now()}-${name}`;
-  const ok = k.media.writeBinary(path, file.bytes, true);
-
-  if (!ok) {
-    return { success: false, code: "WRITE_FAILED", message: "媒体文件写入失败。" };
+  const ext = name.slice(name.lastIndexOf(".")).toLowerCase();
+  if (!allowedExtensions.includes(ext)) {
+    return { success: false, code: "INVALID_EXTENSION", message: "文件扩展名必须是 png、jpg、jpeg、webp 或 gif。" };
   }
+
+  const path = uploadPath(name);
+  k.site.images.addImage(path, file.bytes, name);
+  const saved = k.site.images.getByUrl(path);
 
   return {
     success: true,
-    file: k.media.get(path),
+    file: imageView(saved, path),
   };
 });
 ```
@@ -109,17 +113,19 @@ k.api.post("image", () => {
 
 ## API：列表、删除和清理
 
-上传后通常需要返回列表或预览。列表可以用 `folderFiles()`：
+上传后通常需要返回列表或预览。列表可以用 `getByFolder()`：
 
 ```ts
 k.api.get("list", () => {
-  ensureFolder();
+  const files = (k.site.images.getByFolder(uploadFolder) || [])
+    .map((file) => imageView(file, file.filePath || file.FilePath || file.url || file.Url))
+    .filter((file) => file.path.startsWith(`${uploadFolder}/`));
 
   return {
     success: true,
     data: {
       folder: uploadFolder,
-      files: k.media.folderFiles(uploadFolder),
+      files,
     },
   };
 });
@@ -135,12 +141,13 @@ k.api.post("delete", () => {
     return { success: false, code: "INVALID_PATH", message: "只能删除上传目录下的文件。" };
   }
 
-  if (!k.media.exists(path)) {
+  const image = k.site.images.getByUrl(path);
+  if (!image) {
     return { success: false, code: "NOT_FOUND", message: "文件不存在。" };
   }
 
-  k.media.delete(path);
-  return { success: true, existsAfter: k.media.exists(path) };
+  k.site.images.delete(image.id || path);
+  return { success: true };
 });
 ```
 
@@ -180,7 +187,7 @@ k.api.post("delete", () => {
 </script>
 ```
 
-上传成功后使用 `previewUrl` 展示图片。若上传后还要写报名记录、商品图关系或用户头像，应在同一个服务端流程里记录业务关联，避免只上传了文件却没有业务归属。
+上传成功后使用返回的 `url` 展示图片。若上传后还要写报名记录、商品图关系或用户头像，应在同一个服务端流程里记录业务关联，避免只上传了文件却没有业务归属。
 
 ## 失败处理
 
@@ -190,7 +197,7 @@ k.api.post("delete", () => {
 | MIME 不允许 | 返回 `INVALID_TYPE` |
 | 扩展名不允许 | 返回 `INVALID_EXTENSION` |
 | 文件过大 | 返回 `FILE_TOO_LARGE` |
-| 写入媒体库失败 | 返回 `WRITE_FAILED`，保留前端重试入口 |
+| 写入站点图片库失败 | 返回 `WRITE_FAILED`，保留前端重试入口 |
 | 删除路径越界 | 返回 `INVALID_PATH`，只允许删除业务目录 |
 | 删除不存在文件 | 返回 `NOT_FOUND` |
 | 需要权限 | 在 API 中校验用户、角色和业务归属 |
@@ -198,7 +205,7 @@ k.api.post("delete", () => {
 ## 相关
 
 - [k.request](/api/request/)
-- [k.media](/api/media/)
+- [媒体库选择与前台展示](../media/media-gallery.md)
 - [k.file](/api/file/file)
 - [k.file/resumable](/api/file/file-resumable)
 - [媒体库](/cms/site/media)

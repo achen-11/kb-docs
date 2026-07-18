@@ -138,20 +138,33 @@ return logs.map((log) => ({
 ```ts
 const logs = k.site.pages.getLogs("guide_generated_landing") || [];
 let rollbackBody = "";
+let rollbackLogId = "";
 
 for (const log of logs) {
   const logId = log.logId || log.LogId;
   const snapshot = k.site.pages.getByLog(logId);
   if (snapshot && snapshot.body && snapshot.body.indexOf('data-version="v1"') >= 0) {
     rollbackBody = snapshot.body;
+    rollbackLogId = logId;
     break;
   }
 }
 
-if (rollbackBody) {
-  const page = k.site.pages.get("guide_generated_landing");
-  k.site.pages.updateBody(page.id, rollbackBody);
+if (!rollbackBody) {
+  return {
+    success: false,
+    code: "ROLLBACK_LOG_NOT_FOUND",
+    message: "没有找到包含 v1 标记的页面日志快照。",
+  };
 }
+
+const page = k.site.pages.get("guide_generated_landing");
+k.site.pages.updateBody(page.id, rollbackBody);
+
+return {
+  success: true,
+  source: `log:${rollbackLogId}`,
+};
 ```
 
 真实项目中不要只按“第一个日志”回滚。应按版本号、发布时间、操作人、审批记录或内容签名来选择目标版本。

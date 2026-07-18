@@ -89,15 +89,29 @@ function passwordPolicy(password: string) {
   return "";
 }
 
+function isEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
 k.api.post("register", (body: CredentialBody) => {
   const email = normalizeEmail(body?.email);
   const password = normalize(body?.password);
   const displayName = normalize(body?.displayName) || email;
 
+  if (!isEmail(email)) {
+    k.response.statusCode(400);
+    return { success: false, code: "INVALID_EMAIL", message: "请输入有效邮箱。" };
+  }
+
   const passwordError = passwordPolicy(password);
   if (passwordError) {
     k.response.statusCode(400);
     return { success: false, code: "WEAK_PASSWORD", message: passwordError };
+  }
+
+  if (k.DB.keyValue.get(`${userPrefix}${email}`)) {
+    k.response.statusCode(409);
+    return { success: false, code: "EMAIL_EXISTS", message: "邮箱已注册。" };
   }
 
   const record = {
@@ -194,7 +208,11 @@ k.api.post("login", (body: CredentialBody) => {
 
   const user = safeUser(record);
   k.session.set(sessionUserKey, JSON.stringify(user));
-  k.cookie.set(displayCookie, record.email, 7);
+  if (body?.remember) {
+    k.cookie.set(displayCookie, record.email, 7);
+  } else {
+    k.cookie.setByMinutes(displayCookie, record.email, 60);
+  }
 
   return {
     success: true,
@@ -202,11 +220,14 @@ k.api.post("login", (body: CredentialBody) => {
     data: user,
     session: {
       hasSession: k.session.containsKey(sessionUserKey),
-      hasDisplayCookie: k.cookie.containsKey(displayCookie),
+      displayCookieQueued: true,
+      displayCookieExpires: body?.remember ? "7d" : "60m",
     },
   };
 });
 ```
+
+`k.cookie.set` 写入的是响应 cookie，当前请求内不应再用 `k.cookie.containsKey(displayCookie)` 证明它已经回读。前台可在随后的 `GET /api/password-login/me` 中检查 `displayCookie`，确认浏览器已带回这个非敏感显示 cookie。
 
 cookie 只能保存非敏感显示信息或 remember me 标记。真正的当前用户、角色、组织、权限等服务端可信状态应从 session 或服务端数据读取。
 

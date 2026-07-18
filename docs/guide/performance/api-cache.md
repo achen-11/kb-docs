@@ -25,16 +25,16 @@
 ```text
 src/
 ├── api/
-│   └── summary-cache.ts
+│   └── guide-api-cache.ts
 └── page/
-    └── summary-cache.html
+    └── guide-api-cache.html
 ```
 
 当缓存内容来自数据库、第三方服务或复杂计算时，把生成逻辑放到 CodeBlock：
 
 ```text
 src/
-├── api/summary-cache.ts
+├── api/guide-api-cache.ts
 └── code/services/summary.ts
 ```
 
@@ -45,9 +45,10 @@ API 只负责读请求、拼缓存键、调用 service、返回统一结构。
 使用 `containsKey` 判断本次请求是否命中缓存，再用 `getOrCreate` 保证未命中时只执行一次生成逻辑。
 
 ```ts
-// Example route: /api/summary-cache/{action}
+// Example route: /api/guide-api-cache/{action}
 
-const cacheKey = "summary:home";
+const cacheKey = "guide:api-cache:summary";
+const ttlSeconds = 60;
 
 function createSummary() {
   return {
@@ -58,11 +59,12 @@ function createSummary() {
 
 k.api.get("summary", () => {
   const hadCache = k.cache.containsKey(cacheKey);
-  const summary = k.cache.getOrCreate(cacheKey, createSummary, 60);
+  const summary = k.cache.getOrCreate(cacheKey, createSummary, ttlSeconds);
 
   return {
     success: true,
     cacheKey,
+    ttlSeconds,
     cacheHit: hadCache,
     data: {
       ...summary,
@@ -85,6 +87,7 @@ k.api.post("clear", () => {
 
   return {
     success: true,
+    cacheKey,
     existed,
     existsAfterRemove: k.cache.containsKey(cacheKey),
   };
@@ -98,7 +101,7 @@ k.api.post("clear", () => {
 前台页面不需要知道缓存实现，只需要展示 API 返回的 `cacheHit` 和 `generatedAt`：
 
 ```html
-<!-- Example route: /summary-cache -->
+<!-- Example route: /guide-api-cache -->
 <button id="load-twice" type="button">连续加载两次</button>
 <button id="clear-cache" type="button">清理缓存</button>
 <pre id="result">等待操作。</pre>
@@ -107,16 +110,17 @@ k.api.post("clear", () => {
   const result = document.querySelector("#result");
 
   async function getSummary() {
-    const response = await fetch("/api/summary-cache/summary");
+    const response = await fetch("/api/guide-api-cache/summary");
     return response.json();
   }
 
   async function clearCache() {
-    const response = await fetch("/api/summary-cache/clear", { method: "POST" });
+    const response = await fetch("/api/guide-api-cache/clear", { method: "POST" });
     return response.json();
   }
 
   document.querySelector("#load-twice").addEventListener("click", async () => {
+    await clearCache();
     const first = await getSummary();
     const second = await getSummary();
     result.textContent = JSON.stringify({ first, second }, null, 2);

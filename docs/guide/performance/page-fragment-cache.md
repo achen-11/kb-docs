@@ -34,20 +34,30 @@ Page / View 注入片段
 
 最小场景可以由 API 返回 HTML 片段；复杂项目可以把生成逻辑放进 CodeBlock 或 View，然后由 API / Page 复用。
 
+```text
+src/
+├── api/
+│   └── guide-page-fragment-cache.ts
+└── page/
+    └── guide-page-fragment-cache.html
+```
+
 ## API：生成并缓存片段
 
 下面示例用版本号模拟内容发布。`v1` 和 `v2` 使用不同缓存 key，避免发布后读到旧片段：
 
 ```ts
-// Example route: /api/page-fragment-cache/{action}
+// Example route: /api/guide-page-fragment-cache/{action}
 
 type FragmentData = {
   html: string;
   generatedAt: string;
   version: string;
+  headline: string;
 };
 
-const versionKey = "fragment:promo:version";
+const versionKey = "guide:fragment-cache:version";
+const ttlSeconds = 60;
 
 function readVersion() {
   const raw = k.DB.keyValue.get(versionKey);
@@ -55,7 +65,7 @@ function readVersion() {
 }
 
 function cacheKey(version: string) {
-  return `fragment:promo:${version}`;
+  return `guide:fragment-cache:hero:${version}`;
 }
 
 function createFragment(): FragmentData {
@@ -66,8 +76,10 @@ function createFragment(): FragmentData {
   return {
     version,
     generatedAt,
+    headline,
     html: `<section class="promo-fragment" data-version="${version}">
       <strong>${headline}</strong>
+      <span>缓存版本：${version}</span>
       <small>生成时间：${generatedAt}</small>
     </section>`,
   };
@@ -77,11 +89,13 @@ k.api.get("fragment", () => {
   const version = readVersion();
   const key = cacheKey(version);
   const cacheHit = k.cache.containsKey(key);
-  const data = k.cache.getOrCreate(key, createFragment, 60);
+  const data = k.cache.getOrCreate(key, createFragment, ttlSeconds);
 
   return {
     success: true,
     cacheKey: key,
+    versionKey,
+    ttlSeconds,
     cacheHit,
     data,
   };
@@ -97,7 +111,14 @@ k.api.get("fragment", () => {
 ```ts
 k.api.post("publish", (body: { version?: string }) => {
   const previousVersion = readVersion();
-  const nextVersion = body?.version === "v2" ? "v2" : "v1";
+  const nextVersion = body?.version || "v1";
+  if (nextVersion !== "v1" && nextVersion !== "v2") {
+    return {
+      success: false,
+      code: "INVALID_VERSION",
+      message: "version 只能是 v1 或 v2",
+    };
+  }
 
   k.DB.keyValue.set(versionKey, nextVersion);
   k.cache.remove(cacheKey(previousVersion));
@@ -105,8 +126,10 @@ k.api.post("publish", (body: { version?: string }) => {
 
   return {
     success: true,
+    versionKey,
     previousVersion,
     nextVersion,
+    removedKeys: [cacheKey(previousVersion), cacheKey(nextVersion)],
   };
 });
 
@@ -119,6 +142,7 @@ k.api.post("clear", () => {
   return {
     success: true,
     cacheKey: key,
+    versionKey,
     existed,
     existsAfterRemove: k.cache.containsKey(key),
   };
@@ -132,7 +156,7 @@ k.api.post("clear", () => {
 页面可以通过 API 拉取片段并注入到容器中：
 
 ```html
-<!-- Example route: /fragment-cache-demo -->
+<!-- Example route: /guide-page-fragment-cache -->
 <button id="load-twice" type="button">连续加载片段</button>
 <button id="publish-v2" type="button">发布 v2 并重载</button>
 <div id="fragment"></div>
@@ -143,24 +167,51 @@ k.api.post("clear", () => {
   const result = document.querySelector("#result");
 
   async function getFragment() {
-    const response = await fetch("/api/page-fragment-cache/fragment");
+    const response = await fetch("/api/guide-page-fragment-cache/fragment");
+    return response.json();
+  }
+
+  async function publish(version) {
+    const response = await fetch("/api/guide-page-fragment-cache/publish", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ version }),
+    });
+    return response.json();
+  }
+
+  async function clearCurrent() {
+    const response = await fetch("/api/guide-page-fragment-cache/clear", { method: "POST" });
     return response.json();
   }
 
   function render(data) {
+    if (!data.success || !data.data?.html) return;
     fragment.innerHTML = data.data.html;
+    if (!fragment.querySelector(".promo-fragment")) {
+      throw new Error("片段结构异常");
+    }
   }
 
   document.querySelector("#load-twice").addEventListener("click", async () => {
+    await publish("v1");
+    await clearCurrent();
     const first = await getFragment();
     const second = await getFragment();
     render(second);
     result.textContent = JSON.stringify({ first, second }, null, 2);
   });
+
+  document.querySelector("#publish-v2").addEventListener("click", async () => {
+    const published = await publish("v2");
+    const afterPublish = await getFragment();
+    render(afterPublish);
+    result.textContent = JSON.stringify({ published, afterPublish }, null, 2);
+  });
 </script>
 ```
 
-如果片段 HTML 来自用户输入或富文本，要确保源内容已经过 CMS 或服务端净化，不要把未处理的用户提交直接拼进 HTML。
+如果片段 HTML 来自用户输入或富文本，要确保源内容已经过 CMS 或服务端净化，不要把未处理的用户提交直接拼进 HTML。前端只应注入可信服务端生成的片段，并在注入后检查关键 DOM 结构是否存在。
 
 ## 失效策略
 

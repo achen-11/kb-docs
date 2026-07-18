@@ -190,7 +190,7 @@ k.api.post("callback", () => {
 
 ## 错误处理建议
 
-| 错误码 | HTTP | 处理方式 |
+| 返回标记 / 错误码 | HTTP | 处理方式 |
 |--------|------|----------|
 | `IDEMPOTENCY_REQUIRED` | 400 | 前端重新生成发起支付幂等键 |
 | `ORDER_NOT_FOUND` | 404 | 阻止支付，提示订单不存在或已过期 |
@@ -199,7 +199,8 @@ k.api.post("callback", () => {
 | `INVALID_SIGNATURE` | 401 | 不处理业务，记录 provider、requestId、eventId |
 | `STALE_TIMESTAMP` | 400 | 拒绝旧回调，防止重放 |
 | `AMOUNT_MISMATCH` | 409 | 不更新订单，进入人工核查或补偿队列 |
-| `DUPLICATE_EVENT` | 200 | 返回已处理结果，不重复更新订单 |
+| `duplicate: true` | 200 | 返回已处理结果，不重复更新订单 |
+| `PAYMENT_ALREADY_PAID` | 409 | 拒绝同一支付请求的新支付成功事件，避免重复改写订单 |
 
 支付类错误不要只写前台 toast。服务端日志至少要保留 provider、requestId、orderId、eventId、错误码、处理时间和 traceId。不要记录完整支付签名、私钥、卡号、验证码或第三方密钥。
 

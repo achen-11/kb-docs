@@ -25,21 +25,21 @@
 ```text
 CMS 菜单 guide_main_nav
         ↓
-src/api/navigation.ts
+src/api/guide-dynamic-navigation.ts
         ↓
-Page / Layout / View 渲染导航
+/guide-dynamic-navigation 页面渲染导航
 ```
 
-CMS 菜单只负责结构和 URL；API 负责把菜单转换成前台需要的格式，并加上 `requiresLogin`、`active`、`children` 等运行时字段。这样后台运营可以维护菜单，开发侧仍能集中处理权限、语言和当前路径。
+CMS 菜单只负责结构和 URL；API 负责把菜单转换成前台需要的格式，并加上 `requiresLogin`、`active`、`children` 等运行时字段。这样后台运营可以维护菜单，开发侧仍能集中处理权限、语言和当前路径。实际项目可以按自己的路由约定调整 API 前缀和菜单名，但前后端应保持同一套契约。
 
 ## API：读取并过滤菜单
 
 下面示例用 `k.site.menus` 读取菜单，并按 `audience` 过滤会员入口。真实项目中，`audience` 应来自 session、cookie 或账号角色，而不是前端传参。
 
 ```ts
-// Example route: /api/navigation/{action}
+// Example route: /api/guide-dynamic-navigation/{action}
 
-const menuName = "main_nav";
+const menuName = "guide_main_nav";
 const restrictedUrls = ["/account", "/orders"];
 
 function getAudience() {
@@ -68,14 +68,17 @@ k.api.get("menu", () => {
   const audience = getAudience();
   const path = k.request.queryString.path || "/";
   const menu = k.site.menus.get(menuName);
+  const items = (menu.children || [])
+    .map((item) => normalize(item, audience, path))
+    .filter(Boolean);
 
   return {
     success: true,
+    menuName,
     audience,
     path,
-    items: (menu.children || [])
-      .map((item) => normalize(item, audience, path))
-      .filter(Boolean),
+    totalItems: items.length,
+    items,
   };
 });
 ```
@@ -87,7 +90,7 @@ k.api.get("menu", () => {
 页面或 Layout 只消费 API，不直接写死菜单规则：
 
 ```html
-<!-- Example route: /navigation-demo -->
+<!-- Example route: /guide-dynamic-navigation -->
 <nav id="navigation" aria-label="主导航"></nav>
 
 <script>
@@ -95,7 +98,7 @@ k.api.get("menu", () => {
   let currentPath = location.pathname;
 
   async function loadMenu() {
-    const response = await fetch(`/api/navigation/menu?path=${encodeURIComponent(currentPath)}`);
+    const response = await fetch(`/api/guide-dynamic-navigation/menu?path=${encodeURIComponent(currentPath)}`);
     const data = await response.json();
 
     navigation.innerHTML = "";

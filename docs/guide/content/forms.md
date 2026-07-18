@@ -25,9 +25,9 @@
 ```text
 src/
 ├── page/
-│   └── contact.html
+│   └── guide-form-validation.html
 └── api/
-    └── contact-submit.ts
+    └── guide-form-submit.ts
 ```
 
 当表单开始复用、字段变多、需要写入数据库或发送通知时，把校验、保存和通知逻辑移入 `src/code/services/...`，API 只保留请求入口。
@@ -37,7 +37,7 @@ src/
 Page 负责渲染表单，并把用户输入提交到 API：
 
 ```html
-<!-- Example route: /contact -->
+<!-- Example route: /guide-form-validation -->
 <form id="contact-form" novalidate>
   <input name="name" autocomplete="name" />
   <input name="email" autocomplete="email" />
@@ -60,7 +60,7 @@ Page 负责渲染表单，并把用户输入提交到 API：
       message: form.elements.message.value,
     };
 
-    const response = await fetch("/api/contact-submit/submit", {
+    const response = await fetch("/api/guide-form-submit/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -78,7 +78,7 @@ Page 负责渲染表单，并把用户输入提交到 API：
 API 使用 `{action}` 子路由承载提交动作：
 
 ```ts
-// Example route: /api/contact-submit/{action}
+// Example route: /api/guide-form-submit/{action}
 
 type ContactFormBody = {
   name?: string;
@@ -94,8 +94,9 @@ function isEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-function fail(message: string, field: string) {
-  return { success: false, message, field };
+function fail(code: string, message: string, field: string) {
+  k.response.statusCode(400);
+  return { success: false, code, message, field };
 }
 
 k.api.post("submit", (body: ContactFormBody) => {
@@ -103,10 +104,12 @@ k.api.post("submit", (body: ContactFormBody) => {
   const email = normalizeText(body?.email);
   const message = normalizeText(body?.message);
 
-  if (!name) return fail("请填写姓名。", "name");
-  if (!email) return fail("请填写邮箱。", "email");
-  if (!isEmail(email)) return fail("邮箱格式不正确。", "email");
-  if (message.length < 10) return fail("留言至少需要 10 个字符。", "message");
+  if (!name) return fail("NAME_REQUIRED", "请填写姓名。", "name");
+  if (!email) return fail("EMAIL_REQUIRED", "请填写邮箱。", "email");
+  if (!isEmail(email)) return fail("INVALID_EMAIL", "邮箱格式不正确。", "email");
+  if (message.length < 10) {
+    return fail("MESSAGE_TOO_SHORT", "留言至少需要 10 个字符。", "message");
+  }
 
   return {
     success: true,
@@ -121,14 +124,14 @@ k.api.post("submit", (body: ContactFormBody) => {
 });
 ```
 
-返回结构建议至少包含 `success` 和 `message`。字段级错误可以额外返回 `field`，前端据此定位输入项。
+返回结构建议至少包含 `success`、`code` 和 `message`。字段级错误可以额外返回 `field`，前端据此定位输入项。校验失败时建议用 400 状态码，让调用方能同时从 HTTP 状态和业务错误码判断失败类型。
 
 ## 失败处理
 
 | 情况 | 推荐处理 |
 |------|----------|
-| 必填字段为空 | 返回 `success: false`、可读错误和字段名 |
-| 格式错误 | 在服务端重新校验，不信任前端正则 |
+| 必填字段为空 | 返回 400、稳定错误码、可读错误和字段名 |
+| 格式错误 | 在服务端重新校验，不信任前端正则，返回 400 和稳定错误码 |
 | 请求失败 | 前端展示通用失败提示，并保留用户已输入内容 |
 | 重复提交 | 提交期间禁用按钮；重要业务再增加幂等键 |
 | 需要保存数据 | API 调用 CodeBlock service，由 service 写数据库或内容 |

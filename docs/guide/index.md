@@ -31,7 +31,7 @@
 | [访问控制与 API 防越权](./security/access-control.md) | `k.session` + 资源归属校验 + 角色例外 |
 | [KeyValue 配置与缓存](./data/keyvalue-config.md) | `k.DB.keyValue` + `k.cache` + Page 观察配置更新 |
 | [SQLite 业务模块 CRUD](./data/sqlite-crud.md) | `k.DB.sqlite` + API CRUD + 分页筛选 + Page 操作 |
-| [媒体库选择与前台展示](./media/media-gallery.md) | CMS 媒体库 + `k.media` + Page 图片选择预览 |
+| [媒体库选择与前台展示](./media/media-gallery.md) | CMS 媒体库 + `k.site.images` + Page 图片选择预览 |
 | [内容搜索页](./search/content-search.md) | 内容索引 + `k.request.queryString` + 关键词/分类/分页过滤 |
 | [代码生成资源与回滚](./site-resources/resource-rollback.md) | `k.site.pages/styles/scripts/codes` + 版本日志 + 预览回滚 |
 | [HTTPClient 调用第三方接口](./integrations/httpclient-services.md) | `k.net.httpClient` + API 代理 + 上游错误处理 |

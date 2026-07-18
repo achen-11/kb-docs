@@ -81,6 +81,16 @@ function normalizeEmail(value: unknown) {
   return String(value || "").trim().toLowerCase();
 }
 
+function isEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function passwordPolicy(password: string) {
+  if (password.length < 8) return "密码至少需要 8 位。";
+  if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) return "密码需要同时包含字母和数字。";
+  return "";
+}
+
 function tokenKey(token: string) {
   return `${tokenPrefix}${k.security.sha256(token)}`;
 }
@@ -107,6 +117,17 @@ function createToken(email: string, purpose: TokenPurpose) {
 k.api.post("register", (body) => {
   const email = normalizeEmail(body?.email);
   const password = String(body?.password || "").trim();
+
+  if (!isEmail(email)) {
+    k.response.statusCode(400);
+    return { success: false, code: "INVALID_EMAIL", message: "请输入有效邮箱。" };
+  }
+
+  const passwordError = passwordPolicy(password);
+  if (passwordError) {
+    k.response.statusCode(400);
+    return { success: false, code: "WEAK_PASSWORD", message: passwordError };
+  }
 
   if (readUser(email)) {
     k.response.statusCode(409);
@@ -150,12 +171,12 @@ k.api.post("register", (body) => {
 ```ts
 function validateToken(token: string, purpose: TokenPurpose) {
   const raw = k.DB.keyValue.get(tokenKey(token));
-  if (!raw) return { ok: false, code: "TOKEN_NOT_FOUND" };
+  if (!raw) return { ok: false, status: 404, code: "TOKEN_NOT_FOUND" };
 
   const record = JSON.parse(raw.toString());
-  if (record.purpose !== purpose) return { ok: false, code: "TOKEN_NOT_FOUND" };
-  if (record.usedAt) return { ok: false, code: "TOKEN_USED" };
-  if (Date.parse(record.expiresAt) <= Date.now()) return { ok: false, code: "TOKEN_EXPIRED" };
+  if (record.purpose !== purpose) return { ok: false, status: 404, code: "TOKEN_NOT_FOUND" };
+  if (record.usedAt) return { ok: false, status: 409, code: "TOKEN_USED" };
+  if (Date.parse(record.expiresAt) <= Date.now()) return { ok: false, status: 410, code: "TOKEN_EXPIRED" };
 
   return { ok: true, record };
 }
@@ -164,7 +185,7 @@ k.api.get("confirm", () => {
   const token = String(k.request.queryString.token || "").trim();
   const check = validateToken(token, "verify-email");
   if (!check.ok) {
-    k.response.statusCode(check.code === "TOKEN_EXPIRED" ? 410 : 409);
+    k.response.statusCode(check.status);
     return { success: false, code: check.code, message: "链接无效、过期或已使用。" };
   }
 
@@ -222,8 +243,14 @@ k.api.post("reset-password", (body) => {
   const password = String(body?.password || "").trim();
   const check = validateToken(token, "reset-password");
   if (!check.ok) {
-    k.response.statusCode(409);
+    k.response.statusCode(check.status);
     return { success: false, code: check.code, message: "链接无效、过期或已使用。" };
+  }
+
+  const passwordError = passwordPolicy(password);
+  if (passwordError) {
+    k.response.statusCode(400);
+    return { success: false, code: "WEAK_PASSWORD", message: passwordError };
   }
 
   const user = readUser(check.record.email);
@@ -301,12 +328,12 @@ function sendVerificationMail(email: string, link: string) {
 | 邮箱已注册 | 注册返回 `409 EMAIL_EXISTS` |
 | 未验证邮箱登录 | 返回 `EMAIL_NOT_VERIFIED`，提示重新发送验证邮件 |
 | 找回未知邮箱 | 对外仍返回成功，避免邮箱枚举 |
-| token 不存在 | 返回 `TOKEN_NOT_FOUND` |
+| token 不存在 | 返回 `404 TOKEN_NOT_FOUND` |
 | token 已使用 | 返回 `409 TOKEN_USED` |
 | token 过期 | 返回 `410 TOKEN_EXPIRED` |
 | 邮件发送失败 | 记录失败状态、错误和 attempts，提供重试 |
 | 重置密码成功 | 更新 `passwordHash`，清理旧 session 和一次性 token |
-| 审计 | 不返回 password、passwordHash、token 明文本体 |
+| 审计 | 不返回明文密码、passwordHash 值或 token 明文本体；如需排查，只返回脱敏元信息 |
 
 额外建议：
 

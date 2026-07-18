@@ -81,6 +81,8 @@ Kooboo 的运行时会用 `new Uri(baseUrl, path)` 拼接请求 URL。因为 Ope
 }
 ```
 
+如果验证用的是同站点 mock Partner API，`servers[0].url` 也要写当前站点根域名，`paths` 写 `/api/partner/orders`、`/api/partner/shipment` 这样的完整 API path。站点从 local 迁移到 redev 或生产域名后，必须同步更新 CMS Open API 定义并重新 `kb pull type`，否则 `k.openApi` 可能继续调用旧域名，返回 HTML 或登录页也会被误判为上游成功。
+
 保存后运行 `kb pull type`，从 `kooboo.d.ts` 确认生成的方法名。不要猜 `operationId`，当前生成方法名来自标准化后的路径和 HTTP 方法，例如：
 
 ```ts
@@ -139,6 +141,17 @@ function mapOpenApiResult(result: any) {
   });
 }
 
+function mapOrderPage(result: any) {
+  const mapped = mapOpenApiResult(result);
+  if (mapped?.success === false) return mapped;
+  if (!mapped || mapped.success !== true || !Array.isArray(mapped.items)) {
+    return fail(502, "OPENAPI_BAD_RESPONSE", "OpenAPI 上游返回结构异常。", {
+      expected: "OrderPage.success and OrderPage.items",
+    });
+  }
+  return mapped;
+}
+
 k.api.post("orders", (body: { status?: string; page?: number }) => {
   const client = getClient();
   if (!client) return fail(500, "OPENAPI_CLIENT_NOT_READY", "OpenAPI client is not available.");
@@ -149,14 +162,14 @@ k.api.post("orders", (body: { status?: string; page?: number }) => {
     page: Number(body?.page || 1),
   });
 
-  const mapped = mapOpenApiResult(result);
+  const mapped = mapOrderPage(result);
   if (mapped?.success === false) return mapped;
 
   return { success: true, result };
 });
 ```
 
-上游 4xx/5xx 不一定会抛出 JavaScript 异常，可能以 `{ hasError, code, body, errorMsg }` 返回。业务 API 应显式检查 `hasError`，把错误状态码、上游错误码和用户可读信息拆开。
+上游 4xx/5xx 不一定会抛出 JavaScript 异常，可能以 `{ hasError, code, body, errorMsg }` 返回。业务 API 应显式检查 `hasError`，把错误状态码、上游错误码和用户可读信息拆开。还要校验成功响应的结构；如果 OpenAPI baseUrl 指错，返回的可能是 HTML 或登录页，这类响应应映射为 `OPENAPI_BAD_RESPONSE`，不能当成业务成功。
 
 ## Page：只触发业务 API
 
@@ -184,6 +197,7 @@ k.api.post("orders", (body: { status?: string; page?: number }) => {
 | baseUrl 带子路径导致 404 | 把 `baseUrl` 写成服务根域名，把子路径写进 OpenAPI `paths` |
 | 页面未授权却成功 | 清理旧 authorize，或在业务 API 里显式检查 `authorize.list()` |
 | 上游 500 被当成成功 | 检查返回值的 `hasError`，映射为业务错误和非 2xx 状态 |
+| 上游返回 HTML 或结构不符 | 校验业务字段，映射为 `OPENAPI_BAD_RESPONSE` |
 | 前端暴露密钥 | Page 只调业务 API，授权凭据只写在服务端 |
 
 ## 相关

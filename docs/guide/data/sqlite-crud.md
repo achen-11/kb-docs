@@ -112,6 +112,11 @@ k.api.get("list", () => {
 写操作应先校验字段，再执行 SQL：
 
 ```ts
+function findTask(id) {
+  const rows = k.DB.sqlite.query("SELECT * FROM guide_tasks WHERE id = @id LIMIT 1", { id });
+  return rows[0] || null;
+}
+
 k.api.post("create", () => {
   ensureTable();
 
@@ -138,18 +143,13 @@ k.api.post("create", () => {
     { id, title, status, priority, assignee, createdAt: now, updatedAt: now }
   );
 
-  return { success: true, id };
+  return { success: true, data: findTask(id) };
 });
 ```
 
 更新和删除要先查是否存在，避免前端把“无影响行数”误判成成功：
 
 ```ts
-function findTask(id) {
-  const rows = k.DB.sqlite.query("SELECT * FROM guide_tasks WHERE id = @id LIMIT 1", { id });
-  return rows[0] || null;
-}
-
 k.api.post("remove", () => {
   ensureTable();
 

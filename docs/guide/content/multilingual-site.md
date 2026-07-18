@@ -98,7 +98,8 @@ k.api.get("dict", () => {
 
 ```ts
 k.api.get("content", () => {
-  const lang = normalizeLang(k.request.queryString.lang);
+  const requestedLang = String(k.request.queryString.lang || "");
+  const lang = normalizeLang(requestedLang);
   const state = readState();
   const items = state.articles
     .filter((article) => article.published)
@@ -115,7 +116,9 @@ k.api.get("content", () => {
 
   return {
     success: true,
+    requestedLang,
     lang,
+    defaultLang: state.defaultLang,
     total: items.length,
     fallbackItems: items.filter((item) => item.fallback).map((item) => item.slug),
     items,

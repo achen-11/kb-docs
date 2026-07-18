@@ -93,6 +93,21 @@ k.api.post("login", (body: { userId?: string }) => {
 订单读取接口必须在服务端判断当前用户是否能访问目标订单：
 
 ```ts
+function visibleOrder(order: Order, user: User) {
+  const data: any = {
+    id: order.id,
+    total: order.total,
+    status: order.status,
+    items: order.items,
+  };
+
+  if (user.role === "support") {
+    data.ownerId = order.ownerId;
+  }
+
+  return data;
+}
+
 k.api.get("order", () => {
   const user = currentUser();
   const orderId = String(k.request.queryString.orderId || "").trim();
@@ -128,18 +143,17 @@ k.api.get("order", () => {
 
   return {
     success: true,
-    data: {
-      id: order.id,
-      total: order.total,
-      status: order.status,
-      items: order.items,
+    data: visibleOrder(order, user),
+    user: {
+      id: user.id,
+      name: user.name,
+      role: user.role,
     },
-    user,
   };
 });
 ```
 
-客服、运营或管理员角色可以有更宽的读取权限，但这种例外必须显式写在服务端规则里，并记录审计日志。不要用“前端不会显示这个按钮”作为权限依据。
+公开响应要遵循最小化原则：客户读取自己的订单时不返回 `ownerId`，越权失败时也不要把目标订单的 `ownerId` 放进响应；客服、运营或管理员角色确实需要查看归属字段时，必须由服务端角色判断显式放行，并记录审计日志。不要用“前端不会显示这个按钮”作为权限依据。
 
 ## Page：验证越权路径
 
@@ -177,13 +191,15 @@ k.api.get("order", () => {
 | 情况 | 推荐处理 |
 |------|----------|
 | 未登录 | 返回 `UNAUTHENTICATED`，引导登录 |
-| 资源不存在 | 返回 `ORDER_NOT_FOUND`，不泄露敏感数据 |
-| 资源属于其他用户 | 返回 `FORBIDDEN_ORDER`，记录审计 |
+| 资源不存在 | 返回 `ORDER_NOT_FOUND`，不回显当前用户或内部查询信息 |
+| 资源属于其他用户 | 返回 `FORBIDDEN_ORDER`，只保留必要资源标识，`ownerId` 等细节写入审计 |
 | 客服/运营角色 | 服务端显式允许，并记录读取原因 |
 | 前端隐藏入口 | 只作为体验优化，不作为安全边界 |
 | 批量列表 | 查询条件中加入当前用户/组织/租户维度 |
 
 多租户或组织场景还要加入 `organizationId` / `tenantId` 校验。只校验用户 id 不够，用户可能属于多个组织，权限也可能随组织切换变化。
+
+登录、查询和越权失败的公开错误结构也要保持稳定。可以返回 `code`、`message` 和用户已经知道的资源 id；用于排查的 `userId`、`ownerId`、角色、审计时间等字段应写入日志，不要混入前台响应。
 
 ## 相关
 

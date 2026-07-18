@@ -65,6 +65,14 @@ k.api.post("ship", (body: ShipBody) => {
     return fail(400, "IDEMPOTENCY_REQUIRED", "发货必须提供幂等键。");
   }
 
+  const existingShipmentId = k.DB.keyValue.get(`${shipIdempotencyPrefix}${idempotencyKey}`);
+  if (existingShipmentId) {
+    const existing = readShipments()[existingShipmentId.toString()];
+    if (existing) {
+      return { success: true, idempotent: true, shipment: existing };
+    }
+  }
+
   const order = readOrders()[normalize(body?.orderId)];
   if (!order) return fail(404, "ORDER_NOT_FOUND", "订单不存在。");
   if (order.status !== "paid" || order.fulfillmentStatus !== "unfulfilled") {
@@ -87,6 +95,8 @@ k.api.post("ship", (body: ShipBody) => {
 });
 ```
 
+重复提交同一个发货幂等键时，接口应返回同一张物流单，不重新创建 shipment，也不再次写入通知 outbox。
+
 签收和完成接口只做单向迁移：
 
 ```ts
@@ -106,6 +116,7 @@ k.api.post("deliver", (body: { orderId?: string }) => {
 
 k.api.post("complete", (body: { orderId?: string }) => {
   const order = readOrders()[normalize(body?.orderId)];
+  if (!order) return fail(404, "ORDER_NOT_FOUND", "订单不存在。");
   if (order.fulfillmentStatus !== "delivered") {
     return fail(409, "ORDER_NOT_DELIVERED", "只有已签收订单可以完成。");
   }
@@ -128,6 +139,14 @@ function queueNotification(order, template, payload) {
   outbox.push({
     channel: "email",
     to: order.customerEmail,
+    template,
+    orderId: order.id,
+    payload,
+    status: "queued",
+  });
+  outbox.push({
+    channel: "sms",
+    to: order.customerPhone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2"),
     template,
     orderId: order.id,
     payload,

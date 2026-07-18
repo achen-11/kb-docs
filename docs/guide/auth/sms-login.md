@@ -96,6 +96,7 @@ k.api.post("send", (body) => {
         success: false,
         code: "SMS_RATE_LIMITED",
         message: "验证码发送过于频繁，请稍后再试。",
+        retryAfterSeconds: Math.ceil((sendIntervalSeconds * 1000 - elapsed) / 1000),
       };
     }
   }
@@ -219,13 +220,13 @@ k.utils.sms.chinaMobile.send(phone, `Your login code is ${code}`);
 | 情况 | 推荐处理 |
 |------|----------|
 | 手机号格式错误 | HTTP 400，返回 `INVALID_PHONE` |
-| 发送过于频繁 | HTTP 429，返回 `SMS_RATE_LIMITED` 和 retryAfter |
+| 发送过于频繁 | HTTP 429，返回 `SMS_RATE_LIMITED` 和 `retryAfterSeconds` |
 | 短信服务失败 | 记录 `failed`、错误和 attempts，允许重试 |
 | 验证码不存在 | HTTP 404，返回 `CODE_NOT_FOUND` |
 | 验证码过期 | HTTP 410，返回 `CODE_EXPIRED` |
 | 验证码已使用 | HTTP 409，返回 `CODE_USED` |
 | 验证码错误 | HTTP 401，返回 `INVALID_CODE`，递增 failedCount |
-| 错误次数过多 | HTTP 423，返回 `CODE_LOCKED` |
+| 错误次数过多 | 达到上限的本次错误仍返回 `INVALID_CODE` 和 `locked`，锁定期间 HTTP 423，返回 `CODE_LOCKED` |
 | 登录成功 | 标记 code.usedAt，写入 session |
 | 审计 | 不返回 codeHash，不保存明文验证码 |
 

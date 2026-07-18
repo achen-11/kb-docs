@@ -65,9 +65,22 @@ const outboxKey = "guide-notifications:outbox";
 const idempotencyPrefix = "guide-notifications:idempotency:";
 ```
 
-入队时先校验模板、收件人和幂等键：
+入队时先校验模板、收件人和幂等键。公开响应只返回脱敏后的摘要，不返回原始 `payload` 或渲染后的通知正文：
 
 ```ts
+function publicMessage(message: NotificationMessage) {
+  return {
+    id: message.id,
+    channel: message.channel,
+    to: message.maskedTo,
+    template: message.template,
+    status: message.status,
+    attempts: message.attempts,
+    maxAttempts: message.maxAttempts,
+    payloadKeys: Object.keys(message.payload || {}),
+  };
+}
+
 k.api.post("enqueue", (body: EnqueueBody) => {
   const template = normalize(body?.template) || "order-paid";
   if (!readTemplates()[template]) {
@@ -85,14 +98,29 @@ k.api.post("enqueue", (body: EnqueueBody) => {
     return fail(400, "RECIPIENT_REQUIRED", "至少提供邮箱或手机号。");
   }
 
-  if (email) enqueue("email", email, template, body.payload, idempotencyKey);
-  if (phone) enqueue("sms", phone, template, body.payload, idempotencyKey);
+  const messages = [];
+  if (email) messages.push(enqueue("email", email, template, body.payload, idempotencyKey));
+  if (phone) messages.push(enqueue("sms", phone, template, body.payload, idempotencyKey));
 
-  return { success: true };
+  return {
+    success: true,
+    idempotent: messages.every((item) => item.idempotent),
+    messages: messages.map((item) => publicMessage(item.message)),
+  };
 });
 ```
 
 幂等键应按业务动作生成，例如 `order-paid:<orderId>`、`reset-password:<tokenId>`。不要只用时间戳，否则重复点击或重试无法识别同一业务动作。
+
+常见错误码建议固定为：
+
+| 错误码 | 触发条件 |
+|--------|----------|
+| `TEMPLATE_NOT_FOUND` | 模板不存在 |
+| `IDEMPOTENCY_REQUIRED` | 缺少幂等键 |
+| `RECIPIENT_REQUIRED` | 邮箱和手机号都为空 |
+| `INVALID_EMAIL` | 邮箱格式无效 |
+| `INVALID_PHONE` | 手机号格式无效 |
 
 ## 发送器与重试
 
@@ -124,7 +152,7 @@ k.api.post("process", (body: { retryFailed?: boolean }) => {
 });
 ```
 
-真实发送时把模拟发送替换为 `k.mail` 或 `k.utils.sms`。供应商错误、限流和超时都应落到 `lastError`，不要把异常直接抛给用户页面。
+真实发送时把模拟发送替换为 `k.mail` 或 `k.utils.sms`。供应商错误、限流和超时都应落到 `lastError`，不要把异常直接抛给用户页面。`process` 的公开响应建议只返回 `id`、`channel`、`status`、`error` 和脱敏 outbox 摘要，不要返回渲染后的验证码正文。
 
 ## 脱敏与日志
 
@@ -142,6 +170,18 @@ function maskPhone(phone: string) {
 ```
 
 验证码、完整手机号、完整邮箱、供应商 token、SMTP 密码、短信签名密钥都不要写到前台响应、普通日志或错误堆栈里。需要审计时记录 messageId、template、maskedTo、attempts、lastError 和 traceId。
+
+## 前端验证页
+
+可以提供一个 `/notifications` 验证页，用按钮驱动以下流程：
+
+- 订单通知入队，确认邮件和短信各写入一条 queued 消息；
+- 使用同一幂等键重复入队，确认不会新增 outbox 行；
+- 触发供应商失败，确认消息进入 failed 且记录 `PROVIDER_UNAVAILABLE`；
+- 开启 `retryFailed` 后重试，确认 failed 消息转为 sent；
+- 显示 outbox 时只展示 `maskedTo`、`status`、`attempts`、`lastError` 和 `payloadKeys`。
+
+前端调试面板可以保留 JSON 响应，便于核对错误码和重试次数，但不要把验证码、完整邮箱、完整手机号或供应商凭据渲染出来。
 
 ## 相关
 
