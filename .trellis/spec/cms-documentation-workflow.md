@@ -79,9 +79,9 @@ Markdown 排版（标题与 `---` 分割线等）见 **[markdown-vitepress.md](.
 
 ## 配图采集
 
-- **Agent 会话**：优先 **Cursor Browser MCP**（`browser_navigate` / `browser_take_screenshot`），后台已登录即可，见 [documentation-images.md](./documentation-images.md)。
-- **本地批量**：Playwright — `pnpm screenshots:cms:content` / `commerce` / `site`；凭证为 `.env` 的 `KOOBOO_PASS`。
-- **本机 Chrome tab**：**cdp-bridge** + `scripts/save-cdp-png.mjs`。
+- **Agent 会话**：优先使用 **`@chrome` / 本机 Chrome 操作**，复用已登录后台标签完成点按、填写、提交和截图，见 [documentation-images.md](./documentation-images.md)。
+- **Browser 面板**：用于轻量查看和补图；若需要真实 Chrome 登录态或前台行为验收，回到 `@chrome`。
+- **既有批量脚本**：仅用于维护旧 CMS 截图批处理，不作为新文档默认采集方式。
 
 ## 验证
 

@@ -33,11 +33,11 @@
 <DocImage src="/cms/site/pages-list.png" alt="页面列表" width="1120" />
 ```
 
-截图来源三选一（详见 `.trellis/spec/documentation-images.md`）：
+截图来源（详见 `.trellis/spec/documentation-images.md`）：
 
-1. **Playwright 脚本**（可复现、适合批量）：`pnpm screenshots:cms:site` 等  
-2. **Cursor Browser**（已登录后台时交互截图）  
-3. **本机 Chrome + cdp-bridge**
+1. **`@chrome` / 本机 Chrome 操作**（推荐）：复用已登录后台的 Chrome 标签，完成交互和截图
+2. **Browser 面板**：适合临时查看、点按和补充截图
+3. **既有批量截图脚本**：仅用于维护旧截图批处理，不作为新文档默认采集方式
 
 配图文件 **提交到 Git**；部署时复制到 `kb-remote-site/images/` 再 push。
 

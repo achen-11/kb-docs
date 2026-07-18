@@ -98,7 +98,7 @@ VitePress 标题自带上边框，**勿在 `##` / `###` 前后加 `---`**，以�
 | **Kooboo 源码（首选）** | `Kooboo/Kooboo.Sites/Scripting/`（如 `k.cs`、`Global/SiteItem/*Repository.cs`） |
 | 类型定义 | `old-source/kooboo.d.ts` |
 | 旧文档 | `old-source/api/` |
-| 测试站点 | `old-source/kb-doc/`（`kb push`，默认 `.env` → `kb_doc.localkooboo.com`） |
+| 测试站点 | `old-source/kb-doc/`（`kb push`，默认 `.env` → `kb-doc.redev.cn`） |
 
 `old-source/` 在 `.gitignore` 中，但开发者本地应保留完整目录。Kooboo 源码仓库需单独 clone，与 `kb-docs` 并列。
 
@@ -462,4 +462,3 @@ k.api.post(() => {
 
 - [kooboo-cli 使用文档](https://github.com/kooboo/kooboo-cli)
 - [kb-doc 测试站点](https://kb-doc.redev.cn)
-

@@ -34,13 +34,17 @@
 
 最佳实践不能只凭 API 文档和经验编写。每个进入正文阶段的场景，都应在临时 Kooboo 站点中验证核心路径。
 
+新一轮复核必须执行 [最佳实践文档编写与验证 SOP](./guide-verification-sop.md)，并同步更新 [最佳实践验证 Registry](./guide-verification-registry.md)。旧的 `.local-review/guide_*.zip` 和 `guide-verification-evidence.md` 只能作为历史证据，不能直接等同于“已按当前标准验证通过”。
+
+特别注意：验证站点的前台页面也是交付物。最佳实践不再接受只有裸按钮、裸 `<pre>` 和临时调试排版的验证页；每篇正文页至少达到 `L2 + V1`，涉及鉴权、支付、Webhook、WebSocket、通知、文件上传、安全边界的场景至少达到 `L3 + V1`。
+
 验证方式：
 
-- 使用 `cdp_bridge` 进入 `http://localhost:3000/_Admin/` 的本地 Kooboo 后台创建临时站点；不要用 `kb new` 创建站点。
-- 使用 Kooboo CLI 的 `kb clone` 克隆临时站点项目；后续只用 `kb pull` / `kb push` 同步资源。
-- 临时站点和验证产物放在仓库外，例如 `/tmp/kb-docs-guide-verification/<scenario>/`，不要纳入 git 追踪。
+- 使用 `@chrome` / 本机 Chrome 操作进入 `http://localhost:3000/_Admin/` 的本地 Kooboo 后台确认或创建验证站点；不要用 `kb new` 创建站点。
+- 使用 Kooboo CLI 的 `kb clone` 克隆验证站点项目；后续只用 `kb pull` / `kb push` 同步资源。
+- 验证站点 clone 项目放在仓库外的持久目录 `/Users/achen/Priv/Yardi/kb-docs-guide-sites/<scenario>/<site-folder>/`，不要放在 `/tmp`，也不要纳入 git 追踪。
 - 使用 CLI 推送 Page、View、API、CodeBlock、Script、Style 等资源。
-- 使用 cdp_bridge MCP 或等效 Chrome CDP 工具打开后台和前台页面，完成点击、填写、提交、刷新、重连等真实操作。
+- 使用 `@chrome` 打开后台和前台页面，完成点击、填写、提交、刷新、重连等真实操作。
 - 记录验证结果：站点 URL、测试账号/测试数据、关键截图、API 响应、失败路径和修正记录。
 - 正文只写可复现的稳定结论，不把一次性临时数据、账号密码、站点 ID 写入文档。
 
@@ -50,7 +54,7 @@
 |------|------|----------|
 | L0 | 只核对现有 CMS / API / 模板文档是否存在 | 场景规划、索引页 |
 | L1 | 通过 Kooboo CLI 推送 API / CodeBlock 并用 HTTP 调用验证 | API 组合型场景 |
-| L2 | 通过 CDP 操作前台页面完成完整用户流程 | 登录、表单、电商、内容页 |
+| L2 | 通过 Chrome 操作前台页面完成完整用户流程 | 登录、表单、电商、内容页 |
 | L3 | 覆盖失败路径、重复提交、权限、回调、重连、过期等异常 | 认证、支付、WebSocket、通知 |
 
 默认要求：
@@ -402,7 +406,7 @@ docs/guide/
 
 验证状态：
 
-- 已通过本地临时 Kooboo 站点 `guide_websocket_06090550` 验证无效 token 拒绝、短期 token 签发、Node 22 `ws://` 和 `wss://` 真实 WebSocket 连接、`ping/pong`、连接列表、HTTP 服务端 push、`echo.ack`、任务进度完成、非法消息错误帧、关闭帧和 `kb pull`。CDP 页面加载通过；当前 Chrome/CDP profile 下浏览器内 WSS 直连返回 1006，未标记为页面按钮流通过。
+- 已在 localkooboo 站点 `guide_websocket_06090550` 重构并验证访客/客服双端实时聊天。L3 功能脚本 23 项通过，覆盖一次性房间 token、双连接、服务端身份、房间广播、历史、typing、ping/pong、服务端 push、错误帧和关闭；V2 视觉脚本 27 项通过，覆盖桌面对话、失败态、暗色刷新重连和 390px 移动端。当前 localkooboo 浏览器会话关闭后同页二次握手返回 400，案例与文档均采用已验证的页面刷新恢复并重新获取 token；`kb push`、聚焦 `kb pull` 和 `kb export` 已通过。
 
 ## P1 场景：内容与站点
 
@@ -904,7 +908,7 @@ docs/guide/
 7. P3 只在有真实项目需求或验证样例后写，避免凭空设计复杂应用。
 8. 最后迁移工程化支撑篇，把旧 `old-source/dev-guide/` 的 CLI、Vue、AI 辅助内容重写后放入 `engineering/`。
 9. 每一批完成后运行 `pnpm docs:build` 和 `pnpm check:dead-links`。
-10. 每个 P0/P1 场景正文合并前，必须完成对应验证等级并保存验证摘要；临时站点和验证产物不得纳入 git。
+10. 每个 P0/P1 场景正文合并前，必须完成对应验证等级并保存验证摘要；验证站点 clone 和验证产物不得纳入 git。
 
 ## 验收标准
 

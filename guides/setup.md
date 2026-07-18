@@ -36,18 +36,14 @@ pnpm install
 
 ### 3.1 仓库根目录 `.env`（可选）
 
-用于 **Playwright 自动截图** 脚本登录 Kooboo 后台，本地开发文档本身不依赖此文件。
+用于少量既有批量截图脚本登录 Kooboo 后台。本地开发文档本身不依赖此文件；新文档配图和最佳实践验收优先使用 `@chrome` / 本机 Chrome 操作。
 
 ```bash
 cp .env.example .env
 # 编辑 KOOBOO_USER、KOOBOO_PASS
 ```
 
-首次跑截图脚本还需安装 Chromium：
-
-```bash
-pnpm exec playwright install chromium
-```
+如确需维护旧批量截图脚本，按对应脚本依赖另行准备；新文档配图不要把该路径作为默认流程。
 
 ### 3.2 `kb-remote-site/.env`（部署必需）
 
