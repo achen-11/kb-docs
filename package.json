@@ -16,6 +16,7 @@
     "test:export:kooboo": "node --test scripts/export-vitepress-to-kooboo.test.mjs",
     "test:kooboo-manifest": "node --test scripts/kooboo-manifest.test.mjs",
     "test:stabilize-vitepress": "node --test scripts/stabilize-vitepress-dist.test.mjs",
+    "test:mermaid-diagram": "node --test scripts/mermaid-diagram.test.mjs",
     "check:dead-links": "node scripts/check-dead-links.mjs",
     "screenshots:cms:site": "node scripts/cms-screenshots.mjs",
     "screenshots:cms:content": "node scripts/cms-content-screenshots.mjs",

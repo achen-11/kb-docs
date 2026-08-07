@@ -126,7 +126,7 @@ Markdown **不能**写列宽。本站已在 `docs/.vitepress/theme/custom.css` �
 
 ## Mermaid 流程图（文字勿溢出）
 
-本站 **不是** VitePress 内置 Mermaid，也不是官方 `mermaid.js`，而是构建期插件 [`vitepress-plugin-mermaid-diagram`](https://www.npmjs.com/package/vitepress-plugin-mermaid-diagram)：自研布局 + 静态 SVG，中文标签宽度用启发式估算，**容易比浏览器实际渲染偏窄**，再叠上并排 `subgraph`，就会出现你看到的「字出框」。
+本站 **不是** VitePress 内置 Mermaid，也不是官方 `mermaid.js`，而是构建期插件 [`vitepress-plugin-mermaid-diagram`](https://www.npmjs.com/package/vitepress-plugin-mermaid-diagram)：自研布局 + 静态 SVG。仓库通过 `pnpm-workspace.yaml` 和 `patches/vitepress-plugin-mermaid-diagram@0.3.2.patch` 修正了插件的 CJK 估宽，将汉字、日文假名、韩文及全角标点按 `1em` 计算，避免中文节点丢失左右内边距。
 
 ### 写作约定（优先遵守）
 
@@ -139,9 +139,9 @@ Markdown **不能**写列宽。本站已在 `docs/.vitepress/theme/custom.css` �
 
 ### 全局可调（次要）
 
-在 `docs/.vitepress/config.mts` 的 `diagramPlugin` 上可加大 `flowchart.nodesep` / `ranksep`，或略调 `theme.fontSize`，只能缓解间距，**不能**从根本上修正中文估宽。
+在 `docs/.vitepress/config.mts` 的 `diagramPlugin` 上可加大 `flowchart.nodeSpacing` / `rankSpacing`，用于调整节点之间的距离；这不会改变节点文字的内部留白。
 
-若仍频繁溢出，长期选项是：向插件仓库提 issue（CJK 估宽）、升级插件版本，或评估改回基于官方 Mermaid 的 VitePress 集成（体积与构建更重）。
+升级插件版本时必须运行 `pnpm test:mermaid-diagram`；若上游已经修复同一问题，应删除本地补丁并重新核对中英文流程图。复杂关系仍应优先拆图，不要依赖无限扩大的单张 SVG。
 
 ## 扩展
 

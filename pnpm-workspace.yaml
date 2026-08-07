@@ -1,0 +1,2 @@
+patchedDependencies:
+  vitepress-plugin-mermaid-diagram@0.3.2: patches/vitepress-plugin-mermaid-diagram@0.3.2.patch

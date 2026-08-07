@@ -1,0 +1,19 @@
+diff --git a/dist/index.js b/dist/index.js
+index 14822d26f4e96ab447ba72b89a5be22b923e8ab5..688a41084620371a11f48856f54ae95ec3aa1ad0 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -514,11 +514,13 @@ function ensure2(id, ast) {
+ // src/render/measure.ts
+ var NARROW = `ilI1|!.,;:'"()[]{}/ tjfrJ`;
+ var WIDE = "mwMWGOQD@%";
++var FULL_WIDTH = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\u3000-\u303f\uff01-\uff60\uffe0-\uffe6]/u;
+ function measureText(text2, fontSize = 14) {
+   const scale = fontSize / 14;
+   let width = 0;
+   for (const ch of text2) {
+-    if (NARROW.includes(ch)) width += 5;
++    if (FULL_WIDTH.test(ch)) width += 14;
++    else if (NARROW.includes(ch)) width += 5;
+     else if (WIDE.includes(ch)) width += 11;
+     else width += 8.4;
+   }
