@@ -162,3 +162,38 @@
 ### Next Steps
 
 - None - task complete
+
+## Session: Update AI Claw product docs
+
+**Date**: 2026-08-04
+**Task**: AI Claw / AI Chat documentation refresh
+
+### Summary
+
+对照 Frontend 新版 AI Claw UI，按 CMS 文档 SOP 重写产品文档并刷新截图。
+
+### Main Changes
+
+- docs/product/ai-chat.md — 重写：右侧工作区、执行策略、数据/设计/设置面板
+- docs/product/ai-floating-assistant.md — 对齐执行策略、可移动/缩放浮窗，并移除已下线的侧栏模式
+- docs/index.md — 首页描述更新
+- docs/public/product/ai-chat/* — 新截图
+- scripts/product-ai-screenshots.mjs — 适配新 UI 捕获流程
+
+### Git Commits
+
+docs(product): 更新 AI Claw 文档与截图
+
+### Testing
+
+- [OK] 本机 localhost Admin 登录后核对 AI Claw 各 tab
+- [OK] Playwright 采集 overview / fix / task / data / design / settings / code 截图
+- [OK] node --check scripts/product-ai-screenshots.mjs
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- 用户确认后可 git commit；push 需二次确认

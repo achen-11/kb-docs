@@ -57,7 +57,7 @@ title: Kooboo 文档中心
 <a href="/api/"><span>JSON</span><strong>KScript API</strong><em>服务端 k.* 模块、数据、业务集成与工具</em></a>
 <a href="/product/mail"><span>MAIL</span><strong>邮箱</strong><em>收发邮件、联系人、IMAP / SMTP、扩展模块</em></a>
 <a href="/product/developer-mode"><span>DEV</span><strong>开发者模式</strong><em>类 VS Code 的多资源编辑体验</em></a>
-<a href="/product/ai-chat"><span>AI</span><strong>AI Claw</strong><em>自然语言管理站点、任务与进度</em></a>
+<a href="/product/ai-chat"><span>AI</span><strong>AI Claw</strong><em>对话建站、实时预览与自动化任务</em></a>
 <a href="/product/market"><span>APP</span><strong>市场</strong><em>模板市场、模板详情、我的分享</em></a>
 <a href="/product/console"><span>OPS</span><strong>控制台</strong><em>域名、组织、余额、订单、续费与 AI 配置</em></a>
 </div>
@@ -90,7 +90,7 @@ title: Kooboo 文档中心
 <a href="/product/mail"><span>Mailbox</span><strong>邮箱</strong><em>收发邮件、联系人、IMAP / SMTP、邮件扩展模块</em></a>
 <a href="/product/market"><span>Marketplace</span><strong>市场</strong><em>模板市场、模板详情、我的分享</em></a>
 <a href="/product/developer-mode"><span>Dev Tools</span><strong>开发者模式</strong><em>同时编辑页面、布局、视图、脚本、样式与代码</em></a>
-<a href="/product/ai-chat"><span>ChatBot</span><strong>AI Claw / AI Chat</strong><em>自然语言管理站点、查看任务与进度</em></a>
+<a href="/product/ai-chat"><span>ChatBot</span><strong>AI Claw / AI Chat</strong><em>对话建站、实时预览与自动化任务</em></a>
 <a href="/product/console/balance"><span>Balance</span><strong>余额与订单</strong><em>充值、订单、会员续费在控制台完成</em></a>
 </div>
 </section>

@@ -92,6 +92,10 @@ async function login(page) {
   await page.waitForURL(/\/_Admin\/(?!login)/, { timeout: 60000 })
   await page.waitForTimeout(1800)
 
+  if (/\/_Admin\/login(?:[/?#]|$)/i.test(page.url())) {
+    throw new Error(`Login remained on the login page: ${page.url()}`)
+  }
+
   const hasJwt = (await page.context().cookies(BASE)).some(
     (cookie) => cookie.name === 'jwt_token'
   )
@@ -176,35 +180,33 @@ async function waitForPageSettled(page) {
   await page.waitForTimeout(1600)
 }
 
-async function gotoAiChat(page, tab) {
-  await page.goto(withSite('/ai-chat/overview', tab ? { tab } : {}), {
-    waitUntil: 'networkidle',
-    timeout: 90000,
-  })
-  await page.locator('.overview-mini-chat, .ai-mini-chat').first().waitFor({
-    timeout: 30000,
-  }).catch(() => {})
-  await waitForPageSettled(page)
-}
-
-async function isOverviewDashboard(page) {
-  return (await page.getByText(/任务总览|Task Overview/i).count()) > 0
-}
-
-async function clickOverviewMore(page, index) {
-  const more = page.getByText(/^(更多|More)$/).nth(index)
-  if (!(await more.count())) return false
-  await more.click()
-  await waitForPageSettled(page)
-  return true
-}
-
-async function openAiChatPanel(page, tab, overviewMoreIndex) {
-  await gotoAiChat(page, tab)
-  if (await isOverviewDashboard(page)) {
-    await clickOverviewMore(page, overviewMoreIndex)
+async function gotoAiChat(page, tab, submenu) {
+  await page.goto(
+    withSite('/ai-chat/overview', {
+      ...(tab ? { tab } : {}),
+      ...(submenu ? { submenu } : {}),
+    }),
+    {
+      waitUntil: 'networkidle',
+      timeout: 90000,
+    }
+  )
+  try {
+    const ready =
+      tab === 'setting'
+        ? page.getByRole('heading', { name: /AI Chat 设置|AI Chat Settings/i })
+        : page.locator('.ai-chat-main-panel, .ai-chat-input').first()
+    await ready.waitFor({ timeout: 30000 })
+  } catch {
+    throw new Error(
+      `AI Chat shell did not load: url=${page.url()} title=${await page.title()}`
+    )
   }
   await waitForPageSettled(page)
+
+  if (!/\/_Admin\/ai-chat\/overview(?:[/?#]|$)/i.test(page.url())) {
+    throw new Error(`AI Chat navigation left the expected route: ${page.url()}`)
+  }
 }
 
 async function gotoSitePages(page) {
@@ -225,6 +227,10 @@ async function redactSensitive(page) {
     const urlRe = /https?:\/\/[^\s<>"']+/gi
     const guidRe = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi
     const secretRe = /\b[A-Za-z0-9_-]*(?:key|token|secret|pass)[-_A-Za-z0-9]*\b/gi
+    const emailTestRe = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i
+    const domainTestRe = /\b(?:[a-z0-9-]+\.)+[a-z]{2,}\b/i
+    const urlTestRe = /https?:\/\/[^\s<>"']+/i
+    const secretTestRe = /\b[A-Za-z0-9_-]*(?:key|token|secret|pass)[-_A-Za-z0-9]*\b/i
 
     const shouldSkip = (node) => {
       const parent = node.parentElement
@@ -270,14 +276,14 @@ async function redactSensitive(page) {
           hint.includes('token') ||
           hint.includes('secret') ||
           hint.includes('key') ||
-          secretRe.test(value))
+          secretTestRe.test(value))
       ) {
         nextValue = '********'
-      } else if (value && (hint.includes('email') || emailRe.test(value))) {
+      } else if (value && (hint.includes('email') || emailTestRe.test(value))) {
         nextValue = 'user@example.com'
-      } else if (value && (hint.includes('url') || urlRe.test(value))) {
+      } else if (value && (hint.includes('url') || urlTestRe.test(value))) {
         nextValue = 'https://example.com/path'
-      } else if (value && domainRe.test(value)) {
+      } else if (value && domainTestRe.test(value)) {
         nextValue = value.replace(domainRe, 'example.com')
       }
 
@@ -306,10 +312,6 @@ async function redactSensitive(page) {
         }
       })
 
-    for (const iframe of document.querySelectorAll('iframe')) {
-      iframe.style.visibility = 'hidden'
-    }
-
     for (const message of document.querySelectorAll('.el-message')) {
       message.remove()
     }
@@ -337,26 +339,62 @@ async function captureAiChatOverview(page) {
 }
 
 async function captureFixedTasks(page) {
-  await openAiChatPanel(page, 'fix', 1)
+  await gotoAiChat(page, 'fix')
   await snap(page, 'ai-chat', 'fixed-tasks.png')
 }
 
 async function captureFixedTaskDialog(page) {
-  await openAiChatPanel(page, 'fix', 1)
-  const addButton = page.locator('.el-button:visible').filter({ has: page.locator('.el-icon') }).first()
-  if (await addButton.count()) {
-    await addButton.click().catch(() => {})
-    await page.locator('.ai-task-job-form-dialog').first().waitFor({
-      timeout: 20000,
-    }).catch(() => {})
-    await page.waitForTimeout(1200)
+  await gotoAiChat(page, 'fix')
+  const plus = page.locator('button.el-button--small').filter({
+    has: page.locator('.el-icon'),
+  }).first()
+  if (await plus.count()) {
+    await plus.click()
+    const dialog = page.locator('.el-dialog:visible, .ai-task-job-form-dialog:visible').first()
+    await dialog.waitFor({ timeout: 20000 }).catch(() => {})
+    await page.waitForTimeout(1000)
+    if (await dialog.count()) {
+      await redactSensitive(page)
+      const dir = path.join(OUT_ROOT, 'ai-chat')
+      await mkdir(dir, { recursive: true })
+      const file = path.join(dir, 'fixed-task-dialog.png')
+      await dialog.screenshot({ path: file })
+      shots.push(file)
+      console.log('saved', file)
+      return
+    }
   }
   await snap(page, 'ai-chat', 'fixed-task-dialog.png')
 }
 
 async function captureTaskList(page) {
-  await openAiChatPanel(page, 'task', 2)
+  await gotoAiChat(page, 'task')
   await snap(page, 'ai-chat', 'task-list.png')
+}
+
+async function captureDataContent(page) {
+  await gotoAiChat(page, 'data', 'content-model')
+  await snap(page, 'ai-chat', 'data-content.png')
+}
+
+async function captureDesign(page) {
+  await gotoAiChat(page, 'design')
+  await snap(page, 'ai-chat', 'design.png')
+}
+
+async function captureSettings(page) {
+  await gotoAiChat(page, 'setting')
+  await snap(page, 'ai-chat', 'settings.png')
+}
+
+async function captureWorkspaceCode(page) {
+  await gotoAiChat(page)
+  const codeTab = page.locator('.workspace-mode-tabs__tab').nth(1)
+  if (await codeTab.count()) {
+    await codeTab.click()
+    await page.waitForTimeout(1500)
+  }
+  await snap(page, 'ai-chat', 'workspace-code.png')
 }
 
 async function captureFloatingButton(page) {
@@ -372,29 +410,17 @@ async function captureFloatingPanel(page) {
   await snap(page, 'ai-floating-assistant', 'floating-panel.png')
 }
 
-async function captureFloatingDrawer(page) {
-  await gotoSitePages(page)
-  await page.locator('.ai-floating-button').first().click()
-  await page.locator('.ai-mini-chat-panel').first().waitFor({ timeout: 20000 })
-  const drawerButton = page.locator('.chat-header .header-actions .header-btn').nth(3)
-  if (await drawerButton.count()) {
-    await drawerButton.click()
-    await page.locator('.ai-mini-chat-panel.panel-drawer').first().waitFor({
-      timeout: 20000,
-    }).catch(() => {})
-    await page.waitForTimeout(1000)
-  }
-  await snap(page, 'ai-floating-assistant', 'floating-drawer.png')
-}
-
 const CAPTURES = [
   ['ai-chat-overview', captureAiChatOverview],
   ['fixed-tasks', captureFixedTasks],
   ['fixed-task-dialog', captureFixedTaskDialog],
   ['task-list', captureTaskList],
+  ['data-content', captureDataContent],
+  ['design', captureDesign],
+  ['settings', captureSettings],
+  ['workspace-code', captureWorkspaceCode],
   ['floating-button', captureFloatingButton],
   ['floating-panel', captureFloatingPanel],
-  ['floating-drawer', captureFloatingDrawer],
 ]
 
 async function main() {
