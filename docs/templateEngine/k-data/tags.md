@@ -12,19 +12,20 @@
 </k-data>
 ```
 
----
-
 ## `let`
 
-定义变量、读取请求上下文、调用内置函数、提取字段。
+使用 `as` 指定变量名，使用 `default` 设置默认值：
+
+```html
+<let as="page_size" default="10" />
+```
+
+`let` 还可以读取请求值、提取字段或调用函数：
 
 ```html
 <let as="keyword" source="queryString" from="keyword" default="''" />
-<let as="token" source="cookie" from="access_token" default="''" />
-<let from="token" as="payload" use="jwtDecode" params='{"secret":"your-secret"}' />
-<let from="payload.userId" as="userId" />
-<let from="create_time" as="createdDate" use="dateFormat" params="'yyyy-MM-dd'" />
 <let from="list[0]" as="firstItem" />
+<let from="create_time" as="createdDate" use="dateFormat" params="'yyyy-MM-dd'" />
 ```
 
 | 属性 | 必填 | 说明 |
@@ -38,33 +39,35 @@
 
 `action="list"` 只需第一条时：`<let from="items[0]" as="item" />`。
 
----
-
 ## `query`
 
-执行查询并写入 `as` 变量。
+执行查询并写入 `as` 变量。列表查询写法如下：
 
 ```html
 <query
-    as="product_page"
-    source="commerce"
-    resource="product"
-    action="paged"
-    select="id,title,featuredImage"
-    where="{title:{$contains:'hello'}}"
-    page-number="page_number"
-    page-size="page_size"
-    order-desc="price"
-/>
-<query
-    as="article"
+    as="articles"
     source="content"
     resource="article"
-    action="item"
-    id="article_id"
-    select="id,title,body"
-/>
+    action="list"
+></query>
 ```
+
+分页查询可指定过滤、页码、每页条数和排序：
+
+```html
+<query
+    as="article_page"
+    source="content"
+    resource="article"
+    action="paged"
+    where="{title:'News'}"
+    page-number="1"
+    page-size="10"
+    order-desc="create_time"
+></query>
+```
+
+`<query>` 必须位于 `<k-data>` 内，并显式写结束标签 `</query>`。
 
 | 属性 | 必填 | 说明 |
 |------|------|------|
@@ -88,14 +91,12 @@
 | `list` | 对象数组 |
 | `paged` | `{ list, total, pageIndex, pageSize, pageCount }` |
 
----
-
 ## `map`
 
 对数组逐项映射，或对空 `from` 构造新对象。
 
 ```html
-<map from="product_page.list" as="products">
+<map from="articles" as="article_cards">
     <let from="id" as="id" />
     <let from="title" as="title" />
 </map>
@@ -106,15 +107,13 @@
 | `as` | 是 | 输出变量名（数组或对象） |
 | `from` | 否 | 源数组/对象；省略时根据子 `let` 生成新对象 |
 
----
-
 ## `when` / `else-if` / `else`
 
 仅在 `<k-data>` 内分支；`test` 为 JSON5 条件。
 
 ```html
 <when test="{status:{$eq:'published'}}">
-    <query as="items" source="content" resource="blog" action="list" />
+    <query as="items" source="content" resource="blog" action="list"></query>
     <else-if test="{status:{$eq:'draft'}}">
         <let as="items" default="[]" />
     </else-if>
@@ -124,22 +123,18 @@
 </when>
 ```
 
----
-
 ## `try` / `catch`
 
 `try` 后紧跟同级 `catch`（解析器约定）。
 
 ```html
 <try>
-    <query as="orders" source="commerce" resource="order" action="list" />
+    <query as="orders" source="commerce" resource="order" action="list"></query>
 </try>
 <catch>
     <let as="orders" default="[]" />
 </catch>
 ```
-
----
 
 ## `redirect`
 
@@ -153,15 +148,13 @@
 |------|------|
 | `to` | 目标路径：变量名或 JSON5 字符串（如 `"'/login'"`） |
 
----
-
 ## `export`
 
 将变量暴露给 **k-data 外部的** 模板绑定。
 
 ```html
-<export var="products" />
-<export var="product_page" />
+<export var="articles"></export>
+<export var="article_page"></export>
 ```
 
 | 属性 | 必填 | 说明 |
@@ -169,8 +162,6 @@
 | `var` | 是 | 已存在的变量名 |
 
 未 `export` 的变量在模板层不可见。
-
----
 
 ## 相关文档
 

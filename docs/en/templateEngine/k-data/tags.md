@@ -14,15 +14,18 @@ The root node for a data flow. Child tags run in order.
 
 ## `let`
 
-Defines variables, reads request context, calls built-in functions, or extracts fields.
+Use `as` for the variable name and `default` for its default value:
+
+```html
+<let as="page_size" default="10" />
+```
+
+`let` can also read request input, access a field, or call a function:
 
 ```html
 <let as="keyword" source="queryString" from="keyword" default="''" />
-<let as="token" source="cookie" from="access_token" default="''" />
-<let from="token" as="payload" use="jwtDecode" params='{"secret":"your-secret"}' />
-<let from="payload.userId" as="userId" />
-<let from="create_time" as="createdDate" use="dateFormat" params="'yyyy-MM-dd'" />
 <let from="list[0]" as="firstItem" />
+<let from="create_time" as="createdDate" use="dateFormat" params="'yyyy-MM-dd'" />
 ```
 
 | Attribute | Required | Description |
@@ -38,29 +41,33 @@ When `action="list"` returns a collection and you only need the first item: `<le
 
 ## `query`
 
-Executes a query and writes the result into the variable named by `as`.
+Executes a query and writes the result into the variable named by `as`. A list query looks like this:
 
 ```html
 <query
-    as="product_page"
-    source="commerce"
-    resource="product"
-    action="paged"
-    select="id,title,featuredImage"
-    where="{title:{$contains:'hello'}}"
-    page-number="page_number"
-    page-size="page_size"
-    order-desc="price"
-/>
-<query
-    as="article"
+    as="articles"
     source="content"
     resource="article"
-    action="item"
-    id="article_id"
-    select="id,title,body"
-/>
+    action="list"
+></query>
 ```
+
+A paged query can specify filtering, page index, page size, and sorting:
+
+```html
+<query
+    as="article_page"
+    source="content"
+    resource="article"
+    action="paged"
+    where="{title:'News'}"
+    page-number="1"
+    page-size="10"
+    order-desc="create_time"
+></query>
+```
+
+`<query>` must be inside `<k-data>` and must include an explicit `</query>` end tag.
 
 | Attribute | Required | Description |
 |-----------|----------|-------------|
@@ -89,7 +96,7 @@ Executes a query and writes the result into the variable named by `as`.
 Maps an array item by item, or builds a fresh object when `from` is omitted.
 
 ```html
-<map from="product_page.list" as="products">
+<map from="articles" as="article_cards">
     <let from="id" as="id" />
     <let from="title" as="title" />
 </map>
@@ -106,7 +113,7 @@ Conditional branches that only work inside `<k-data>`. The `test` attribute is a
 
 ```html
 <when test="{status:{$eq:'published'}}">
-    <query as="items" source="content" resource="blog" action="list" />
+    <query as="items" source="content" resource="blog" action="list"></query>
     <else-if test="{status:{$eq:'draft'}}">
         <let as="items" default="[]" />
     </else-if>
@@ -122,7 +129,7 @@ Conditional branches that only work inside `<k-data>`. The `test` attribute is a
 
 ```html
 <try>
-    <query as="orders" source="commerce" resource="order" action="list" />
+    <query as="orders" source="commerce" resource="order" action="list"></query>
 </try>
 <catch>
     <let as="orders" default="[]" />
@@ -146,8 +153,8 @@ Performs a server-side redirect.
 Exposes a variable to template bindings **outside** `<k-data>`.
 
 ```html
-<export var="products" />
-<export var="product_page" />
+<export var="articles"></export>
+<export var="article_page"></export>
 ```
 
 | Attribute | Required | Description |

@@ -21,43 +21,47 @@ Compared with the old single-attribute **`k-query`** syntax, k-data:
 See [Template Binding Syntax](../binding/) for the rendering layer.
 :::
 
-## Minimal Example
+## Minimal Runnable Example
+
+This example does one thing: query `article` content and display each title.
 
 ```html
 <k-data>
-    <let as="keyword" source="queryString" from="keyword" default="''" />
-    <let as="page_number" source="queryString" from="page_number" default="1" />
-    <let as="page_size" source="queryString" from="page_size" default="10" />
     <query
-        as="query_result"
+        as="articles"
         source="content"
-        resource="user"
-        action="paged"
-        select="id,age,name,birthday"
-        where="{age:{$gt:23},name:{$contains:'lily'}}"
-        page-number="page_number"
-        page-size="page_size"
-        order-desc="create_time"
-    />
-    <map from="query_result.list" as="users">
-        <let from="id" as="id" />
-        <let from="name" as="name" />
-        <let from="birthday" as="birthday" use="dateFormat" params="'yyyy-MM-dd'" />
-    </map>
-    <export var="query_result" />
-    <export var="users" />
+        resource="article"
+        action="list"
+    ></query>
+    <export var="articles"></export>
 </k-data>
-<div>
-    <div k-for="user in users" repeat-self>
-        <p k-content="user.name"></p>
-        <p k-content="user.birthday"></p>
-    </div>
-    <p>
-        Total <span k-content="query_result.total"></span> items,
-        page <span k-content="query_result.pageIndex"></span> / <span k-content="query_result.pageCount"></span>
-    </p>
-</div>
+
+<ul>
+    <li k-for="article in articles">
+        <span k-content="article.title"></span>
+    </li>
+</ul>
 ```
+
+This is the smallest complete data flow:
+
+1. `<query>` fetches data and stores the result in `articles`.
+2. `<export>` exposes `articles` to the template.
+3. `k-for` iterates over the result and `k-content` displays each title.
+
+::: tip Before you run it
+The site must have a Content Folder named `article` with a `title` field. Replace these names with the resource and field names used by your site.
+:::
+
+## Related Topics
+
+| Topic | Description | Documentation |
+|-------|-------------|---------------|
+| Fields and filters | Control query results with `select` and `where` | [Query Sources](./query.md#content) |
+| Request input | Read values from URLs, cookies, headers, and other request sources | [Tag Syntax · let](./tags.md#let) |
+| Pagination and sorting | Use `paged`, `page-number`, and `order-desc` | [Query Sources · paged](./query.md#paged) |
+| Mapping and formatting | Reshape fields and format display values | [Tag Syntax · map](./tags.md#map), [Built-in Functions](./functions.md) |
+| Conditions and errors | Branches, error handling, and redirects | [Condition Expressions](./condition.md), [Tag Syntax](./tags.md) |
 
 ## Authoring Conventions
 
@@ -67,6 +71,7 @@ See [Template Binding Syntax](../binding/) for the rendering layer.
 4. In the template layer, use only variables that were exposed with `<export var="...">`.
 5. `<when>`, `<else-if>`, and `<else>` belong only inside `<k-data>`. In the DOM layer, use `k-if`, `k-else-if`, and `k-else`.
 6. The `{...}` syntax in `k-attribute` only interpolates variables. It does not perform calculations. Use `<let use="add|subtract|...">` first, then bind the result.
+7. `<query>` is not an HTML void element. Always include `</query>`; do not write `<query ... />`.
 
 ## Tag Summary
 

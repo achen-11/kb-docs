@@ -4,9 +4,11 @@
 
 ## Invocation Pattern
 
+Each `<let>` performs one transformation on an existing value:
+
 ```html
-<let from="token" as="payload" use="jwtDecode" params='{"secret":"your-256-bit-secret"}' />
 <let from="create_time" as="createdDate" use="dateFormat" params="'yyyy-MM-dd'" />
+<let from="title" as="shortTitle" use="truncate" params='{"length":20,"ellipsis":"..."}' />
 <let from="amount" as="amountText" use="currencyFormat" params='{"currency":"USD"}' />
 <let from="page_number" as="prev_page" use="subtract" params="1" />
 ```
@@ -18,7 +20,7 @@
 | `use` | Function name from the table below |
 | `params` | JSON5: a single value, an object, or a format string wrapped in single quotes |
 
-When a function fails, most return `null` or the original input instead of throwing into the template layer. For auth failures, combine them with `<redirect>`.
+When a function fails, most return `null` or the original input instead of throwing into the template layer.
 
 ## Function Summary
 
@@ -29,20 +31,6 @@ When a function fails, most return `null` or the original input instead of throw
 | Currency | `currencyFormat` |
 | Math | `add`, `subtract`, `multiply`, `divide`, `modulo` |
 | Text | `trim`, `lowercase`, `uppercase`, `truncate` |
-
-## `jwtDecode`
-
-Parses a JWT. Signature verification is optional through `params`.
-
-```html
-<let as="token" source="cookie" from="access_token" default="''" />
-<let from="token" as="payload" use="jwtDecode" params='{"secret":"your-secret"}' />
-<when test="payload == null">
-    <redirect to="'/login'" />
-</when>
-```
-
-- Failure cases such as an empty token, invalid format, or failed verification return `null`
 
 ## `dateFormat`
 
@@ -86,6 +74,24 @@ Example for pagination links. Do not write `{pageIndex - 1}` directly inside `k-
 ```
 
 For `truncate`, `length <= 0` returns an empty string.
+
+## `jwtDecode`
+
+Parses a JWT and optionally verifies its signature through `params`. A failed parse can be combined with a condition and redirect.
+
+```html
+<k-data>
+    <let as="token" source="cookie" from="access_token" default="''" />
+    <let from="token" as="payload" use="jwtDecode" params='{"secret":"your-secret"}' />
+    <when test="{payload:{$eq:null}}">
+        <redirect to="'/login'" />
+    </when>
+    <export var="payload"></export>
+</k-data>
+```
+
+- Failure cases such as an empty token, invalid format, or failed verification return `null`.
+- `when test` uses a JSON5 condition, not an ordinary expression such as `payload == null`.
 
 ## Related
 

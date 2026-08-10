@@ -10,8 +10,6 @@
 
 `$and`、`$or`、`$eq`、`$ne`、`$gt`、`$gte`、`$lt`、`$lte`、`$contains`、`$startswith`
 
----
-
 ## 基础写法
 
 **字段直写**（等价 `$eq`）：
@@ -37,8 +35,6 @@
 }
 ```
 
----
-
 ## 操作符说明
 
 | 操作符 | 含义 | 示例 |
@@ -56,50 +52,64 @@
 
 条件里可引用 `<let>` 定义的变量名（如 `keyword`、`min_age`）。
 
----
-
 ## 在 query 中使用
 
+固定等值条件：
+
 ```html
-<let as="keyword" source="queryString" from="keyword" default="''" />
-<let as="min_age" source="queryString" from="min_age" default="18" />
-<query
-    as="user_page"
-    source="content"
-    resource="user"
-    action="paged"
-    where="{
-        $and: [
-            { age: { $gte: min_age } },
-            { $or: [
-                { name: { $contains: keyword } },
-                { email: { $startswith: keyword } }
-            ]},
-            { status: { $ne: 'disabled' } }
-        ]
-    }"
-    page-number="1"
-    page-size="20"
-/>
+<k-data>
+    <query
+        as="articles"
+        source="content"
+        resource="article"
+        action="list"
+        where="{title:'News'}"
+    ></query>
+    <export var="articles"></export>
+</k-data>
 ```
 
----
+条件也可以引用 `<let>` 读取的 URL 参数：
+
+```html
+<k-data>
+    <let as="keyword" source="queryString" from="keyword" default="''" />
+    <query
+        as="articles"
+        source="content"
+        resource="article"
+        action="list"
+        where="{title:{$contains:keyword}}"
+    ></query>
+    <export var="articles"></export>
+</k-data>
+```
+
+使用 `$and` / `$or` 组合多个条件：
+
+```json5
+{
+  $and: [
+    { status: 'published' },
+    { title: { $contains: keyword } }
+  ]
+}
+```
 
 ## 在 when 中使用
 
 ```html
-<when test="{ status: { $eq: 'published' } }">
-    <query as="items" source="content" resource="blog" action="list" />
-    <else-if test="{ status: { $eq: 'draft' } }">
-        <let as="items" default="[]" />
-    </else-if>
-    <else>
-        <let as="items" default="[]" />
-    </else>
-</when>
+<k-data>
+    <let as="status" source="queryString" from="status" default="'draft'" />
+    <when test="{status:'published'}">
+        <let as="message" default="'Published'" />
+        <else>
+            <let as="message" default="'Not published'" />
+        </else>
+    </when>
+    <export var="message"></export>
+</k-data>
 ```
-
----
 
 ## 相关文档
 

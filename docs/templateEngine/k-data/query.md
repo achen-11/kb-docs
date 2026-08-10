@@ -4,9 +4,107 @@
 
 通用属性见 [标签语法](./tags.md#query)。下文按数据源分类；`action` 均为 `item` / `list` / `paged` 之一。
 
-## 分页结果字段
+::: warning 示例约定
+`<query>` 必须写在 `<k-data>` 内，并显式写 `</query>`。模板要使用查询结果时，还必须通过 `<export>` 导出。除明确包含 `<k-data>` 的完整示例外，下文单独出现的 `<query>` 代码块都是查询片段，只用于展示数据源特有属性。
+:::
 
-`action="paged"` 时，`as` 变量包含：
+## content
+
+`resource` = **内容类型（Content Folder）名称**。
+
+### list
+
+下面是一个可以直接复制的完整列表查询示例：
+
+```html
+<k-data>
+    <query
+        as="articles"
+        source="content"
+        resource="article"
+        action="list"
+    ></query>
+    <export var="articles"></export>
+</k-data>
+
+<ul>
+    <li k-for="article in articles">
+        <span k-content="article.title"></span>
+    </li>
+</ul>
+```
+
+### 增加字段选择和固定过滤
+
+`select` 用于限制返回字段，`where` 用于过滤结果：
+
+```html
+<k-data>
+    <query
+        as="articles"
+        source="content"
+        resource="article"
+        action="list"
+        select="id,title"
+        where="{title:'News'}"
+    ></query>
+    <export var="articles"></export>
+</k-data>
+```
+
+### item
+
+根据 URL 参数查询单条内容。`item` 需要 `id`。下面先用 `<let>` 读取 `/detail?id=...` 中的参数，再执行查询：
+
+```html
+<k-data>
+    <let as="article_id" source="queryString" from="id" />
+    <query
+        as="article"
+        source="content"
+        resource="article"
+        action="item"
+        id="article_id"
+        select="id,title,body"
+    ></query>
+    <export var="article"></export>
+</k-data>
+
+<article k-if="article">
+    <h1 k-content="article.title"></h1>
+    <div k-content="article.body"></div>
+</article>
+```
+
+### paged
+
+分页查询使用 `action="paged"`：
+
+```html
+<k-data>
+    <query
+        as="article_page"
+        source="content"
+        resource="article"
+        action="paged"
+        page-number="1"
+        page-size="10"
+        order-desc="create_time"
+    ></query>
+    <export var="article_page"></export>
+</k-data>
+
+<div k-for="article in article_page.list">
+    <h2 k-content="article.title"></h2>
+</div>
+<p>
+    共 <span k-content="article_page.total"></span> 条，
+    第 <span k-content="article_page.pageIndex"></span> /
+    <span k-content="article_page.pageCount"></span> 页
+</p>
+```
+
+分页查询结果包含：
 
 | 字段 | 说明 |
 |------|------|
@@ -15,66 +113,6 @@
 | `pageIndex` | 当前页码 |
 | `pageSize` | 每页大小 |
 | `pageCount` | 总页数 |
-
----
-
-## content
-
-`resource` = **内容类型（Content Folder）名称**。
-
-### item
-
-```html
-<k-data>
-    <let as="article_id" source="queryString" from="id" />
-    <query
-        as="article_detail"
-        source="content"
-        resource="article"
-        action="item"
-        id="article_id"
-        select="id,title,body"
-    />
-    <export var="article_detail" />
-</k-data>
-<div k-if="article_detail">
-    <h1 k-content="article_detail.title"></h1>
-    <div k-content="article_detail.body"></div>
-</div>
-```
-
-### list
-
-```html
-<query
-    as="articles"
-    source="content"
-    resource="article"
-    action="list"
-    select="id,title"
-    where="{title:{$contains:'news'}}"
-/>
-```
-
-### paged
-
-```html
-<query
-    as="article_paged"
-    source="content"
-    resource="article"
-    action="paged"
-    where="{title:{$contains:'news'}}"
-    page-number="1"
-    page-size="10"
-    order-desc="createDate"
-/>
-<div k-for="item in article_paged.list" repeat-self>
-    <h2 k-content="item.title"></h2>
-</div>
-```
-
----
 
 ## commerce
 
@@ -93,8 +131,8 @@
     source="commerce"
     resource="product"
     action="list"
-    where="{category:'men-shirt',title:{$contains:'shoe'}}"
-/>
+    where="{category:'men-shirt'}"
+></query>
 ```
 
 ### category
@@ -110,7 +148,7 @@
 - 可不传 `id`，使用当前上下文购物车 id
 
 ```html
-<query as="cart_detail" source="commerce" resource="cart" action="item" />
+<query as="cart_detail" source="commerce" resource="cart" action="item"></query>
 ```
 
 ### order
@@ -120,22 +158,23 @@
 | `item` | 需 `id` |
 | `list` / `paged` | **不支持** `where`；**不支持** `order` / `order-desc`（按创建时间倒序） |
 
----
-
 ## sqlite / mysql / sqlserver
 
 三者的 `<query>` 属性相同；`resource` = **表名**。
 
 ```html
-<let as="record_id" source="queryString" from="id" />
-<query
-    as="payment_record"
-    source="sqlite"
-    resource="payment_records"
-    action="item"
-    id="record_id"
-    select="id,amount,status"
-/>
+<k-data>
+    <let as="record_id" source="queryString" from="id" />
+    <query
+        as="payment_record"
+        source="sqlite"
+        resource="payment_records"
+        action="item"
+        id="record_id"
+        select="id,amount,status"
+    ></query>
+    <export var="payment_record"></export>
+</k-data>
 ```
 
 ```html
@@ -146,13 +185,11 @@
     action="paged"
     select="id,name,email"
     where="{name:{$contains:'tom'}}"
-    page-number="page_number"
+    page-number="1"
     page-size="10"
     order="name"
-/>
+></query>
 ```
-
----
 
 ## indexeddb
 
@@ -168,10 +205,8 @@
     page-number="1"
     page-size="10"
     order-desc="id"
-/>
+></query>
 ```
-
----
 
 ## culture（多语言链接）
 
@@ -183,14 +218,18 @@
 - 返回：`{ key, name, url, isActive }` 或 `null`
 
 ```html
-<let as="lang" source="queryString" from="lang" />
-<query
-    as="current_culture"
-    source="culture"
-    resource="/products/detail"
-    action="item"
-    id="lang"
-/>
+<k-data>
+    <let as="lang" source="queryString" from="lang" />
+    <query
+        as="current_culture"
+        source="culture"
+        resource="/products/detail"
+        action="item"
+        id="lang"
+    ></query>
+    <export var="current_culture"></export>
+</k-data>
+
 <a k-attribute="href {current_culture.url}" k-content="current_culture.name"></a>
 ```
 
@@ -199,13 +238,15 @@
 返回上述结构的数组，用于语言切换列表。
 
 ```html
-<query as="culture_urls" source="culture" resource="/products/detail" action="list" />
-<div k-for="item in culture_urls" repeat-self>
+<k-data>
+    <query as="culture_urls" source="culture" resource="/products/detail" action="list"></query>
+    <export var="culture_urls"></export>
+</k-data>
+
+<div k-for="item in culture_urls">
     <a k-attribute="href {item.url}" k-content="item.name"></a>
 </div>
 ```
-
----
 
 ## 相关文档
 

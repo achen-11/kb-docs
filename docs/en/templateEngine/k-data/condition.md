@@ -54,41 +54,61 @@ Conditions can reference variables defined by `<let>`, such as `keyword` or `min
 
 ## Using Conditions in `query`
 
+A fixed equality condition:
+
 ```html
-<let as="keyword" source="queryString" from="keyword" default="''" />
-<let as="min_age" source="queryString" from="min_age" default="18" />
-<query
-    as="user_page"
-    source="content"
-    resource="user"
-    action="paged"
-    where="{
-        $and: [
-            { age: { $gte: min_age } },
-            { $or: [
-                { name: { $contains: keyword } },
-                { email: { $startswith: keyword } }
-            ]},
-            { status: { $ne: 'disabled' } }
-        ]
-    }"
-    page-number="1"
-    page-size="20"
-/>
+<k-data>
+    <query
+        as="articles"
+        source="content"
+        resource="article"
+        action="list"
+        where="{title:'News'}"
+    ></query>
+    <export var="articles"></export>
+</k-data>
+```
+
+A condition can also reference a URL parameter defined by `<let>`:
+
+```html
+<k-data>
+    <let as="keyword" source="queryString" from="keyword" default="''" />
+    <query
+        as="articles"
+        source="content"
+        resource="article"
+        action="list"
+        where="{title:{$contains:keyword}}"
+    ></query>
+    <export var="articles"></export>
+</k-data>
+```
+
+Use `$and` or `$or` to combine multiple conditions:
+
+```json5
+{
+  $and: [
+    { status: 'published' },
+    { title: { $contains: keyword } }
+  ]
+}
 ```
 
 ## Using Conditions in `when`
 
 ```html
-<when test="{ status: { $eq: 'published' } }">
-    <query as="items" source="content" resource="blog" action="list" />
-    <else-if test="{ status: { $eq: 'draft' } }">
-        <let as="items" default="[]" />
-    </else-if>
-    <else>
-        <let as="items" default="[]" />
-    </else>
-</when>
+<k-data>
+    <let as="status" source="queryString" from="status" default="'draft'" />
+    <when test="{status:'published'}">
+        <let as="message" default="'Published'" />
+        <else>
+            <let as="message" default="'Not published'" />
+        </else>
+    </when>
+    <export var="message"></export>
+</k-data>
 ```
 
 ## Related
