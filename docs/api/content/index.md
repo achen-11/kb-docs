@@ -12,27 +12,11 @@
 
 ```ts
 interface KContent {
-  // 获取查询操作符
-  operators(): ContentOperators;
-
   // 获取所有内容文件夹名称
   getFolders(): string[];
 
   // 获取指定文件夹
   [folderName: string]: KContentFolder;
-}
-
-interface ContentOperators {
-  AND: string;
-  OR: string;
-  EQ: string;
-  NE: string;
-  GT: string;
-  GTE: string;
-  LT: string;
-  LTE: string;
-  STARTS_WITH: string;
-  CONTAINS: string;
 }
 
 interface KContentFolder {
@@ -41,6 +25,11 @@ interface KContentFolder {
   get(nameOrId: string): Content | null;
   find(query: string | object, options?: QueryOptions): Content | null;
   findAll(query: string | object, options?: QueryOptions): Content[];
+  findAllByCategory(
+    categoryFolder: string,
+    categorySlugOrId: string,
+    options?: QueryOptions
+  ): Content[];
 
   // 增删改方法
   add(content: object): Content;
@@ -52,28 +41,17 @@ interface KContentFolder {
 }
 
 interface QueryOptions {
-  excludeEmpty?: boolean;      // 排除空值记录
-  includeOfflineData?: boolean;  // 包含离线数据
+  excludeEmpty?: boolean;         // 排除空值记录
+  includeOfflineData?: boolean;   // 包含离线数据
+  skip?: number;                  // 跳过的记录数
+  take?: number;                  // 返回的最大记录数
+  orderBy?: string;               // 按字段升序排列
+  orderByDescending?: string;     // 按字段降序排列
+  select?: string[];              // 只返回指定字段
 }
 ```
 
 ## 全局方法
-
-### k.content.operators()
-
-获取查询操作符，用于构建复杂的查询条件。
-
-**参数：** 无。
-
-**返回：** 查询操作符字典。
-
-```ts
-k.api.get(() => {
-    const ops = k.content.operators();
-    return ops;
-})
-// 返回: { AND: "AND", OR: "OR", EQ: "EQ", NE: "NE", GT: "GT", ... }
-```
 
 ### k.content.getFolders()
 
@@ -110,6 +88,11 @@ k.api.get(() => {
 |------|------|------|
 | excludeEmpty | `boolean` | 是否排除空值记录，默认 `false` |
 | includeOfflineData | `boolean` | 是否包含离线数据，默认 `false` |
+| skip | `number` | 跳过的记录数 |
+| take | `number` | 返回的最大记录数 |
+| orderBy | `string` | 按指定字段升序排列 |
+| orderByDescending | `string` | 按指定字段降序排列 |
+| select | `string[]` | 只读取并返回指定字段 |
 
 **返回：** `Content[]`。
 
@@ -122,6 +105,16 @@ k.api.get(() => {
 // 包含离线内容
 k.api.get(() => {
     return k.content.Article.all({ includeOfflineData: true });
+})
+
+// 分页、排序并限制返回字段
+k.api.get(() => {
+    return k.content.Article.all({
+        skip: 20,
+        take: 10,
+        orderByDescending: "creationDate",
+        select: ["title", "slug", "creationDate"]
+    });
 })
 ```
 
@@ -167,16 +160,31 @@ k.api.get(() => {
 
 **支持的运算符：**
 - `==` 等于
+- `!=` / `<>` 不等于
 - `>=` 大于等于
 - `>` 大于
 - `<=` 小于等于
 - `<` 小于
-- `&&` 并且
-- `||` 或者
+- `&&` / `and` 并且
+- `||` / `or` 或者
 - `contains` 包含
 - `startwith` 开头匹配
 
 ```ts
+// 数字字段按数值比较；数字不要加引号
+k.api.get(() => {
+    const adult = k.content.People.find("age > 23");
+    return adult;
+})
+
+// 日期字段支持大小比较；系统日期字段也可直接用于查询
+k.api.get(() => {
+    const recent = k.content.Article.find(
+        "creationDate >= '2026-01-01T00:00:00Z'"
+    );
+    return recent;
+})
+
 // 多条件查询
 k.api.get(() => {
     const article = k.content.Article.find("title == 'Hello' && author == 'John'");
@@ -190,21 +198,42 @@ k.api.get(() => {
 })
 ```
 
-**对象查询（使用操作符）：**
+查询会根据条件值的类型执行比较：未加引号的数字按数值处理，日期字段按日期时间处理，字符串则按文本处理。`userKey`、`slug`、`creationDate`、`lastModified` 等系统字段也可以写在查询条件中。
+
+**对象查询：**
 
 ```ts
+// 使用对象查询运算符进行数字比较
 k.api.get(() => {
-    const { GT, AND } = k.content.operators();
-
-    const article = k.content.Article.find({
-        [AND]: {
-            title: { [GT]: "" },
-            views: { [GT]: 100 }
-        }
+    return k.content.People.find({
+        age: { $gt: 23 }
     });
-    return article;
+})
+
+// 使用系统日期字段进行日期比较
+k.api.get(() => {
+    return k.content.Article.findAll({
+        creationDate: { $gte: "2026-01-01T00:00:00Z" }
+    });
+})
+
+// 使用 $and 和 $or 组合多个条件
+k.api.get(() => {
+    return k.content.People.findAll({
+        $and: [
+            { age: { $gte: 18 } },
+            {
+                $or: [
+                    { status: "active" },
+                    { status: "pending" }
+                ]
+            }
+        ]
+    });
 })
 ```
+
+对象查询的运算符以 `$` 开头，直接写在查询对象中，无需预先获取或声明运算符常量。同一级直接书写的多个字段按 AND 关系组合；需要显式分组时使用 `$and` 或 `$or`。同样的对象语法也适用于 `findAll()`。
 
 **find + options：**
 
@@ -235,12 +264,10 @@ k.api.get(() => {
     return { count: articles.length, articles };
 })
 
-// 使用操作符
+// 使用对象条件表达 OR 查询
 k.api.get(() => {
-    const { GT, OR } = k.content.operators();
-
     const articles = k.content.Article.findAll({
-        [OR]: [
+        $or: [
             { title: "News1" },
             { title: "News2" }
         ]
@@ -248,6 +275,35 @@ k.api.get(() => {
     return { count: articles.length };
 })
 ```
+
+### findAllByCategory()
+
+根据分类内容查询当前内容夹中的所有关联内容。分类内容可以用所属内容夹名称，以及该分类的 `slug`、`userKey` 或 ID 指定。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `categoryFolder` | `string` | 是 | 分类内容所在的内容夹名称 |
+| `categorySlugOrId` | `string` | 是 | 分类内容的 `slug`、`userKey` 或 ID |
+| `options` | `QueryOptions` | 否 | 分页、排序、字段选择和离线数据选项 |
+
+**返回：** `Content[]`。分类内容不存在、分类内容夹不匹配或没有关联内容时返回空数组。
+
+```ts
+k.api.get(() => {
+    const articles = k.content.Article.findAllByCategory(
+        "Tags",
+        "technology",
+        {
+            take: 10,
+            orderByDescending: "creationDate"
+        }
+    );
+
+    return { count: articles.length, articles };
+})
+```
+
+这里的 `Tags` 是分类内容夹名称，`technology` 是该内容夹中某条分类内容的 `slug` 或 `userKey`。也可以把第二个参数替换为该分类内容的 ID。
 
 ## 增删改方法
 
@@ -414,12 +470,21 @@ k.api.get(() => {
 |------|------|------|
 | id | `string` | 内容的唯一标识符（GUID） |
 | userKey | `string` | 用户定义的唯一标识 |
+| slug | `string` | `userKey` 的查询与输出别名 |
 | lastModified | `string` | 最后修改时间（ISO 8601） |
 | creationDate | `string` | 创建时间（ISO 8601） |
 | parentId | `string` | 父级 ID |
 | version | `number` | 版本号 |
 | sequence | `number` | 排序序号 |
 | online | `boolean` | 是否上线（true=在线，false=离线） |
+
+`find()` 和 `findAll()` 的查询条件可以直接引用系统字段。当前最常用的系统字段查询如下：
+
+| 字段 | 比较方式 | 示例 |
+|------|----------|------|
+| `userKey` / `slug` | 精确匹配；`findAll()` 还支持不等于、包含和开头匹配 | `slug == 'release-notes'` |
+| `creationDate` | 日期等于、不等于及大小比较 | `creationDate >= '2026-01-01T00:00:00Z'` |
+| `lastModified` | 日期等于、不等于及大小比较 | `lastModified < '2026-08-01T00:00:00Z'` |
 
 ### 示例内容对象
 
@@ -430,6 +495,7 @@ k.api.get(() => {
     "author": "作者名",
     "id": "cd6b8f09-2146-73d3-cade-4e832627b4f6",
     "userKey": "my-article-key",
+    "slug": "my-article-key",
     "lastModified": "2025-10-28T09:32:30.3162015Z",
     "creationDate": "2025-10-28T09:32:30.3137662Z",
     "parentId": "00000000-0000-0000-0000-000000000000",
@@ -441,59 +507,78 @@ k.api.get(() => {
 
 ## 查询操作符详解
 
-### 比较操作符
+`find()` 和 `findAll()` 同时支持对象查询和字符串查询。对象查询使用 `$...` 运算符键，字符串查询使用 `>`、`contains`、`&&` 等表达式运算符。
+
+### 对象查询运算符
 
 | 操作符 | 说明 | 示例 |
 |--------|------|------|
-| `EQ` / `==` | 等于 | `title == 'Hello'` |
-| `NE` | 不等于 | `status != 'draft'` |
-| `GT` / `>` | 大于 | `views > 100` |
-| `GTE` / `>=` | 大于等于 | `price >= 10` |
-| `LT` / `<` | 小于 | `stock < 5` |
-| `LTE` / `<=` | 小于等于 | `price <= 100` |
+| `$eq` | 等于；字段直接赋值也是等值查询 | `{ status: { $eq: "active" } }` |
+| `$ne` | 不等于 | `{ status: { $ne: "deleted" } }` |
+| `$gt` | 大于 | `{ age: { $gt: 23 } }` |
+| `$gte` | 大于等于 | `{ age: { $gte: 18 } }` |
+| `$lt` | 小于 | `{ stock: { $lt: 10 } }` |
+| `$lte` | 小于等于 | `{ creationDate: { $lte: "2026-12-31T23:59:59Z" } }` |
+| `$contains` | 包含，常用于字符串字段 | `{ title: { $contains: "Kooboo" } }` |
+| `$startswith` | 以前缀开头，常用于字符串字段 | `{ code: { $startswith: "SKU-" } }` |
+| `$and` | 所有条件都成立 | `{ $and: [{ age: { $gte: 18 } }, { status: "active" }] }` |
+| `$or` | 任一条件成立 | `{ $or: [{ status: "active" }, { status: "pending" }] }` |
 
-### 字符串操作符
-
-| 操作符 | 说明 | 示例 |
-|--------|------|------|
-| `CONTAINS` | 包含 | `title contains 'news'` |
-| `STARTS_WITH` | 开头匹配 | `name startwith 'A'` |
-
-### 逻辑操作符
-
-| 操作符 | 说明 | 示例 |
-|--------|------|------|
-| `AND` / `&&` | 并且 | `a == 1 && b == 2` |
-| `OR` / `\|\|` | 或者 | `a == 1 \|\| a == 2` |
-
-### OR 操作符的三种写法
+对象条件中的数字直接写为数字；日期建议使用 ISO 8601 字符串。对象运算符直接写在查询对象中，不需要额外声明。
 
 ```ts
-// 1. 对象方式（字段值 OR 关系）
 k.api.get(() => {
-    const { OR } = k.content.operators();
-    const articles = k.content.Article.findAll({
-        [OR]: { title: "News1", category: "News2" }
-    });
-})
-
-// 2. 数组方式（多条件 OR）
-k.api.get(() => {
-    const { OR } = k.content.operators();
-    const articles = k.content.Article.findAll({
-        [OR]: [
-            { title: "Article1" },
-            { title: "Article2" }
+    return k.content.Article.findAll({
+        $and: [
+            { creationDate: { $gte: "2026-01-01T00:00:00Z" } },
+            { title: { $contains: "Kooboo" } }
         ]
     });
 })
+```
 
-// 3. 单字段多值
+### 字符串查询比较操作符
+
+| 操作符 | 说明 | 示例 |
+|--------|------|------|
+| `==` / `=` | 等于 | `title == 'Hello'` |
+| `!=` / `<>` | 不等于 | `status != 'draft'` |
+| `>` | 大于 | `age > 23` |
+| `>=` | 大于等于 | `price >= 10` |
+| `<` | 小于 | `stock < 5` |
+| `<=` | 小于等于 | `creationDate <= '2026-12-31T23:59:59Z'` |
+
+数字、日期和字符串使用同一组比较符，但按照字段值类型进行比较。数字条件不要加引号；日期建议使用 ISO 8601 格式。
+
+### 字符串查询文本操作符
+
+| 操作符 | 说明 | 示例 |
+|--------|------|------|
+| `contains` | 包含 | `title contains 'news'` |
+| `startwith` | 开头匹配 | `name startwith 'A'` |
+
+### 字符串查询逻辑操作符
+
+| 操作符 | 说明 | 示例 |
+|--------|------|------|
+| `&&` / `and` | 并且 | `a == 1 && b == 2` |
+| `\|\|` / `or` | 或者 | `a == 1 \|\| a == 2` |
+
+### 字符串 OR 查询示例
+
+```ts
+// 使用 ||
 k.api.get(() => {
-    const { OR } = k.content.operators();
-    const articles = k.content.Article.findAll({
-        title: { [OR]: ["Article1", "Article2"] }
-    });
+    return k.content.Article.findAll(
+        "title == 'News1' || title == 'News2'"
+    );
+})
+
+// 使用 or
+k.api.get(() => {
+    return k.content.Article.findAll(
+        "status == 'published' or status == 'scheduled'"
+    );
 })
 ```
 
@@ -518,6 +603,44 @@ k.api.get(() => {
 k.api.get(() => {
     // 返回包括离线内容的所有内容
     return k.content.Article.all({ includeOfflineData: true });
+})
+```
+
+### skip 与 take
+
+使用 `skip` 跳过前面的记录，使用 `take` 限制返回数量。它们可用于 `all()`、`findAll()` 和 `findAllByCategory()`。
+
+```ts
+k.api.get(() => {
+    return k.content.Article.findAll("age > 23", {
+        skip: 20,
+        take: 10
+    });
+})
+```
+
+### orderBy 与 orderByDescending
+
+传入字段名进行升序或降序排列。一次查询选择其中一种排序方向即可；字段可以是自定义字段，也可以是 `creationDate`、`lastModified` 等系统字段。
+
+```ts
+k.api.get(() => {
+    return k.content.Article.findAll("age > 23", {
+        orderByDescending: "creationDate",
+        take: 10
+    });
+})
+```
+
+### select
+
+只读取并返回指定字段，可减少不需要的内容字段读取。
+
+```ts
+k.api.get(() => {
+    return k.content.Article.all({
+        select: ["title", "slug", "creationDate"]
+    });
 })
 ```
 
