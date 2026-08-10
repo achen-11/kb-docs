@@ -47,7 +47,6 @@
 | [模板引擎](/templateEngine/) | 想理解 Page / Layout / View / Script / Style |
 | [API 详情](/api/) | 想查 `k.*` 方法、参数、返回值与脚本示例 |
 | [产品功能](/product/) | 想了解控制台、邮箱、市场、AI 等站点外功能 |
-| [最佳实践](/guide/) | 想把多个能力组合成完整业务流程 |
 
 ## 下一步
 

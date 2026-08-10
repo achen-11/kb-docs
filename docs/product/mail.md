@@ -83,6 +83,5 @@
 | 文档 | 说明 |
 |------|------|
 | [k.mail](/api/mail/) | KScript 邮件 API |
-| [邮件与短信通知](/guide/integrations/email-sms-notifications.md) | 业务通知最佳实践 |
 | [控制台](./console.md) | 域名、余额与组织 |
 | [CMS：服务集成](/cms/settings/integrations/) | 站点级第三方服务配置 |

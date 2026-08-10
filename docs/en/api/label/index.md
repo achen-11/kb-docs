@@ -106,4 +106,3 @@ const label = k.site.labels.get("Cancel");
 ## Related Docs
 
 - [k.site](/en/api/site/) - Site Overview
-- [Best Practices](/guide/) — Development Guide (under preparation)

@@ -6,6 +6,13 @@ import { fileURLToPath } from 'node:url'
 
 const DOCS_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 
+/**
+ * 最佳实践（docs/guide/**）发布开关。
+ * false：本地保留源文件，但不进 nav / sidebar / dist（dev 与 build 均不生成路由）。
+ * 恢复发布时改为 true 即可。
+ */
+const PUBLISH_GUIDE = false
+
 /** VitePress 左侧栏：路径前缀须匹配 `cms/**` 下的页面 */
 const cmsSidebar = [
   {
@@ -760,7 +767,7 @@ const zhNav = [
   { text: '模板引擎', link: '/templateEngine/' },
   { text: 'Kooboo CLI', link: '/cli/' },
   { text: 'API 详情', link: '/api/' },
-  { text: '最佳实践', link: '/guide/' }
+  ...(PUBLISH_GUIDE ? [{ text: '最佳实践', link: '/guide/' }] : []),
 ]
 
 const enNav = [
@@ -799,8 +806,12 @@ const zhSidebar = {
   '/quick-start': quickStartSidebar,
   '/product/': productSidebar,
   '/product': productSidebar,
-  '/guide/': guideSidebar,
-  '/guide': guideSidebar,
+  ...(PUBLISH_GUIDE
+    ? {
+        '/guide/': guideSidebar,
+        '/guide': guideSidebar,
+      }
+    : {}),
   '/cli/': cliSidebar,
   '/cli': cliSidebar,
   '/cms/': cmsSidebar,
@@ -827,6 +838,8 @@ const enSidebar = {
 
 export default defineConfig({
   ignoreDeadLinks: true,
+  // 收起时排除 guide 源文件，避免生成 /guide/** 路由与 dist 产物
+  srcExclude: PUBLISH_GUIDE ? [] : ['guide/**'],
   vite: {
     build: {
       rollupOptions: {
