@@ -99,6 +99,7 @@ docs/** 发生修改
 4. 新保存到达时，取消仍在运行的旧稳定构建，释放共享 preview lock 后保存新内容。
 5. Dev Server 必须忽略 `.vitepress/dist` 和 `.vitepress/.temp`，避免稳定构建造成全站 reload 风暴。
 6. Dev 与稳定构建使用独立 Vite cache 目录；两者可以并行运行。
+7. systemd 通过 pnpm script 传递 VitePress 参数时直接使用 `pnpm docs:dev --host ...`；不要插入额外的 `--`，否则 VitePress 会忽略 host/port 并回退到 `localhost:5173`。
 
 ## 本地命令
 

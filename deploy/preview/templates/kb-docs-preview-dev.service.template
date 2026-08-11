@@ -10,7 +10,7 @@ Group={{SERVICE_GROUP}}
 WorkingDirectory={{APP_DIR}}
 EnvironmentFile={{CONFIG_DIR}}/preview.env
 Environment=DOCS_VITEPRESS_CACHE_DIR={{DATA_DIR}}/vitepress-cache/dev
-ExecStart=/usr/bin/env corepack pnpm docs:dev -- --host {{BIND_HOST}} --port {{FAST_PREVIEW_PORT}} --strictPort
+ExecStart=/usr/bin/env corepack pnpm docs:dev --host {{BIND_HOST}} --port {{FAST_PREVIEW_PORT}} --strictPort
 Restart=on-failure
 RestartSec=3
 TimeoutStopSec=30

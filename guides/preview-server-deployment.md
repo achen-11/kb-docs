@@ -17,7 +17,7 @@
   -> 原子切换 current
   -> 更新持久化状态
 
-快速预览：pnpm docs:dev -- --host 0.0.0.0 --port 4173
+快速预览：pnpm docs:dev --host 0.0.0.0 --port 4173
   -> 监听 Markdown 和配置变化
   -> HMR 更新编辑页面
   -> 不承担生产构建验证

@@ -48,6 +48,7 @@ test('renderPreviewServerConfig creates complete Linux service configuration', a
     assert.match(service, /ReadWritePaths=\/opt\/kb-docs \/srv\/kb-docs-preview/u)
     assert.match(devService, /vitepress|docs:dev/u)
     assert.match(devService, /--port 4173/u)
+    assert.doesNotMatch(devService, /docs:dev -- --host/u)
     assert.match(devService, /vitepress-cache\/dev/u)
     assert.match(nginx, /server_name docs-preview\.kbdev\.com;/u)
     assert.match(nginx, /127\.0\.0\.1:4180/u)
