@@ -53,5 +53,7 @@ After a reviewed commit reaches the configured remote branch, the internal host 
 - The service account successfully executed `git ls-remote` against `https://cnb.cool/kooboo.com/kooboo/team/kooboo-doc.git` and resolved `main` to `dc5f634267b427c77d1e9f53e5a23dd5a8578725`.
 - HTTPS credentials are stored under `/etc/kb-docs-preview/` and consumed through `GIT_ASKPASS`; the token is not stored in the repository, rendered config, systemd unit, or command arguments.
 - Focused Git/lock tests pass 6/6, deployment-render tests pass 2/2, and preview tests pass 5/5. Shell syntax, rendered placeholders, Git whitespace, and systemd unit verification pass.
-- `kb-docs-preview.service` remains active and `/__preview/status` reports release `20260811T035352Z-unknown-4` ready.
-- `kb-docs-preview-sync.timer` remains uninstalled and inactive. Activation is blocked until the current preview implementation and its required base commits exist on a safe remote branch.
+- The server uses the clean checkout `/opt/kb-docs-git` on `codex/docs-preview-phase1`; the original non-Git `/opt/kb-docs` deployment remains available for rollback.
+- `kb-docs-preview.service` and `kb-docs-preview-sync.timer` are enabled and active. The timer polls CNB every 30 seconds.
+- End-to-end commit `18c23fe` was automatically fetched, fast-forwarded, built, health-checked, and published as release `20260811T043851Z-18c23fe-7`. The marker `preview-sync-e2e-20260811-1237` was verified through the LAN URL while the previous release remained available during the build.
+- The temporary verification page is removed by the completion commit; its disappearance is verified after the final automatic rebuild.

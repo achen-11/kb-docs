@@ -192,7 +192,7 @@ Linux + systemd + Nginx 的配置模板、dry-run 安装器和更新脚本位于
 - 只有构建和健康检查成功后才推进“已发布 commit”标记；失败时下一轮继续重试，旧 release 保持可用。
 - 开发者的第一条可用链路为 `commit/push -> 主动拉取 -> 自动构建 -> 4173 更新`。
 
-当前实施状态（2026-08-11）：同步器、跨进程锁、systemd 模板和 CNB 只读部署令牌已经实现并验证。CNB 使用仓库级 HTTPS 部署令牌，不使用个人凭据；服务器服务账户已通过 `git ls-remote` 验证 `main` 可读。由于本地 `main` 仍领先 `cnb/main` 7 个提交，且当前工作区包含尚未整理的预览实现，服务器仍保留现有非 Git 部署副本，sync timer 保持关闭。只有建立包含当前预览基础设施的安全远端 Git 基线后，才允许切换真实 checkout 并启用 30 秒轮询。
+当前实施状态（2026-08-11）：Phase 1 已完成。同步器、跨进程锁、systemd timer 和 CNB 仓库级 HTTPS 只读部署令牌均已启用；服务器使用 `/opt/kb-docs-git` 的干净 checkout，轮询 `codex/docs-preview-phase1`，间隔 30 秒。端到端提交 `18c23fe` 已自动完成 fetch、fast-forward、VitePress 构建、健康检查和 release 原子切换，且构建期间旧 release 持续可用。原 `/opt/kb-docs` 非 Git 副本保留为回滚材料。后续进入 Phase 2：VitePress 编辑链接和编辑平台骨架。
 
 ### Phase 2：VitePress 编辑链接与编辑平台骨架
 
