@@ -15,7 +15,7 @@ async function main() {
   const response = await fetch(`${baseUrl}/api/health`, { signal: AbortSignal.timeout(3000) })
   if (!response.ok) throw new Error(`Editor health returned HTTP ${response.status}`)
   const payload = await response.json()
-  if (payload.status !== 'ready' || payload.mode !== 'readonly') {
+  if (payload.status !== 'ready' || payload.mode !== 'draft') {
     throw new Error(`Editor health is invalid: ${JSON.stringify(payload)}`)
   }
   console.log(JSON.stringify({ baseUrl, checkedAt: new Date().toISOString(), ...payload }, null, 2))

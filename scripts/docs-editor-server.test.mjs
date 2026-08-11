@@ -114,6 +114,9 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
   const unauthorized = await fetch(`${editorUrl}/api/document?path=docs%2Findex.md`)
   assert.equal(unauthorized.status, 401)
 
+  const healthResponse = await fetch(`${editorUrl}/api/health`)
+  assert.deepEqual(await healthResponse.json(), { status: 'ready', mode: 'draft' })
+
   const badLogin = await fetch(`${editorUrl}/api/session`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
