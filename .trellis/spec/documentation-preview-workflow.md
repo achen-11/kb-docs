@@ -235,7 +235,7 @@ Linux + systemd + Nginx 的配置模板、dry-run 安装器和更新脚本位于
 
 当前实施状态（2026-08-11）：Phase 3 已部署到 kbdev。4174 允许认证用户编辑现有 `docs/**/*.md`，保存时携带上次读取的 SHA-256；服务端在共享 preview lock 内重新校验哈希，通过同目录临时文件、`fsync` 和原子 rename 写入，然后串行执行 VitePress 生产构建、健康检查和 release 切换。冲突返回 409 且不写文件；构建失败保留已保存草稿和上一成功 release。编辑器展示队列/保存/构建/冲突状态，并通过 CSP 白名单加载 4173 iframe。草稿期间 Git timer 成功返回 deferred，不 fetch 或覆盖工作区；文档恢复 Git clean 后草稿标记自动删除，timer 恢复正常同步。真实服务器验收先生成 release `20260811T073016Z-9b17706-15`，随后恢复原文并生成 clean release `20260811T073126Z-9b17706-16`；4173、4174、Git timer 与 Kooboo.Web 均保持 active。
 
-Phase 3 快速预览扩展（2026-08-11）：本地实现与检查已完成。保存 API 在原子写入和草稿标记完成后返回 `queued`，稳定构建在后台 debounce；连续保存会合并，正在运行的旧构建会被取消。部署配置将 4173 改为常驻 VitePress Dev Server，4174 保持编辑器，原不可变预览迁移到 4175。29 个聚焦 Node 测试、编辑器构建、完整 VitePress 构建、Dev 与生产构建并发测试均通过；排除 `dist` / `.temp` 后稳定构建不再触发全站 reload 风暴。浏览器确认 Markdown 原生 HMR 生效，700ms iframe reload 兜底的可见耗时为 1.329 秒。部署到 kbdev 后，应补充真实保存耗时、4173 可见耗时、4175 release 以及恢复原文后的 Git clean 证据。
+Phase 3 快速预览扩展（2026-08-11）：已部署到 kbdev，部署提交为 `8c25f90`。保存 API 在原子写入和草稿标记完成后返回 `queued`，稳定构建在后台 debounce；连续保存会合并，正在运行的旧构建会被取消。4173 运行常驻 VitePress Dev Server，4174 运行编辑器，4175 提供不可变稳定 release。29 个聚焦 Node 测试、编辑器构建、完整 VitePress 构建、Dev 与生产构建并发测试均通过；排除 `dist` / `.temp` 后稳定构建没有触发全站 reload 风暴。真实服务器验收中，保存请求 22ms 返回，4173 浏览器在 API 响应时间戳后 289ms 看到 Markdown 更新；包含 8 秒 debounce 的 4175 release 在保存后 38.563 秒完成。恢复请求 20ms 返回，release `20260811T103536Z-8c25f90-24` 恢复原文。部署前已有的 `docs/cli/index.md` 用户草稿及 draft marker 已备份并逐字节保留，最终工作区只保留该原始草稿。
 
 ### Phase 4：Git 提交与审核
 
