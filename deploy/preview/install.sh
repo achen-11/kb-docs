@@ -10,6 +10,7 @@ CONFIG_DIR="/etc/kb-docs-preview"
 DATA_DIR="/srv/kb-docs-preview"
 GIT_BRANCH="main"
 GIT_REMOTE="origin"
+EDITOR_BASE_URL=""
 HOSTNAME_VALUE="docs-preview.kbdev.com"
 KEEP_RELEASES="5"
 NGINX_CONFIG="/etc/nginx/conf.d/kb-docs-preview.conf"
@@ -37,6 +38,7 @@ usage() {
   echo "  --data-dir PATH"
   echo "  --git-branch NAME"
   echo "  --git-remote NAME"
+  echo "  --editor-base-url URL"
   echo "  --hostname HOST"
   echo "  --keep-releases NUMBER"
   echo "  --lock-timeout MILLISECONDS"
@@ -60,6 +62,7 @@ while [[ $# -gt 0 ]]; do
     --data-dir) DATA_DIR="$2"; shift 2 ;;
     --git-branch) GIT_BRANCH="$2"; shift 2 ;;
     --git-remote) GIT_REMOTE="$2"; shift 2 ;;
+    --editor-base-url) EDITOR_BASE_URL="$2"; shift 2 ;;
     --hostname) HOSTNAME_VALUE="$2"; shift 2 ;;
     --keep-releases) KEEP_RELEASES="$2"; shift 2 ;;
     --lock-timeout) UPDATE_LOCK_TIMEOUT_MS="$2"; shift 2 ;;
@@ -85,6 +88,7 @@ node "${PROJECT_DIR}/scripts/render-preview-server-config.mjs" \
   --data-dir "${DATA_DIR}" \
   --git-branch "${GIT_BRANCH}" \
   --git-remote "${GIT_REMOTE}" \
+  --editor-base-url "${EDITOR_BASE_URL}" \
   --group "${SERVICE_GROUP}" \
   --hostname "${HOSTNAME_VALUE}" \
   --keep-releases "${KEEP_RELEASES}" \

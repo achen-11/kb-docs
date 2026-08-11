@@ -13,15 +13,24 @@ importers:
 
   .:
     devDependencies:
+      '@vitejs/plugin-vue':
+        specifier: ^5.2.4
+        version: 5.2.4(vite@5.4.21)(vue@3.5.30)
       playwright:
         specifier: 1.58.2
         version: 1.58.2
+      vite:
+        specifier: ^5.4.21
+        version: 5.4.21
       vitepress:
         specifier: ^1.6.4
         version: 1.6.4(@algolia/client-search@5.49.2)(postcss@8.5.8)(search-insights@2.17.3)
       vitepress-plugin-mermaid-diagram:
         specifier: ^0.3.2
         version: 0.3.2(patch_hash=5ac050fe8cc697055233ac10d650e068dab9997c05cacd2978dc3160a4f0f5dd)(markdown-it@14.2.0)
+      vue:
+        specifier: ^3.5.30
+        version: 3.5.30
 
 packages:
 
@@ -463,6 +472,7 @@ packages:
 
   '@ungap/structured-clone@1.3.0':
     resolution: {integrity: sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==}
+    deprecated: Potential CWE-502 - Update to 1.3.1 or higher
 
   '@vitejs/plugin-vue@5.2.4':
     resolution: {integrity: sha512-7Yx/SXSOcQq5HiiV3orevHUFn+pmMB4cgbEkDYgnkUWb0WfeQ/wa2yFv6D5ICiCQOVpjA7vYDXrC7AGO8yjDHA==}

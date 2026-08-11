@@ -1,0 +1,50 @@
+{
+  "id": "docs-editor-links",
+  "name": "docs-editor-links",
+  "title": "Add VitePress edit links and a read-only documentation editor",
+  "description": "Implement Phase 2 of the approved documentation workflow: environment-gated VitePress edit links and an authenticated, read-only editor platform with safe document loading and preview status.",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": "docs/.vitepress, editor, scripts/docs-editor-*, deploy/editor, package.json, pnpm-lock.yaml, .trellis/spec/documentation-preview-workflow.md",
+  "priority": "P1",
+  "creator": "wg",
+  "assignee": "wg",
+  "createdAt": "2026-08-11",
+  "completedAt": null,
+  "branch": "codex/docs-editor-phase2",
+  "base_branch": "codex/docs-preview-phase1",
+  "worktree_path": null,
+  "current_phase": 1,
+  "next_action": [
+    {
+      "phase": 1,
+      "action": "implement"
+    },
+    {
+      "phase": 2,
+      "action": "check"
+    },
+    {
+      "phase": 3,
+      "action": "finish"
+    },
+    {
+      "phase": 4,
+      "action": "create-pr"
+    }
+  ],
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "docs/.vitepress/config.mts",
+    "docs/.vitepress/editor-link.mjs",
+    "editor/src/App.vue",
+    "scripts/docs-editor-server.mjs",
+    "scripts/docs-editor-server.test.mjs",
+    "deploy/editor/install.sh"
+  ],
+  "notes": "Phase 2 is read-only. It must not save Markdown, create commits, expose Git credentials, or weaken the Phase 1 fast-forward-only preview pipeline. Public VitePress builds keep edit links disabled unless DOCS_EDITOR_BASE_URL is explicitly set."
+}

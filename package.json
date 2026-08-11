@@ -13,6 +13,10 @@
     "docs:preview:serve": "node scripts/local-preview-server.mjs --no-watch --skip-initial-build",
     "docs:preview:health": "node scripts/check-local-preview.mjs",
     "docs:preview:sync": "node scripts/sync-preview-from-git.mjs",
+    "docs:editor:build": "vite build --config editor/vite.config.ts",
+    "docs:editor:serve": "node scripts/docs-editor-server.mjs",
+    "docs:editor:health": "node scripts/check-docs-editor.mjs",
+    "test:docs-editor": "node --test scripts/docs-editor-link.test.mjs scripts/docs-editor-server.test.mjs scripts/render-docs-editor-config.test.mjs",
     "docs:build:kooboo": "vitepress build docs && node scripts/stabilize-vitepress-dist.mjs && node scripts/export-vitepress-to-kooboo.mjs",
     "docs:deploy:kooboo": "node scripts/deploy-kooboo.mjs",
     "docs:deploy:kooboo:dry-run": "node scripts/deploy-kooboo.mjs --dry-run",
@@ -41,8 +45,11 @@
     "screenshots:product:ai": "node scripts/product-ai-screenshots.mjs"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.4",
     "playwright": "1.58.2",
+    "vite": "^5.4.21",
     "vitepress": "^1.6.4",
-    "vitepress-plugin-mermaid-diagram": "^0.3.2"
+    "vitepress-plugin-mermaid-diagram": "^0.3.2",
+    "vue": "^3.5.30"
   }
 }

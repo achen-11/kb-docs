@@ -17,6 +17,7 @@ test('renderPreviewServerConfig creates complete Linux service configuration', a
       bindHost: '0.0.0.0',
       configDir: '/etc/kb-docs-preview',
       dataDir: '/srv/kb-docs-preview',
+      editorBaseUrl: 'http://192.168.10.75:4174/',
       gitBranch: 'preview/main',
       gitRemote: 'cnb',
       keepReleases: '7',
@@ -48,6 +49,7 @@ test('renderPreviewServerConfig creates complete Linux service configuration', a
     assert.match(environment, /DOCS_PREVIEW_HOST=0\.0\.0\.0/u)
     assert.match(environment, /DOCS_PREVIEW_GIT_REMOTE=cnb/u)
     assert.match(environment, /DOCS_PREVIEW_GIT_BRANCH=preview\/main/u)
+    assert.match(environment, /DOCS_EDITOR_BASE_URL=http:\/\/192\.168\.10\.75:4174/u)
     assert.match(environment, /DOCS_PREVIEW_UPDATE_LOCK_TIMEOUT_MS=240000/u)
     assert.match(environment, /GIT_TERMINAL_PROMPT=0/u)
     assert.match(environment, /GIT_ASKPASS=\/etc\/kb-docs-preview\/git-askpass\.sh/u)
@@ -71,6 +73,7 @@ test('normalizePreviewServerConfig rejects unsafe server values', () => {
     bindHost: '127.0.0.1',
     configDir: '/etc/kb-docs-preview',
     dataDir: '/srv/kb-docs-preview',
+    editorBaseUrl: '',
     outputDir: '/tmp/rendered-preview',
     previewHostname: 'docs-preview.kbdev.com',
     serviceGroup: 'kb-docs-preview',
@@ -103,5 +106,9 @@ test('normalizePreviewServerConfig rejects unsafe server values', () => {
   assert.throws(
     () => normalizePreviewServerConfig({ ...valid, gitRemote: 'origin;touch' }),
     /remote/u
+  )
+  assert.throws(
+    () => normalizePreviewServerConfig({ ...valid, editorBaseUrl: 'file:///tmp/editor' }),
+    /editor base URL/u
   )
 })

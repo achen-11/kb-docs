@@ -70,6 +70,18 @@ function assertGitBranch(value) {
   return value
 }
 
+function assertOptionalHttpUrl(value, name) {
+  if (!value) return ''
+  const url = new URL(value)
+  if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) {
+    throw new Error(`${name} must be an http or https URL without credentials`)
+  }
+  if (url.search || url.hash || /[\r\n\0]/u.test(value)) {
+    throw new Error(`${name} must not contain query, hash, or control characters`)
+  }
+  return url.toString().replace(/\/$/u, '')
+}
+
 function readPositiveInteger(value, fallback, name, maximum = Number.MAX_SAFE_INTEGER) {
   if (value === undefined) return fallback
   const parsed = Number.parseInt(value, 10)
@@ -96,6 +108,7 @@ export function normalizePreviewServerConfig(input) {
     bindHost: assertBindHost(input.bindHost || '127.0.0.1'),
     configDir: assertAbsolutePath(input.configDir, 'config directory'),
     dataDir: assertAbsolutePath(input.dataDir, 'data directory'),
+    editorBaseUrl: assertOptionalHttpUrl(input.editorBaseUrl, 'editor base URL'),
     gitBranch: assertGitBranch(input.gitBranch || 'main'),
     gitRemote: assertGitRemote(input.gitRemote || 'origin'),
     keepReleases: readPositiveInteger(input.keepReleases, 5, 'release retention', 100),
@@ -126,6 +139,7 @@ export async function renderPreviewServerConfig(input) {
     BIND_HOST: config.bindHost,
     CONFIG_DIR: config.configDir,
     DATA_DIR: config.dataDir,
+    EDITOR_BASE_URL: config.editorBaseUrl,
     GIT_BRANCH: config.gitBranch,
     GIT_REMOTE: config.gitRemote,
     GIT_STATE_FILE: path.join(config.dataDir, '.git-sync-state.json'),
@@ -177,6 +191,7 @@ async function main() {
     bindHost: readArg(argv, '--bind-host') || '127.0.0.1',
     configDir: readArg(argv, '--config-dir') || '/etc/kb-docs-preview',
     dataDir: readArg(argv, '--data-dir') || '/srv/kb-docs-preview',
+    editorBaseUrl: readArg(argv, '--editor-base-url') || '',
     gitBranch: readArg(argv, '--git-branch') || 'main',
     gitRemote: readArg(argv, '--git-remote') || 'origin',
     keepReleases: readArg(argv, '--keep-releases') || '5',

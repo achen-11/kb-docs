@@ -3,8 +3,12 @@ import { diagramPlugin } from 'vitepress-plugin-mermaid-diagram'
 import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { createEditLinkConfig } from './editor-link.mjs'
 
 const DOCS_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
+const EDITOR_BASE_URL = process.env.DOCS_EDITOR_BASE_URL
+const zhEditLink = createEditLinkConfig(EDITOR_BASE_URL, '在编辑平台打开')
+const enEditLink = createEditLinkConfig(EDITOR_BASE_URL, 'Open in documentation editor')
 
 /**
  * 最佳实践（docs/guide/**）发布开关。
@@ -886,6 +890,7 @@ export default defineConfig({
     'templateEngine/template-binding-syntax.md': 'templateEngine/binding/index.md',
   },
   themeConfig: {
+    editLink: zhEditLink,
     search: {
       provider: 'local'
     },
@@ -900,6 +905,7 @@ export default defineConfig({
       title: 'Kooboo',
       description: 'Kooboo Documentation',
       themeConfig: {
+        editLink: zhEditLink,
         siteTitle: 'Kooboo',
         nav: zhNav,
         sidebar: zhSidebar,
@@ -913,6 +919,7 @@ export default defineConfig({
       title: 'Kooboo',
       description: 'Kooboo Documentation',
       themeConfig: {
+        editLink: enEditLink,
         siteTitle: 'Kooboo',
         nav: prefixLocaleNav(enNav, '/en'),
         sidebar: enSidebar,

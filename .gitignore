@@ -12,3 +12,4 @@ kb-remote-site/*
 .cdp-scratch/
 .claude/
 .local-preview/
+/editor/dist/
