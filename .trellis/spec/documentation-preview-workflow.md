@@ -209,6 +209,8 @@ Linux + systemd + Nginx 的配置模板、dry-run 安装器和更新脚本位于
 - 保存后进入统一构建队列，编辑界面显示排队、构建、成功或失败，并在成功后刷新预览 iframe。
 - 浏览器端不接触 Git、SSH、Kooboo 或服务器部署凭据。
 
+当前实施状态（2026-08-11）：Phase 3 已部署到 kbdev。4174 允许认证用户编辑现有 `docs/**/*.md`，保存时携带上次读取的 SHA-256；服务端在共享 preview lock 内重新校验哈希，通过同目录临时文件、`fsync` 和原子 rename 写入，然后串行执行 VitePress 生产构建、健康检查和 release 切换。冲突返回 409 且不写文件；构建失败保留已保存草稿和上一成功 release。编辑器展示队列/保存/构建/冲突状态，并通过 CSP 白名单加载 4173 iframe。草稿期间 Git timer 成功返回 deferred，不 fetch 或覆盖工作区；文档恢复 Git clean 后草稿标记自动删除，timer 恢复正常同步。真实服务器验收先生成 release `20260811T073016Z-9b17706-15`，随后恢复原文并生成 clean release `20260811T073126Z-9b17706-16`；4173、4174、Git timer 与 Kooboo.Web 均保持 active。
+
 ### Phase 4：Git 提交与审核
 
 - 提交前展示完整 diff 并要求修改说明。

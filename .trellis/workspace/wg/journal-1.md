@@ -120,7 +120,10 @@
 
 ### Main Changes
 
-
+- Added SHA-256 optimistic concurrency, same-directory atomic writes, draft marker state, JSONL audit records, and a serialized save/build coordinator under the shared preview lock.
+- Added authenticated `PUT /api/document` and `GET /api/build-status`, build failure separation, Git-sync deferral, editor deployment write boundaries, and preview iframe CSP configuration.
+- Upgraded the Vue editor with Markdown editing, dirty-state protection, Cmd/Ctrl+S, conflict recovery, build progress, and automatic 4173 iframe refresh.
+- Deployed `codex/docs-editor-phase3` to `/opt/kb-docs-git` and switched the Git timer to track the Phase 3 branch.
 
 ### Git Commits
 
@@ -128,7 +131,11 @@
 
 ### Testing
 
-- [OK] (Add test results)
+- [OK] 21 focused Node tests for atomic save, conflicts, serialization, server APIs, config rendering, preview lock, and Git-sync deferral.
+- [OK] Editor Vite production build and complete VitePress production build.
+- [OK] Local Playwright acceptance: login, save, iframe refresh, stale-hash conflict, server-version reload, clean restoration, marker cleanup, and audit output.
+- [OK] Real kbdev acceptance: temporary `docs/index.md` edit produced release `20260811T073016Z-9b17706-15`; Git sync deferred successfully; restoring the original produced clean release `20260811T073126Z-9b17706-16` and resumed normal sync.
+- [OK] 4173, 4174, Git sync timer, and Kooboo.Web active; local-LAN health requests succeeded.
 
 ### Status
 
@@ -225,6 +232,39 @@ Implemented and deployed environment-gated VitePress edit links plus an authenti
 |------|---------|
 | `3b1ae44` | (see git log) |
 | `abc9cf0` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
+
+
+## Session 6: Deploy Phase 3 shared draft editor
+
+**Date**: 2026-08-11
+**Task**: Deploy Phase 3 shared draft editor
+
+### Summary
+
+Implemented and deployed hash-checked atomic Markdown saving, serialized preview builds, conflict handling, iframe refresh, audit logging, and Git-sync deferral; verified a reversible real-server save and clean restoration.
+
+### Main Changes
+
+
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `422bee6` | (see git log) |
+| `9b17706` | (see git log) |
 
 ### Testing
 
