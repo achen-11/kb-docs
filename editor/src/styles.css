@@ -112,7 +112,9 @@ input:focus {
 
 .primary-button,
 .ghost-button,
-.refresh-button {
+.refresh-button,
+.save-button,
+.workspace-error button {
   border: 0;
   border-radius: 9px;
   cursor: pointer;
@@ -193,6 +195,15 @@ input:focus {
   gap: 16px;
 }
 
+.dirty-badge {
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #9a5f00;
+  background: #fff2cf;
+  font-size: 11px;
+  font-weight: 800;
+}
+
 .text-link {
   color: #2469e8;
   font-size: 13px;
@@ -250,8 +261,8 @@ input:focus {
   flex: none;
   margin-top: 4px;
   border-radius: 50%;
-  background: #e6a526;
-  box-shadow: 0 0 0 4px rgba(230, 165, 38, 0.13);
+  background: #2469e8;
+  box-shadow: 0 0 0 4px rgba(36, 105, 232, 0.13);
 }
 
 .path-form {
@@ -289,6 +300,20 @@ input:focus {
   animation: pulse 1.4s ease-in-out infinite;
 }
 
+.status-indicator[data-tone="danger"] {
+  background: #c94855;
+}
+
+.status-indicator[data-tone="neutral"] {
+  background: #8d98aa;
+}
+
+.build-error {
+  max-height: 150px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
 .status-card dl {
   margin: 16px 0 0;
 }
@@ -321,7 +346,7 @@ input:focus {
   font-size: 11px;
 }
 
-.document-panel {
+.workbench {
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -330,9 +355,30 @@ input:focus {
 }
 
 .workspace-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 16px;
   padding: 12px 14px;
   border-radius: 9px;
+  font-size: 13px;
+}
+
+.workspace-error button {
+  flex: none;
+  padding: 7px 10px;
+  color: #a12431;
+  background: #ffdce0;
+}
+
+.workspace-notice {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid #bfe8da;
+  border-radius: 9px;
+  color: #167058;
+  background: #edfbf6;
   font-size: 13px;
 }
 
@@ -366,6 +412,32 @@ input:focus {
   text-align: right;
 }
 
+.document-actions {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: end;
+  gap: 6px 14px;
+}
+
+.document-actions small {
+  grid-column: 2;
+  color: #8994a6;
+  font-size: 10px;
+  text-align: center;
+}
+
+.save-button {
+  min-height: 40px;
+  padding: 0 16px;
+  color: #fff;
+  background: #2469e8;
+}
+
+.save-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .hash-block span,
 .hash-block code {
   display: block;
@@ -384,20 +456,75 @@ input:focus {
   font-size: 12px;
 }
 
-.source-viewer {
+.editor-preview-grid {
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) minmax(360px, 1fr);
+  gap: 16px;
+}
+
+.editor-pane,
+.preview-pane {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #d9e1eb;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.pane-label {
+  height: 42px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 13px;
+  border-bottom: 1px solid #dfe6ef;
+  color: #6e7a8d;
+  background: #fff;
+  font-size: 11px;
+}
+
+.pane-label strong {
+  color: #3a475e;
+  font-size: 12px;
+}
+
+.pane-label .danger {
+  color: #b52e3c;
+  font-weight: 800;
+}
+
+.source-editor {
   width: 100%;
   min-height: 0;
   flex: 1;
   resize: none;
   padding: 20px;
-  border: 1px solid #d9e1eb;
-  border-radius: 12px;
+  border: 0;
   color: #23304a;
   background: #f8fafc;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 13px;
   line-height: 1.65;
   outline: none;
+}
+
+.source-editor:focus {
+  background: #fff;
+  box-shadow: inset 0 0 0 2px rgba(36, 105, 232, 0.2);
+}
+
+.preview-pane iframe {
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+  border: 0;
+  background: #fff;
 }
 
 .empty-state {
@@ -458,8 +585,13 @@ input:focus {
     border-bottom: 1px solid #dde5ef;
   }
 
-  .document-panel {
+  .workbench {
     min-height: 65vh;
+  }
+
+  .editor-preview-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(520px, 1fr) minmax(520px, 1fr);
   }
 
   .document-header {
@@ -469,6 +601,11 @@ input:focus {
 
   .hash-block {
     text-align: left;
+  }
+
+  .document-actions {
+    width: 100%;
+    grid-template-columns: 1fr auto;
   }
 }
 
@@ -482,7 +619,7 @@ input:focus {
     display: none;
   }
 
-  .document-panel,
+  .workbench,
   .sidebar-panel {
     padding: 18px;
   }

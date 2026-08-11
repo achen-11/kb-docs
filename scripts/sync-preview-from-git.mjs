@@ -1,5 +1,5 @@
 import { execFile, spawn } from 'node:child_process'
-import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
+import { access, mkdir, readFile, rename, rm, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
@@ -96,10 +96,37 @@ async function writeSyncState(stateFile, state) {
   }
 }
 
+async function deferForEditorDraft(appDir, draftStateFile) {
+  try {
+    await access(draftStateFile)
+  } catch (error) {
+    if (error && typeof error === 'object' && error.code === 'ENOENT') return null
+    throw error
+  }
+
+  const { stdout } = await runGit(appDir, [
+    'status',
+    '--porcelain',
+    '--untracked-files=normal',
+    '--',
+    'docs'
+  ])
+  if (!stdout.trim()) {
+    await unlink(draftStateFile).catch((error) => {
+      if (!(error && typeof error === 'object' && error.code === 'ENOENT')) throw error
+    })
+    return null
+  }
+
+  console.log('Git preview sync deferred because an editor draft is active')
+  return { changed: false, deferred: true, published: false, reason: 'editor_draft' }
+}
+
 export async function syncPreviewFromGit({
   appDir = projectRoot,
   branch = 'main',
   envFile = '/etc/kb-docs-preview/preview.env',
+  draftStateFile,
   lockFile,
   lockTimeoutMs = 180_000,
   remote = 'origin',
@@ -114,6 +141,11 @@ export async function syncPreviewFromGit({
   const normalizedStateFile = path.resolve(
     stateFile || process.env.DOCS_PREVIEW_GIT_STATE_FILE || path.join(previewRoot, '.git-sync-state.json')
   )
+  const normalizedDraftStateFile = path.resolve(
+    draftStateFile ||
+      process.env.DOCS_EDITOR_DRAFT_STATE_FILE ||
+      path.join(previewRoot, '.editor-draft.json')
+  )
 
   return withPreviewLock(
     { lockFile: normalizedLockFile, timeoutMs: lockTimeoutMs },
@@ -126,6 +158,9 @@ export async function syncPreviewFromGit({
       if (repositoryCheck.failed || repositoryCheck.stdout.trim() !== 'true') {
         throw new Error(`Application directory is not a Git worktree: ${normalizedAppDir}`)
       }
+
+      const deferred = await deferForEditorDraft(normalizedAppDir, normalizedDraftStateFile)
+      if (deferred) return deferred
 
       await runGit(normalizedAppDir, ['remote', 'get-url', normalizedRemote])
       await runGit(normalizedAppDir, [
@@ -222,6 +257,10 @@ async function main() {
       readArg(argv, '--env-file') ||
       process.env.DOCS_PREVIEW_ENV_FILE ||
       '/etc/kb-docs-preview/preview.env',
+    draftStateFile:
+      readArg(argv, '--draft-state-file') ||
+      process.env.DOCS_EDITOR_DRAFT_STATE_FILE ||
+      path.join(previewRoot, '.editor-draft.json'),
     lockFile:
       readArg(argv, '--lock-file') ||
       process.env.DOCS_PREVIEW_UPDATE_LOCK_FILE ||

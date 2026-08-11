@@ -4,11 +4,18 @@ import { createServer } from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import {
+  DEFAULT_MAX_DOCUMENT_BYTES,
+  DocumentConflictError,
+  DocumentValidationError,
+  createDraftCoordinator,
+} from './docs-editor-draft.mjs'
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const defaultProjectRoot = path.resolve(__dirname, '..')
 const SESSION_COOKIE = 'kb_docs_editor_session'
 const DEFAULT_SESSION_TTL_MS = 12 * 60 * 60 * 1000
-const MAX_BODY_BYTES = 4096
+const MAX_BODY_BYTES = DEFAULT_MAX_DOCUMENT_BYTES + 64 * 1024
 
 const contentTypes = new Map([
   ['.css', 'text/css; charset=utf-8'],
@@ -178,11 +185,11 @@ function createLoginLimiter() {
   }
 }
 
-function securityHeaders(contentType) {
+function securityHeaders(contentType, previewFrameOrigin = "'none'") {
   return {
     'Content-Type': contentType,
     'Content-Security-Policy':
-      "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+      `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; frame-src ${previewFrameOrigin}; frame-ancestors 'none'; base-uri 'none'; form-action 'self'`,
     'Referrer-Policy': 'no-referrer',
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
@@ -235,6 +242,13 @@ async function readAuthToken(input) {
 
 async function normalizeConfig(input = {}) {
   const projectRoot = path.resolve(input.projectRoot || process.env.DOCS_EDITOR_PROJECT_ROOT || defaultProjectRoot)
+  const previewRoot = path.resolve(
+    input.previewRoot || process.env.DOCS_EDITOR_PREVIEW_ROOT || path.join(projectRoot, '.local-preview')
+  )
+  const previewBaseUrl = assertHttpUrl(
+    input.previewBaseUrl || process.env.DOCS_EDITOR_PREVIEW_PUBLIC_URL || 'http://127.0.0.1:4173',
+    'preview public URL'
+  ).replace(/\/$/u, '')
   return {
     authToken: await readAuthToken({
       authToken: input.authToken,
@@ -245,10 +259,39 @@ async function normalizeConfig(input = {}) {
     ),
     host: assertBindHost(input.host || process.env.DOCS_EDITOR_HOST || '127.0.0.1'),
     port: readPositiveInteger(input.port ?? process.env.DOCS_EDITOR_PORT, 4174, 'editor port', 65535),
-    previewBaseUrl: assertHttpUrl(
-      input.previewBaseUrl || process.env.DOCS_EDITOR_PREVIEW_PUBLIC_URL || 'http://127.0.0.1:4173',
-      'preview public URL'
-    ).replace(/\/$/u, ''),
+    auditLog: path.resolve(
+      input.auditLog || process.env.DOCS_EDITOR_AUDIT_LOG || path.join(previewRoot, 'editor-audit.jsonl')
+    ),
+    draftStateFile: path.resolve(
+      input.draftStateFile ||
+        process.env.DOCS_EDITOR_DRAFT_STATE_FILE ||
+        path.join(previewRoot, '.editor-draft.json')
+    ),
+    lockFile: path.resolve(
+      input.lockFile ||
+        process.env.DOCS_EDITOR_UPDATE_LOCK_FILE ||
+        path.join(previewRoot, '.update.lock')
+    ),
+    lockTimeoutMs: readPositiveInteger(
+      input.lockTimeoutMs ?? process.env.DOCS_EDITOR_UPDATE_LOCK_TIMEOUT_MS,
+      180_000,
+      'preview update lock timeout',
+      3_600_000
+    ),
+    maximumDocumentBytes: readPositiveInteger(
+      input.maximumDocumentBytes ?? process.env.DOCS_EDITOR_MAX_DOCUMENT_BYTES,
+      DEFAULT_MAX_DOCUMENT_BYTES,
+      'maximum document bytes',
+      16 * 1024 * 1024
+    ),
+    previewBaseUrl,
+    previewEnvFile: path.resolve(
+      input.previewEnvFile ||
+        process.env.DOCS_EDITOR_PREVIEW_ENV_FILE ||
+        '/etc/kb-docs-preview/preview.env'
+    ),
+    previewFrameOrigin: new URL(previewBaseUrl).origin,
+    previewRoot,
     previewStatusUrl: assertHttpUrl(
       input.previewStatusUrl ||
         process.env.DOCS_EDITOR_PREVIEW_STATUS_URL ||
@@ -299,7 +342,10 @@ async function sendStaticFile(config, request, requestPath, response) {
   const extension = path.extname(candidate).toLowerCase()
   const isIndex = path.basename(candidate) === 'index.html'
   response.writeHead(200, {
-    ...securityHeaders(contentTypes.get(extension) || 'application/octet-stream'),
+    ...securityHeaders(
+      contentTypes.get(extension) || 'application/octet-stream',
+      config.previewFrameOrigin
+    ),
     'Cache-Control': isIndex ? 'no-store' : 'public, max-age=31536000, immutable',
     'Content-Length': body.length,
   })
@@ -310,6 +356,21 @@ export async function createDocsEditorServer(input = {}) {
   const config = await normalizeConfig(input)
   const sessions = createSessionStore(config.sessionTtlMs)
   const loginLimiter = createLoginLimiter()
+  const draftCoordinator =
+    input.draftCoordinator ||
+    createDraftCoordinator({
+      projectRoot: config.projectRoot,
+      previewRoot: config.previewRoot,
+      previewEnvFile: config.previewEnvFile,
+      draftStateFile: config.draftStateFile,
+      auditLog: config.auditLog,
+      lockFile: config.lockFile,
+      lockTimeoutMs: config.lockTimeoutMs,
+      maximumBytes: config.maximumDocumentBytes,
+      buildCommand: input.buildCommand,
+      readDocument,
+      normalizeDocumentPath,
+    })
 
   return createServer(async (request, response) => {
     try {
@@ -318,7 +379,7 @@ export async function createDocsEditorServer(input = {}) {
       const authenticated = sessions.has(sessionId)
 
       if (request.method === 'GET' && url.pathname === '/api/health') {
-        sendJson(response, 200, { status: 'ready', mode: 'readonly' })
+        sendJson(response, 200, { status: 'ready', mode: 'draft' })
         return
       }
       if (request.method === 'GET' && url.pathname === '/api/session') {
@@ -361,14 +422,46 @@ export async function createDocsEditorServer(input = {}) {
       }
       if (request.method === 'GET' && url.pathname === '/api/config') {
         sendJson(response, 200, {
-          mode: 'readonly',
+          mode: 'draft',
           allowedDocumentPattern: 'docs/**/*.md',
+          maximumDocumentBytes: config.maximumDocumentBytes,
           previewBaseUrl: config.previewBaseUrl,
         })
         return
       }
       if (request.method === 'GET' && url.pathname === '/api/document') {
         sendJson(response, 200, await readDocument(config.projectRoot, url.searchParams.get('path')))
+        return
+      }
+      if (request.method === 'PUT' && url.pathname === '/api/document') {
+        const body = await readJsonBody(request)
+        try {
+          const result = await draftCoordinator.save({
+            actor: request.socket.remoteAddress || 'unknown',
+            documentPath: body.path,
+            content: body.content,
+            expectedHash: body.expectedHash,
+          })
+          sendJson(response, 200, result)
+        } catch (error) {
+          if (error instanceof DocumentConflictError) {
+            sendJson(response, 409, {
+              code: 'DOCUMENT_CONFLICT',
+              error: '文档已被其他修改更新，请重新加载服务器版本后再编辑。',
+              document: error.currentDocument,
+            })
+            return
+          }
+          if (error instanceof DocumentValidationError) {
+            sendJson(response, error.statusCode, { error: error.message })
+            return
+          }
+          throw error
+        }
+        return
+      }
+      if (request.method === 'GET' && url.pathname === '/api/build-status') {
+        sendJson(response, 200, draftCoordinator.getStatus())
         return
       }
       if (request.method === 'GET' && url.pathname === '/api/preview-status') {

@@ -12,6 +12,9 @@ OUTPUT_DIR="${PROJECT_DIR}/.local-preview/editor-config"
 PORT="4174"
 PREVIEW_STATUS_URL="http://127.0.0.1:4173/__preview/status"
 PREVIEW_URL="http://127.0.0.1:4173"
+PREVIEW_ENV_FILE="/etc/kb-docs-preview/preview.env"
+PREVIEW_ROOT="/srv/kb-docs-preview"
+LOCK_TIMEOUT="180000"
 SERVICE_GROUP="kb-docs-preview"
 SERVICE_USER="kb-docs-preview"
 SYSTEMD_UNIT="/etc/systemd/system/kb-docs-editor.service"
@@ -31,6 +34,9 @@ usage() {
   echo "  --port NUMBER"
   echo "  --preview-status-url URL"
   echo "  --preview-url URL"
+  echo "  --preview-env-file PATH"
+  echo "  --preview-root PATH"
+  echo "  --lock-timeout MS"
   echo "  --service-group NAME"
   echo "  --service-user NAME"
   echo "  --systemd-unit PATH"
@@ -48,6 +54,9 @@ while [[ $# -gt 0 ]]; do
     --port) PORT="$2"; shift 2 ;;
     --preview-status-url) PREVIEW_STATUS_URL="$2"; shift 2 ;;
     --preview-url) PREVIEW_URL="$2"; shift 2 ;;
+    --preview-env-file) PREVIEW_ENV_FILE="$2"; shift 2 ;;
+    --preview-root) PREVIEW_ROOT="$2"; shift 2 ;;
+    --lock-timeout) LOCK_TIMEOUT="$2"; shift 2 ;;
     --service-group) SERVICE_GROUP="$2"; shift 2 ;;
     --service-user) SERVICE_USER="$2"; shift 2 ;;
     --systemd-unit) SYSTEMD_UNIT="$2"; shift 2 ;;
@@ -72,6 +81,9 @@ RENDER_ARGS=(
   --port "${PORT}"
   --preview-status-url "${PREVIEW_STATUS_URL}"
   --preview-url "${PREVIEW_URL}"
+  --preview-env-file "${PREVIEW_ENV_FILE}"
+  --preview-root "${PREVIEW_ROOT}"
+  --lock-timeout "${LOCK_TIMEOUT}"
   --user "${SERVICE_USER}"
 )
 if [[ "${SECURE_COOKIE}" == "true" ]]; then

@@ -1,6 +1,7 @@
 export interface EditorConfig {
-  mode: 'readonly'
+  mode: 'draft'
   allowedDocumentPattern: string
+  maximumDocumentBytes: number
   previewBaseUrl: string
 }
 
@@ -26,6 +27,43 @@ export interface PreviewStatusPayload {
   error?: string
 }
 
+export type BuildState = 'idle' | 'queued' | 'saving' | 'building' | 'ready' | 'error' | 'conflict'
+
+export interface BuildStatusPayload {
+  status: BuildState
+  queued: number
+  operationId?: string | null
+  path?: string | null
+  savedAt?: string | null
+  finishedAt?: string | null
+  releaseId?: string | null
+  error?: string | null
+}
+
+export interface SaveDocumentPayload {
+  document: DocumentPayload
+  build: {
+    status: 'ready' | 'error'
+    releaseId?: string | null
+    error?: string
+    finishedAt: string
+  }
+}
+
+export class ApiError extends Error {
+  status: number
+  code?: string
+  payload?: Record<string, unknown>
+
+  constructor(message: string, status: number, payload?: Record<string, unknown>) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
+    this.code = typeof payload?.code === 'string' ? payload.code : undefined
+    this.payload = payload
+  }
+}
+
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, {
     credentials: 'same-origin',
@@ -38,8 +76,12 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
   })
 
   if (!response.ok) {
-    const payload = await response.json().catch(() => null)
-    throw new Error(payload?.error || `请求失败（${response.status}）`)
+    const payload = await response.json().catch(() => undefined) as Record<string, unknown> | undefined
+    throw new ApiError(
+      typeof payload?.error === 'string' ? payload.error : `请求失败（${response.status}）`,
+      response.status,
+      payload
+    )
   }
 
   if (response.status === 204) return undefined as T
@@ -67,6 +109,17 @@ export function getEditorConfig() {
 
 export function getDocument(path: string) {
   return request<DocumentPayload>(`/api/document?path=${encodeURIComponent(path)}`)
+}
+
+export function saveDocument(path: string, content: string, expectedHash: string) {
+  return request<SaveDocumentPayload>('/api/document', {
+    method: 'PUT',
+    body: JSON.stringify({ path, content, expectedHash }),
+  })
+}
+
+export function getBuildStatus() {
+  return request<BuildStatusPayload>('/api/build-status')
 }
 
 export function getPreviewStatus() {

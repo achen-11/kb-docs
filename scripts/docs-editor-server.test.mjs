@@ -5,6 +5,8 @@ import os from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
 
+import { DocumentConflictError } from './docs-editor-draft.mjs'
+
 import {
   EditorHttpError,
   createDocsEditorServer,
@@ -81,6 +83,24 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
     previewBaseUrl: 'http://preview.example:4173',
     previewStatusUrl: previewUrl,
     projectRoot: root,
+    draftCoordinator: {
+      getStatus: () => ({ status: 'ready', queued: 0, releaseId: 'draft-release' }),
+      async save(input) {
+        if (input.expectedHash === '0'.repeat(64)) {
+          throw new DocumentConflictError({
+            path: 'docs/index.md',
+            content: '# Server version\n',
+            hash: '1'.repeat(64),
+            bytes: 17,
+            modifiedAt: new Date(0).toISOString(),
+          })
+        }
+        return {
+          document: { ...document, content: input.content, hash: '2'.repeat(64) },
+          build: { status: 'ready', releaseId: 'draft-release' },
+        }
+      },
+    },
   })
   const editorUrl = await listen(editorServer)
   t.after(() => close(editorServer))
@@ -89,6 +109,7 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
   assert.equal(indexResponse.status, 200)
   assert.match(await indexResponse.text(), /id="app"/u)
   assert.match(indexResponse.headers.get('content-security-policy'), /frame-ancestors 'none'/u)
+  assert.match(indexResponse.headers.get('content-security-policy'), /frame-src http:\/\/preview\.example:4173/u)
 
   const unauthorized = await fetch(`${editorUrl}/api/document?path=docs%2Findex.md`)
   assert.equal(unauthorized.status, 401)
@@ -127,10 +148,46 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
 
   const configResponse = await fetch(`${editorUrl}/api/config`, { headers: authenticatedHeaders })
   assert.deepEqual(await configResponse.json(), {
-    mode: 'readonly',
+    mode: 'draft',
     allowedDocumentPattern: 'docs/**/*.md',
+    maximumDocumentBytes: 2097152,
     previewBaseUrl: 'http://preview.example:4173',
   })
+
+  const saveResponse = await fetch(`${editorUrl}/api/document`, {
+    method: 'PUT',
+    headers: { ...authenticatedHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      path: 'docs/index.md',
+      content: '# Edited document\n',
+      expectedHash: document.hash,
+    }),
+  })
+  assert.equal(saveResponse.status, 200)
+  assert.deepEqual((await saveResponse.json()).build, {
+    status: 'ready',
+    releaseId: 'draft-release',
+  })
+
+  const conflictResponse = await fetch(`${editorUrl}/api/document`, {
+    method: 'PUT',
+    headers: { ...authenticatedHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      path: 'docs/index.md',
+      content: '# Stale edit\n',
+      expectedHash: '0'.repeat(64),
+    }),
+  })
+  assert.equal(conflictResponse.status, 409)
+  const conflict = await conflictResponse.json()
+  assert.equal(conflict.code, 'DOCUMENT_CONFLICT')
+  assert.equal(conflict.document.content, '# Server version\n')
+
+  const buildStatusResponse = await fetch(`${editorUrl}/api/build-status`, {
+    headers: authenticatedHeaders,
+  })
+  assert.equal(buildStatusResponse.status, 200)
+  assert.equal((await buildStatusResponse.json()).releaseId, 'draft-release')
 
   const statusResponse = await fetch(`${editorUrl}/api/preview-status`, {
     headers: authenticatedHeaders,

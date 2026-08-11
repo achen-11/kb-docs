@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { execFile } from 'node:child_process'
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
@@ -30,7 +30,9 @@ async function createFixture() {
   await git(seedDir, ['config', 'user.name', 'Preview Test'])
   await writeFile(path.join(seedDir, 'package.json'), '{"name":"preview-test"}\n', 'utf-8')
   await writeFile(path.join(seedDir, 'document.md'), '# Version 1\n', 'utf-8')
-  await git(seedDir, ['add', 'package.json', 'document.md'])
+  await mkdir(path.join(seedDir, 'docs'))
+  await writeFile(path.join(seedDir, 'docs', 'page.md'), '# Draft page\n', 'utf-8')
+  await git(seedDir, ['add', 'package.json', 'document.md', 'docs/page.md'])
   await git(seedDir, ['commit', '-m', 'initial'])
   await git(seedDir, ['remote', 'add', 'origin', remoteDir])
   await git(seedDir, ['push', '-u', 'origin', 'main'])
@@ -46,6 +48,7 @@ async function createFixture() {
   return {
     checkoutDir,
     lockFile,
+    draftStateFile: path.join(root, 'preview-data', 'editor-draft.json'),
     remoteDir,
     root,
     seedDir,
@@ -183,6 +186,47 @@ test('Git preview sync refuses dirty and non-fast-forward worktrees', async () =
         }),
       /Refusing non-fast-forward/u
     )
+  } finally {
+    await rm(fixture.root, { recursive: true, force: true })
+  }
+})
+
+test('Git preview sync defers active editor drafts before fetching and removes stale markers', async () => {
+  const fixture = await createFixture()
+  try {
+    await writeFile(path.join(fixture.checkoutDir, 'docs', 'page.md'), '# Active draft\n', 'utf8')
+    await mkdir(path.dirname(fixture.draftStateFile), { recursive: true })
+    await writeFile(fixture.draftStateFile, '{"active":true}\n', 'utf8')
+
+    const deferred = await syncPreviewFromGit({
+      appDir: fixture.checkoutDir,
+      branch: 'main',
+      draftStateFile: fixture.draftStateFile,
+      lockFile: fixture.lockFile,
+      remote: 'origin',
+      stateFile: fixture.stateFile,
+      updateCommand: fixture.updateCommand
+    })
+    assert.deepEqual(deferred, {
+      changed: false,
+      deferred: true,
+      published: false,
+      reason: 'editor_draft'
+    })
+    assert.equal(await countPublishes(fixture.updateLog), 0)
+
+    await git(fixture.checkoutDir, ['restore', 'docs/page.md'])
+    const resumed = await syncPreviewFromGit({
+      appDir: fixture.checkoutDir,
+      branch: 'main',
+      draftStateFile: fixture.draftStateFile,
+      lockFile: fixture.lockFile,
+      remote: 'origin',
+      stateFile: fixture.stateFile,
+      updateCommand: fixture.updateCommand
+    })
+    assert.equal(resumed.published, true)
+    await assert.rejects(() => readFile(fixture.draftStateFile, 'utf8'), { code: 'ENOENT' })
   } finally {
     await rm(fixture.root, { recursive: true, force: true })
   }

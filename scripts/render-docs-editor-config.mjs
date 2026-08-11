@@ -52,6 +52,15 @@ function readPort(value) {
   return parsed
 }
 
+function readPositiveInteger(value, fallback, name, maximum = Number.MAX_SAFE_INTEGER) {
+  if (value === undefined || value === null || value === '') return fallback
+  const parsed = Number.parseInt(value, 10)
+  if (!Number.isInteger(parsed) || parsed <= 0 || parsed > maximum) {
+    throw new Error(`${name} must be an integer between 1 and ${maximum}`)
+  }
+  return parsed
+}
+
 function renderTemplate(template, replacements) {
   const rendered = template.replace(/\{\{([A-Z0-9_]+)\}\}/gu, (_match, name) => {
     if (!(name in replacements)) throw new Error(`Missing template value: ${name}`)
@@ -65,6 +74,7 @@ function renderTemplate(template, replacements) {
 
 export function normalizeDocsEditorConfig(input) {
   const configDir = assertAbsolutePath(input.configDir, 'config directory')
+  const previewRoot = assertAbsolutePath(input.previewRoot || '/srv/kb-docs-preview', 'preview root')
   return {
     appDir: assertAbsolutePath(input.appDir, 'app directory'),
     authTokenFile: assertAbsolutePath(
@@ -75,11 +85,34 @@ export function normalizeDocsEditorConfig(input) {
     configDir,
     editorPort: readPort(input.editorPort || '4174'),
     outputDir: path.resolve(input.outputDir),
+    auditLog: assertAbsolutePath(
+      input.auditLog || path.join(previewRoot, 'editor-audit.jsonl'),
+      'audit log'
+    ),
+    draftStateFile: assertAbsolutePath(
+      input.draftStateFile || path.join(previewRoot, '.editor-draft.json'),
+      'draft state file'
+    ),
+    previewEnvFile: assertAbsolutePath(
+      input.previewEnvFile || '/etc/kb-docs-preview/preview.env',
+      'preview environment file'
+    ),
     previewPublicUrl: assertHttpUrl(input.previewPublicUrl, 'preview public URL'),
+    previewRoot,
     previewStatusUrl: assertHttpUrl(input.previewStatusUrl, 'preview status URL'),
     secureCookie: input.secureCookie ? 'true' : 'false',
     serviceGroup: assertSafeIdentity(input.serviceGroup, 'service group'),
     serviceUser: assertSafeIdentity(input.serviceUser, 'service user'),
+    updateLockFile: assertAbsolutePath(
+      input.updateLockFile || path.join(previewRoot, '.update.lock'),
+      'preview update lock file'
+    ),
+    updateLockTimeoutMs: readPositiveInteger(
+      input.updateLockTimeoutMs,
+      180_000,
+      'preview update lock timeout',
+      3_600_000
+    ),
   }
 }
 
@@ -87,15 +120,21 @@ export async function renderDocsEditorConfig(input) {
   const config = normalizeDocsEditorConfig(input)
   const replacements = {
     APP_DIR: config.appDir,
+    AUDIT_LOG: config.auditLog,
     AUTH_TOKEN_FILE: config.authTokenFile,
     BIND_HOST: config.bindHost,
     CONFIG_DIR: config.configDir,
+    DRAFT_STATE_FILE: config.draftStateFile,
     EDITOR_PORT: config.editorPort,
     PREVIEW_PUBLIC_URL: config.previewPublicUrl,
+    PREVIEW_ENV_FILE: config.previewEnvFile,
+    PREVIEW_ROOT: config.previewRoot,
     PREVIEW_STATUS_URL: config.previewStatusUrl,
     SECURE_COOKIE: config.secureCookie,
     SERVICE_GROUP: config.serviceGroup,
     SERVICE_USER: config.serviceUser,
+    UPDATE_LOCK_FILE: config.updateLockFile,
+    UPDATE_LOCK_TIMEOUT_MS: config.updateLockTimeoutMs,
   }
   const templateFiles = {
     'editor.env': 'editor.env.template',
@@ -131,12 +170,16 @@ async function main() {
     editorPort: readArg(argv, '--port') || '4174',
     outputDir:
       readArg(argv, '--output-dir') || path.join(projectRoot, '.local-preview', 'editor-config'),
+    previewEnvFile:
+      readArg(argv, '--preview-env-file') || '/etc/kb-docs-preview/preview.env',
     previewPublicUrl: readArg(argv, '--preview-url') || 'http://127.0.0.1:4173',
+    previewRoot: readArg(argv, '--preview-root') || '/srv/kb-docs-preview',
     previewStatusUrl:
       readArg(argv, '--preview-status-url') || 'http://127.0.0.1:4173/__preview/status',
     secureCookie: argv.includes('--secure-cookie'),
     serviceGroup: readArg(argv, '--group') || serviceUser,
     serviceUser,
+    updateLockTimeoutMs: readArg(argv, '--lock-timeout') || '180000',
   })
   console.log(JSON.stringify(manifest, null, 2))
 }

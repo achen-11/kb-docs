@@ -17,6 +17,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectHome=true
 ProtectSystem=strict
+ReadWritePaths={{APP_DIR}} {{PREVIEW_ROOT}}
 
 [Install]
 WantedBy=multi-user.target

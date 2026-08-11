@@ -51,6 +51,7 @@ test('renderPreviewServerConfig creates complete Linux service configuration', a
     assert.match(environment, /DOCS_PREVIEW_GIT_BRANCH=preview\/main/u)
     assert.match(environment, /DOCS_EDITOR_BASE_URL=http:\/\/192\.168\.10\.75:4174/u)
     assert.match(environment, /DOCS_PREVIEW_UPDATE_LOCK_TIMEOUT_MS=240000/u)
+    assert.match(environment, /DOCS_EDITOR_DRAFT_STATE_FILE=\/srv\/kb-docs-preview\/\.editor-draft\.json/u)
     assert.match(environment, /GIT_TERMINAL_PROMPT=0/u)
     assert.match(environment, /GIT_ASKPASS=\/etc\/kb-docs-preview\/git-askpass\.sh/u)
     assert.match(environment, /git-deploy-key/u)

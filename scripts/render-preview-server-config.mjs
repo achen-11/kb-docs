@@ -139,6 +139,7 @@ export async function renderPreviewServerConfig(input) {
     BIND_HOST: config.bindHost,
     CONFIG_DIR: config.configDir,
     DATA_DIR: config.dataDir,
+    DRAFT_STATE_FILE: path.join(config.dataDir, '.editor-draft.json'),
     EDITOR_BASE_URL: config.editorBaseUrl,
     GIT_BRANCH: config.gitBranch,
     GIT_REMOTE: config.gitRemote,
