@@ -8,33 +8,13 @@ title: Kooboo Documentation Center
 <div class="kb-doc-hero__inner">
 <div class="kb-doc-hero__copy">
 <p class="kb-doc-mark">Kooboo Documentation</p>
-<h1 id="kb-doc-title">Kooboo <span class="kb-doc-nowrap">Documentation Center</span></h1>
+<h1 id="kb-doc-title" class="kb-doc-hero__title--en">Kooboo <span>Documentation Center</span></h1>
 <p class="kb-doc-subtitle">From AI site building to the admin CMS, the template engine, and the KScript API, Kooboo's product capabilities are tied together into a workflow you can actually ship.</p>
 <div class="kb-doc-hero__actions" aria-label="Main entry points">
 <a class="kb-doc-btn kb-doc-btn--primary" href="/en/cms/getting-started/create-site">Quick Start <span>Start</span></a>
-<a class="kb-doc-btn" href="/en/cms/">Admin CMS</a>
-<a class="kb-doc-btn" href="/en/api/">API Details</a>
 </div>
 </div>
-<div class="kb-doc-builder" aria-label="Documentation navigation generator">
-<div class="kb-doc-builder__tabs">
-<span class="is-active">Docs Route</span>
-<span>CMS</span>
-<span>API</span>
-</div>
-<div class="kb-doc-builder__panel">
-<p>Enter the docs from a real site workflow</p>
-<div class="kb-doc-builder__routes">
-<a href="/en/cms/getting-started/create-site"><span>01</span><strong>Quick Start</strong><em>Create a site, publish pages, and bind a domain</em></a>
-<a href="/en/cms/"><span>02</span><strong>Admin CMS</strong><em>Follow the menu path to finish setup and operations</em></a>
-<a href="/en/api/"><span>03</span><strong>KScript API</strong><em>Inspect k.* module signatures and script entry points</em></a>
-</div>
-</div>
-<div class="kb-doc-builder__footer">
-<span>Kooboo Web Ecosystem</span>
-<a href="/en/cms/getting-started/create-site">Generate Route</a>
-</div>
-</div>
+<HomeRouteTabs locale="en" />
 </div>
 </section>
 

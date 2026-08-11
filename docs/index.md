@@ -12,29 +12,9 @@ title: Kooboo 文档中心
 <p class="kb-doc-subtitle">从 AI 建站到后台 CMS、模板引擎与 KScript API，把 Kooboo 的产品能力串成一条可以落地的工作流。</p>
 <div class="kb-doc-hero__actions" aria-label="主要入口">
 <a class="kb-doc-btn kb-doc-btn--primary" href="/quick-start/">快速开始 <span>Start</span></a>
-<a class="kb-doc-btn" href="/cms/">后台 CMS</a>
-<a class="kb-doc-btn" href="/api/">API 详情</a>
 </div>
 </div>
-<div class="kb-doc-builder" aria-label="文档导航生成器">
-<div class="kb-doc-builder__tabs">
-<span class="is-active">Docs Route</span>
-<span>CMS</span>
-<span>API</span>
-</div>
-<div class="kb-doc-builder__panel">
-<p>从真实站点流程进入文档</p>
-<div class="kb-doc-builder__routes">
-<a href="/quick-start/"><span>01</span><strong>快速开始</strong><em>创建站点、发布页面、绑定域名</em></a>
-<a href="/cms/"><span>02</span><strong>后台 CMS</strong><em>按菜单路径完成配置与运营</em></a>
-<a href="/api/"><span>03</span><strong>KScript API</strong><em>查询 k.* 模块签名和脚本入口</em></a>
-</div>
-</div>
-<div class="kb-doc-builder__footer">
-<span>Kooboo Web Ecosystem</span>
-<a href="/quick-start/">生成路线</a>
-</div>
-</div>
+<HomeRouteTabs locale="zh" />
 </div>
 </section>
 

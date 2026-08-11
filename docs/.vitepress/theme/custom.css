@@ -257,6 +257,10 @@ body.doc-image-preview-open {
   padding: 58px 70px;
 }
 
+.kb-doc-hero__copy {
+  min-width: 0;
+}
+
 .kb-doc-mark {
   display: inline-flex;
   align-items: center;
@@ -282,9 +286,15 @@ body.doc-image-preview-open {
   line-height: 1.05;
 }
 
+.kb-doc-hero h1.kb-doc-hero__title--en {
+  max-width: 100%;
+  font-size: clamp(42px, 4.2vw, 62px);
+  text-wrap: balance;
+}
+
 .kb-doc-subtitle {
   max-width: 620px;
-  margin-top: 20px;
+  margin-top: 16px;
   color: var(--doc-body);
   font-size: 18px;
   line-height: 1.72;
@@ -360,12 +370,29 @@ body.doc-image-preview-open {
   font-weight: 700;
 }
 
-.kb-doc-builder__tabs span {
+.kb-doc-builder__tabs button {
   position: relative;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 .kb-doc-builder__tabs .is-active {
   color: var(--doc-blue);
+}
+
+.kb-doc-builder__tabs button:hover {
+  color: var(--doc-title);
+}
+
+.kb-doc-builder__tabs button:focus-visible {
+  border-radius: 4px;
+  outline: 3px solid rgba(31, 108, 240, 0.22);
+  outline-offset: 5px;
 }
 
 .kb-doc-builder__tabs .is-active::after {
@@ -385,6 +412,11 @@ body.doc-image-preview-open {
   border-radius: 12px;
   background: #f8fbff;
   box-shadow: none;
+}
+
+.kb-doc-builder__panel:focus-visible {
+  outline: 3px solid rgba(31, 108, 240, 0.18);
+  outline-offset: 3px;
 }
 
 .kb-doc-builder__panel p {
@@ -414,6 +446,12 @@ body.doc-image-preview-open {
   transform: translateY(-1px);
   border-color: rgba(31, 108, 240, 0.26);
   box-shadow: 0 12px 28px rgba(29, 43, 66, 0.07);
+}
+
+.kb-doc-builder__routes a:focus-visible,
+.kb-doc-builder__footer a:focus-visible {
+  outline: 3px solid rgba(31, 108, 240, 0.24);
+  outline-offset: 3px;
 }
 
 .kb-doc-builder__routes span {
@@ -757,14 +795,14 @@ body.doc-image-preview-open {
   }
 
   .kb-doc-subtitle {
-    margin-top: 12px;
+    margin-top: 16px;
     font-size: 15px;
     line-height: 1.58;
   }
 
   .kb-doc-hero__actions {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .kb-doc-builder__footer {
