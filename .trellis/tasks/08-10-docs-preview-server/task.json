@@ -1,0 +1,39 @@
+{
+  "id": "docs-preview-server",
+  "name": "docs-preview-server",
+  "title": "Internal documentation preview server MVP",
+  "description": "Persist the approved two-stage preview architecture and implement a portable local VitePress preview runner with atomic releases, automatic rebuilds, LAN serving, and status reporting.",
+  "status": "completed",
+  "dev_type": null,
+  "scope": "scripts/local-preview-server.mjs, scripts/local-preview-server.test.mjs, package.json, .gitignore, guides/local-preview.md, .trellis/spec/documentation-preview-workflow.md",
+  "priority": "P1",
+  "creator": "wg",
+  "assignee": "wg",
+  "createdAt": "2026-08-10",
+  "completedAt": "2026-08-10",
+  "branch": null,
+  "base_branch": "main",
+  "worktree_path": null,
+  "current_phase": 3,
+  "next_action": [
+    {
+      "phase": 4,
+      "action": "create-pr"
+    }
+  ],
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    ".trellis/spec/documentation-preview-workflow.md",
+    "guides/local-preview.md",
+    "scripts/local-preview-server.mjs",
+    "scripts/local-preview-server.test.mjs",
+    "package.json",
+    ".gitignore"
+  ],
+  "notes": "Implemented and locally verified production VitePress preview releases, atomic switching, automatic rebuilds, clean-route HTTP serving, status reporting, failure preservation, release retention, and explicit LAN binding. Unit tests passed 4/4; real build, root route, /cms/, status, file-watch rebuild, and 0.0.0.0 binding smoke checks passed.",
+  "meta": {}
+}

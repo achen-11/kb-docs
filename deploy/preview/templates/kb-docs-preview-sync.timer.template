@@ -1,0 +1,12 @@
+[Unit]
+Description=Poll Git for Kooboo documentation preview updates
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec={{SYNC_INTERVAL_SECONDS}}s
+AccuracySec=5s
+Persistent=true
+Unit=kb-docs-preview-sync.service
+
+[Install]
+WantedBy=timers.target

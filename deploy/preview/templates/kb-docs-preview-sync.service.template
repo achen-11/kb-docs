@@ -1,0 +1,20 @@
+[Unit]
+Description=Synchronize Kooboo documentation preview from Git
+Wants=network-online.target
+After=network-online.target kb-docs-preview.service
+ConditionPathExists={{APP_DIR}}/.git
+
+[Service]
+Type=oneshot
+User={{SERVICE_USER}}
+Group={{SERVICE_GROUP}}
+WorkingDirectory={{APP_DIR}}
+EnvironmentFile={{CONFIG_DIR}}/preview.env
+ExecStart=/usr/bin/env node {{APP_DIR}}/scripts/sync-preview-from-git.mjs
+TimeoutStartSec=15min
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths={{APP_DIR}} {{DATA_DIR}}

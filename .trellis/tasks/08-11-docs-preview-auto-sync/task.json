@@ -1,0 +1,58 @@
+{
+  "id": "docs-preview-auto-sync",
+  "name": "docs-preview-auto-sync",
+  "title": "Automate Git-backed documentation preview updates",
+  "description": "Implement Phase 1 of the approved docs editing roadmap: safe Git polling, fast-forward-only synchronization, cross-process build serialization, and automatic publication to the internal VitePress preview.",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": ".trellis/spec/documentation-preview-workflow.md, deploy/preview, scripts/sync-preview-from-git.mjs, package.json, guides/preview-server-deployment.md",
+  "priority": "P1",
+  "creator": "wg",
+  "assignee": "wg",
+  "createdAt": "2026-08-11",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "main",
+  "worktree_path": null,
+  "current_phase": 1,
+  "next_action": [
+    {
+      "phase": 1,
+      "action": "establish-git-baseline"
+    },
+    {
+      "phase": 2,
+      "action": "check"
+    },
+    {
+      "phase": 3,
+      "action": "finish"
+    },
+    {
+      "phase": 4,
+      "action": "create-pr"
+    }
+  ],
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    ".trellis/spec/documentation-preview-workflow.md",
+    "deploy/preview/update.sh",
+    "deploy/preview/install.sh",
+    "deploy/preview/templates/git-askpass.sh.template",
+    "deploy/preview/templates/preview.env.template",
+    "scripts/sync-preview-from-git.mjs",
+    "scripts/sync-preview-from-git.test.mjs",
+    "scripts/run-with-preview-lock.mjs",
+    "scripts/run-with-preview-lock.test.mjs",
+    "scripts/render-preview-server-config.mjs",
+    "scripts/render-preview-server-config.test.mjs",
+    "guides/preview-server-deployment.md",
+    "package.json"
+  ],
+  "notes": "Approved sequence: Git automatic preview updates, edit links and editor skeleton, draft save and preview, Git submission and review, then multi-user worktrees and Kooboo candidate automation. Phase 1 implementation and server credential verification are complete, including a CNB repository deployment token limited to repo-code read-only. The sync timer remains intentionally absent because local main is seven commits ahead of cnb/main and the working tree has 51 changed or untracked paths; do not replace the kbdev checkout until the current preview implementation has a safe Git baseline.",
+  "meta": {}
+}

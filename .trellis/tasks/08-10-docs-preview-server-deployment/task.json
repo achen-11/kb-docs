@@ -1,0 +1,46 @@
+{
+  "id": "docs-preview-server-deployment",
+  "name": "docs-preview-server-deployment",
+  "title": "Package internal docs preview for SSH deployment",
+  "description": "Package the verified local preview MVP for an internal Linux host with non-interactive publishing, health checks, systemd and Nginx templates, and idempotent install/update scripts that can be transferred over SSH.",
+  "status": "completed",
+  "dev_type": null,
+  "scope": "deploy/preview, scripts/publish-local-preview.mjs, scripts/check-local-preview.mjs, scripts/render-preview-server-config.mjs, scripts/local-preview-server.mjs, guides/preview-server-deployment.md, package.json",
+  "priority": "P1",
+  "creator": "wg",
+  "assignee": "wg",
+  "createdAt": "2026-08-10",
+  "completedAt": "2026-08-10",
+  "branch": null,
+  "base_branch": "main",
+  "worktree_path": null,
+  "current_phase": 3,
+  "next_action": [
+    {
+      "phase": 4,
+      "action": "create-pr"
+    }
+  ],
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "deploy/preview/templates/kb-docs-preview.service.template",
+    "deploy/preview/templates/nginx.conf.template",
+    "deploy/preview/templates/preview.env.template",
+    "deploy/preview/install.sh",
+    "deploy/preview/update.sh",
+    "scripts/publish-local-preview.mjs",
+    "scripts/check-local-preview.mjs",
+    "scripts/render-preview-server-config.mjs",
+    "scripts/render-preview-server-config.test.mjs",
+    "scripts/local-preview-server.mjs",
+    "scripts/local-preview-server.test.mjs",
+    "guides/preview-server-deployment.md",
+    "package.json"
+  ],
+  "notes": "Implemented portable one-shot publishing, serve-only runtime, persisted status, strict/degraded health checks, validated Linux systemd/Nginx/env rendering, dry-run-by-default install, and unprivileged update flow. Local server simulation verified release 1, release 2 without restart, strict health success, expected publish failure preserving release 2, strict degraded failure, and allow-degraded success. Local preview tests passed 5/5 and deployment rendering tests passed 2/2.",
+  "meta": {}
+}

@@ -2,6 +2,8 @@
 node_modules
 /docs/.vitepress/dist
 /docs/.vitepress/cache
+/docs/.vitepress/.temp
+/docs/.vitepress/config.mts.timestamp-*.mjs
 old-source/*
 kb-remote-site/*
 !kb-remote-site/.env.example
@@ -9,3 +11,4 @@ kb-remote-site/*
 .env
 .cdp-scratch/
 .claude/
+.local-preview/

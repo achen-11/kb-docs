@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+case "${1:-}" in
+  *Username*) exec cat {{CONFIG_DIR}}/git-username ;;
+  *Password*) exec cat {{CONFIG_DIR}}/git-token ;;
+  *) exit 1 ;;
+esac

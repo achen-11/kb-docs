@@ -1,0 +1,36 @@
+{
+  "id": "deploy-docs-preview-kbdev",
+  "name": "deploy-docs-preview-kbdev",
+  "title": "Deploy documentation preview to kooboo-kbdev",
+  "description": "Deploy the verified preview service to 192.168.10.75 on port 4173 using a dedicated non-root account without changing Kooboo.Web or ports 80/443.",
+  "status": "completed",
+  "dev_type": null,
+  "scope": "192.168.10.75:4173, /opt/kb-docs, /srv/kb-docs-preview, kb-docs-preview.service, deploy/preview/install.sh, scripts/publish-local-preview.mjs, scripts/local-preview-server.mjs",
+  "priority": "P1",
+  "creator": "wg",
+  "assignee": "wg",
+  "createdAt": "2026-08-11",
+  "completedAt": "2026-08-11",
+  "branch": null,
+  "base_branch": "main",
+  "worktree_path": null,
+  "current_phase": 3,
+  "next_action": [
+    {
+      "phase": 4,
+      "action": "create-pr"
+    }
+  ],
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "deploy/preview/install.sh",
+    "scripts/publish-local-preview.mjs",
+    "scripts/local-preview-server.mjs"
+  ],
+  "notes": "Deployed the current kb-docs worktree to 192.168.10.75:4173 with the dedicated kb-docs-preview account, immutable releases, and an enabled systemd service. Nginx was intentionally skipped because Kooboo.Web continues to own ports 80/443. Fixed the production-only nested pnpm launch failure by using corepack pnpm, added installer health retries for the Type=simple startup race, and report sourceDirty as null when Git metadata is intentionally absent. Verified service active/enabled, status ready, root and /cms/ HTTP 200 from both the server and the local LAN client, and Kooboo.Web remained active. Release: 20260811T030456Z-unknown-3.",
+  "meta": {}
+}
