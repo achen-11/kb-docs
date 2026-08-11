@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
 import { createEditLinkConfig, createEditorUrl } from '../docs/.vitepress/editor-link.mjs'
@@ -34,5 +35,16 @@ test('editor link configuration rejects unsafe base URLs', () => {
   assert.throws(
     () => createEditLinkConfig('https://example.com/?token=secret', 'Edit'),
     /must not contain/u
+  )
+})
+
+test('preview installer enables edit links during the initial publish', async () => {
+  const installScript = await readFile(
+    new URL('../deploy/preview/install.sh', import.meta.url),
+    'utf8'
+  )
+  assert.match(
+    installScript,
+    /DOCS_EDITOR_BASE_URL="\$\{EDITOR_BASE_URL\}"[\s\S]+corepack pnpm docs:preview:publish/u
   )
 })

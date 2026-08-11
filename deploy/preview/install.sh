@@ -182,6 +182,7 @@ fi
   runuser -u "${SERVICE_USER}" -- env HOME="${SERVICE_HOME}" \
     corepack pnpm install --frozen-lockfile
   runuser -u "${SERVICE_USER}" -- env \
+    DOCS_EDITOR_BASE_URL="${EDITOR_BASE_URL}" \
     DOCS_PREVIEW_KEEP_RELEASES="${KEEP_RELEASES}" \
     DOCS_PREVIEW_ROOT="${DATA_DIR}" \
     HOME="${SERVICE_HOME}" \
