@@ -8,7 +8,7 @@
 
 ## 架构
 
-服务器进程分成两个职责：
+服务器进程分成三个职责：
 
 ```text
 发布器：pnpm docs:preview:publish
@@ -17,10 +17,15 @@
   -> 原子切换 current
   -> 更新持久化状态
 
-常驻服务：pnpm docs:preview:serve
+快速预览：pnpm docs:dev -- --host 0.0.0.0 --port 4173
+  -> 监听 Markdown 和配置变化
+  -> HMR 更新编辑页面
+  -> 不承担生产构建验证
+
+稳定常驻服务：pnpm docs:preview:serve
   -> 不构建、不监控源码
   -> 始终读取 current
-  -> 提供页面和 /__preview/status
+  -> 在 4175 提供页面和 /__preview/status
 ```
 
 文档更新不需要重启服务。只有预览服务代码、依赖或 systemd 配置发生变化时才需要重启。
@@ -36,7 +41,8 @@
 | 预览数据 | `/srv/kb-docs-preview` |
 | 环境配置 | `/etc/kb-docs-preview/preview.env` |
 | 内部域名 | `docs-preview.kbdev.com` |
-| Node 服务 | `127.0.0.1:4173` |
+| 快速预览 | `127.0.0.1:4173` |
+| 稳定预览 | `127.0.0.1:4175` |
 
 服务账户必须是非 root 账户，并且需要对仓库目录和预览数据目录有读写权限，因为 VitePress 构建会写入 `docs/.vitepress/dist` 和缓存。
 
@@ -69,6 +75,7 @@ bash deploy/preview/install.sh \
 包括：
 
 - `kb-docs-preview.service`；
+- `kb-docs-preview-dev.service`；
 - `kb-docs-preview-sync.service`；
 - `kb-docs-preview-sync.timer`；
 - `kb-docs-preview.nginx.conf`；
@@ -114,7 +121,8 @@ sudo bash deploy/preview/install.sh \
   --app-dir /opt/kb-docs \
   --data-dir /srv/kb-docs-preview \
   --bind-host 0.0.0.0 \
-  --port 4173 \
+  --fast-port 4173 \
+  --port 4175 \
   --service-user kb-docs-preview \
   --service-group kb-docs-preview \
   --without-nginx \
@@ -126,7 +134,7 @@ sudo bash deploy/preview/install.sh \
 1. 安装环境、systemd 和 Nginx 配置；
 2. 以非 root 服务账户安装依赖；
 3. 发布第一个静态 release；
-4. 启用预览服务；
+4. 启用 4173 快速预览和 4175 稳定预览服务；
 5. 校验 Nginx；
 6. 执行健康检查。
 
@@ -158,7 +166,7 @@ bash deploy/preview/update.sh \
 
 1. `--app-dir` 是真实 Git worktree，不是排除 `.git` 后的 rsync 副本；
 2. 服务账户可以读取仓库，并能通过配置的 remote 拉取目标 branch；
-3. 服务器工作区保持干净，不在服务器上直接修改或提交文档；
+3. 没有编辑草稿时服务器工作区保持干净；编辑平台保存草稿后必须存在 draft marker，使 Git timer 在 fetch 前返回 deferred；
 4. 当前代码已经进入远端 Git 基线，不能让服务器切换到缺少预览脚本的旧分支；
 5. 私有仓库使用只读 Deploy Key 或仓库级部署令牌，不复制个人 Git 凭据。
 
@@ -222,7 +230,8 @@ sudo bash deploy/preview/install.sh \
   --app-dir /opt/kb-docs \
   --data-dir /srv/kb-docs-preview \
   --bind-host 0.0.0.0 \
-  --port 4173 \
+  --fast-port 4173 \
+  --port 4175 \
   --service-user kb-docs-preview \
   --service-group kb-docs-preview \
   --git-remote cnb \
@@ -247,7 +256,7 @@ sudo bash deploy/preview/install.sh \
   -> 原子写入已发布 commit 状态
 ```
 
-如果构建或健康检查失败，Git checkout 可能已经 fast-forward，但“已发布 commit”不会前移，因此下一轮 timer 会继续重试；4173 仍提供上一个成功 release。
+如果构建或健康检查失败，Git checkout 可能已经 fast-forward，但“已发布 commit”不会前移，因此下一轮 timer 会继续重试；4173 会快速显示 checkout 中的新内容，4175 继续提供上一个成功 release。
 
 以下情况会拒绝自动更新并返回非零：
 
@@ -269,6 +278,7 @@ journalctl -u kb-docs-preview-sync.service -n 100 --no-pager
 
 ```bash
 pnpm docs:preview:health
+pnpm docs:preview:fast-health
 ```
 
 健康检查同时要求：
@@ -276,6 +286,8 @@ pnpm docs:preview:health
 - `/__preview/status` 返回 `ready`；
 - 状态包含 `releaseId`；
 - `/` 的 HEAD 请求返回成功。
+
+快速预览健康检查只要求 4173 根页面的 HEAD 请求成功。它不替代 4175 的 release、构建状态和原子发布检查。
 
 如果只是确认旧版本仍能服务，并允许最近一次构建失败：
 
@@ -300,4 +312,4 @@ release 目录不会在切换时覆盖旧版本。回滚时应：
 - 每个合并请求的独立 worktree 和域名；
 - `kbdev.com` Kooboo 候选部署；
 - 生产部署；
-- Docs Studio 编辑入口。
+- Git 提交与审核入口。

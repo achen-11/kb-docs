@@ -15,11 +15,14 @@ test('renderDocsEditorConfig creates a complete draft editor service configurati
       bindHost: '0.0.0.0',
       configDir: '/etc/kb-docs-editor',
       editorPort: '4174',
+      fastPreviewHealthUrl: 'http://127.0.0.1:4173/',
+      fastPreviewPublicUrl: 'http://192.168.10.75:4173',
       outputDir,
       previewEnvFile: '/etc/kb-docs-preview/preview.env',
-      previewPublicUrl: 'http://192.168.10.75:4173',
       previewRoot: '/srv/kb-docs-preview',
-      previewStatusUrl: 'http://127.0.0.1:4173/__preview/status',
+      stableBuildDebounceMs: '6000',
+      stablePreviewPublicUrl: 'http://192.168.10.75:4175',
+      stablePreviewStatusUrl: 'http://127.0.0.1:4175/__preview/status',
       secureCookie: false,
       serviceGroup: 'kb-docs-preview',
       serviceUser: 'kb-docs-preview',
@@ -30,7 +33,11 @@ test('renderDocsEditorConfig creates a complete draft editor service configurati
     assert.match(environment, /DOCS_EDITOR_HOST=0\.0\.0\.0/u)
     assert.match(environment, /DOCS_EDITOR_PORT=4174/u)
     assert.match(environment, /DOCS_EDITOR_AUTH_TOKEN_FILE=\/etc\/kb-docs-editor\/auth-token/u)
-    assert.match(environment, /DOCS_EDITOR_PREVIEW_PUBLIC_URL=http:\/\/192\.168\.10\.75:4173/u)
+    assert.match(environment, /DOCS_EDITOR_FAST_PREVIEW_PUBLIC_URL=http:\/\/192\.168\.10\.75:4173/u)
+    assert.match(environment, /DOCS_EDITOR_FAST_PREVIEW_HEALTH_URL=http:\/\/127\.0\.0\.1:4173/u)
+    assert.match(environment, /DOCS_EDITOR_STABLE_PREVIEW_PUBLIC_URL=http:\/\/192\.168\.10\.75:4175/u)
+    assert.match(environment, /DOCS_EDITOR_STABLE_PREVIEW_STATUS_URL=http:\/\/127\.0\.0\.1:4175\/__preview\/status/u)
+    assert.match(environment, /DOCS_EDITOR_STABLE_BUILD_DEBOUNCE_MS=6000/u)
     assert.match(environment, /DOCS_EDITOR_DRAFT_STATE_FILE=\/srv\/kb-docs-preview\/\.editor-draft\.json/u)
     assert.match(environment, /DOCS_EDITOR_UPDATE_LOCK_FILE=\/srv\/kb-docs-preview\/\.update\.lock/u)
     assert.match(service, /User=kb-docs-preview/u)
@@ -49,8 +56,8 @@ test('normalizeDocsEditorConfig rejects unsafe deployment values', () => {
     bindHost: '127.0.0.1',
     configDir: '/etc/kb-docs-editor',
     outputDir: '/tmp/kb-docs-editor-config',
-    previewPublicUrl: 'http://127.0.0.1:4173',
-    previewStatusUrl: 'http://127.0.0.1:4173/__preview/status',
+    fastPreviewPublicUrl: 'http://127.0.0.1:4173',
+    stablePreviewStatusUrl: 'http://127.0.0.1:4175/__preview/status',
     serviceGroup: 'kb-docs-preview',
     serviceUser: 'kb-docs-preview',
   }
@@ -58,7 +65,7 @@ test('normalizeDocsEditorConfig rejects unsafe deployment values', () => {
   assert.throws(() => normalizeDocsEditorConfig({ ...valid, bindHost: 'all interfaces' }), /bind/u)
   assert.throws(() => normalizeDocsEditorConfig({ ...valid, editorPort: '70000' }), /65535/u)
   assert.throws(
-    () => normalizeDocsEditorConfig({ ...valid, previewPublicUrl: 'file:///tmp/preview' }),
+    () => normalizeDocsEditorConfig({ ...valid, fastPreviewPublicUrl: 'file:///tmp/preview' }),
     /http or https/u
   )
   assert.throws(

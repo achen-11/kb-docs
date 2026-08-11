@@ -841,6 +841,7 @@ const enSidebar = {
 }
 
 export default defineConfig({
+  cacheDir: process.env.DOCS_VITEPRESS_CACHE_DIR || undefined,
   ignoreDeadLinks: true,
   // 收起时排除 guide 源文件，避免生成 /guide/** 路由与 dist 产物
   srcExclude: PUBLISH_GUIDE ? [] : ['guide/**'],
@@ -852,6 +853,11 @@ export default defineConfig({
           chunkFileNames: 'assets/[name].js',
           assetFileNames: 'assets/[name].[ext]',
         },
+      },
+    },
+    server: {
+      watch: {
+        ignored: ['**/.vitepress/dist/**', '**/.vitepress/.temp/**'],
       },
     },
   },

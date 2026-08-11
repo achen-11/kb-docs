@@ -245,9 +245,19 @@ async function normalizeConfig(input = {}) {
   const previewRoot = path.resolve(
     input.previewRoot || process.env.DOCS_EDITOR_PREVIEW_ROOT || path.join(projectRoot, '.local-preview')
   )
-  const previewBaseUrl = assertHttpUrl(
-    input.previewBaseUrl || process.env.DOCS_EDITOR_PREVIEW_PUBLIC_URL || 'http://127.0.0.1:4173',
-    'preview public URL'
+  const fastPreviewBaseUrl = assertHttpUrl(
+    input.fastPreviewBaseUrl ||
+      input.previewBaseUrl ||
+      process.env.DOCS_EDITOR_FAST_PREVIEW_PUBLIC_URL ||
+      process.env.DOCS_EDITOR_PREVIEW_PUBLIC_URL ||
+      'http://127.0.0.1:4173',
+    'fast preview public URL'
+  ).replace(/\/$/u, '')
+  const stablePreviewBaseUrl = assertHttpUrl(
+    input.stablePreviewBaseUrl ||
+      process.env.DOCS_EDITOR_STABLE_PREVIEW_PUBLIC_URL ||
+      'http://127.0.0.1:4175',
+    'stable preview public URL'
   ).replace(/\/$/u, '')
   return {
     authToken: await readAuthToken({
@@ -278,25 +288,40 @@ async function normalizeConfig(input = {}) {
       'preview update lock timeout',
       3_600_000
     ),
+    buildDebounceMs: readPositiveInteger(
+      input.buildDebounceMs ?? process.env.DOCS_EDITOR_STABLE_BUILD_DEBOUNCE_MS,
+      8_000,
+      'stable preview build debounce',
+      300_000
+    ),
     maximumDocumentBytes: readPositiveInteger(
       input.maximumDocumentBytes ?? process.env.DOCS_EDITOR_MAX_DOCUMENT_BYTES,
       DEFAULT_MAX_DOCUMENT_BYTES,
       'maximum document bytes',
       16 * 1024 * 1024
     ),
-    previewBaseUrl,
+    fastPreviewBaseUrl,
+    fastPreviewHealthUrl: assertHttpUrl(
+      input.fastPreviewHealthUrl ||
+        process.env.DOCS_EDITOR_FAST_PREVIEW_HEALTH_URL ||
+        'http://127.0.0.1:4173/',
+      'fast preview health URL'
+    ),
     previewEnvFile: path.resolve(
       input.previewEnvFile ||
         process.env.DOCS_EDITOR_PREVIEW_ENV_FILE ||
         '/etc/kb-docs-preview/preview.env'
     ),
-    previewFrameOrigin: new URL(previewBaseUrl).origin,
+    previewFrameOrigin: new URL(fastPreviewBaseUrl).origin,
     previewRoot,
-    previewStatusUrl: assertHttpUrl(
-      input.previewStatusUrl ||
+    stablePreviewBaseUrl,
+    stablePreviewStatusUrl: assertHttpUrl(
+      input.stablePreviewStatusUrl ||
+        input.previewStatusUrl ||
+        process.env.DOCS_EDITOR_STABLE_PREVIEW_STATUS_URL ||
         process.env.DOCS_EDITOR_PREVIEW_STATUS_URL ||
-        'http://127.0.0.1:4173/__preview/status',
-      'preview status URL'
+        'http://127.0.0.1:4175/__preview/status',
+      'stable preview status URL'
     ),
     projectRoot,
     secureCookie:
@@ -314,6 +339,33 @@ async function fetchPreviewStatus(url) {
   const response = await fetch(url, { signal: AbortSignal.timeout(3000) })
   if (!response.ok) throw new Error(`Preview status returned HTTP ${response.status}`)
   return response.json()
+}
+
+async function fetchFastPreview(url) {
+  const response = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(3000) })
+  if (!response.ok) throw new Error(`Fast preview returned HTTP ${response.status}`)
+  return { available: true }
+}
+
+async function resolvePreviewStatus(config) {
+  const [fastResult, stableResult] = await Promise.allSettled([
+    fetchFastPreview(config.fastPreviewHealthUrl),
+    fetchPreviewStatus(config.stablePreviewStatusUrl),
+  ])
+  return {
+    fast:
+      fastResult.status === 'fulfilled'
+        ? fastResult.value
+        : { available: false, error: publicFetchError(fastResult.reason) },
+    stable:
+      stableResult.status === 'fulfilled'
+        ? { available: true, status: stableResult.value }
+        : { available: false, error: publicFetchError(stableResult.reason) },
+  }
+}
+
+function publicFetchError(error) {
+  return error instanceof Error ? error.message : String(error)
 }
 
 async function sendStaticFile(config, request, requestPath, response) {
@@ -367,6 +419,7 @@ export async function createDocsEditorServer(input = {}) {
       lockFile: config.lockFile,
       lockTimeoutMs: config.lockTimeoutMs,
       maximumBytes: config.maximumDocumentBytes,
+      buildDebounceMs: config.buildDebounceMs,
       buildCommand: input.buildCommand,
       readDocument,
       normalizeDocumentPath,
@@ -425,7 +478,8 @@ export async function createDocsEditorServer(input = {}) {
           mode: 'draft',
           allowedDocumentPattern: 'docs/**/*.md',
           maximumDocumentBytes: config.maximumDocumentBytes,
-          previewBaseUrl: config.previewBaseUrl,
+          fastPreviewBaseUrl: config.fastPreviewBaseUrl,
+          stablePreviewBaseUrl: config.stablePreviewBaseUrl,
         })
         return
       }
@@ -465,17 +519,7 @@ export async function createDocsEditorServer(input = {}) {
         return
       }
       if (request.method === 'GET' && url.pathname === '/api/preview-status') {
-        try {
-          sendJson(response, 200, {
-            available: true,
-            status: await fetchPreviewStatus(config.previewStatusUrl),
-          })
-        } catch (error) {
-          sendJson(response, 502, {
-            available: false,
-            error: error instanceof Error ? error.message : String(error),
-          })
-        }
+        sendJson(response, 200, await resolvePreviewStatus(config))
         return
       }
       if (url.pathname.startsWith('/api/')) throw new EditorHttpError(404, 'API route not found')

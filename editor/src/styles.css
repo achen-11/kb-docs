@@ -494,6 +494,11 @@ input:focus {
   font-size: 12px;
 }
 
+.pane-label .refresh-button {
+  margin-top: 0;
+  padding: 5px 8px;
+}
+
 .pane-label .danger {
   color: #b52e3c;
   font-weight: 800;

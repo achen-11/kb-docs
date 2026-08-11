@@ -1,6 +1,6 @@
 # 文档站共享预览工作流
 
-> 本规范记录已确认的内网预览与编辑架构。静态预览 MVP 已部署到 `http://192.168.10.75:4173/`，后续按本文路线继续建设自动同步、编辑入口、草稿预览和 Git 审核。
+> 本规范记录已确认的内网预览与编辑架构。草稿快速预览使用 `http://192.168.10.75:4173/`，编辑器使用 `4174`，生产构建级稳定预览使用 `4175`。
 
 ## 目标
 
@@ -45,9 +45,9 @@ change-128.docs-preview.kbdev.com
 
 同一个 Kooboo 测试站的部署必须串行。静态草稿预览可以并行，Kooboo 候选预览默认只保留一个当前候选版本。
 
-## 本地 MVP
+## 不可变预览 MVP
 
-本地 MVP 使用生产构建而不是长期暴露 VitePress Dev Server：
+最初的本地 MVP 使用生产构建和不可变 release，现作为 `4175` 稳定预览继续保留：
 
 ```text
 docs/** 发生修改
@@ -77,6 +77,29 @@ docs/** 发生修改
 5. HTML 默认不缓存；预览页面返回 `X-Robots-Tag: noindex, nofollow`。
 6. 默认只监听 `127.0.0.1`；需要局域网访问时显式监听 `0.0.0.0`。
 
+## 快速草稿预览
+
+编辑平台保存草稿时，不再等待完整生产构建：
+
+```text
+保存并完成 SHA-256 冲突校验
+  -> 同目录临时文件 + fsync + 原子 rename
+  -> 立即返回编辑器
+  -> 4173 VitePress Dev Server 监听 Markdown 变化
+  -> HMR 更新当前页面；编辑器在约 700ms 后重新加载 iframe 作为兜底
+  -> 4175 稳定构建进入 8 秒 debounce 队列
+  -> 完整构建成功后原子切换 immutable release
+```
+
+约束：
+
+1. `4173` 是编辑反馈面，不代表生产构建验证通过。
+2. `4175` 始终提供最后一个成功 release；构建失败或被新保存取消时不切换 `current`。
+3. debounce 窗口内的多次保存合并为一次稳定构建。
+4. 新保存到达时，取消仍在运行的旧稳定构建，释放共享 preview lock 后保存新内容。
+5. Dev Server 必须忽略 `.vitepress/dist` 和 `.vitepress/.temp`，避免稳定构建造成全站 reload 风暴。
+6. Dev 与稳定构建使用独立 Vite cache 目录；两者可以并行运行。
+
 ## 本地命令
 
 仅本机访问：
@@ -96,7 +119,7 @@ pnpm docs:preview:lan
 | 变量 | 默认值 | 说明 |
 |------|--------|------|
 | `DOCS_PREVIEW_HOST` | `127.0.0.1` | HTTP 监听地址 |
-| `DOCS_PREVIEW_PORT` | `4173` | HTTP 端口 |
+| `DOCS_PREVIEW_PORT` | `4173` | 单进程本地命令的默认端口；服务器双预览部署将稳定预览显式设为 `4175` |
 | `DOCS_PREVIEW_ROOT` | `.local-preview` | release 与运行状态目录 |
 | `DOCS_PREVIEW_KEEP_RELEASES` | `5` | 保留成功 release 数量 |
 | `DOCS_PREVIEW_DEBOUNCE_MS` | `800` | 文件修改后的合并等待时间 |
@@ -162,11 +185,11 @@ Linux + systemd + Nginx 的配置模板、dry-run 安装器和更新脚本位于
 
 ```text
 本地开发者修改 -> Git push 或开发者草稿同步 ┐
-                                                ├-> 统一串行构建队列
+                                                ├-> 服务器 Git 工作区
 内容人员点击编辑链接 -> 编辑平台 -> 保存草稿 ┘
-  -> VitePress 完整构建
-  -> 成功后原子切换 release
-  -> 4173 自动刷新或重新加载当前页面
+  -> 4173 Dev Server HMR / 快速重新加载
+  -> 后台 debounce 稳定构建队列
+  -> 成功后原子切换 4175 release
 
 编辑平台提交审核
   -> 生成干净的 Git commit / 分支
@@ -181,7 +204,7 @@ Linux + systemd + Nginx 的配置模板、dry-run 安装器和更新脚本位于
 2. “提交审核”展示 diff 和修改说明，然后生成可审查的 Git commit。
 3. 生产发布只接受审核后的明确 Git commit，不接受编辑平台未提交的工作区状态。
 4. 第一版使用一个共享草稿预览；多人独立 worktree 和独立 Host 在后续阶段增加。
-5. 不把共享服务器改成长期开启的 VitePress Dev Server。保存后运行生产构建，成功前继续服务旧 release。
+5. 4173 长期开启 VitePress Dev Server用于快速草稿反馈；4175 继续使用完整生产构建和原子 release，二者职责不可混淆。
 
 ### Phase 1：Git 自动同步与构建串行化
 
@@ -211,6 +234,8 @@ Linux + systemd + Nginx 的配置模板、dry-run 安装器和更新脚本位于
 
 当前实施状态（2026-08-11）：Phase 3 已部署到 kbdev。4174 允许认证用户编辑现有 `docs/**/*.md`，保存时携带上次读取的 SHA-256；服务端在共享 preview lock 内重新校验哈希，通过同目录临时文件、`fsync` 和原子 rename 写入，然后串行执行 VitePress 生产构建、健康检查和 release 切换。冲突返回 409 且不写文件；构建失败保留已保存草稿和上一成功 release。编辑器展示队列/保存/构建/冲突状态，并通过 CSP 白名单加载 4173 iframe。草稿期间 Git timer 成功返回 deferred，不 fetch 或覆盖工作区；文档恢复 Git clean 后草稿标记自动删除，timer 恢复正常同步。真实服务器验收先生成 release `20260811T073016Z-9b17706-15`，随后恢复原文并生成 clean release `20260811T073126Z-9b17706-16`；4173、4174、Git timer 与 Kooboo.Web 均保持 active。
 
+Phase 3 快速预览扩展（2026-08-11）：本地实现与检查已完成。保存 API 在原子写入和草稿标记完成后返回 `queued`，稳定构建在后台 debounce；连续保存会合并，正在运行的旧构建会被取消。部署配置将 4173 改为常驻 VitePress Dev Server，4174 保持编辑器，原不可变预览迁移到 4175。29 个聚焦 Node 测试、编辑器构建、完整 VitePress 构建、Dev 与生产构建并发测试均通过；排除 `dist` / `.temp` 后稳定构建不再触发全站 reload 风暴。浏览器确认 Markdown 原生 HMR 生效，700ms iframe reload 兜底的可见耗时为 1.329 秒。部署到 kbdev 后，应补充真实保存耗时、4173 可见耗时、4175 release 以及恢复原文后的 Git clean 证据。
+
 ### Phase 4：Git 提交与审核
 
 - 提交前展示完整 diff 并要求修改说明。
@@ -225,7 +250,7 @@ Linux + systemd + Nginx 的配置模板、dry-run 安装器和更新脚本位于
 
 ## 编辑平台 MVP 约束
 
-- 预览服务继续使用 `4173`；编辑服务初期使用独立端口。
+- 快速预览使用 `4173`，编辑服务使用 `4174`，稳定预览使用 `4175`。
 - 仅允许编辑 `docs/**/*.md` 和明确开放的静态资源目录。
 - 同一文件被其他人修改后，旧版本保存必须返回冲突，不允许静默覆盖。
 - 所有构建必须串行；独立进程不能各自启动并发 VitePress 构建。

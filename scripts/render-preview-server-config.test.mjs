@@ -18,6 +18,7 @@ test('renderPreviewServerConfig creates complete Linux service configuration', a
       configDir: '/etc/kb-docs-preview',
       dataDir: '/srv/kb-docs-preview',
       editorBaseUrl: 'http://192.168.10.75:4174/',
+      fastPreviewPort: '4173',
       gitBranch: 'preview/main',
       gitRemote: 'cnb',
       keepReleases: '7',
@@ -30,9 +31,11 @@ test('renderPreviewServerConfig creates complete Linux service configuration', a
       updateLockTimeoutMs: '240000'
     })
     assert.equal(manifest.keepReleases, 7)
+    assert.equal(manifest.fastPreviewPort, 4173)
     assert.equal(manifest.previewPort, 4180)
 
     const service = await readFile(path.join(outputDir, 'kb-docs-preview.service'), 'utf-8')
+    const devService = await readFile(path.join(outputDir, 'kb-docs-preview-dev.service'), 'utf-8')
     const nginx = await readFile(path.join(outputDir, 'kb-docs-preview.nginx.conf'), 'utf-8')
     const syncService = await readFile(
       path.join(outputDir, 'kb-docs-preview-sync.service'),
@@ -43,9 +46,15 @@ test('renderPreviewServerConfig creates complete Linux service configuration', a
     const askpass = await readFile(path.join(outputDir, 'git-askpass.sh'), 'utf-8')
     assert.match(service, /User=kb-docs-preview/u)
     assert.match(service, /ReadWritePaths=\/opt\/kb-docs \/srv\/kb-docs-preview/u)
+    assert.match(devService, /vitepress|docs:dev/u)
+    assert.match(devService, /--port 4173/u)
+    assert.match(devService, /vitepress-cache\/dev/u)
     assert.match(nginx, /server_name docs-preview\.kbdev\.com;/u)
     assert.match(nginx, /127\.0\.0\.1:4180/u)
     assert.match(environment, /DOCS_PREVIEW_KEEP_RELEASES=7/u)
+    assert.match(environment, /DOCS_PREVIEW_PORT=4180/u)
+    assert.match(environment, /DOCS_PREVIEW_FAST_PORT=4173/u)
+    assert.match(environment, /DOCS_VITEPRESS_CACHE_DIR=\/srv\/kb-docs-preview\/vitepress-cache\/stable/u)
     assert.match(environment, /DOCS_PREVIEW_HOST=0\.0\.0\.0/u)
     assert.match(environment, /DOCS_PREVIEW_GIT_REMOTE=cnb/u)
     assert.match(environment, /DOCS_PREVIEW_GIT_BRANCH=preview\/main/u)
@@ -60,7 +69,7 @@ test('renderPreviewServerConfig creates complete Linux service configuration', a
     assert.match(syncService, /sync-preview-from-git\.mjs/u)
     assert.match(syncTimer, /OnUnitActiveSec=45s/u)
     assert.doesNotMatch(
-      `${service}${syncService}${syncTimer}${nginx}${environment}${askpass}`,
+      `${service}${devService}${syncService}${syncTimer}${nginx}${environment}${askpass}`,
       /\{\{/u
     )
   } finally {
@@ -95,6 +104,10 @@ test('normalizePreviewServerConfig rejects unsafe server values', () => {
   assert.throws(
     () => normalizePreviewServerConfig({ ...valid, previewPort: '70000' }),
     /between 1 and 65535/u
+  )
+  assert.throws(
+    () => normalizePreviewServerConfig({ ...valid, fastPreviewPort: '4175', previewPort: '4175' }),
+    /must be different/u
   )
   assert.throws(
     () => normalizePreviewServerConfig({ ...valid, bindHost: 'all interfaces' }),

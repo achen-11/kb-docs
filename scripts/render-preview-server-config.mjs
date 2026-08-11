@@ -103,18 +103,24 @@ function renderTemplate(template, replacements) {
 }
 
 export function normalizePreviewServerConfig(input) {
+  const fastPreviewPort = readPositiveInteger(input.fastPreviewPort, 4173, 'fast preview port', 65535)
+  const previewPort = readPositiveInteger(input.previewPort, 4175, 'stable preview port', 65535)
+  if (fastPreviewPort === previewPort) {
+    throw new Error('fast preview port and stable preview port must be different')
+  }
   return {
     appDir: assertAbsolutePath(input.appDir, 'app directory'),
     bindHost: assertBindHost(input.bindHost || '127.0.0.1'),
     configDir: assertAbsolutePath(input.configDir, 'config directory'),
     dataDir: assertAbsolutePath(input.dataDir, 'data directory'),
     editorBaseUrl: assertOptionalHttpUrl(input.editorBaseUrl, 'editor base URL'),
+    fastPreviewPort,
     gitBranch: assertGitBranch(input.gitBranch || 'main'),
     gitRemote: assertGitRemote(input.gitRemote || 'origin'),
     keepReleases: readPositiveInteger(input.keepReleases, 5, 'release retention', 100),
     outputDir: path.resolve(input.outputDir),
     previewHostname: assertHostname(input.previewHostname),
-    previewPort: readPositiveInteger(input.previewPort, 4173, 'preview port', 65535),
+    previewPort,
     serviceGroup: assertSafeIdentity(input.serviceGroup, 'service group'),
     serviceUser: assertSafeIdentity(input.serviceUser, 'service user'),
     syncIntervalSeconds: readPositiveInteger(
@@ -141,6 +147,7 @@ export async function renderPreviewServerConfig(input) {
     DATA_DIR: config.dataDir,
     DRAFT_STATE_FILE: path.join(config.dataDir, '.editor-draft.json'),
     EDITOR_BASE_URL: config.editorBaseUrl,
+    FAST_PREVIEW_PORT: config.fastPreviewPort,
     GIT_BRANCH: config.gitBranch,
     GIT_REMOTE: config.gitRemote,
     GIT_STATE_FILE: path.join(config.dataDir, '.git-sync-state.json'),
@@ -156,6 +163,7 @@ export async function renderPreviewServerConfig(input) {
   const templateFiles = {
     'git-askpass.sh': 'git-askpass.sh.template',
     'kb-docs-preview.nginx.conf': 'nginx.conf.template',
+    'kb-docs-preview-dev.service': 'kb-docs-preview-dev.service.template',
     'kb-docs-preview.service': 'kb-docs-preview.service.template',
     'kb-docs-preview-sync.service': 'kb-docs-preview-sync.service.template',
     'kb-docs-preview-sync.timer': 'kb-docs-preview-sync.timer.template',
@@ -193,13 +201,14 @@ async function main() {
     configDir: readArg(argv, '--config-dir') || '/etc/kb-docs-preview',
     dataDir: readArg(argv, '--data-dir') || '/srv/kb-docs-preview',
     editorBaseUrl: readArg(argv, '--editor-base-url') || '',
+    fastPreviewPort: readArg(argv, '--fast-port') || '4173',
     gitBranch: readArg(argv, '--git-branch') || 'main',
     gitRemote: readArg(argv, '--git-remote') || 'origin',
     keepReleases: readArg(argv, '--keep-releases') || '5',
     outputDir:
       readArg(argv, '--output-dir') || path.join(projectRoot, '.local-preview', 'server-config'),
     previewHostname: readArg(argv, '--hostname') || 'docs-preview.kbdev.com',
-    previewPort: readArg(argv, '--port') || '4173',
+    previewPort: readArg(argv, '--port') || '4175',
     serviceGroup: readArg(argv, '--group') || serviceUser,
     serviceUser,
     syncIntervalSeconds: readArg(argv, '--sync-interval') || '30',

@@ -1,0 +1,37 @@
+{
+  "id": "docs-editor-fast-preview",
+  "name": "docs-editor-fast-preview",
+  "title": "Add instant HMR draft preview and background stable builds",
+  "description": "Split the interactive 4173 VitePress Dev preview from the immutable 4175 production preview and make stable builds asynchronous and debounced.",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": "scripts/docs-editor-draft*, scripts/docs-editor-server*, editor, deploy/preview, deploy/editor, .trellis/spec/documentation-preview-workflow.md",
+  "priority": "P1",
+  "creator": "wg",
+  "assignee": "wg",
+  "createdAt": "2026-08-11",
+  "completedAt": null,
+  "branch": "codex/docs-editor-fast-preview",
+  "base_branch": "codex/docs-editor-phase3",
+  "worktree_path": "/private/tmp/kb-docs-editor-phase2.hM1YkG",
+  "current_phase": 3,
+  "next_action": [
+    { "phase": 1, "action": "implement" },
+    { "phase": 2, "action": "check" },
+    { "phase": 3, "action": "deploy" },
+    { "phase": 4, "action": "finish" }
+  ],
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "docs-editor-drafts",
+  "relatedFiles": [
+    "scripts/docs-editor-draft.mjs",
+    "scripts/docs-editor-server.mjs",
+    "editor/src/App.vue",
+    "deploy/preview/install.sh",
+    "deploy/preview/templates/kb-docs-preview-dev.service.template"
+  ],
+  "notes": "Local implementation and verification passed: 29 focused Node tests, editor production build, full VitePress build, concurrent Dev plus production build, no dist reload storm, native Markdown HMR visible by the post-save signal, and a 1.329s iframe reload fallback. Next: deploy 4173/4174/4175 to kbdev and perform a reversible real save."
+}

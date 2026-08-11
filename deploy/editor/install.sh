@@ -10,8 +10,11 @@ BIND_HOST="127.0.0.1"
 CONFIG_DIR="/etc/kb-docs-editor"
 OUTPUT_DIR="${PROJECT_DIR}/.local-preview/editor-config"
 PORT="4174"
-PREVIEW_STATUS_URL="http://127.0.0.1:4173/__preview/status"
-PREVIEW_URL="http://127.0.0.1:4173"
+FAST_PREVIEW_HEALTH_URL="http://127.0.0.1:4173/"
+FAST_PREVIEW_URL="http://127.0.0.1:4173"
+STABLE_PREVIEW_STATUS_URL="http://127.0.0.1:4175/__preview/status"
+STABLE_PREVIEW_URL="http://127.0.0.1:4175"
+STABLE_BUILD_DEBOUNCE_MS="8000"
 PREVIEW_ENV_FILE="/etc/kb-docs-preview/preview.env"
 PREVIEW_ROOT="/srv/kb-docs-preview"
 LOCK_TIMEOUT="180000"
@@ -32,8 +35,11 @@ usage() {
   echo "  --config-dir PATH"
   echo "  --output-dir PATH"
   echo "  --port NUMBER"
-  echo "  --preview-status-url URL"
-  echo "  --preview-url URL"
+  echo "  --fast-preview-health-url URL"
+  echo "  --fast-preview-url URL"
+  echo "  --stable-preview-status-url URL"
+  echo "  --stable-preview-url URL"
+  echo "  --stable-build-debounce-ms MS"
   echo "  --preview-env-file PATH"
   echo "  --preview-root PATH"
   echo "  --lock-timeout MS"
@@ -52,8 +58,11 @@ while [[ $# -gt 0 ]]; do
     --config-dir) CONFIG_DIR="$2"; shift 2 ;;
     --output-dir) OUTPUT_DIR="$2"; shift 2 ;;
     --port) PORT="$2"; shift 2 ;;
-    --preview-status-url) PREVIEW_STATUS_URL="$2"; shift 2 ;;
-    --preview-url) PREVIEW_URL="$2"; shift 2 ;;
+    --fast-preview-health-url) FAST_PREVIEW_HEALTH_URL="$2"; shift 2 ;;
+    --fast-preview-url|--preview-url) FAST_PREVIEW_URL="$2"; shift 2 ;;
+    --stable-preview-status-url|--preview-status-url) STABLE_PREVIEW_STATUS_URL="$2"; shift 2 ;;
+    --stable-preview-url) STABLE_PREVIEW_URL="$2"; shift 2 ;;
+    --stable-build-debounce-ms) STABLE_BUILD_DEBOUNCE_MS="$2"; shift 2 ;;
     --preview-env-file) PREVIEW_ENV_FILE="$2"; shift 2 ;;
     --preview-root) PREVIEW_ROOT="$2"; shift 2 ;;
     --lock-timeout) LOCK_TIMEOUT="$2"; shift 2 ;;
@@ -79,8 +88,11 @@ RENDER_ARGS=(
   --group "${SERVICE_GROUP}"
   --output-dir "${OUTPUT_DIR}"
   --port "${PORT}"
-  --preview-status-url "${PREVIEW_STATUS_URL}"
-  --preview-url "${PREVIEW_URL}"
+  --fast-preview-health-url "${FAST_PREVIEW_HEALTH_URL}"
+  --fast-preview-url "${FAST_PREVIEW_URL}"
+  --stable-preview-status-url "${STABLE_PREVIEW_STATUS_URL}"
+  --stable-preview-url "${STABLE_PREVIEW_URL}"
+  --stable-build-debounce-ms "${STABLE_BUILD_DEBOUNCE_MS}"
   --preview-env-file "${PREVIEW_ENV_FILE}"
   --preview-root "${PREVIEW_ROOT}"
   --lock-timeout "${LOCK_TIMEOUT}"

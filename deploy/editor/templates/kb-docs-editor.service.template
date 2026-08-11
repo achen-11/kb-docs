@@ -1,7 +1,7 @@
 [Unit]
 Description=Kooboo documentation editor
 Wants=network-online.target
-After=network-online.target kb-docs-preview.service
+After=network-online.target kb-docs-preview-dev.service kb-docs-preview.service
 
 [Service]
 Type=simple

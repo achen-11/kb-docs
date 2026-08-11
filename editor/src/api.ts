@@ -2,7 +2,8 @@ export interface EditorConfig {
   mode: 'draft'
   allowedDocumentPattern: string
   maximumDocumentBytes: number
-  previewBaseUrl: string
+  fastPreviewBaseUrl: string
+  stablePreviewBaseUrl: string
 }
 
 export interface DocumentPayload {
@@ -14,17 +15,23 @@ export interface DocumentPayload {
 }
 
 export interface PreviewStatusPayload {
-  available: boolean
-  status?: {
-    status: string
-    buildNumber?: number
-    buildReason?: string
-    releaseId?: string
-    sourceCommit?: string
-    sourceDirty?: boolean | null
-    error?: string | null
+  fast: {
+    available: boolean
+    error?: string
   }
-  error?: string
+  stable: {
+    available: boolean
+    status?: {
+      status: string
+      buildNumber?: number
+      buildReason?: string
+      releaseId?: string
+      sourceCommit?: string
+      sourceDirty?: boolean | null
+      error?: string | null
+    }
+    error?: string
+  }
 }
 
 export type BuildState = 'idle' | 'queued' | 'saving' | 'building' | 'ready' | 'error' | 'conflict'
@@ -43,10 +50,10 @@ export interface BuildStatusPayload {
 export interface SaveDocumentPayload {
   document: DocumentPayload
   build: {
-    status: 'ready' | 'error'
-    releaseId?: string | null
-    error?: string
-    finishedAt: string
+    status: 'queued'
+    operationId: string
+    scheduledAt: string
+    debounceMs: number
   }
 }
 

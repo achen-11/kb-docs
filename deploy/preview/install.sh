@@ -15,13 +15,15 @@ HOSTNAME_VALUE="docs-preview.kbdev.com"
 KEEP_RELEASES="5"
 NGINX_CONFIG="/etc/nginx/conf.d/kb-docs-preview.conf"
 OUTPUT_DIR="${PROJECT_DIR}/.local-preview/server-config"
-PORT="4173"
+FAST_PORT="4173"
+PORT="4175"
 SERVICE_GROUP="kb-docs-preview"
 SERVICE_USER="kb-docs-preview"
 SYNC_INTERVAL_SECONDS="30"
 SYNC_SERVICE_UNIT="/etc/systemd/system/kb-docs-preview-sync.service"
 SYNC_TIMER_UNIT="/etc/systemd/system/kb-docs-preview-sync.timer"
 SYSTEMD_UNIT="/etc/systemd/system/kb-docs-preview.service"
+FAST_SYSTEMD_UNIT="/etc/systemd/system/kb-docs-preview-dev.service"
 UPDATE_LOCK_TIMEOUT_MS="180000"
 APPLY="false"
 ENABLE_GIT_SYNC="false"
@@ -39,6 +41,8 @@ usage() {
   echo "  --git-branch NAME"
   echo "  --git-remote NAME"
   echo "  --editor-base-url URL"
+  echo "  --fast-port NUMBER"
+  echo "  --fast-systemd-unit PATH"
   echo "  --hostname HOST"
   echo "  --keep-releases NUMBER"
   echo "  --lock-timeout MILLISECONDS"
@@ -63,6 +67,8 @@ while [[ $# -gt 0 ]]; do
     --git-branch) GIT_BRANCH="$2"; shift 2 ;;
     --git-remote) GIT_REMOTE="$2"; shift 2 ;;
     --editor-base-url) EDITOR_BASE_URL="$2"; shift 2 ;;
+    --fast-port) FAST_PORT="$2"; shift 2 ;;
+    --fast-systemd-unit) FAST_SYSTEMD_UNIT="$2"; shift 2 ;;
     --hostname) HOSTNAME_VALUE="$2"; shift 2 ;;
     --keep-releases) KEEP_RELEASES="$2"; shift 2 ;;
     --lock-timeout) UPDATE_LOCK_TIMEOUT_MS="$2"; shift 2 ;;
@@ -89,6 +95,7 @@ node "${PROJECT_DIR}/scripts/render-preview-server-config.mjs" \
   --git-branch "${GIT_BRANCH}" \
   --git-remote "${GIT_REMOTE}" \
   --editor-base-url "${EDITOR_BASE_URL}" \
+  --fast-port "${FAST_PORT}" \
   --group "${SERVICE_GROUP}" \
   --hostname "${HOSTNAME_VALUE}" \
   --keep-releases "${KEEP_RELEASES}" \
@@ -163,11 +170,13 @@ fi
 install -d -m 0750 -o "${SERVICE_USER}" -g "${SERVICE_GROUP}" "${DATA_DIR}"
 install -d -m 0750 -o root -g "${SERVICE_GROUP}" "${CONFIG_DIR}"
 install -d -m 0755 "$(dirname "${SYSTEMD_UNIT}")"
+install -d -m 0755 "$(dirname "${FAST_SYSTEMD_UNIT}")"
 install -m 0640 -o root -g "${SERVICE_GROUP}" \
   "${OUTPUT_DIR}/preview.env" "${CONFIG_DIR}/preview.env"
 install -m 0750 -o root -g "${SERVICE_GROUP}" \
   "${OUTPUT_DIR}/git-askpass.sh" "${CONFIG_DIR}/git-askpass.sh"
 install -m 0644 "${OUTPUT_DIR}/kb-docs-preview.service" "${SYSTEMD_UNIT}"
+install -m 0644 "${OUTPUT_DIR}/kb-docs-preview-dev.service" "${FAST_SYSTEMD_UNIT}"
 if [[ "${ENABLE_GIT_SYNC}" == "true" ]]; then
   install -m 0644 "${OUTPUT_DIR}/kb-docs-preview-sync.service" "${SYNC_SERVICE_UNIT}"
   install -m 0644 "${OUTPUT_DIR}/kb-docs-preview-sync.timer" "${SYNC_TIMER_UNIT}"
@@ -190,7 +199,10 @@ fi
 )
 
 systemctl daemon-reload
-systemctl enable --now kb-docs-preview.service
+systemctl enable kb-docs-preview.service
+systemctl restart kb-docs-preview.service
+systemctl enable kb-docs-preview-dev.service
+systemctl restart kb-docs-preview-dev.service
 if [[ "${INSTALL_NGINX}" == "true" ]]; then
   nginx -t
   systemctl reload nginx
@@ -220,6 +232,31 @@ if [[ "${HEALTHY}" != "true" ]]; then
   exit 1
 fi
 
+FAST_HEALTHY="false"
+for ((attempt = 1; attempt <= 15; attempt += 1)); do
+  if (
+    cd "${APP_DIR}"
+    runuser -u "${SERVICE_USER}" -- env \
+      DOCS_PREVIEW_FAST_PORT="${FAST_PORT}" \
+      DOCS_PREVIEW_HOST="${BIND_HOST}" \
+      HOME="${SERVICE_HOME}" \
+      corepack pnpm docs:preview:fast-health
+  ); then
+    FAST_HEALTHY="true"
+    break
+  fi
+
+  if ((attempt < 15)); then
+    echo "Fast preview health check attempt ${attempt} failed; retrying in 1 second..." >&2
+    sleep 1
+  fi
+done
+
+if [[ "${FAST_HEALTHY}" != "true" ]]; then
+  echo "Fast preview service did not become healthy after 15 attempts." >&2
+  exit 1
+fi
+
 if [[ "${ENABLE_GIT_SYNC}" == "true" ]]; then
   systemctl enable --now kb-docs-preview-sync.timer
 fi
@@ -227,8 +264,9 @@ fi
 if [[ "${INSTALL_NGINX}" == "true" ]]; then
   echo "Preview server installation completed: http://${HOSTNAME_VALUE}/"
 else
-  echo "Preview server installation completed: http://${BIND_HOST}:${PORT}/"
+  echo "Stable preview installation completed: http://${BIND_HOST}:${PORT}/"
 fi
+echo "Fast preview installation completed: http://${BIND_HOST}:${FAST_PORT}/"
 if [[ "${ENABLE_GIT_SYNC}" == "true" ]]; then
   echo "Git synchronization enabled: ${GIT_REMOTE}/${GIT_BRANCH} every ${SYNC_INTERVAL_SECONDS} seconds"
 fi

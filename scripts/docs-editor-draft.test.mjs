@@ -80,7 +80,7 @@ test('writeDocumentAtomically checks hashes, preserves permissions, and rejects 
   assert.equal(await readFile(filePath, 'utf8'), '# Updated\n')
 })
 
-test('draft coordinator serializes saves, builds previews, writes audit, and manages the draft marker', async (t) => {
+test('draft coordinator returns after atomic saves and coalesces background stable builds', async (t) => {
   const fixture = await createFixture()
   t.after(() => rm(fixture.root, { recursive: true, force: true }))
   const buildLog = path.join(fixture.root, 'build.log')
@@ -89,7 +89,7 @@ test('draft coordinator serializes saves, builds previews, writes audit, and man
     buildStub,
     `import { appendFile, writeFile } from 'node:fs/promises';\n` +
       `const [log,status]=process.argv.slice(2);\n` +
-      `await appendFile(log,'start\\n'); await new Promise(r=>setTimeout(r,40)); await appendFile(log,'end\\n');\n` +
+      `await appendFile(log,'start\\n'); await new Promise(r=>setTimeout(r,80)); await appendFile(log,'end\\n');\n` +
       `await writeFile(status,JSON.stringify({status:'ready',releaseId:'draft-release'})+'\\n');\n`,
     'utf8'
   )
@@ -102,6 +102,7 @@ test('draft coordinator serializes saves, builds previews, writes audit, and man
     draftStateFile,
     auditLog,
     lockFile: path.join(fixture.previewRoot, '.update.lock'),
+    buildDebounceMs: 100,
     buildCommand: {
       command: process.execPath,
       args: [buildStub, buildLog, path.join(fixture.previewRoot, '.preview-status.json')],
@@ -118,9 +119,13 @@ test('draft coordinator serializes saves, builds previews, writes audit, and man
       actor: 'test', documentPath: 'docs/two.md', content: '# Two edited\n', expectedHash: hashContent('# Two\n'),
     }),
   ])
-  assert.equal(one.build.releaseId, 'draft-release')
-  assert.equal(two.build.status, 'ready')
-  assert.equal(await readFile(buildLog, 'utf8'), 'start\nend\nstart\nend\n')
+  assert.equal(one.build.status, 'queued')
+  assert.equal(two.build.status, 'queued')
+  await assert.rejects(() => readFile(buildLog, 'utf8'), { code: 'ENOENT' })
+  await coordinator.waitForIdle()
+  assert.equal(await readFile(buildLog, 'utf8'), 'start\nend\n')
+  assert.equal(coordinator.getStatus().status, 'ready')
+  assert.equal(coordinator.getStatus().releaseId, 'draft-release')
   assert.equal(JSON.parse(await readFile(draftStateFile, 'utf8')).active, true)
   assert.match(await readFile(auditLog, 'utf8'), /"outcome":"preview_ready"/u)
 
@@ -132,6 +137,8 @@ test('draft coordinator serializes saves, builds previews, writes audit, and man
   await coordinator.save({
     actor: 'test', documentPath: 'docs/two.md', content: '# Two\n', expectedHash: hashContent(currentTwo),
   })
+  await coordinator.waitForIdle()
+  assert.equal(await readFile(buildLog, 'utf8'), 'start\nend\nstart\nend\n')
   await assert.rejects(() => readFile(draftStateFile, 'utf8'), { code: 'ENOENT' })
 })
 
@@ -143,6 +150,7 @@ test('draft coordinator keeps a saved document when preview build fails', async 
     previewRoot: fixture.previewRoot,
     previewEnvFile: path.join(fixture.root, 'unused.env'),
     lockFile: path.join(fixture.previewRoot, '.update.lock'),
+    buildDebounceMs: 10,
     buildCommand: { command: process.execPath, args: ['-e', 'process.exit(9)'] },
     normalizeDocumentPath: (value) => value,
     readDocument: async () => null,
@@ -150,7 +158,54 @@ test('draft coordinator keeps a saved document when preview build fails', async 
   const result = await coordinator.save({
     actor: 'test', documentPath: 'docs/one.md', content: '# Saved despite failure\n', expectedHash: hashContent('# One\n'),
   })
-  assert.equal(result.build.status, 'error')
-  assert.match(result.build.error, /exited with code 9/u)
+  assert.equal(result.build.status, 'queued')
   assert.equal(await readFile(path.join(fixture.root, 'docs', 'one.md'), 'utf8'), '# Saved despite failure\n')
+  await coordinator.waitForIdle()
+  assert.equal(coordinator.getStatus().status, 'error')
+  assert.match(coordinator.getStatus().error, /exited with code 9/u)
+})
+
+test('a newer save supersedes an active stable build instead of waiting for it', async (t) => {
+  const fixture = await createFixture()
+  t.after(() => rm(fixture.root, { recursive: true, force: true }))
+  const buildStub = path.join(fixture.root, 'slow-build.mjs')
+  const buildLog = path.join(fixture.root, 'slow-build.log')
+  await writeFile(
+    buildStub,
+    `import { appendFile, writeFile } from 'node:fs/promises';\n` +
+      `const [log,status]=process.argv.slice(2); await appendFile(log,'start\\n');\n` +
+      `await new Promise(r=>setTimeout(r,5000)); await writeFile(status,JSON.stringify({releaseId:'latest'})+'\\n');\n`,
+    'utf8'
+  )
+  const coordinator = createDraftCoordinator({
+    projectRoot: fixture.root,
+    previewRoot: fixture.previewRoot,
+    previewEnvFile: path.join(fixture.root, 'unused.env'),
+    lockFile: path.join(fixture.previewRoot, '.update.lock'),
+    auditLog: path.join(fixture.previewRoot, 'editor-audit.jsonl'),
+    buildDebounceMs: 10,
+    buildCommand: {
+      command: process.execPath,
+      args: [buildStub, buildLog, path.join(fixture.previewRoot, '.preview-status.json')],
+    },
+    normalizeDocumentPath: (value) => value,
+    readDocument: async () => null,
+  })
+  const first = await coordinator.save({
+    actor: 'test', documentPath: 'docs/one.md', content: '# First\n', expectedHash: hashContent('# One\n'),
+  })
+  assert.equal(first.build.status, 'queued')
+  while (coordinator.getStatus().status !== 'building') {
+    await new Promise((resolve) => setTimeout(resolve, 10))
+  }
+
+  const startedAt = Date.now()
+  const second = await coordinator.save({
+    actor: 'test', documentPath: 'docs/one.md', content: '# Second\n', expectedHash: first.document.hash,
+  })
+  assert.equal(second.build.status, 'queued')
+  assert.ok(Date.now() - startedAt < 2500)
+  await coordinator.waitForIdle()
+  assert.equal(coordinator.getStatus().status, 'ready')
+  assert.match(await readFile(path.join(fixture.previewRoot, 'editor-audit.jsonl'), 'utf8'), /preview_superseded/u)
 })

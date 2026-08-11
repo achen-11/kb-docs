@@ -1,0 +1,26 @@
+[Unit]
+Description=Kooboo documentation fast VitePress preview
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User={{SERVICE_USER}}
+Group={{SERVICE_GROUP}}
+WorkingDirectory={{APP_DIR}}
+EnvironmentFile={{CONFIG_DIR}}/preview.env
+Environment=DOCS_VITEPRESS_CACHE_DIR={{DATA_DIR}}/vitepress-cache/dev
+ExecStart=/usr/bin/env corepack pnpm docs:dev -- --host {{BIND_HOST}} --port {{FAST_PREVIEW_PORT}} --strictPort
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=30
+KillSignal=SIGTERM
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths={{APP_DIR}} {{DATA_DIR}}
+
+[Install]
+WantedBy=multi-user.target

@@ -80,8 +80,10 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
   const editorServer = await createDocsEditorServer({
     authToken: 'editor-test-token-123',
     distDir: path.join(root, 'editor', 'dist'),
-    previewBaseUrl: 'http://preview.example:4173',
-    previewStatusUrl: previewUrl,
+    fastPreviewBaseUrl: 'http://preview.example:4173',
+    fastPreviewHealthUrl: previewUrl,
+    stablePreviewBaseUrl: 'http://preview.example:4175',
+    stablePreviewStatusUrl: previewUrl,
     projectRoot: root,
     draftCoordinator: {
       getStatus: () => ({ status: 'ready', queued: 0, releaseId: 'draft-release' }),
@@ -97,7 +99,7 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
         }
         return {
           document: { ...document, content: input.content, hash: '2'.repeat(64) },
-          build: { status: 'ready', releaseId: 'draft-release' },
+          build: { status: 'queued', operationId: 'test-operation', scheduledAt: new Date(0).toISOString(), debounceMs: 8000 },
         }
       },
     },
@@ -154,7 +156,8 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
     mode: 'draft',
     allowedDocumentPattern: 'docs/**/*.md',
     maximumDocumentBytes: 2097152,
-    previewBaseUrl: 'http://preview.example:4173',
+    fastPreviewBaseUrl: 'http://preview.example:4173',
+    stablePreviewBaseUrl: 'http://preview.example:4175',
   })
 
   const saveResponse = await fetch(`${editorUrl}/api/document`, {
@@ -168,8 +171,10 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
   })
   assert.equal(saveResponse.status, 200)
   assert.deepEqual((await saveResponse.json()).build, {
-    status: 'ready',
-    releaseId: 'draft-release',
+    status: 'queued',
+    operationId: 'test-operation',
+    scheduledAt: new Date(0).toISOString(),
+    debounceMs: 8000,
   })
 
   const conflictResponse = await fetch(`${editorUrl}/api/document`, {
@@ -197,7 +202,10 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
   })
   assert.equal(statusResponse.status, 200)
   assert.deepEqual(await statusResponse.json(), {
-    available: true,
-    status: { status: 'ready', releaseId: 'test-release' },
+    fast: { available: true },
+    stable: {
+      available: true,
+      status: { status: 'ready', releaseId: 'test-release' },
+    },
   })
 })

@@ -97,9 +97,29 @@ export function normalizeDocsEditorConfig(input) {
       input.previewEnvFile || '/etc/kb-docs-preview/preview.env',
       'preview environment file'
     ),
-    previewPublicUrl: assertHttpUrl(input.previewPublicUrl, 'preview public URL'),
+    fastPreviewHealthUrl: assertHttpUrl(
+      input.fastPreviewHealthUrl || 'http://127.0.0.1:4173/',
+      'fast preview health URL'
+    ),
+    fastPreviewPublicUrl: assertHttpUrl(
+      input.fastPreviewPublicUrl || input.previewPublicUrl,
+      'fast preview public URL'
+    ),
     previewRoot,
-    previewStatusUrl: assertHttpUrl(input.previewStatusUrl, 'preview status URL'),
+    stableBuildDebounceMs: readPositiveInteger(
+      input.stableBuildDebounceMs,
+      8_000,
+      'stable preview build debounce',
+      300_000
+    ),
+    stablePreviewPublicUrl: assertHttpUrl(
+      input.stablePreviewPublicUrl || 'http://127.0.0.1:4175',
+      'stable preview public URL'
+    ),
+    stablePreviewStatusUrl: assertHttpUrl(
+      input.stablePreviewStatusUrl || input.previewStatusUrl,
+      'stable preview status URL'
+    ),
     secureCookie: input.secureCookie ? 'true' : 'false',
     serviceGroup: assertSafeIdentity(input.serviceGroup, 'service group'),
     serviceUser: assertSafeIdentity(input.serviceUser, 'service user'),
@@ -126,10 +146,13 @@ export async function renderDocsEditorConfig(input) {
     CONFIG_DIR: config.configDir,
     DRAFT_STATE_FILE: config.draftStateFile,
     EDITOR_PORT: config.editorPort,
-    PREVIEW_PUBLIC_URL: config.previewPublicUrl,
+    FAST_PREVIEW_HEALTH_URL: config.fastPreviewHealthUrl,
+    FAST_PREVIEW_PUBLIC_URL: config.fastPreviewPublicUrl,
     PREVIEW_ENV_FILE: config.previewEnvFile,
     PREVIEW_ROOT: config.previewRoot,
-    PREVIEW_STATUS_URL: config.previewStatusUrl,
+    STABLE_BUILD_DEBOUNCE_MS: config.stableBuildDebounceMs,
+    STABLE_PREVIEW_PUBLIC_URL: config.stablePreviewPublicUrl,
+    STABLE_PREVIEW_STATUS_URL: config.stablePreviewStatusUrl,
     SECURE_COOKIE: config.secureCookie,
     SERVICE_GROUP: config.serviceGroup,
     SERVICE_USER: config.serviceUser,
@@ -172,10 +195,18 @@ async function main() {
       readArg(argv, '--output-dir') || path.join(projectRoot, '.local-preview', 'editor-config'),
     previewEnvFile:
       readArg(argv, '--preview-env-file') || '/etc/kb-docs-preview/preview.env',
-    previewPublicUrl: readArg(argv, '--preview-url') || 'http://127.0.0.1:4173',
+    fastPreviewHealthUrl:
+      readArg(argv, '--fast-preview-health-url') || 'http://127.0.0.1:4173/',
+    fastPreviewPublicUrl:
+      readArg(argv, '--fast-preview-url') || readArg(argv, '--preview-url') || 'http://127.0.0.1:4173',
     previewRoot: readArg(argv, '--preview-root') || '/srv/kb-docs-preview',
-    previewStatusUrl:
-      readArg(argv, '--preview-status-url') || 'http://127.0.0.1:4173/__preview/status',
+    stableBuildDebounceMs: readArg(argv, '--stable-build-debounce-ms') || '8000',
+    stablePreviewPublicUrl:
+      readArg(argv, '--stable-preview-url') || 'http://127.0.0.1:4175',
+    stablePreviewStatusUrl:
+      readArg(argv, '--stable-preview-status-url') ||
+      readArg(argv, '--preview-status-url') ||
+      'http://127.0.0.1:4175/__preview/status',
     secureCookie: argv.includes('--secure-cookie'),
     serviceGroup: readArg(argv, '--group') || serviceUser,
     serviceUser,

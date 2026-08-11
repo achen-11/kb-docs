@@ -41,8 +41,8 @@ const canSave = computed(() => dirty.value && !saving.value && !contentTooLarge.
 
 const buildLabel = computed(() => {
   const labels: Record<BuildStatusPayload['status'], string> = {
-    idle: '等待编辑', queued: '已进入队列', saving: '正在保存草稿', building: '正在构建预览',
-    ready: '预览已更新', error: '草稿已保存，预览失败', conflict: '检测到内容冲突',
+    idle: '等待稳定验证', queued: '稳定验证已排队', saving: '正在保存草稿', building: '正在构建稳定预览',
+    ready: '稳定预览已更新', error: '草稿已保存，稳定构建失败', conflict: '检测到内容冲突',
   }
   return labels[buildStatus.value.status]
 })
@@ -67,10 +67,18 @@ function documentPreviewPath(sourcePath: string) {
   return `/${value}/`
 }
 
-const previewUrl = computed(() => {
-  if (!editorConfig.value?.previewBaseUrl || !document.value) return ''
-  const url = new URL(documentPreviewPath(document.value.path), `${editorConfig.value.previewBaseUrl}/`)
-  url.searchParams.set('__editor_release', buildStatus.value.releaseId || String(previewRefreshKey.value))
+const fastPreviewUrl = computed(() => {
+  if (!editorConfig.value?.fastPreviewBaseUrl || !document.value) return ''
+  const url = new URL(documentPreviewPath(document.value.path), `${editorConfig.value.fastPreviewBaseUrl}/`)
+  url.searchParams.set('__editor_view', String(previewRefreshKey.value))
+  return url.toString()
+})
+
+const stablePreviewUrl = computed(() => {
+  if (!editorConfig.value?.stablePreviewBaseUrl || !document.value) return ''
+  const url = new URL(documentPreviewPath(document.value.path), `${editorConfig.value.stablePreviewBaseUrl}/`)
+  const releaseId = previewStatus.value?.stable.status?.releaseId || buildStatus.value.releaseId
+  if (releaseId) url.searchParams.set('__editor_release', releaseId)
   return url.toString()
 })
 
@@ -87,15 +95,24 @@ async function refreshPreviewStatus() {
   try {
     previewStatus.value = await getPreviewStatus()
   } catch (error) {
-    previewStatus.value = { available: false, error: error instanceof Error ? error.message : String(error) }
+    const message = error instanceof Error ? error.message : String(error)
+    previewStatus.value = {
+      fast: { available: false, error: message },
+      stable: { available: false, error: message },
+    }
   }
 }
 
 async function refreshBuildStatus() {
   try {
+    const previous = buildStatus.value.status
     buildStatus.value = await getBuildStatus()
+    if (['queued', 'building'].includes(previous) && buildStatus.value.status === 'ready') {
+      noticeMessage.value = '4175 稳定预览已完成，可以打开进行生产构建核验。'
+      await refreshPreviewStatus()
+    }
   } catch {
-    // The save request reports the terminal error; transient polling failures are non-fatal.
+    // Transient polling failures are non-fatal; the next poll retries.
   }
 }
 
@@ -161,16 +178,20 @@ async function saveDraft() {
     document.value = result.document
     editorContent.value = result.document.content
     conflictDocument.value = null
-    await refreshBuildStatus()
-    if (result.build.status === 'ready') {
-      noticeMessage.value = '草稿已保存，4173 预览已更新。'
-      buildStatus.value = { ...buildStatus.value, status: 'ready', releaseId: result.build.releaseId || null }
-      previewRefreshKey.value += 1
-      await refreshPreviewStatus()
-    } else {
-      noticeMessage.value = '草稿已保存，但本次预览构建失败；4173 仍显示上一个成功版本。'
-      buildStatus.value = { ...buildStatus.value, status: 'error', error: result.build.error || null }
+    buildStatus.value = {
+      ...buildStatus.value,
+      status: 'queued',
+      operationId: result.build.operationId,
+      path: result.document.path,
+      savedAt: result.build.scheduledAt,
+      queued: Math.max(1, buildStatus.value.queued || 0),
+      error: null,
     }
+    noticeMessage.value = '草稿已保存。4173 正在通过 HMR 更新；编辑器会快速重新加载一次作为兜底。4175 稳定验证已在后台排队。'
+    window.setTimeout(() => {
+      previewRefreshKey.value += 1
+    }, 700)
+    window.setTimeout(refreshPreviewStatus, 1000)
   } catch (error) {
     if (error instanceof ApiError && error.code === 'DOCUMENT_CONFLICT') {
       conflictDocument.value = error.payload?.document as DocumentPayload
@@ -189,6 +210,10 @@ function loadServerVersion() {
   conflictDocument.value = null
   errorMessage.value = ''
   noticeMessage.value = '已加载服务器最新版本。此前未保存的本地内容已被替换。'
+}
+
+function reloadFastPreview() {
+  previewRefreshKey.value += 1
 }
 
 async function signOut() {
@@ -259,7 +284,8 @@ onUnmounted(() => {
       </div>
       <div class="topbar-actions">
         <span v-if="dirty" class="dirty-badge">未保存</span>
-        <a v-if="editorConfig?.previewBaseUrl" class="text-link" :href="previewUrl || editorConfig.previewBaseUrl" target="_blank" rel="noreferrer">打开预览站</a>
+        <a v-if="editorConfig?.fastPreviewBaseUrl" class="text-link" :href="fastPreviewUrl || editorConfig.fastPreviewBaseUrl" target="_blank" rel="noreferrer">打开快速预览</a>
+        <a v-if="editorConfig?.stablePreviewBaseUrl" class="text-link" :href="stablePreviewUrl || editorConfig.stablePreviewBaseUrl" target="_blank" rel="noreferrer">打开稳定预览</a>
         <button class="ghost-button" type="button" @click="signOut">退出</button>
       </div>
     </header>
@@ -268,7 +294,7 @@ onUnmounted(() => {
       <aside class="sidebar-panel">
         <div class="mode-banner">
           <span class="mode-dot"></span>
-          <div><strong>共享草稿模式</strong><p>保存会写入服务器工作区并触发生产构建，不会提交 Git。</p></div>
+          <div><strong>共享草稿模式</strong><p>保存后 4173 通过 HMR 快速更新；4175 在后台完成生产构建验证，不会提交 Git。</p></div>
         </div>
 
         <form class="path-form" @submit.prevent="openDocument(false)">
@@ -285,8 +311,8 @@ onUnmounted(() => {
           </div>
           <dl>
             <div><dt>队列</dt><dd>{{ buildStatus.queued || 0 }}</dd></div>
-            <div><dt>Release</dt><dd>{{ buildStatus.releaseId || previewStatus?.status?.releaseId || '—' }}</dd></div>
-            <div><dt>Commit</dt><dd>{{ previewStatus?.status?.sourceCommit || '—' }}</dd></div>
+            <div><dt>稳定 Release</dt><dd>{{ buildStatus.releaseId || previewStatus?.stable.status?.releaseId || '—' }}</dd></div>
+            <div><dt>Commit</dt><dd>{{ previewStatus?.stable.status?.sourceCommit || '—' }}</dd></div>
           </dl>
           <p v-if="buildStatus.error" class="status-error build-error">{{ buildStatus.error }}</p>
           <button class="refresh-button" type="button" @click="refreshBuildStatus">刷新状态</button>
@@ -304,7 +330,7 @@ onUnmounted(() => {
           <div><p class="eyebrow">MARKDOWN DRAFT</p><h1>{{ document.path }}</h1><p>{{ documentStats }} · 修改于 {{ new Date(document.modifiedAt).toLocaleString('zh-CN') }}</p></div>
           <div class="document-actions">
             <div class="hash-block"><span>SHA-256</span><code>{{ document.hash.slice(0, 16) }}…</code></div>
-            <button class="save-button" type="button" :disabled="!canSave" @click="saveDraft">{{ saving ? buildLabel : '保存并更新预览' }}</button>
+            <button class="save-button" type="button" :disabled="!canSave" @click="saveDraft">{{ saving ? '正在保存…' : '保存草稿' }}</button>
             <small>⌘/Ctrl + S</small>
           </div>
         </div>
@@ -315,8 +341,12 @@ onUnmounted(() => {
             <textarea v-model="editorContent" class="source-editor" spellcheck="false" aria-label="Markdown 源文件内容"></textarea>
           </div>
           <div class="preview-pane">
-            <div class="pane-label"><strong>4173 预览</strong><span>{{ previewStatus?.available ? '在线' : '不可用' }}</span></div>
-            <iframe v-if="previewUrl" :key="`${previewRefreshKey}-${buildStatus.releaseId || ''}`" :src="previewUrl" title="文档预览"></iframe>
+            <div class="pane-label">
+              <strong>4173 快速预览</strong>
+              <span>{{ previewStatus?.fast.available ? 'HMR 在线' : '不可用' }}</span>
+              <button class="refresh-button" type="button" @click="reloadFastPreview">重新加载</button>
+            </div>
+            <iframe v-if="fastPreviewUrl" :key="previewRefreshKey" :src="fastPreviewUrl" title="文档快速预览"></iframe>
           </div>
         </div>
 

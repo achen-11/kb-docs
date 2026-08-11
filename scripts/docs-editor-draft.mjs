@@ -9,6 +9,13 @@ export const DEFAULT_MAX_DOCUMENT_BYTES = 2 * 1024 * 1024
 const MAX_BUILD_OUTPUT_BYTES = 256 * 1024
 const MAX_BUILD_ERROR_CHARS = 8_000
 
+class BuildSupersededError extends Error {
+  constructor() {
+    super('Stable preview build was superseded by a newer save')
+    this.name = 'BuildSupersededError'
+  }
+}
+
 export class DocumentConflictError extends Error {
   constructor(currentDocument) {
     super('Document changed after it was opened')
@@ -138,9 +145,34 @@ async function writeJsonAtomically(filePath, payload) {
   }
 }
 
-async function runCommand(command, args, cwd) {
-  const child = spawn(command, args, { cwd, shell: false, stdio: ['ignore', 'pipe', 'pipe'] })
+async function runCommand(command, args, cwd, { signal: abortSignal } = {}) {
+  if (abortSignal?.aborted) throw new BuildSupersededError()
+  const detached = process.platform !== 'win32'
+  const child = spawn(command, args, {
+    cwd,
+    detached,
+    shell: false,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  })
   let captured = Buffer.alloc(0)
+  let forceKillTimer
+  const terminate = () => {
+    try {
+      if (detached && child.pid) process.kill(-child.pid, 'SIGTERM')
+      else child.kill('SIGTERM')
+    } catch (error) {
+      if (error?.code !== 'ESRCH') throw error
+    }
+    forceKillTimer = setTimeout(() => {
+      try {
+        if (detached && child.pid) process.kill(-child.pid, 'SIGKILL')
+        else child.kill('SIGKILL')
+      } catch (error) {
+        if (error?.code !== 'ESRCH') console.error(error)
+      }
+    }, 2_000)
+    forceKillTimer.unref?.()
+  }
   const capture = (chunk) => {
     captured = Buffer.concat([captured, chunk])
     if (captured.length > MAX_BUILD_OUTPUT_BYTES) {
@@ -149,17 +181,35 @@ async function runCommand(command, args, cwd) {
   }
   child.stdout.on('data', capture)
   child.stderr.on('data', capture)
+  if (abortSignal?.aborted) terminate()
+  else abortSignal?.addEventListener('abort', terminate, { once: true })
   return new Promise((resolve, reject) => {
-    child.once('error', reject)
-    child.once('close', (code, signal) => {
+    let settled = false
+    const cleanup = () => {
+      clearTimeout(forceKillTimer)
+      abortSignal?.removeEventListener?.('abort', terminate)
+      child.off('error', onError)
+      child.off('close', onClose)
+    }
+    const settle = (callback) => {
+      if (settled) return
+      settled = true
+      cleanup()
+      callback()
+    }
+    const onError = (error) => settle(() => reject(error))
+    const onClose = (code, processSignal) => settle(() => {
       const output = captured.toString('utf8').trim()
-      if (code === 0) resolve({ output })
+      if (abortSignal?.aborted) reject(new BuildSupersededError())
+      else if (code === 0) resolve({ output })
       else {
         const suffix = output.slice(-MAX_BUILD_ERROR_CHARS)
-        const reason = signal ? `terminated by ${signal}` : `exited with code ${code}`
+        const reason = processSignal ? `terminated by ${processSignal}` : `exited with code ${code}`
         reject(new Error(`${command} ${reason}${suffix ? `\n${suffix}` : ''}`))
       }
     })
+    child.once('error', onError)
+    child.once('close', onClose)
   })
 }
 
@@ -196,6 +246,14 @@ async function appendAudit(auditLog, event) {
   await appendFile(auditLog, `${JSON.stringify({ schemaVersion: 1, ...event })}\n`, { encoding: 'utf8', mode: 0o640 })
 }
 
+async function appendBackgroundAudit(auditLog, event) {
+  try {
+    await appendAudit(auditLog, event)
+  } catch (error) {
+    console.error('Unable to append documentation editor build audit event', error)
+  }
+}
+
 function publicError(error) {
   const message = error instanceof Error ? error.message : String(error)
   return message.slice(-MAX_BUILD_ERROR_CHARS)
@@ -210,16 +268,21 @@ export function createDraftCoordinator({
   lockFile = path.join(previewRoot, '.update.lock'),
   lockTimeoutMs = 180_000,
   maximumBytes = DEFAULT_MAX_DOCUMENT_BYTES,
+  buildDebounceMs = 8_000,
   buildCommand,
   readDocument,
   normalizeDocumentPath,
 }) {
-  let tail = Promise.resolve()
-  let queued = 0
+  let saveTail = Promise.resolve()
+  let saveQueued = 0
   let sequence = 0
+  let pendingBuild = null
+  let buildTimer = null
+  let buildPromise = null
+  let activeBuildController = null
+  const idleWaiters = new Set()
   const status = {
     status: 'idle',
-    queued: 0,
     operationId: null,
     path: null,
     savedAt: null,
@@ -228,8 +291,121 @@ export function createDraftCoordinator({
     error: null,
   }
 
-  const snapshot = () => ({ ...status, queued })
+  const queuedCount = () => saveQueued + (pendingBuild ? 1 : 0)
+  const snapshot = () => ({ ...status, queued: queuedCount() })
   const setStatus = (next, extra = {}) => Object.assign(status, { status: next, ...extra })
+
+  function isIdle() {
+    return saveQueued === 0 && !pendingBuild && !buildTimer && !buildPromise
+  }
+
+  function notifyIdle() {
+    if (!isIdle()) return
+    for (const resolve of idleWaiters) resolve()
+    idleWaiters.clear()
+  }
+
+  function createBuildCommand(paths) {
+    return buildCommand || {
+      command: '/bin/bash',
+      args: [
+        path.join(projectRoot, 'deploy', 'preview', 'update.sh'),
+        '--app-dir', projectRoot,
+        '--env-file', previewEnvFile,
+        '--reason', `editor draft ${paths.join(', ')}`,
+        '--skip-lock',
+      ],
+    }
+  }
+
+  async function performBuild(job) {
+    const controller = new AbortController()
+    activeBuildController = controller
+    setStatus('building', {
+      operationId: job.operationId,
+      path: job.paths.at(-1) || null,
+      error: null,
+      finishedAt: null,
+    })
+    try {
+      if (controller.signal.aborted) throw new BuildSupersededError()
+      return await withPreviewLock({ lockFile, timeoutMs: lockTimeoutMs }, async () => {
+        if (controller.signal.aborted) throw new BuildSupersededError()
+        const command = createBuildCommand(job.paths)
+        await runCommand(command.command, command.args, projectRoot, { signal: controller.signal })
+        const previewStatus = await readJson(path.join(previewRoot, '.preview-status.json'))
+        const finishedAt = new Date().toISOString()
+        setStatus('ready', { finishedAt, releaseId: previewStatus?.releaseId || null, error: null })
+        await appendBackgroundAudit(auditLog, {
+          at: finishedAt,
+          actor: job.actor,
+          operationId: job.operationId,
+          paths: job.paths,
+          releaseId: status.releaseId,
+          outcome: 'preview_ready',
+        })
+      })
+    } catch (error) {
+      const finishedAt = new Date().toISOString()
+      if (error instanceof BuildSupersededError) {
+        await appendBackgroundAudit(auditLog, {
+          at: finishedAt,
+          actor: job.actor,
+          operationId: job.operationId,
+          paths: job.paths,
+          outcome: 'preview_superseded',
+        })
+        return
+      }
+      const errorSummary = publicError(error)
+      setStatus('error', { finishedAt, error: errorSummary })
+      await appendBackgroundAudit(auditLog, {
+        at: finishedAt,
+        actor: job.actor,
+        operationId: job.operationId,
+        paths: job.paths,
+        error: errorSummary,
+        outcome: 'preview_error',
+      })
+    } finally {
+      if (activeBuildController === controller) activeBuildController = null
+    }
+  }
+
+  function startBuild() {
+    buildTimer = null
+    if (buildPromise || !pendingBuild) return
+    const job = pendingBuild
+    pendingBuild = null
+    buildPromise = performBuild(job).finally(() => {
+      buildPromise = null
+      if (pendingBuild) scheduleBuildTimer()
+      else notifyIdle()
+    })
+  }
+
+  function scheduleBuildTimer() {
+    if (buildPromise || !pendingBuild) return
+    clearTimeout(buildTimer)
+    setStatus('queued', {
+      operationId: pendingBuild.operationId,
+      path: pendingBuild.paths.at(-1) || null,
+      error: null,
+      finishedAt: null,
+    })
+    buildTimer = setTimeout(startBuild, buildDebounceMs)
+  }
+
+  function scheduleBuild({ actor, operationId, path: documentPath }) {
+    if (pendingBuild) {
+      pendingBuild.actor = actor
+      pendingBuild.operationId = operationId
+      if (!pendingBuild.paths.includes(documentPath)) pendingBuild.paths.push(documentPath)
+    } else {
+      pendingBuild = { actor, operationId, paths: [documentPath] }
+    }
+    if (!buildPromise) scheduleBuildTimer()
+  }
 
   async function performSave({ documentPath, content, expectedHash, actor }) {
     const operationId = `${Date.now()}-${++sequence}`
@@ -284,35 +460,15 @@ export function createDraftCoordinator({
       await appendAudit(auditLog, {
         at: savedAt, actor, operationId, path: normalizedPath, hash: document.hash, bytes: document.bytes, outcome: 'saved',
       })
-
-      setStatus('building')
-      const command = buildCommand || {
-        command: '/bin/bash',
-        args: [
-          path.join(projectRoot, 'deploy', 'preview', 'update.sh'),
-          '--app-dir', projectRoot,
-          '--env-file', previewEnvFile,
-          '--reason', `editor draft ${normalizedPath}`,
-          '--skip-lock',
-        ],
-      }
-      try {
-        await runCommand(command.command, command.args, projectRoot)
-        const previewStatus = await readJson(path.join(previewRoot, '.preview-status.json'))
-        const finishedAt = new Date().toISOString()
-        setStatus('ready', { finishedAt, releaseId: previewStatus?.releaseId || null, error: null })
-        await appendAudit(auditLog, {
-          at: finishedAt, actor, operationId, path: normalizedPath, releaseId: status.releaseId, outcome: 'preview_ready',
-        })
-        return { document, build: { status: 'ready', releaseId: status.releaseId, finishedAt } }
-      } catch (error) {
-        const finishedAt = new Date().toISOString()
-        const errorSummary = publicError(error)
-        setStatus('error', { finishedAt, error: errorSummary })
-        await appendAudit(auditLog, {
-          at: finishedAt, actor, operationId, path: normalizedPath, error: errorSummary, outcome: 'preview_error',
-        })
-        return { document, build: { status: 'error', error: errorSummary, finishedAt } }
+      scheduleBuild({ actor, operationId, path: normalizedPath })
+      return {
+        document,
+        build: {
+          status: 'queued',
+          operationId,
+          scheduledAt: savedAt,
+          debounceMs: buildDebounceMs,
+        },
       }
     })
   }
@@ -320,17 +476,18 @@ export function createDraftCoordinator({
   return {
     getStatus: snapshot,
     save(input) {
-      const wasIdle = queued === 0
-      queued += 1
-      if (wasIdle) setStatus('queued', { path: input.documentPath, error: null })
-      const task = tail.then(() => performSave(input))
-      tail = task.catch(() => undefined).finally(() => {
-        queued -= 1
-        if (queued === 0 && status.status === 'queued') {
-          setStatus('idle', { operationId: null, path: null })
-        }
+      activeBuildController?.abort()
+      saveQueued += 1
+      const task = saveTail.then(() => performSave(input))
+      saveTail = task.catch(() => undefined).finally(() => {
+        saveQueued -= 1
+        notifyIdle()
       })
       return task
+    },
+    waitForIdle() {
+      if (isIdle()) return Promise.resolve()
+      return new Promise((resolve) => idleWaiters.add(resolve))
     },
     async readCurrent(documentPath) {
       return readDocument(projectRoot, documentPath)
