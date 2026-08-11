@@ -4,6 +4,7 @@ export interface EditorConfig {
   maximumDocumentBytes: number
   fastPreviewBaseUrl: string
   stablePreviewBaseUrl: string
+  productionPublishAvailable: boolean
 }
 
 export interface DocumentPayload {
@@ -34,7 +35,7 @@ export interface PreviewStatusPayload {
   }
 }
 
-export type BuildState = 'idle' | 'queued' | 'saving' | 'building' | 'ready' | 'error' | 'conflict'
+export type BuildState = 'idle' | 'draft_saved' | 'queued' | 'saving' | 'building' | 'ready' | 'error' | 'conflict'
 
 export interface BuildStatusPayload {
   status: BuildState
@@ -50,11 +51,18 @@ export interface BuildStatusPayload {
 export interface SaveDocumentPayload {
   document: DocumentPayload
   build: {
-    status: 'queued'
+    status: 'not_requested'
     operationId: string
     scheduledAt: string
     debounceMs: number
   }
+}
+
+export interface RequestBuildPayload {
+  status: 'queued'
+  operationId: string
+  scheduledAt: string
+  debounceMs: number
 }
 
 export class ApiError extends Error {
@@ -122,6 +130,13 @@ export function saveDocument(path: string, content: string, expectedHash: string
   return request<SaveDocumentPayload>('/api/document', {
     method: 'PUT',
     body: JSON.stringify({ path, content, expectedHash }),
+  })
+}
+
+export function requestStableBuild(path: string) {
+  return request<RequestBuildPayload>('/api/build', {
+    method: 'POST',
+    body: JSON.stringify({ path }),
   })
 }
 

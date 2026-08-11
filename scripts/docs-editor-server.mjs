@@ -480,6 +480,7 @@ export async function createDocsEditorServer(input = {}) {
           maximumDocumentBytes: config.maximumDocumentBytes,
           fastPreviewBaseUrl: config.fastPreviewBaseUrl,
           stablePreviewBaseUrl: config.stablePreviewBaseUrl,
+          productionPublishAvailable: false,
         })
         return
       }
@@ -506,6 +507,22 @@ export async function createDocsEditorServer(input = {}) {
             })
             return
           }
+          if (error instanceof DocumentValidationError) {
+            sendJson(response, error.statusCode, { error: error.message })
+            return
+          }
+          throw error
+        }
+        return
+      }
+      if (request.method === 'POST' && url.pathname === '/api/build') {
+        const body = await readJsonBody(request)
+        try {
+          sendJson(response, 202, await draftCoordinator.build({
+            actor: request.socket.remoteAddress || 'unknown',
+            documentPath: body.path,
+          }))
+        } catch (error) {
           if (error instanceof DocumentValidationError) {
             sendJson(response, error.statusCode, { error: error.message })
             return

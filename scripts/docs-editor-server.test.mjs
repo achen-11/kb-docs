@@ -99,8 +99,12 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
         }
         return {
           document: { ...document, content: input.content, hash: '2'.repeat(64) },
-          build: { status: 'queued', operationId: 'test-operation', scheduledAt: new Date(0).toISOString(), debounceMs: 8000 },
+          build: { status: 'not_requested', operationId: 'test-operation', scheduledAt: new Date(0).toISOString(), debounceMs: 0 },
         }
+      },
+      async build(input) {
+        assert.equal(input.documentPath, 'docs/index.md')
+        return { status: 'queued', operationId: 'test-build', scheduledAt: new Date(1).toISOString(), debounceMs: 0 }
       },
     },
   })
@@ -158,6 +162,7 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
     maximumDocumentBytes: 2097152,
     fastPreviewBaseUrl: 'http://preview.example:4173',
     stablePreviewBaseUrl: 'http://preview.example:4175',
+    productionPublishAvailable: false,
   })
 
   const saveResponse = await fetch(`${editorUrl}/api/document`, {
@@ -171,10 +176,23 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
   })
   assert.equal(saveResponse.status, 200)
   assert.deepEqual((await saveResponse.json()).build, {
-    status: 'queued',
+    status: 'not_requested',
     operationId: 'test-operation',
     scheduledAt: new Date(0).toISOString(),
-    debounceMs: 8000,
+    debounceMs: 0,
+  })
+
+  const buildResponse = await fetch(`${editorUrl}/api/build`, {
+    method: 'POST',
+    headers: { ...authenticatedHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: 'docs/index.md' }),
+  })
+  assert.equal(buildResponse.status, 202)
+  assert.deepEqual(await buildResponse.json(), {
+    status: 'queued',
+    operationId: 'test-build',
+    scheduledAt: new Date(1).toISOString(),
+    debounceMs: 0,
   })
 
   const conflictResponse = await fetch(`${editorUrl}/api/document`, {

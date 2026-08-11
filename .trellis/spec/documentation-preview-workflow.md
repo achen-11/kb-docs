@@ -237,6 +237,8 @@ Linux + systemd + Nginx 的配置模板、dry-run 安装器和更新脚本位于
 
 Phase 3 快速预览扩展（2026-08-11）：已部署到 kbdev，部署提交为 `8c25f90`。保存 API 在原子写入和草稿标记完成后返回 `queued`，稳定构建在后台 debounce；连续保存会合并，正在运行的旧构建会被取消。4173 运行常驻 VitePress Dev Server，4174 运行编辑器，4175 提供不可变稳定 release。29 个聚焦 Node 测试、编辑器构建、完整 VitePress 构建、Dev 与生产构建并发测试均通过；排除 `dist` / `.temp` 后稳定构建没有触发全站 reload 风暴。真实服务器验收中，保存请求 22ms 返回，4173 浏览器在 API 响应时间戳后 289ms 看到 Markdown 更新；包含 8 秒 debounce 的 4175 release 在保存后 38.563 秒完成。恢复请求 20ms 返回，release `20260811T103536Z-8c25f90-24` 恢复原文。部署前已有的 `docs/cli/index.md` 用户草稿及 draft marker 已备份并逐字节保留，最终工作区只保留该原始草稿。
 
+编辑工作流调整（2026-08-11）：后续版本将草稿保存与稳定构建拆为显式动作。`保存草稿` 只执行哈希校验、原子写入和 draft marker 更新，由 4173 HMR 提供快速反馈；`构建预览` 才启动完整 VitePress 构建并切换 4175 release。编辑器内嵌的 4173 页面通过受校验的 `postMessage` 回传 VitePress `relativePath`，预览切页时自动加载对应 Markdown；工具侧栏默认收起并允许展开。`发布线上` 保留为独立的最高风险入口，在生产命令、凭据、审核与二次确认未配置前必须禁用。实施记录只保留任务状态、关键合约和验证证据，不再机械追加冗余 Trellis session。
+
 ### Phase 4：Git 提交与审核
 
 - 提交前展示完整 diff 并要求修改说明。

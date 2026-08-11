@@ -393,18 +393,26 @@ export function createDraftCoordinator({
       error: null,
       finishedAt: null,
     })
-    buildTimer = setTimeout(startBuild, buildDebounceMs)
+    buildTimer = setTimeout(startBuild, pendingBuild.delayMs)
   }
 
-  function scheduleBuild({ actor, operationId, path: documentPath }) {
+  function scheduleBuild({ actor, operationId, path: documentPath, delayMs = 0 }) {
     if (pendingBuild) {
       pendingBuild.actor = actor
       pendingBuild.operationId = operationId
+      pendingBuild.delayMs = Math.min(pendingBuild.delayMs, delayMs)
       if (!pendingBuild.paths.includes(documentPath)) pendingBuild.paths.push(documentPath)
     } else {
-      pendingBuild = { actor, operationId, paths: [documentPath] }
+      pendingBuild = { actor, operationId, delayMs, paths: [documentPath] }
     }
     if (!buildPromise) scheduleBuildTimer()
+  }
+
+  function cancelStableBuild() {
+    clearTimeout(buildTimer)
+    buildTimer = null
+    pendingBuild = null
+    activeBuildController?.abort()
   }
 
   async function performSave({ documentPath, content, expectedHash, actor }) {
@@ -460,23 +468,51 @@ export function createDraftCoordinator({
       await appendAudit(auditLog, {
         at: savedAt, actor, operationId, path: normalizedPath, hash: document.hash, bytes: document.bytes, outcome: 'saved',
       })
-      scheduleBuild({ actor, operationId, path: normalizedPath })
+      setStatus('draft_saved', {
+        operationId,
+        path: normalizedPath,
+        savedAt,
+        finishedAt: savedAt,
+        error: null,
+      })
       return {
         document,
         build: {
-          status: 'queued',
+          status: 'not_requested',
           operationId,
           scheduledAt: savedAt,
-          debounceMs: buildDebounceMs,
+          debounceMs: 0,
         },
       }
     })
   }
 
+  async function requestBuild({ documentPath, actor }) {
+    const operationId = `${Date.now()}-${++sequence}`
+    const normalizedPath = normalizeDocumentPath(documentPath)
+    await readDocument(projectRoot, normalizedPath)
+    const scheduledAt = new Date().toISOString()
+    await appendAudit(auditLog, {
+      at: scheduledAt,
+      actor,
+      operationId,
+      path: normalizedPath,
+      outcome: 'preview_queued',
+    })
+    activeBuildController?.abort()
+    scheduleBuild({ actor, operationId, path: normalizedPath, delayMs: 0 })
+    return {
+      status: 'queued',
+      operationId,
+      scheduledAt,
+      debounceMs: 0,
+    }
+  }
+
   return {
     getStatus: snapshot,
     save(input) {
-      activeBuildController?.abort()
+      cancelStableBuild()
       saveQueued += 1
       const task = saveTail.then(() => performSave(input))
       saveTail = task.catch(() => undefined).finally(() => {
@@ -484,6 +520,9 @@ export function createDraftCoordinator({
         notifyIdle()
       })
       return task
+    },
+    build(input) {
+      return saveTail.then(() => requestBuild(input))
     },
     waitForIdle() {
       if (isIdle()) return Promise.resolve()

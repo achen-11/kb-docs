@@ -80,7 +80,7 @@ test('writeDocumentAtomically checks hashes, preserves permissions, and rejects 
   assert.equal(await readFile(filePath, 'utf8'), '# Updated\n')
 })
 
-test('draft coordinator returns after atomic saves and coalesces background stable builds', async (t) => {
+test('draft coordinator keeps saves fast and builds the stable preview only when requested', async (t) => {
   const fixture = await createFixture()
   t.after(() => rm(fixture.root, { recursive: true, force: true }))
   const buildLog = path.join(fixture.root, 'build.log')
@@ -119,9 +119,13 @@ test('draft coordinator returns after atomic saves and coalesces background stab
       actor: 'test', documentPath: 'docs/two.md', content: '# Two edited\n', expectedHash: hashContent('# Two\n'),
     }),
   ])
-  assert.equal(one.build.status, 'queued')
-  assert.equal(two.build.status, 'queued')
+  assert.equal(one.build.status, 'not_requested')
+  assert.equal(two.build.status, 'not_requested')
   await assert.rejects(() => readFile(buildLog, 'utf8'), { code: 'ENOENT' })
+  assert.equal(coordinator.getStatus().status, 'draft_saved')
+
+  const build = await coordinator.build({ actor: 'test', documentPath: 'docs/one.md' })
+  assert.equal(build.status, 'queued')
   await coordinator.waitForIdle()
   assert.equal(await readFile(buildLog, 'utf8'), 'start\nend\n')
   assert.equal(coordinator.getStatus().status, 'ready')
@@ -138,11 +142,12 @@ test('draft coordinator returns after atomic saves and coalesces background stab
     actor: 'test', documentPath: 'docs/two.md', content: '# Two\n', expectedHash: hashContent(currentTwo),
   })
   await coordinator.waitForIdle()
-  assert.equal(await readFile(buildLog, 'utf8'), 'start\nend\nstart\nend\n')
+  assert.equal(await readFile(buildLog, 'utf8'), 'start\nend\n')
+  assert.equal(coordinator.getStatus().status, 'draft_saved')
   await assert.rejects(() => readFile(draftStateFile, 'utf8'), { code: 'ENOENT' })
 })
 
-test('draft coordinator keeps a saved document when preview build fails', async (t) => {
+test('draft coordinator keeps a saved document when an explicit preview build fails', async (t) => {
   const fixture = await createFixture()
   t.after(() => rm(fixture.root, { recursive: true, force: true }))
   const coordinator = createDraftCoordinator({
@@ -158,14 +163,16 @@ test('draft coordinator keeps a saved document when preview build fails', async 
   const result = await coordinator.save({
     actor: 'test', documentPath: 'docs/one.md', content: '# Saved despite failure\n', expectedHash: hashContent('# One\n'),
   })
-  assert.equal(result.build.status, 'queued')
+  assert.equal(result.build.status, 'not_requested')
   assert.equal(await readFile(path.join(fixture.root, 'docs', 'one.md'), 'utf8'), '# Saved despite failure\n')
+  const build = await coordinator.build({ actor: 'test', documentPath: 'docs/one.md' })
+  assert.equal(build.status, 'queued')
   await coordinator.waitForIdle()
   assert.equal(coordinator.getStatus().status, 'error')
   assert.match(coordinator.getStatus().error, /exited with code 9/u)
 })
 
-test('a newer save supersedes an active stable build instead of waiting for it', async (t) => {
+test('a newer save supersedes an active stable build without starting another build', async (t) => {
   const fixture = await createFixture()
   t.after(() => rm(fixture.root, { recursive: true, force: true }))
   const buildStub = path.join(fixture.root, 'slow-build.mjs')
@@ -194,7 +201,8 @@ test('a newer save supersedes an active stable build instead of waiting for it',
   const first = await coordinator.save({
     actor: 'test', documentPath: 'docs/one.md', content: '# First\n', expectedHash: hashContent('# One\n'),
   })
-  assert.equal(first.build.status, 'queued')
+  assert.equal(first.build.status, 'not_requested')
+  await coordinator.build({ actor: 'test', documentPath: 'docs/one.md' })
   while (coordinator.getStatus().status !== 'building') {
     await new Promise((resolve) => setTimeout(resolve, 10))
   }
@@ -203,9 +211,9 @@ test('a newer save supersedes an active stable build instead of waiting for it',
   const second = await coordinator.save({
     actor: 'test', documentPath: 'docs/one.md', content: '# Second\n', expectedHash: first.document.hash,
   })
-  assert.equal(second.build.status, 'queued')
+  assert.equal(second.build.status, 'not_requested')
   assert.ok(Date.now() - startedAt < 2500)
   await coordinator.waitForIdle()
-  assert.equal(coordinator.getStatus().status, 'ready')
+  assert.equal(coordinator.getStatus().status, 'draft_saved')
   assert.match(await readFile(path.join(fixture.previewRoot, 'editor-audit.jsonl'), 'utf8'), /preview_superseded/u)
 })
