@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 6
+- **Total Sessions**: 7
 - **Last Active**: 2026-08-11
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~272 | Active |
+| `journal-1.md` | ~323 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits |
 |---|------|-------|---------|
+| 7 | 2026-08-11 | Deploy fast documentation preview to kbdev | `e2b7173`, `8c25f90`, `a119332` |
 | 6 | 2026-08-11 | Deploy Phase 3 shared draft editor | `422bee6`, `9b17706` |
 | 5 | 2026-08-11 | Deploy Phase 2 documentation editor | `3b1ae44`, `abc9cf0` |
 | 4 | 2026-04-16 | 补全 k.DB.sqlite API 文档并通过 curl 验证 | - |

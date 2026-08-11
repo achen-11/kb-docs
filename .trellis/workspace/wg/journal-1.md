@@ -277,3 +277,46 @@ Implemented and deployed hash-checked atomic Markdown saving, serialized preview
 ### Next Steps
 
 - None - task complete
+
+
+## Session 7: Deploy fast documentation preview to kbdev
+
+**Date**: 2026-08-11
+**Task**: Deploy fast documentation preview to kbdev
+
+### Summary
+
+Implemented and deployed VitePress HMR preview on 4173, authenticated editor on 4174, and immutable stable preview on 4175; verified 22ms save response, 289ms visible update, background stable build, Git sync, and service health.
+
+### Main Changes
+
+- Added persistent VitePress Dev Server deployment on port 4173 for Markdown HMR.
+- Kept the authenticated Markdown editor on port 4174 and moved immutable full-build preview releases to port 4175.
+- Changed saves to return `queued` after hash validation and atomic write; stable builds now debounce, coalesce, and cancel superseded builds.
+- Corrected the systemd command-line argument forwarding so VitePress binds to `0.0.0.0:4173` on kbdev.
+- Recorded the real kbdev deployment evidence in the workflow specification and completed task metadata.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `e2b7173` | feat(docs-editor): add fast HMR preview |
+| `8c25f90` | fix(docs-preview): pass dev server options |
+| `a119332` | docs(docs-editor): record fast preview deployment |
+
+### Testing
+
+- [OK] 29 focused Node tests passed.
+- [OK] Editor production build and full VitePress build passed.
+- [OK] Dev Server and production build ran concurrently without a `.vitepress/dist` reload storm.
+- [OK] Real save returned in 22 ms and port 4173 showed the Markdown update 289 ms after the API response timestamp.
+- [OK] Stable release `20260811T103536Z-8c25f90-24` restored the acceptance document; the later Git sync published `20260811T104124Z-a119332-27`.
+- [OK] Ports 4173, 4174, and 4175, all preview/editor services, the Git sync timer, and Kooboo.Web were active after deployment.
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
