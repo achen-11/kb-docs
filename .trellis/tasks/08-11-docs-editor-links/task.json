@@ -3,18 +3,18 @@
   "name": "docs-editor-links",
   "title": "Add VitePress edit links and a read-only documentation editor",
   "description": "Implement Phase 2 of the approved documentation workflow: environment-gated VitePress edit links and an authenticated, read-only editor platform with safe document loading and preview status.",
-  "status": "in_progress",
+  "status": "completed",
   "dev_type": null,
   "scope": "docs/.vitepress, editor, scripts/docs-editor-*, deploy/editor, package.json, pnpm-lock.yaml, .trellis/spec/documentation-preview-workflow.md",
   "priority": "P1",
   "creator": "wg",
   "assignee": "wg",
   "createdAt": "2026-08-11",
-  "completedAt": null,
+  "completedAt": "2026-08-11",
   "branch": "codex/docs-editor-phase2",
   "base_branch": "codex/docs-preview-phase1",
   "worktree_path": null,
-  "current_phase": 1,
+  "current_phase": 3,
   "next_action": [
     {
       "phase": 1,
@@ -33,7 +33,7 @@
       "action": "create-pr"
     }
   ],
-  "commit": null,
+  "commit": "abc9cf0dfbe0bf23ad77fed43f14c6ad6186012f",
   "pr_url": null,
   "subtasks": [],
   "children": [],
@@ -46,5 +46,5 @@
     "scripts/docs-editor-server.test.mjs",
     "deploy/editor/install.sh"
   ],
-  "notes": "Phase 2 is read-only. It must not save Markdown, create commits, expose Git credentials, or weaken the Phase 1 fast-forward-only preview pipeline. Public VitePress builds keep edit links disabled unless DOCS_EDITOR_BASE_URL is explicitly set."
+  "notes": "Phase 2 is deployed to kbdev. The editor remains read-only and has no save, Git, SSH, Kooboo, or filesystem write API. Public VitePress builds keep edit links disabled unless DOCS_EDITOR_BASE_URL is explicitly set. The first verified Phase 2 preview release was 20260811T063649Z-abc9cf0-10; subsequent documentation-only commits continue through the same atomic Git sync pipeline. Kooboo.Web remains active."
 }

@@ -192,13 +192,15 @@ Linux + systemd + Nginx 的配置模板、dry-run 安装器和更新脚本位于
 - 只有构建和健康检查成功后才推进“已发布 commit”标记；失败时下一轮继续重试，旧 release 保持可用。
 - 开发者的第一条可用链路为 `commit/push -> 主动拉取 -> 自动构建 -> 4173 更新`。
 
-当前实施状态（2026-08-11）：Phase 1 已完成。同步器、跨进程锁、systemd timer 和 CNB 仓库级 HTTPS 只读部署令牌均已启用；服务器使用 `/opt/kb-docs-git` 的干净 checkout，轮询 `codex/docs-preview-phase1`，间隔 30 秒。端到端提交 `18c23fe` 已自动完成 fetch、fast-forward、VitePress 构建、健康检查和 release 原子切换，且构建期间旧 release 持续可用。原 `/opt/kb-docs` 非 Git 副本保留为回滚材料。后续进入 Phase 2：VitePress 编辑链接和编辑平台骨架。
+当前实施状态（2026-08-11）：Phase 1 已完成。同步器、跨进程锁、systemd timer 和 CNB 仓库级 HTTPS 只读部署令牌均已启用；服务器使用 `/opt/kb-docs-git` 的干净 checkout，轮询指定预览分支，间隔 30 秒。端到端更新已自动完成 fetch、fast-forward、VitePress 构建、健康检查和 release 原子切换，且构建期间旧 release 持续可用。原 `/opt/kb-docs` 非 Git 副本保留为回滚材料。当前预览分支已切换为 `codex/docs-editor-phase2`。
 
 ### Phase 2：VitePress 编辑链接与编辑平台骨架
 
 - 编辑链接通过环境变量配置编辑平台地址，内网预览显示，公开构建默认关闭。
 - 使用 VitePress 提供的真实 `filePath` 生成链接；编辑平台必须再次进行路径白名单和路径穿越校验。
 - 创建独立的编辑服务，第一版提供登录、打开文档、只读展示和构建状态入口。
+
+当前实施状态（2026-08-11）：Phase 2 已部署。首个已验证 release `20260811T063649Z-abc9cf0-10` 基于提交 `abc9cf0`，中英文页脚编辑链接分别携带真实 `docs/...` 源文件路径并指向 `http://192.168.10.75:4174/`；后续仅记录状态的提交继续通过同一 Git 同步与原子 release 流程发布。4174 使用独立 systemd 服务、root-owned 访问口令文件、HttpOnly 严格同站会话和 `docs/**/*.md` 服务端路径白名单；只提供登录、只读文档、元数据和 4173 状态查询，不包含任何保存或 Git 接口。4173、4174、Git timer 与 Kooboo.Web 均保持 active。
 
 ### Phase 3：草稿保存与自动预览
 

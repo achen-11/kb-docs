@@ -83,7 +83,10 @@
 
 ### Main Changes
 
-
+- Added environment-gated VitePress edit links based on the real `PageData.filePath`.
+- Added the authenticated, read-only Vue editor and hardened Node document service.
+- Added editor and preview systemd deployment configuration, tests, and operations guidance.
+- Deployed `codex/docs-editor-phase2` to kbdev on ports 4173 and 4174.
 
 ### Git Commits
 
@@ -91,7 +94,11 @@
 
 ### Testing
 
-- [OK] (Add test results)
+- [OK] 10 focused Node tests passed before deployment; the installer regression test added later also passed.
+- [OK] Vue editor production build and VitePress public/internal builds passed.
+- [OK] Public builds contained no internal edit link; Chinese and English internal links were verified.
+- [OK] Server authentication, document metadata, preview status, logout, browser navigation, and console checks passed.
+- [OK] `kb-docs-preview`, `kb-docs-preview-sync.timer`, `kb-docs-editor`, and `Kooboo.Web` remained active.
 
 ### Status
 
@@ -197,3 +204,36 @@ docs(product): 更新 AI Claw 文档与截图
 ### Next Steps
 
 - 用户确认后可 git commit；push 需二次确认
+
+
+## Session 5: Deploy Phase 2 documentation editor
+
+**Date**: 2026-08-11
+**Task**: Deploy Phase 2 documentation editor
+
+### Summary
+
+Implemented and deployed environment-gated VitePress edit links plus an authenticated read-only Vue editor on kbdev; verified Git sync, release status, path security, browser navigation, and Kooboo.Web isolation.
+
+### Main Changes
+
+
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `3b1ae44` | (see git log) |
+| `abc9cf0` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
