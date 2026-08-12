@@ -52,5 +52,8 @@
     "vitepress": "^1.6.4",
     "vitepress-plugin-mermaid-diagram": "^0.3.2",
     "vue": "^3.5.30"
+  },
+  "dependencies": {
+    "vue-router": "^4.6.4"
   }
 }

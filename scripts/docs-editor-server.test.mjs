@@ -117,6 +117,10 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
   assert.match(indexResponse.headers.get('content-security-policy'), /frame-ancestors 'none'/u)
   assert.match(indexResponse.headers.get('content-security-policy'), /frame-src http:\/\/preview\.example:4173/u)
 
+  const nestedSpaResponse = await fetch(`${editorUrl}/content/editor?path=docs%2Findex.md`)
+  assert.equal(nestedSpaResponse.status, 200)
+  assert.match(await nestedSpaResponse.text(), /id="app"/u)
+
   const unauthorized = await fetch(`${editorUrl}/api/document?path=docs%2Findex.md`)
   assert.equal(unauthorized.status, 401)
 
