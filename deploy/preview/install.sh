@@ -189,7 +189,7 @@ fi
 (
   cd "${APP_DIR}"
   runuser -u "${SERVICE_USER}" -- env HOME="${SERVICE_HOME}" \
-    corepack pnpm install --frozen-lockfile
+    corepack pnpm install --frozen-lockfile --store-dir "${DATA_DIR}/.pnpm-store"
   runuser -u "${SERVICE_USER}" -- env \
     DOCS_EDITOR_BASE_URL="${EDITOR_BASE_URL}" \
     DOCS_PREVIEW_KEEP_RELEASES="${KEEP_RELEASES}" \
