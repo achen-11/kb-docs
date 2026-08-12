@@ -71,15 +71,5 @@ title: Kooboo Documentation Center
 </div>
 </section>
 
-<section class="kb-doc-product" aria-labelledby="kb-doc-product-title">
-<h2 id="kb-doc-product-title">Kooboo Product Map</h2>
-<div class="kb-doc-product__list">
-<a href="/en/cms/settings/domains"><span>Domains</span><strong>Domains</strong><em>Bind and manage domains for a site</em></a>
-<a href="/en/api/mail/"><span>Mail</span><strong>Mail APIs</strong><em>Send and receive mail, IMAP / SMTP, and message parsing</em></a>
-<a href="/en/cms/commerce/product-management"><span>Products</span><strong>Product Management</strong><em>Create products, variants, categories, and commerce content</em></a>
-<a href="/en/cms/development/"><span>Dev Tools</span><strong>Developer Mode</strong><em>Edit pages, layouts, views, scripts, styles, and code together</em></a>
-<a href="/en/cms/settings/ai-service"><span>AI</span><strong>AI Service</strong><em>Configure AI providers and site-level AI settings</em></a>
-<a href="/en/cms/commerce/orders"><span>Orders</span><strong>Orders</strong><em>Track orders, payment status, fulfillment, and commerce operations</em></a>
-</div>
-</section>
+<HomeProductMap locale="en" />
 </main>

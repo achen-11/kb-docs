@@ -71,15 +71,5 @@ title: Kooboo 文档中心
 </div>
 </section>
 
-<section class="kb-doc-product" aria-labelledby="kb-doc-product-title">
-<h2 id="kb-doc-product-title">Kooboo 产品地图</h2>
-<div class="kb-doc-product__list">
-<a href="/product/console"><span>Console</span><strong>控制台</strong><em>域名、组织、数据中心、订单、余额、AI 配置</em></a>
-<a href="/product/mail"><span>Mailbox</span><strong>邮箱</strong><em>收发邮件、联系人、IMAP / SMTP、邮件扩展模块</em></a>
-<a href="/product/market"><span>Marketplace</span><strong>市场</strong><em>模板市场、模板详情、我的分享</em></a>
-<a href="/product/developer-mode"><span>Dev Tools</span><strong>开发者模式</strong><em>同时编辑页面、布局、视图、脚本、样式与代码</em></a>
-<a href="/product/ai-chat"><span>ChatBot</span><strong>AI Claw / AI Chat</strong><em>对话建站、实时预览与自动化任务</em></a>
-<a href="/product/console/balance"><span>Balance</span><strong>余额与订单</strong><em>充值、订单、会员续费在控制台完成</em></a>
-</div>
-</section>
+<HomeProductMap locale="zh" />
 </main>
