@@ -12,29 +12,9 @@ title: Kooboo 文档中心
 <p class="kb-doc-subtitle">从 AI 建站到后台 CMS、模板引擎与 KScript API，把 Kooboo 的产品能力串成一条可以落地的工作流。</p>
 <div class="kb-doc-hero__actions" aria-label="主要入口">
 <a class="kb-doc-btn kb-doc-btn--primary" href="/quick-start/">快速开始 <span>Start</span></a>
-<a class="kb-doc-btn" href="/cms/">后台 CMS</a>
-<a class="kb-doc-btn" href="/api/">API 详情</a>
 </div>
 </div>
-<div class="kb-doc-builder" aria-label="文档导航生成器">
-<div class="kb-doc-builder__tabs">
-<span class="is-active">Docs Route</span>
-<span>CMS</span>
-<span>API</span>
-</div>
-<div class="kb-doc-builder__panel">
-<p>从真实站点流程进入文档</p>
-<div class="kb-doc-builder__routes">
-<a href="/quick-start/"><span>01</span><strong>快速开始</strong><em>创建站点、发布页面、绑定域名</em></a>
-<a href="/cms/"><span>02</span><strong>后台 CMS</strong><em>按菜单路径完成配置与运营</em></a>
-<a href="/api/"><span>03</span><strong>KScript API</strong><em>查询 k.* 模块签名和脚本入口</em></a>
-</div>
-</div>
-<div class="kb-doc-builder__footer">
-<span>Kooboo Web Ecosystem</span>
-<a href="/quick-start/">生成路线</a>
-</div>
-</div>
+<HomeRouteTabs locale="zh" />
 </div>
 </section>
 
@@ -52,46 +32,44 @@ title: Kooboo 文档中心
 <section class="kb-doc-ecosystem" aria-labelledby="kb-doc-ecosystem-title">
 <h2 id="kb-doc-ecosystem-title">Build, use, and run Kooboo in one place</h2>
 <div class="kb-doc-ecosystem__grid">
-<a href="/cms/"><span>CMS</span><strong>后台 CMS</strong><em>站点、内容、电商、开发、数据库、设置</em></a>
-<a href="/templateEngine/"><span>HTML</span><strong>模板引擎</strong><em>页面资源、模板绑定、k-data</em></a>
-<a href="/api/"><span>JSON</span><strong>KScript API</strong><em>服务端 k.* 模块、数据、业务集成与工具</em></a>
-<a href="/product/mail"><span>MAIL</span><strong>邮箱</strong><em>收发邮件、联系人、IMAP / SMTP、扩展模块</em></a>
-<a href="/product/developer-mode"><span>DEV</span><strong>开发者模式</strong><em>类 VS Code 的多资源编辑体验</em></a>
-<a href="/product/ai-chat"><span>AI</span><strong>AI Claw</strong><em>对话建站、实时预览与自动化任务</em></a>
-<a href="/product/market"><span>APP</span><strong>市场</strong><em>模板市场、模板详情、我的分享</em></a>
-<a href="/product/console"><span>OPS</span><strong>控制台</strong><em>域名、组织、余额、订单、续费与 AI 配置</em></a>
+<a href="/cms/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/admin-cms.svg" alt=""></span><strong>后台 CMS</strong><em>站点、内容、电商、开发、数据库、设置</em></a>
+<a href="/templateEngine/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/template-engine.svg" alt=""></span><strong>模板引擎</strong><em>页面资源、模板绑定、k-data</em></a>
+<a href="/api/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/kscript-api.svg" alt=""></span><strong>KScript API</strong><em>服务端 k.* 模块、数据、业务集成与工具</em></a>
+<a href="/product/mail"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/mail.svg" alt=""></span><strong>邮箱</strong><em>收发邮件、联系人、IMAP / SMTP、扩展模块</em></a>
+<a href="/product/developer-mode"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/developer-mode.svg" alt=""></span><strong>开发者模式</strong><em>类 VS Code 的多资源编辑体验</em></a>
+<a href="/product/ai-chat"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/ai-claw.svg" alt=""></span><strong>AI Claw</strong><em>对话建站、实时预览与自动化任务</em></a>
+<a href="/product/market"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/marketplace.svg" alt=""></span><strong>市场</strong><em>模板市场、模板详情、我的分享</em></a>
+<a href="/product/console"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/console.svg" alt=""></span><strong>控制台</strong><em>域名、组织、余额、订单、续费与 AI 配置</em></a>
 </div>
 </section>
 
 <section class="kb-doc-ai-band" aria-labelledby="kb-doc-route-title">
 <div class="kb-doc-route">
 <div class="kb-doc-route__header">
-<p class="kb-doc-mark">AI guided documentation</p>
-<strong id="kb-doc-route-title">按真实站点进度找文档</strong>
+<p class="kb-doc-mark">AI site lifecycle</p>
+<h2 id="kb-doc-route-title">AI 赋能的全流程建站</h2>
+<p>从页面生成、内容配置到开发调试与持续运营，了解 AI 在每个阶段如何参与。</p>
 </div>
 <ol class="kb-doc-route__steps">
-<li><span>01</span><strong>体验</strong><em>创建站点、发布页面</em></li>
-<li><span>02</span><strong>配置</strong><em>内容模型、用户、域名</em></li>
-<li><span>03</span><strong>开发</strong><em>模板引擎、脚本、API</em></li>
-<li><span>04</span><strong>产品化</strong><em>邮箱、市场与 AI</em></li>
+<li><span>01 · 生成</span><strong>对话创建站点与页面</strong><em>用自然语言描述目标，生成页面并实时预览结果</em></li>
+<li><span>02 · 配置</span><strong>辅助维护内容与设计</strong><em>管理内容模型、内容数据、商品与设计变量</em></li>
+<li><span>03 · 开发</span><strong>协助编码与问题排查</strong><em>查看代码、日志和网络请求，辅助修改与调试</em></li>
+<li><span>04 · 运营</span><strong>执行自动化任务</strong><em>设置定期巡检、维护任务并跟踪执行记录</em></li>
 </ol>
 </div>
+<div class="kb-doc-ai-capabilities">
+<div class="kb-doc-ai-capabilities__header">
+<strong>Kooboo AI 能力拆解</strong>
+<p>了解 AI 工作台、页面助手和底层站点能力如何配合。</p>
+</div>
 <div class="kb-doc-ai-band__links">
-<a href="/quick-start/">快速开始</a>
-<a href="/cms/settings/ai-service">AI 服务</a>
-<a href="/product/ai-floating-assistant">AI 悬浮助手</a>
+<a href="/product/ai-chat"><span>Workspace</span><strong>AI Claw / AI Chat</strong><em>对话建站、实时预览、代码与自动化任务</em></a>
+<a href="/product/ai-floating-assistant"><span>Assistant</span><strong>AI 悬浮助手</strong><em>基于当前后台页面上下文，边操作边协作</em></a>
+<a href="/cms/settings/ai-service"><span>Service</span><strong>AI 服务</strong><em>MCP、AI 函数、向量搜索与 AI 输出能力</em></a>
+<a href="/product/console/ai-config"><span>Provider</span><strong>AI 配置</strong><em>组织级 Provider、模型与 API Key</em></a>
+</div>
 </div>
 </section>
 
-<section class="kb-doc-product" aria-labelledby="kb-doc-product-title">
-<h2 id="kb-doc-product-title">Kooboo 产品地图</h2>
-<div class="kb-doc-product__list">
-<a href="/product/console"><span>Console</span><strong>控制台</strong><em>域名、组织、数据中心、订单、余额、AI 配置</em></a>
-<a href="/product/mail"><span>Mailbox</span><strong>邮箱</strong><em>收发邮件、联系人、IMAP / SMTP、邮件扩展模块</em></a>
-<a href="/product/market"><span>Marketplace</span><strong>市场</strong><em>模板市场、模板详情、我的分享</em></a>
-<a href="/product/developer-mode"><span>Dev Tools</span><strong>开发者模式</strong><em>同时编辑页面、布局、视图、脚本、样式与代码</em></a>
-<a href="/product/ai-chat"><span>ChatBot</span><strong>AI Claw / AI Chat</strong><em>对话建站、实时预览与自动化任务</em></a>
-<a href="/product/console/balance"><span>Balance</span><strong>余额与订单</strong><em>充值、订单、会员续费在控制台完成</em></a>
-</div>
-</section>
+<HomeProductMap locale="zh" />
 </main>
