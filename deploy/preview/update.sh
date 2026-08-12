@@ -57,6 +57,7 @@ fi
 
 cd "${PROJECT_DIR}"
 if [[ "${INSTALL_DEPS}" == "true" ]]; then
+  export CI="${CI:-true}"
   corepack pnpm install --frozen-lockfile --store-dir "${PNPM_STORE_DIR:-${DOCS_PREVIEW_ROOT:-${PROJECT_DIR}/.local-preview}/.pnpm-store}"
 fi
 DOCS_PREVIEW_REASON="${REASON}" corepack pnpm docs:preview:publish
