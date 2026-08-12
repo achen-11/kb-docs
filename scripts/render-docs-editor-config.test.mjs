@@ -42,6 +42,7 @@ test('renderDocsEditorConfig creates a complete draft editor service configurati
     assert.match(environment, /DOCS_EDITOR_UPDATE_LOCK_FILE=\/srv\/kb-docs-preview\/\.update\.lock/u)
     assert.match(service, /User=kb-docs-preview/u)
     assert.match(service, /docs-editor-server\.mjs/u)
+    assert.match(service, /EnvironmentFile=-\/etc\/kb-docs-preview\/preview\.env/u)
     assert.match(service, /ProtectSystem=strict/u)
     assert.match(service, /ReadWritePaths=\/opt\/kb-docs-git \/srv\/kb-docs-preview/u)
     assert.doesNotMatch(`${environment}${service}`, /\{\{/u)

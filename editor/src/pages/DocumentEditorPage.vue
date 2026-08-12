@@ -47,7 +47,7 @@ let previewResizeObserver: ResizeObserver | undefined
 const dirty = computed(() => Boolean(document.value && editorContent.value !== document.value.content))
 const editorBytes = computed(() => new TextEncoder().encode(editorContent.value).byteLength)
 const contentTooLarge = computed(() => editorBytes.value > (workspace.editorConfig.value?.maximumDocumentBytes || Infinity))
-const canSave = computed(() => dirty.value && !saving.value && !contentTooLarge.value && !conflictDocument.value)
+const canSave = computed(() => dirty.value && !saving.value && !contentTooLarge.value && !conflictDocument.value && !workspace.workspaceStatus.value?.pendingPush)
 const canBuild = computed(() => Boolean(
   document.value && !saving.value && !requestingBuild.value && !loadingDocument.value &&
   !contentTooLarge.value && !conflictDocument.value &&
@@ -165,6 +165,7 @@ async function saveDraft() {
       ...workspace.buildStatus.value, status: 'draft_saved', operationId: result.build.operationId,
       path: result.document.path, savedAt: result.build.scheduledAt, finishedAt: result.build.scheduledAt, queued: 0, error: null,
     }
+    await workspace.refreshWorkspaceStatus()
     noticeMessage.value = '草稿已保存，4173 正在更新；改动尚未提交 Git，自动同步已暂停。'
     window.setTimeout(() => { previewRefreshKey.value += 1 }, 700)
     return true
@@ -310,7 +311,7 @@ onUnmounted(() => {
         <div v-if="document" class="hash-block"><span>SHA-256</span><code>{{ document.hash.slice(0, 12) }}…</code></div>
         <button class="save-button" type="button" :disabled="!canSave" @click="saveDraft">{{ saving ? '正在保存…' : '保存草稿' }}</button>
         <button class="build-button" type="button" :disabled="!canBuild" @click="buildStablePreview">{{ requestingBuild ? '正在排队…' : '构建预览' }}</button>
-        <RouterLink class="submit-change-link" to="/changes/workspace" title="Phase B 将在当前改动页面接入提交能力">提交改动</RouterLink>
+        <RouterLink class="submit-change-link" to="/workflow">查看改动</RouterLink>
       </div>
       <form v-if="pathPickerOpen" class="editor-path-picker" @submit.prevent="openDocument(false)">
         <label for="document-path">Markdown 路径</label>
@@ -326,6 +327,7 @@ onUnmounted(() => {
       <a v-if="stablePreviewUrl" :href="stablePreviewUrl" target="_blank" rel="noreferrer">打开 4175</a>
       <small>⌘/Ctrl + S 仅保存草稿</small>
     </div>
+    <div v-if="workspace.workspaceStatus.value?.pendingPush" class="workspace-error" role="alert"><span>已有版本等待推送，新的草稿保存已暂停。请先进入“改动与发布”重试推送。</span><RouterLink to="/workflow">处理待推送版本</RouterLink></div>
 
     <div v-if="errorMessage" class="workspace-error" role="alert"><span>{{ errorMessage }}</span><button v-if="conflictDocument" type="button" @click="loadServerVersion">重新加载服务器版本</button></div>
     <div v-if="noticeMessage" class="workspace-notice" role="status">{{ noticeMessage }}</div>

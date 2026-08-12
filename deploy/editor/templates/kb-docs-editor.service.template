@@ -9,6 +9,7 @@ User={{SERVICE_USER}}
 Group={{SERVICE_GROUP}}
 WorkingDirectory={{APP_DIR}}
 EnvironmentFile={{CONFIG_DIR}}/editor.env
+EnvironmentFile=-{{PREVIEW_ENV_FILE}}
 ExecStart=/usr/bin/env node {{APP_DIR}}/scripts/docs-editor-server.mjs
 Restart=on-failure
 RestartSec=3s

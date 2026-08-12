@@ -107,6 +107,14 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
         return { status: 'queued', operationId: 'test-build', scheduledAt: new Date(1).toISOString(), debounceMs: 0 }
       },
     },
+    workspaceCoordinator: {
+      async getStatus() { return { branch: 'main', remote: 'origin', remoteBranch: 'main', head: 'a'.repeat(40), fingerprint: 'b'.repeat(64), changedFiles: 1, stagedFiles: 0, outOfScopeFiles: 0, pendingPush: false, pendingPushCommit: null, ahead: 0, behind: 0, files: [{ path: 'docs/index.md', originalPath: null, status: 'modified', staged: false, additions: 1, deletions: 1, binary: false }] } },
+      async getDiff(filePath) { return { path: filePath, binary: false, truncated: false, diff: '@@ -1 +1 @@\n-old\n+new\n' } },
+      async getRecentCommits() { return [{ hash: 'c'.repeat(40), shortHash: 'ccccccc', author: 'Docs Studio', authoredAt: new Date(0).toISOString(), subject: 'docs: test' }] },
+      async revert() { return { changedFiles: 0, files: [], fingerprint: 'd'.repeat(64) } },
+      async commit() { return { branch: 'main', commit: 'e'.repeat(40), pushed: true, remote: 'origin', workspace: { changedFiles: 0, files: [] } } },
+      async retryPush() { return { branch: 'main', commit: 'e'.repeat(40), pushed: true, remote: 'origin', workspace: { changedFiles: 0, files: [] } } },
+    },
   })
   const editorUrl = await listen(editorServer)
   t.after(() => close(editorServer))
@@ -218,6 +226,24 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
   })
   assert.equal(buildStatusResponse.status, 200)
   assert.equal((await buildStatusResponse.json()).releaseId, 'draft-release')
+
+  const workspaceResponse = await fetch(`${editorUrl}/api/workspace`, { headers: authenticatedHeaders })
+  assert.equal((await workspaceResponse.json()).changedFiles, 1)
+  const diffResponse = await fetch(`${editorUrl}/api/workspace/diff?path=docs%2Findex.md`, { headers: authenticatedHeaders })
+  assert.match((await diffResponse.json()).diff, /\+new/u)
+  const commitsResponse = await fetch(`${editorUrl}/api/workspace/commits`, { headers: authenticatedHeaders })
+  assert.equal((await commitsResponse.json()).commits[0].shortHash, 'ccccccc')
+  const revertResponse = await fetch(`${editorUrl}/api/workspace/revert`, {
+    method: 'POST', headers: { ...authenticatedHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ paths: ['docs/index.md'], expectedFingerprint: 'b'.repeat(64) }),
+  })
+  assert.equal((await revertResponse.json()).changedFiles, 0)
+  const commitResponse = await fetch(`${editorUrl}/api/workspace/commit`, {
+    method: 'POST', headers: { ...authenticatedHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: 'docs: test', expectedFingerprint: 'b'.repeat(64) }),
+  })
+  assert.equal(commitResponse.status, 201)
+  assert.equal((await commitResponse.json()).pushed, true)
 
   const statusResponse = await fetch(`${editorUrl}/api/preview-status`, {
     headers: authenticatedHeaders,

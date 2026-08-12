@@ -10,6 +10,7 @@ import {
   DocumentValidationError,
   createDraftCoordinator,
 } from './docs-editor-draft.mjs'
+import { WorkspaceOperationError, createWorkspaceCoordinator } from './docs-editor-workspace.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const defaultProjectRoot = path.resolve(__dirname, '..')
@@ -58,6 +59,21 @@ function assertHttpUrl(value, name) {
     throw new Error(`${name} must be an http or https URL without credentials`)
   }
   return url.toString()
+}
+
+function assertGitRemote(value) {
+  if (!/^[A-Za-z0-9._-]+$/u.test(value)) throw new Error('Git remote name contains unsupported characters')
+  return value
+}
+
+function assertGitBranch(value) {
+  if (
+    !value || value.startsWith('-') || value.startsWith('/') || value.endsWith('/') || value.endsWith('.') ||
+    value.includes('..') || value.includes('//') || value.includes('@{') ||
+    /[\s~^:?*\[\\\x00-\x1f\x7f]/u.test(value) ||
+    value.split('/').some((part) => !part || part.startsWith('.') || part.endsWith('.lock'))
+  ) throw new Error('Git branch name is invalid')
+  return value
 }
 
 function isPathInside(parent, candidate) {
@@ -301,6 +317,8 @@ async function normalizeConfig(input = {}) {
       16 * 1024 * 1024
     ),
     fastPreviewBaseUrl,
+    gitBranch: assertGitBranch(input.gitBranch || process.env.DOCS_PREVIEW_GIT_BRANCH || 'main'),
+    gitRemote: assertGitRemote(input.gitRemote || process.env.DOCS_PREVIEW_GIT_REMOTE || 'origin'),
     fastPreviewHealthUrl: assertHttpUrl(
       input.fastPreviewHealthUrl ||
         process.env.DOCS_EDITOR_FAST_PREVIEW_HEALTH_URL ||
@@ -424,6 +442,17 @@ export async function createDocsEditorServer(input = {}) {
       readDocument,
       normalizeDocumentPath,
     })
+  const workspaceCoordinator =
+    input.workspaceCoordinator ||
+    createWorkspaceCoordinator({
+      projectRoot: config.projectRoot,
+      draftStateFile: config.draftStateFile,
+      auditLog: config.auditLog,
+      lockFile: config.lockFile,
+      lockTimeoutMs: config.lockTimeoutMs,
+      gitRemote: config.gitRemote,
+      gitBranch: config.gitBranch,
+    })
 
   return createServer(async (request, response) => {
     try {
@@ -491,6 +520,10 @@ export async function createDocsEditorServer(input = {}) {
       if (request.method === 'PUT' && url.pathname === '/api/document') {
         const body = await readJsonBody(request)
         try {
+          const workspace = await workspaceCoordinator.getStatus()
+          if (workspace.pendingPush) {
+            throw new WorkspaceOperationError(409, 'PENDING_PUSH_EXISTS', '已有一个版本等待推送，请先在“改动与发布”中重试推送。')
+          }
           const result = await draftCoordinator.save({
             actor: request.socket.remoteAddress || 'unknown',
             documentPath: body.path,
@@ -535,6 +568,40 @@ export async function createDocsEditorServer(input = {}) {
         sendJson(response, 200, draftCoordinator.getStatus())
         return
       }
+      if (request.method === 'GET' && url.pathname === '/api/workspace') {
+        sendJson(response, 200, await workspaceCoordinator.getStatus())
+        return
+      }
+      if (request.method === 'GET' && url.pathname === '/api/workspace/diff') {
+        sendJson(response, 200, await workspaceCoordinator.getDiff(url.searchParams.get('path')))
+        return
+      }
+      if (request.method === 'GET' && url.pathname === '/api/workspace/commits') {
+        sendJson(response, 200, { commits: await workspaceCoordinator.getRecentCommits(url.searchParams.get('limit')) })
+        return
+      }
+      if (request.method === 'POST' && url.pathname === '/api/workspace/revert') {
+        const body = await readJsonBody(request)
+        sendJson(response, 200, await workspaceCoordinator.revert({
+          actor: request.socket.remoteAddress || 'unknown',
+          paths: body.paths,
+          expectedFingerprint: body.expectedFingerprint,
+        }))
+        return
+      }
+      if (request.method === 'POST' && url.pathname === '/api/workspace/commit') {
+        const body = await readJsonBody(request)
+        sendJson(response, 201, await workspaceCoordinator.commit({
+          actor: request.socket.remoteAddress || 'unknown',
+          message: body.message,
+          expectedFingerprint: body.expectedFingerprint,
+        }))
+        return
+      }
+      if (request.method === 'POST' && url.pathname === '/api/workspace/push') {
+        sendJson(response, 200, await workspaceCoordinator.retryPush({ actor: request.socket.remoteAddress || 'unknown' }))
+        return
+      }
       if (request.method === 'GET' && url.pathname === '/api/preview-status') {
         sendJson(response, 200, await resolvePreviewStatus(config))
         return
@@ -546,13 +613,16 @@ export async function createDocsEditorServer(input = {}) {
 
       await sendStaticFile(config, request, url.pathname, response)
     } catch (error) {
-      const statusCode = error instanceof EditorHttpError ? error.statusCode : 500
+      const statusCode = error instanceof EditorHttpError || error instanceof WorkspaceOperationError ? error.statusCode : 500
       const message =
-        error instanceof EditorHttpError
+        error instanceof EditorHttpError || error instanceof WorkspaceOperationError
           ? error.message
           : 'Internal editor server error'
       if (statusCode >= 500) console.error(error)
-      if (!response.headersSent) sendJson(response, statusCode, { error: message })
+      if (!response.headersSent) sendJson(response, statusCode, {
+        error: message,
+        ...(error instanceof WorkspaceOperationError ? { code: error.code, ...error.details } : {}),
+      })
       else response.destroy()
     }
   })

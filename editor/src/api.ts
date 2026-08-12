@@ -65,6 +65,57 @@ export interface RequestBuildPayload {
   debounceMs: number
 }
 
+export type WorkspaceFileStatus = 'modified' | 'added' | 'deleted' | 'renamed' | 'copied' | 'untracked'
+
+export interface WorkspaceFilePayload {
+  path: string
+  originalPath: string | null
+  status: WorkspaceFileStatus
+  staged: boolean
+  additions: number | null
+  deletions: number | null
+  binary: boolean
+}
+
+export interface WorkspaceStatusPayload {
+  ahead: number | null
+  behind: number | null
+  branch: string
+  changedFiles: number
+  files: WorkspaceFilePayload[]
+  fingerprint: string
+  head: string
+  outOfScopeFiles: number
+  pendingPush: boolean
+  pendingPushCommit: string | null
+  remote: string
+  remoteBranch: string
+  stagedFiles: number
+}
+
+export interface WorkspaceDiffPayload {
+  path: string
+  binary: boolean
+  diff: string
+  truncated: boolean
+}
+
+export interface WorkspaceCommitPayload {
+  hash: string
+  shortHash: string
+  author: string
+  authoredAt: string
+  subject: string
+}
+
+export interface WorkspaceSubmitPayload {
+  branch: string
+  commit: string
+  pushed: boolean
+  remote: string
+  workspace: WorkspaceStatusPayload
+}
+
 export class ApiError extends Error {
   status: number
   code?: string
@@ -146,4 +197,34 @@ export function getBuildStatus() {
 
 export function getPreviewStatus() {
   return request<PreviewStatusPayload>('/api/preview-status')
+}
+
+export function getWorkspaceStatus() {
+  return request<WorkspaceStatusPayload>('/api/workspace')
+}
+
+export function getWorkspaceDiff(path: string) {
+  return request<WorkspaceDiffPayload>(`/api/workspace/diff?path=${encodeURIComponent(path)}`)
+}
+
+export function getWorkspaceCommits(limit = 8) {
+  return request<{ commits: WorkspaceCommitPayload[] }>(`/api/workspace/commits?limit=${limit}`)
+}
+
+export function revertWorkspaceFiles(paths: string[], expectedFingerprint: string) {
+  return request<WorkspaceStatusPayload>('/api/workspace/revert', {
+    method: 'POST',
+    body: JSON.stringify({ paths, expectedFingerprint }),
+  })
+}
+
+export function submitWorkspace(message: string, expectedFingerprint: string) {
+  return request<WorkspaceSubmitPayload>('/api/workspace/commit', {
+    method: 'POST',
+    body: JSON.stringify({ message, expectedFingerprint }),
+  })
+}
+
+export function retryWorkspacePush() {
+  return request<WorkspaceSubmitPayload>('/api/workspace/push', { method: 'POST' })
 }

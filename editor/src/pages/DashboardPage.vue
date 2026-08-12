@@ -54,15 +54,15 @@ const buildText = computed(() => {
         <ol class="workflow-timeline">
           <li class="done"><span>1</span><div><strong>保存草稿</strong><p>原子写入 Markdown，并立即更新 4173。</p></div></li>
           <li :class="{ current: workspace.hasDraft.value }"><span>2</span><div><strong>构建稳定预览</strong><p>显式运行完整构建，成功后更新 4175。</p></div></li>
-          <li><span>3</span><div><strong>提交与审核</strong><p>Phase B 接入 Git diff、commit 和审核分支。</p></div></li>
+          <li :class="{ current: workspace.hasDraft.value }"><span>3</span><div><strong>检查并提交</strong><p>在“改动与发布”中查看 diff、撤销错误改动或推送版本。</p></div></li>
           <li><span>4</span><div><strong>候选与生产</strong><p>Phase D/E 接入 artifact、Kooboo 候选验收和线上发布。</p></div></li>
         </ol>
       </article>
       <article class="next-panel">
         <p class="section-kicker">下一步建设</p>
-        <h2>当前改动与 Git 闭环</h2>
-        <p>后台骨架完成后，优先让服务器草稿可以被审查、提交或安全撤销，避免 Git 自动同步长期暂停。</p>
-        <RouterLink to="/changes/workspace">查看当前改动规划</RouterLink>
+        <h2>图片资源与编辑器插入</h2>
+        <p>Git 闭环完成后，下一阶段将接入图片浏览、上传、粘贴、引用检查和编辑器友好插入。</p>
+        <RouterLink to="/workflow">进入改动与发布</RouterLink>
       </article>
     </section>
   </div>
