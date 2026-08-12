@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, shallowRef } from 'vue'
+import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import {
   ApiError,
   getBuildStatus,
@@ -34,10 +34,32 @@ const editorConfig = shallowRef<EditorConfig | null>(null)
 const previewStatus = shallowRef<PreviewStatusPayload | null>(null)
 const buildStatus = shallowRef<BuildStatusPayload>({ status: 'idle', queued: 0 })
 const previewFrame = shallowRef<HTMLIFrameElement | null>(null)
+const editorPreviewGrid = shallowRef<HTMLElement | null>(null)
+const previewCanvas = shallowRef<HTMLElement | null>(null)
 const sidebarCollapsed = ref(window.localStorage.getItem('kb-docs-editor-sidebar') !== 'expanded')
+const splitPercent = ref(Number.parseFloat(window.localStorage.getItem('kb-docs-editor-split') || '50'))
+const resizingPanels = ref(false)
+type PreviewDevice = 'responsive' | 'desktop' | 'tablet' | 'tablet-landscape' | 'mobile'
+interface PreviewDevicePreset {
+  id: PreviewDevice
+  label: string
+  width: number | null
+  height: number | null
+}
+const previewDevices: PreviewDevicePreset[] = [
+  { id: 'desktop', label: 'PC · 1440 × 900', width: 1440, height: 900 },
+  { id: 'tablet', label: '平板 · 768 × 1024', width: 768, height: 1024 },
+  { id: 'tablet-landscape', label: '平板横屏 · 1024 × 768', width: 1024, height: 768 },
+  { id: 'mobile', label: '手机 · 390 × 844', width: 390, height: 844 },
+  { id: 'responsive', label: '自适应', width: null, height: null },
+]
+const storedPreviewDevice = window.localStorage.getItem('kb-docs-editor-device') as PreviewDevice | null
+const previewDevice = ref<PreviewDevice>(previewDevices.some((item) => item.id === storedPreviewDevice) ? storedPreviewDevice! : 'desktop')
+const previewCanvasSize = ref({ width: 0, height: 0 })
 let statusTimer: number | undefined
 let buildTimer: number | undefined
 let documentLoadSequence = 0
+let previewResizeObserver: ResizeObserver | undefined
 
 const dirty = computed(() => Boolean(document.value && editorContent.value !== document.value.content))
 const editorBytes = computed(() => new TextEncoder().encode(editorContent.value).byteLength)
@@ -52,6 +74,35 @@ const canBuild = computed(() => Boolean(
   !conflictDocument.value &&
   !['queued', 'building'].includes(buildStatus.value.status)
 ))
+
+const activePreviewDevice = computed(() => previewDevices.find((item) => item.id === previewDevice.value) || previewDevices[0])
+const editorPreviewGridStyle = computed(() => ({
+  gridTemplateColumns: `minmax(320px, ${splitPercent.value}fr) 14px minmax(360px, ${100 - splitPercent.value}fr)`,
+}))
+const previewScale = computed(() => {
+  const preset = activePreviewDevice.value
+  if (!preset.width || !preset.height) return 1
+  const availableWidth = Math.max(1, previewCanvasSize.value.width - 32)
+  const availableHeight = Math.max(1, previewCanvasSize.value.height - 32)
+  return Math.min(1, availableWidth / preset.width, availableHeight / preset.height)
+})
+const previewStageStyle = computed(() => {
+  const preset = activePreviewDevice.value
+  if (!preset.width || !preset.height) return undefined
+  return {
+    width: `${Math.round(preset.width * previewScale.value)}px`,
+    height: `${Math.round(preset.height * previewScale.value)}px`,
+  }
+})
+const previewFrameStyle = computed(() => {
+  const preset = activePreviewDevice.value
+  if (!preset.width || !preset.height) return undefined
+  return {
+    width: `${preset.width}px`,
+    height: `${preset.height}px`,
+    transform: `scale(${previewScale.value})`,
+  }
+})
 
 const buildLabel = computed(() => {
   const labels: Record<BuildStatusPayload['status'], string> = {
@@ -284,6 +335,53 @@ function toggleSidebar() {
   window.localStorage.setItem('kb-docs-editor-sidebar', sidebarCollapsed.value ? 'collapsed' : 'expanded')
 }
 
+function clampSplitPercent(clientX: number) {
+  const grid = editorPreviewGrid.value
+  if (!grid) return
+  const rect = grid.getBoundingClientRect()
+  const usableWidth = Math.max(1, rect.width - 14)
+  const minimum = Math.min(48, Math.max(20, 320 / usableWidth * 100))
+  const maximum = Math.max(52, Math.min(80, 100 - 360 / usableWidth * 100))
+  splitPercent.value = Math.min(maximum, Math.max(minimum, (clientX - rect.left) / usableWidth * 100))
+}
+
+function stopPanelResize() {
+  if (!resizingPanels.value) return
+  resizingPanels.value = false
+  window.localStorage.setItem('kb-docs-editor-split', splitPercent.value.toFixed(2))
+  window.removeEventListener('pointermove', handlePanelPointerMove)
+  window.removeEventListener('pointerup', stopPanelResize)
+  window.removeEventListener('pointercancel', stopPanelResize)
+}
+
+function handlePanelPointerMove(event: PointerEvent) {
+  clampSplitPercent(event.clientX)
+}
+
+function startPanelResize(event: PointerEvent) {
+  if (window.matchMedia('(max-width: 820px)').matches) return
+  event.preventDefault()
+  resizingPanels.value = true
+  clampSplitPercent(event.clientX)
+  window.addEventListener('pointermove', handlePanelPointerMove)
+  window.addEventListener('pointerup', stopPanelResize)
+  window.addEventListener('pointercancel', stopPanelResize)
+}
+
+function handlePanelResizeKeydown(event: KeyboardEvent) {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
+  event.preventDefault()
+  if (event.key === 'Home') splitPercent.value = 30
+  else if (event.key === 'End') splitPercent.value = 70
+  else splitPercent.value = Math.min(70, Math.max(30, splitPercent.value + (event.key === 'ArrowLeft' ? -2 : 2)))
+  window.localStorage.setItem('kb-docs-editor-split', splitPercent.value.toFixed(2))
+}
+
+function updatePreviewCanvasSize(element = previewCanvas.value) {
+  if (!element) return
+  previewCanvasSize.value = { width: element.clientWidth, height: element.clientHeight }
+}
+
 function handlePreviewRouteMessage(event: MessageEvent) {
   if (!editorConfig.value?.fastPreviewBaseUrl || event.source !== previewFrame.value?.contentWindow) return
   if (event.origin !== new URL(editorConfig.value.fastPreviewBaseUrl).origin) return
@@ -337,12 +435,27 @@ onMounted(async () => {
   }
 })
 
+watch(previewCanvas, (element) => {
+  previewResizeObserver?.disconnect()
+  previewResizeObserver = undefined
+  if (!element) return
+  updatePreviewCanvasSize(element)
+  previewResizeObserver = new ResizeObserver(() => updatePreviewCanvasSize(element))
+  previewResizeObserver.observe(element)
+})
+
+watch(previewDevice, (value) => {
+  window.localStorage.setItem('kb-docs-editor-device', value)
+})
+
 onUnmounted(() => {
   window.clearInterval(statusTimer)
   window.clearInterval(buildTimer)
   window.removeEventListener('keydown', handleKeydown)
   window.removeEventListener('beforeunload', handleBeforeUnload)
   window.removeEventListener('message', handlePreviewRouteMessage)
+  previewResizeObserver?.disconnect()
+  stopPanelResize()
 })
 </script>
 
@@ -434,17 +547,42 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <div v-if="document" class="editor-preview-grid">
+        <div v-if="document" ref="editorPreviewGrid" class="editor-preview-grid" :class="{ 'is-resizing': resizingPanels }" :style="editorPreviewGridStyle">
           <div class="editor-pane">
             <div class="pane-label"><strong>Markdown</strong><span :class="{ danger: contentTooLarge }">{{ new Intl.NumberFormat('zh-CN').format(editorBytes) }} / {{ new Intl.NumberFormat('zh-CN').format(editorConfig?.maximumDocumentBytes || 0) }} 字节</span></div>
             <textarea v-model="editorContent" class="source-editor" spellcheck="false" aria-label="Markdown 源文件内容"></textarea>
           </div>
+          <div
+            class="panel-resizer"
+            role="separator"
+            aria-label="调整编辑区与预览区宽度"
+            aria-orientation="vertical"
+            :aria-valuenow="Math.round(splitPercent)"
+            aria-valuemin="30"
+            aria-valuemax="70"
+            tabindex="0"
+            @pointerdown="startPanelResize"
+            @keydown="handlePanelResizeKeydown"
+          ><span aria-hidden="true"></span></div>
           <div class="preview-pane">
             <div class="pane-label">
               <strong>4173 快速预览</strong>
-              <div class="pane-actions"><span>{{ previewStatus?.fast.available ? 'HMR 在线 · 跟随切页' : '不可用' }}</span><button class="refresh-button" type="button" @click="reloadFastPreview">重新加载</button></div>
+              <div class="pane-actions">
+                <label class="viewport-control" aria-label="预览设备视口">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.75 4.75h16.5v11.5H3.75zM9 20h6M12 16.25V20" /></svg>
+                  <select v-model="previewDevice">
+                    <option v-for="device in previewDevices" :key="device.id" :value="device.id">{{ device.label }}</option>
+                  </select>
+                </label>
+                <span>{{ previewStatus?.fast.available ? 'HMR 在线 · 跟随切页' : '不可用' }}</span>
+                <button class="refresh-button" type="button" @click="reloadFastPreview">重新加载</button>
+              </div>
             </div>
-            <iframe v-if="fastPreviewUrl" ref="previewFrame" :key="previewRefreshKey" :src="fastPreviewUrl" title="文档快速预览"></iframe>
+            <div ref="previewCanvas" class="preview-canvas" :class="{ 'is-responsive': previewDevice === 'responsive' }">
+              <div class="preview-device-stage" :style="previewStageStyle">
+                <iframe v-if="fastPreviewUrl" ref="previewFrame" :key="previewRefreshKey" :src="fastPreviewUrl" :style="previewFrameStyle" title="文档快速预览"></iframe>
+              </div>
+            </div>
           </div>
         </div>
 

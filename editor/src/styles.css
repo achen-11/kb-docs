@@ -570,8 +570,16 @@ input:focus {
   min-height: 0;
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(360px, 1fr) minmax(360px, 1fr);
-  gap: 16px;
+  gap: 0;
+}
+
+.editor-preview-grid.is-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+.editor-preview-grid.is-resizing iframe {
+  pointer-events: none;
 }
 
 .editor-pane,
@@ -584,6 +592,50 @@ input:focus {
   border: 1px solid #d9e1eb;
   border-radius: 12px;
   background: #f8fafc;
+}
+
+.panel-resizer {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 14px;
+  cursor: col-resize;
+  touch-action: none;
+  outline: none;
+}
+
+.panel-resizer::before {
+  position: absolute;
+  inset: 0 4px;
+  content: "";
+  border-radius: 999px;
+  background: transparent;
+  transition: background 160ms ease;
+}
+
+.panel-resizer span {
+  position: relative;
+  z-index: 1;
+  width: 4px;
+  height: 46px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, #91a1b8 1px, transparent 1.5px) center / 4px 8px repeat-y;
+  opacity: 0.58;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.panel-resizer:hover::before,
+.panel-resizer:focus-visible::before,
+.editor-preview-grid.is-resizing .panel-resizer::before {
+  background: rgba(36, 105, 232, 0.09);
+}
+
+.panel-resizer:hover span,
+.panel-resizer:focus-visible span,
+.editor-preview-grid.is-resizing .panel-resizer span {
+  opacity: 1;
+  transform: scaleY(1.08);
 }
 
 .pane-label {
@@ -615,6 +667,51 @@ input:focus {
   gap: 10px;
 }
 
+.viewport-control {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 28px;
+  margin: 0;
+  padding: 0 7px;
+  border: 1px solid #d6dfeb;
+  border-radius: 7px;
+  color: #47566e;
+  background: #f7f9fc;
+  cursor: pointer;
+  font-weight: 700;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.viewport-control:hover,
+.viewport-control:focus-within {
+  border-color: #a9bfe1;
+  background: #fff;
+}
+
+.viewport-control svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  fill: none;
+  stroke: #2469e8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.viewport-control select {
+  max-width: 118px;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  outline: none;
+}
+
 .pane-label .danger {
   color: #b52e3c;
   font-weight: 800;
@@ -640,12 +737,59 @@ input:focus {
   box-shadow: inset 0 0 0 2px rgba(36, 105, 232, 0.2);
 }
 
-.preview-pane iframe {
-  width: 100%;
+.preview-canvas {
   min-height: 0;
   flex: 1;
-  border: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 16px;
+  background:
+    linear-gradient(45deg, rgba(214, 224, 237, 0.28) 25%, transparent 25%, transparent 75%, rgba(214, 224, 237, 0.28) 75%),
+    linear-gradient(45deg, rgba(214, 224, 237, 0.28) 25%, transparent 25%, transparent 75%, rgba(214, 224, 237, 0.28) 75%),
+    #edf2f7;
+  background-position: 0 0, 8px 8px;
+  background-size: 16px 16px;
+}
+
+.preview-device-stage {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid #cfd9e6;
+  border-radius: 7px;
   background: #fff;
+  box-shadow: 0 18px 48px rgba(35, 48, 70, 0.18);
+}
+
+.preview-canvas.is-responsive {
+  padding: 0;
+  background: #fff;
+}
+
+.preview-canvas.is-responsive .preview-device-stage {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.preview-pane iframe {
+  display: block;
+  max-width: none;
+  min-height: 0;
+  border: 0;
+  transform-origin: left top;
+  background: #fff;
+}
+
+.preview-canvas.is-responsive iframe {
+  width: 100%;
+  height: 100%;
+  transform: none;
+  border: 0;
 }
 
 .empty-state {
@@ -719,8 +863,13 @@ input:focus {
   }
 
   .editor-preview-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     grid-template-rows: minmax(520px, 1fr) minmax(520px, 1fr);
+    gap: 16px;
+  }
+
+  .panel-resizer {
+    display: none;
   }
 
   .document-header {
