@@ -53,6 +53,7 @@ test('renderPreviewServerConfig creates complete Linux service configuration', a
     assert.match(nginx, /server_name docs-preview\.kbdev\.com;/u)
     assert.match(nginx, /127\.0\.0\.1:4180/u)
     assert.match(environment, /DOCS_PREVIEW_KEEP_RELEASES=7/u)
+    assert.match(environment, /^CI=true$/mu)
     assert.match(environment, /DOCS_PREVIEW_PORT=4180/u)
     assert.match(environment, /DOCS_PREVIEW_FAST_PORT=4173/u)
     assert.match(environment, /PNPM_STORE_DIR=\/srv\/kb-docs-preview\/\.pnpm-store/u)
