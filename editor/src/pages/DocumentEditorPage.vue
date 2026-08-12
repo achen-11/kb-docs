@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   ApiError,
@@ -9,6 +9,8 @@ import {
   type DocumentPayload,
 } from '../api'
 import { useWorkspace } from '../app/workspace'
+import MediaBrowser from '../components/MediaBrowser.vue'
+import type { MediaItemPayload } from '../api'
 
 const route = useRoute()
 const router = useRouter()
@@ -29,6 +31,11 @@ const previewCanvas = shallowRef<HTMLElement | null>(null)
 const splitPercent = ref(Number.parseFloat(window.localStorage.getItem('kb-docs-editor-split') || '50'))
 const resizingPanels = ref(false)
 const pathPickerOpen = ref(false)
+const mediaPickerOpen = ref(false)
+const sourceEditor = shallowRef<HTMLTextAreaElement | null>(null)
+const savedSelection = ref({ start: 0, end: 0 })
+const mediaAlt = ref('')
+const mediaSyntax = ref<'doc-image' | 'markdown'>('doc-image')
 type PreviewDevice = 'responsive' | 'desktop' | 'tablet' | 'tablet-landscape' | 'mobile'
 interface PreviewDevicePreset { id: PreviewDevice; label: string; width: number | null; height: number | null }
 const previewDevices: PreviewDevicePreset[] = [
@@ -257,6 +264,35 @@ function handlePreviewRouteMessage(event: MessageEvent) {
 function handleKeydown(event: KeyboardEvent) {
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') { event.preventDefault(); void saveDraft() }
 }
+function rememberSelection() {
+  const editor = sourceEditor.value
+  if (editor) savedSelection.value = { start: editor.selectionStart, end: editor.selectionEnd }
+}
+function openMediaPicker() {
+  rememberSelection()
+  mediaPickerOpen.value = true
+}
+async function insertMedia(item: MediaItemPayload) {
+  const fallbackAlt = item.name.replace(/\.[^.]+$/u, '').replace(/[-_]+/gu, ' ')
+  const alt = mediaAlt.value.trim() || fallbackAlt
+  const reference = mediaSyntax.value === 'markdown'
+    ? `![${alt}](${item.url})`
+    : `<DocImage src="${item.url}" alt="${alt}" />`
+  const { start, end } = savedSelection.value
+  const before = editorContent.value.slice(0, start)
+  const after = editorContent.value.slice(end)
+  const prefix = before && !before.endsWith('\n') ? '\n' : ''
+  const suffix = after && !after.startsWith('\n') ? '\n' : ''
+  editorContent.value = `${before}${prefix}${reference}${suffix}${after}`
+  const cursor = start + prefix.length + reference.length
+  savedSelection.value = { start: cursor, end: cursor }
+  mediaPickerOpen.value = false
+  mediaAlt.value = ''
+  await nextTick()
+  sourceEditor.value?.focus()
+  sourceEditor.value?.setSelectionRange(cursor, cursor)
+  noticeMessage.value = '图片引用已插入，按 ⌘/Ctrl + S 保存草稿后即可在 4173 查看。'
+}
 function handleBeforeUnload(event: BeforeUnloadEvent) {
   if (!dirty.value) return
   event.preventDefault(); event.returnValue = ''
@@ -309,6 +345,7 @@ onUnmounted(() => {
       </div>
       <div class="editor-actions">
         <div v-if="document" class="hash-block"><span>SHA-256</span><code>{{ document.hash.slice(0, 12) }}…</code></div>
+        <button class="media-picker-button" type="button" :disabled="!document" @click="openMediaPicker">插入图片</button>
         <button class="save-button" type="button" :disabled="!canSave" @click="saveDraft">{{ saving ? '正在保存…' : '保存草稿' }}</button>
         <button class="build-button" type="button" :disabled="!canBuild" @click="buildStablePreview">{{ requestingBuild ? '正在排队…' : '构建预览' }}</button>
         <RouterLink class="submit-change-link" to="/workflow">查看改动</RouterLink>
@@ -335,7 +372,7 @@ onUnmounted(() => {
     <div v-if="document" ref="editorPreviewGrid" class="editor-preview-grid" :class="{ 'is-resizing': resizingPanels }" :style="editorPreviewGridStyle">
       <section class="editor-pane">
         <header class="pane-label"><strong>Markdown</strong><span :class="{ danger: contentTooLarge }">{{ new Intl.NumberFormat('zh-CN').format(editorBytes) }} / {{ new Intl.NumberFormat('zh-CN').format(workspace.editorConfig.value?.maximumDocumentBytes || 0) }} 字节</span></header>
-        <textarea v-model="editorContent" class="source-editor" spellcheck="false" aria-label="Markdown 源文件内容"></textarea>
+        <textarea ref="sourceEditor" v-model="editorContent" class="source-editor" spellcheck="false" aria-label="Markdown 源文件内容" @click="rememberSelection" @keyup="rememberSelection" @select="rememberSelection"></textarea>
       </section>
       <div class="panel-resizer" role="separator" aria-label="调整编辑区与预览区宽度" aria-orientation="vertical" :aria-valuenow="Math.round(splitPercent)" aria-valuemin="30" aria-valuemax="70" tabindex="0" @pointerdown="startPanelResize" @keydown="handlePanelResizeKeydown"><span aria-hidden="true"></span></div>
       <section class="preview-pane">
@@ -358,5 +395,14 @@ onUnmounted(() => {
       </section>
     </div>
     <div v-else class="empty-state"><div class="empty-glyph">MD</div><h2>{{ loadingDocument ? '正在读取文档' : '无法打开 Markdown 文档' }}</h2><p>检查路径是否属于 {{ workspace.editorConfig.value?.allowedDocumentPattern || 'docs/**/*.md' }}。</p></div>
+    <Teleport to="body">
+      <div v-if="mediaPickerOpen" class="media-picker-backdrop" @click.self="mediaPickerOpen = false">
+        <aside class="media-picker-drawer" aria-label="插入图片">
+          <header><div><p class="section-kicker">插入到当前光标</p><h2>选择或上传图片</h2></div><button type="button" aria-label="关闭" @click="mediaPickerOpen = false">×</button></header>
+          <div class="media-insert-options"><label>替代文字<input v-model="mediaAlt" placeholder="留空则使用文件名" /></label><label>插入格式<select v-model="mediaSyntax"><option value="doc-image">DocImage 组件</option><option value="markdown">Markdown 图片</option></select></label></div>
+          <MediaBrowser compact select-label="插入当前文档" @select="insertMedia" />
+        </aside>
+      </div>
+    </Teleport>
   </div>
 </template>

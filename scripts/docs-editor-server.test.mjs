@@ -115,6 +115,12 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
       async commit() { return { branch: 'main', commit: 'e'.repeat(40), pushed: true, remote: 'origin', workspace: { changedFiles: 0, files: [] } } },
       async retryPush() { return { branch: 'main', commit: 'e'.repeat(40), pushed: true, remote: 'origin', workspace: { changedFiles: 0, files: [] } } },
     },
+    mediaCoordinator: {
+      async list() { return { items: [{ path: 'docs/public/cms/login.png', url: '/cms/login.png', name: 'login.png', bytes: 4, modifiedAt: new Date(0).toISOString() }], total: 1, page: 1, pageSize: 48, folders: ['cms'], roots: ['cms', 'product', 'en/cms', 'en/product'] } },
+      async content() { return { body: Buffer.from([137, 80, 78, 71]), contentType: 'image/png' } },
+      async references() { return { path: 'docs/public/cms/login.png', url: '/cms/login.png', references: [{ path: 'docs/index.md', line: 1 }] } },
+      async upload(input) { assert.equal(input.directory, 'cms'); return { path: 'docs/public/cms/new.png', url: '/cms/new.png', name: 'new.png', bytes: 4, modifiedAt: new Date(0).toISOString() } },
+    },
   })
   const editorUrl = await listen(editorServer)
   t.after(() => close(editorServer))
@@ -172,6 +178,7 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
     mode: 'draft',
     allowedDocumentPattern: 'docs/**/*.md',
     maximumDocumentBytes: 2097152,
+    maximumMediaBytes: 8388608,
     fastPreviewBaseUrl: 'http://preview.example:4173',
     stablePreviewBaseUrl: 'http://preview.example:4175',
     productionPublishAvailable: false,
@@ -226,6 +233,20 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
   })
   assert.equal(buildStatusResponse.status, 200)
   assert.equal((await buildStatusResponse.json()).releaseId, 'draft-release')
+
+  const mediaResponse = await fetch(`${editorUrl}/api/media?root=cms`, { headers: authenticatedHeaders })
+  assert.equal((await mediaResponse.json()).items[0].url, '/cms/login.png')
+  const mediaContentResponse = await fetch(`${editorUrl}/api/media/content?path=docs%2Fpublic%2Fcms%2Flogin.png`, { headers: authenticatedHeaders })
+  assert.equal(mediaContentResponse.headers.get('content-type'), 'image/png')
+  assert.deepEqual(Buffer.from(await mediaContentResponse.arrayBuffer()), Buffer.from([137, 80, 78, 71]))
+  const referencesResponse = await fetch(`${editorUrl}/api/media/references?path=docs%2Fpublic%2Fcms%2Flogin.png`, { headers: authenticatedHeaders })
+  assert.equal((await referencesResponse.json()).references[0].path, 'docs/index.md')
+  const uploadResponse = await fetch(`${editorUrl}/api/media/upload`, {
+    method: 'POST', headers: { ...authenticatedHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ directory: 'cms', fileName: 'new.png', contentBase64: 'iVBORw0KGgo=' }),
+  })
+  assert.equal(uploadResponse.status, 201)
+  assert.equal((await uploadResponse.json()).url, '/cms/new.png')
 
   const workspaceResponse = await fetch(`${editorUrl}/api/workspace`, { headers: authenticatedHeaders })
   assert.equal((await workspaceResponse.json()).changedFiles, 1)

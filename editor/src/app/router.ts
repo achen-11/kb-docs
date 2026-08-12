@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import DashboardPage from '../pages/DashboardPage.vue'
 import DocumentEditorPage from '../pages/DocumentEditorPage.vue'
+import MediaLibraryPage from '../pages/MediaLibraryPage.vue'
 import PlannedPage from '../pages/PlannedPage.vue'
 import WorkflowPage from '../pages/WorkflowPage.vue'
 
@@ -17,9 +18,8 @@ const plannedRoutes: RouteRecordRaw[] = [
   {
     path: '/content/media',
     name: 'media',
-    component: PlannedPage,
+    component: MediaLibraryPage,
     meta: { eyebrow: '内容管理', title: '图片资源', description: '统一浏览、上传、引用和插入文档图片。' },
-    props: { phase: 'Phase C', capability: 'media' },
   },
   {
     path: '/settings/users',

@@ -11,12 +11,13 @@ import {
   createDraftCoordinator,
 } from './docs-editor-draft.mjs'
 import { WorkspaceOperationError, createWorkspaceCoordinator } from './docs-editor-workspace.mjs'
+import { DEFAULT_MAX_MEDIA_BYTES, MediaOperationError, createMediaCoordinator } from './docs-editor-media.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const defaultProjectRoot = path.resolve(__dirname, '..')
 const SESSION_COOKIE = 'kb_docs_editor_session'
 const DEFAULT_SESSION_TTL_MS = 12 * 60 * 60 * 1000
-const MAX_BODY_BYTES = DEFAULT_MAX_DOCUMENT_BYTES + 64 * 1024
+const MAX_BODY_BYTES = Math.max(DEFAULT_MAX_DOCUMENT_BYTES + 64 * 1024, Math.ceil(DEFAULT_MAX_MEDIA_BYTES * 4 / 3) + 128 * 1024)
 
 const contentTypes = new Map([
   ['.css', 'text/css; charset=utf-8'],
@@ -316,6 +317,12 @@ async function normalizeConfig(input = {}) {
       'maximum document bytes',
       16 * 1024 * 1024
     ),
+    maximumMediaBytes: readPositiveInteger(
+      input.maximumMediaBytes ?? process.env.DOCS_EDITOR_MAX_MEDIA_BYTES,
+      DEFAULT_MAX_MEDIA_BYTES,
+      'maximum media bytes',
+      32 * 1024 * 1024
+    ),
     fastPreviewBaseUrl,
     gitBranch: assertGitBranch(input.gitBranch || process.env.DOCS_PREVIEW_GIT_BRANCH || 'main'),
     gitRemote: assertGitRemote(input.gitRemote || process.env.DOCS_PREVIEW_GIT_REMOTE || 'origin'),
@@ -453,6 +460,16 @@ export async function createDocsEditorServer(input = {}) {
       gitRemote: config.gitRemote,
       gitBranch: config.gitBranch,
     })
+  const mediaCoordinator =
+    input.mediaCoordinator ||
+    createMediaCoordinator({
+      projectRoot: config.projectRoot,
+      draftStateFile: config.draftStateFile,
+      auditLog: config.auditLog,
+      lockFile: config.lockFile,
+      lockTimeoutMs: config.lockTimeoutMs,
+      maximumBytes: config.maximumMediaBytes,
+    })
 
   return createServer(async (request, response) => {
     try {
@@ -507,6 +524,7 @@ export async function createDocsEditorServer(input = {}) {
           mode: 'draft',
           allowedDocumentPattern: 'docs/**/*.md',
           maximumDocumentBytes: config.maximumDocumentBytes,
+          maximumMediaBytes: config.maximumMediaBytes,
           fastPreviewBaseUrl: config.fastPreviewBaseUrl,
           stablePreviewBaseUrl: config.stablePreviewBaseUrl,
           productionPublishAvailable: false,
@@ -572,6 +590,43 @@ export async function createDocsEditorServer(input = {}) {
         sendJson(response, 200, await workspaceCoordinator.getStatus())
         return
       }
+      if (request.method === 'GET' && url.pathname === '/api/media') {
+        sendJson(response, 200, await mediaCoordinator.list({
+          root: url.searchParams.get('root') || '',
+          search: url.searchParams.get('search') || '',
+          page: Number.parseInt(url.searchParams.get('page') || '1', 10),
+          pageSize: Number.parseInt(url.searchParams.get('pageSize') || '48', 10),
+        }))
+        return
+      }
+      if (request.method === 'GET' && url.pathname === '/api/media/content') {
+        const media = await mediaCoordinator.content(url.searchParams.get('path'))
+        response.writeHead(200, {
+          ...securityHeaders(media.contentType),
+          'Cache-Control': 'private, max-age=60',
+          'Content-Length': media.body.length,
+        })
+        response.end(request.method === 'HEAD' ? undefined : media.body)
+        return
+      }
+      if (request.method === 'GET' && url.pathname === '/api/media/references') {
+        sendJson(response, 200, await mediaCoordinator.references(url.searchParams.get('path')))
+        return
+      }
+      if (request.method === 'POST' && url.pathname === '/api/media/upload') {
+        const workspace = await workspaceCoordinator.getStatus()
+        if (workspace.pendingPush) {
+          throw new WorkspaceOperationError(409, 'PENDING_PUSH_EXISTS', '已有一个版本等待推送，请先在“改动与发布”中重试推送。')
+        }
+        const body = await readJsonBody(request)
+        sendJson(response, 201, await mediaCoordinator.upload({
+          actor: request.socket.remoteAddress || 'unknown',
+          directory: body.directory,
+          fileName: body.fileName,
+          contentBase64: body.contentBase64,
+        }))
+        return
+      }
       if (request.method === 'GET' && url.pathname === '/api/workspace/diff') {
         sendJson(response, 200, await workspaceCoordinator.getDiff(url.searchParams.get('path')))
         return
@@ -613,15 +668,16 @@ export async function createDocsEditorServer(input = {}) {
 
       await sendStaticFile(config, request, url.pathname, response)
     } catch (error) {
-      const statusCode = error instanceof EditorHttpError || error instanceof WorkspaceOperationError ? error.statusCode : 500
+      const statusCode = error instanceof EditorHttpError || error instanceof WorkspaceOperationError || error instanceof MediaOperationError ? error.statusCode : 500
       const message =
-        error instanceof EditorHttpError || error instanceof WorkspaceOperationError
+        error instanceof EditorHttpError || error instanceof WorkspaceOperationError || error instanceof MediaOperationError
           ? error.message
           : 'Internal editor server error'
       if (statusCode >= 500) console.error(error)
       if (!response.headersSent) sendJson(response, statusCode, {
         error: message,
         ...(error instanceof WorkspaceOperationError ? { code: error.code, ...error.details } : {}),
+        ...(error instanceof MediaOperationError ? { code: error.code } : {}),
       })
       else response.destroy()
     }

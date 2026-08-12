@@ -56,10 +56,15 @@ test('workspace coordinator lists docs changes, returns diff, and safely reverts
   assert.equal(status.outOfScopeFiles, 0)
   assert.match(status.fingerprint, /^[a-f0-9]{64}$/u)
   assert.deepEqual(status.files.map((file) => file.status), ['modified', 'untracked'])
+  assert.equal(status.files.find((file) => file.path === 'docs/new.md')?.binary, false)
+  assert.equal(status.files.find((file) => file.path === 'docs/new.md')?.additions, 1)
 
   const diff = await fixture.coordinator.getDiff('docs/index.md')
   assert.match(diff.diff, /-# Initial/u)
   assert.match(diff.diff, /\+# Edited/u)
+  const newFileDiff = await fixture.coordinator.getDiff('docs/new.md')
+  assert.equal(newFileDiff.binary, false)
+  assert.match(newFileDiff.diff, /\+# New/u)
 
   const afterOne = await fixture.coordinator.revert({
     actor: 'test',

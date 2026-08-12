@@ -2,6 +2,7 @@ export interface EditorConfig {
   mode: 'draft'
   allowedDocumentPattern: string
   maximumDocumentBytes: number
+  maximumMediaBytes: number
   fastPreviewBaseUrl: string
   stablePreviewBaseUrl: string
   productionPublishAvailable: boolean
@@ -116,6 +117,29 @@ export interface WorkspaceSubmitPayload {
   workspace: WorkspaceStatusPayload
 }
 
+export interface MediaItemPayload {
+  path: string
+  url: string
+  name: string
+  bytes: number
+  modifiedAt: string
+}
+
+export interface MediaListPayload {
+  items: MediaItemPayload[]
+  total: number
+  page: number
+  pageSize: number
+  folders: string[]
+  roots: string[]
+}
+
+export interface MediaReferencesPayload {
+  path: string
+  url: string
+  references: Array<{ path: string; line: number }>
+}
+
 export class ApiError extends Error {
   status: number
   code?: string
@@ -227,4 +251,28 @@ export function submitWorkspace(message: string, expectedFingerprint: string) {
 
 export function retryWorkspacePush() {
   return request<WorkspaceSubmitPayload>('/api/workspace/push', { method: 'POST' })
+}
+
+export function getMediaList(options: { root?: string; search?: string; page?: number; pageSize?: number } = {}) {
+  const parameters = new URLSearchParams()
+  if (options.root) parameters.set('root', options.root)
+  if (options.search) parameters.set('search', options.search)
+  parameters.set('page', String(options.page || 1))
+  parameters.set('pageSize', String(options.pageSize || 48))
+  return request<MediaListPayload>(`/api/media?${parameters}`)
+}
+
+export function mediaContentUrl(path: string) {
+  return `/api/media/content?path=${encodeURIComponent(path)}`
+}
+
+export function getMediaReferences(path: string) {
+  return request<MediaReferencesPayload>(`/api/media/references?path=${encodeURIComponent(path)}`)
+}
+
+export function uploadMedia(directory: string, fileName: string, contentBase64: string) {
+  return request<MediaItemPayload>('/api/media/upload', {
+    method: 'POST',
+    body: JSON.stringify({ directory, fileName, contentBase64 }),
+  })
 }

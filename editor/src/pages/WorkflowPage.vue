@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, shallowRef } from 'vue'
+import { html as renderDiffHtml } from 'diff2html'
 import {
   ApiError,
   getWorkspaceCommits,
@@ -24,6 +25,8 @@ const commitMessage = ref('')
 const errorMessage = ref('')
 const noticeMessage = ref('')
 const guideOpen = ref(window.localStorage.getItem('kb-docs-studio-guide-dismissed') !== 'true')
+type DiffLayout = 'line-by-line' | 'side-by-side'
+const diffLayout = ref<DiffLayout>(window.localStorage.getItem('kb-docs-studio-diff-layout') === 'side-by-side' ? 'side-by-side' : 'line-by-line')
 
 const status = computed(() => workspace.workspaceStatus.value)
 const selectedFile = computed(() => status.value?.files.find((file) => file.path === selectedPath.value) || null)
@@ -44,6 +47,13 @@ const statusText = computed(() => {
   if (status.value.changedFiles) return `检测到 ${status.value.changedFiles} 个文档文件改动`
   return '当前没有待提交的文档改动'
 })
+const renderedDiff = computed(() => diff.value?.diff ? renderDiffHtml(diff.value.diff, {
+  drawFileList: false,
+  outputFormat: diffLayout.value,
+  matching: 'lines',
+  diffStyle: 'word',
+  colorScheme: 'light',
+}) : '')
 
 const statusLabels: Record<WorkspaceFilePayload['status'], string> = {
   modified: '修改', added: '新增', deleted: '删除', renamed: '重命名', copied: '复制', untracked: '新增',
@@ -148,6 +158,11 @@ function dismissGuide() {
   window.localStorage.setItem('kb-docs-studio-guide-dismissed', 'true')
 }
 
+function setDiffLayout(layout: DiffLayout) {
+  diffLayout.value = layout
+  window.localStorage.setItem('kb-docs-studio-diff-layout', layout)
+}
+
 onMounted(loadWorkspace)
 </script>
 
@@ -213,10 +228,19 @@ onMounted(loadWorkspace)
       </section>
 
       <section class="diff-panel">
-        <header class="section-heading"><div><p class="section-kicker">差异预览</p><h2>{{ selectedFile?.path || '选择一个文件' }}</h2></div><button v-if="selectedFile" class="danger-link" type="button" :disabled="!canMutate" @click="revertFiles([selectedFile.path])">撤销此文件</button></header>
+        <header class="section-heading">
+          <div><p class="section-kicker">差异预览</p><h2>{{ selectedFile?.path || '选择一个文件' }}</h2></div>
+          <div class="diff-heading-actions">
+            <div v-if="selectedFile && !selectedFile.binary" class="diff-layout-switch" aria-label="差异显示方式">
+              <button type="button" :class="{ active: diffLayout === 'line-by-line' }" @click="setDiffLayout('line-by-line')">统一</button>
+              <button type="button" :class="{ active: diffLayout === 'side-by-side' }" @click="setDiffLayout('side-by-side')">左右对照</button>
+            </div>
+            <button v-if="selectedFile" class="danger-link" type="button" :disabled="!canMutate" @click="revertFiles([selectedFile.path])">撤销此文件</button>
+          </div>
+        </header>
         <div v-if="loadingDiff" class="diff-loading">正在读取差异…</div>
         <div v-else-if="diff?.binary" class="binary-diff"><strong>二进制文件已变化</strong><p>图片对比将在图片资源阶段接入；当前仍可提交或撤销该文件。</p></div>
-        <pre v-else-if="diff?.diff" class="diff-view"><code>{{ diff.diff }}</code></pre>
+        <div v-else-if="renderedDiff" class="diff-view" v-html="renderedDiff"></div>
         <div v-else class="diff-placeholder">从左侧选择文件查看具体改动。</div>
         <p v-if="diff?.truncated" class="diff-truncated">差异内容较大，平台仅展示前 768 KB；提交仍会包含完整文件。</p>
       </section>

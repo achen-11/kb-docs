@@ -103,8 +103,9 @@ async function untrackedStats(projectRoot, filePath) {
   try {
     const content = await readFile(path.join(projectRoot, filePath))
     const binary = content.includes(0)
+    const text = binary ? '' : content.toString('utf8')
     return {
-      additions: binary ? null : content.toString('utf8').split('\n').length - (content.endsWith('\n') ? 1 : 0),
+      additions: binary ? null : text.split('\n').length - (content.at(-1) === 10 ? 1 : 0),
       deletions: binary ? null : 0,
       binary,
     }

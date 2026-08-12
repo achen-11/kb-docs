@@ -19,7 +19,7 @@ export const navigationGroups: NavigationGroup[] = [
     label: '内容管理',
     items: [
       { label: '文档编辑', route: '/content/editor', icon: 'document' },
-      { label: '图片资源', route: '/content/media', icon: 'media', phase: 'C' },
+      { label: '图片资源', route: '/content/media', icon: 'media' },
     ],
   },
   {
