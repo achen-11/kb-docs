@@ -151,8 +151,8 @@ install -m 0644 "${OUTPUT_DIR}/kb-docs-editor.service" "${SYSTEMD_UNIT}"
 
 (
   cd "${APP_DIR}"
-  runuser -u "${SERVICE_USER}" -- env HOME="${SERVICE_HOME}" corepack pnpm install --frozen-lockfile
-  runuser -u "${SERVICE_USER}" -- env HOME="${SERVICE_HOME}" corepack pnpm docs:editor:build
+  runuser -u "${SERVICE_USER}" -- env HOME="${SERVICE_HOME}" CI=true corepack pnpm install --frozen-lockfile
+  runuser -u "${SERVICE_USER}" -- env HOME="${SERVICE_HOME}" CI=true corepack pnpm docs:editor:build
 )
 
 systemctl daemon-reload

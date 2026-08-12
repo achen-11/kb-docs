@@ -231,3 +231,31 @@ test('Git preview sync defers active editor drafts before fetching and removes s
     await rm(fixture.root, { recursive: true, force: true })
   }
 })
+
+test('Git preview sync preserves a pending-push marker even when docs are clean', async () => {
+  const fixture = await createFixture()
+  try {
+    await mkdir(path.dirname(fixture.draftStateFile), { recursive: true })
+    await writeFile(fixture.draftStateFile, '{"active":true,"pendingPush":true,"commit":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}\n', 'utf8')
+
+    const deferred = await syncPreviewFromGit({
+      appDir: fixture.checkoutDir,
+      branch: 'main',
+      draftStateFile: fixture.draftStateFile,
+      lockFile: fixture.lockFile,
+      remote: 'origin',
+      stateFile: fixture.stateFile,
+      updateCommand: fixture.updateCommand
+    })
+    assert.deepEqual(deferred, {
+      changed: false,
+      deferred: true,
+      published: false,
+      reason: 'editor_pending_push'
+    })
+    assert.equal(JSON.parse(await readFile(fixture.draftStateFile, 'utf8')).pendingPush, true)
+    assert.equal(await countPublishes(fixture.updateLog), 0)
+  } finally {
+    await rm(fixture.root, { recursive: true, force: true })
+  }
+})

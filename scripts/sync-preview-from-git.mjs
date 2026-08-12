@@ -1,5 +1,5 @@
 import { execFile, spawn } from 'node:child_process'
-import { access, mkdir, readFile, rename, rm, unlink, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rename, rm, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
@@ -97,11 +97,18 @@ async function writeSyncState(stateFile, state) {
 }
 
 async function deferForEditorDraft(appDir, draftStateFile) {
+  let marker
   try {
-    await access(draftStateFile)
+    marker = JSON.parse(await readFile(draftStateFile, 'utf8'))
   } catch (error) {
     if (error && typeof error === 'object' && error.code === 'ENOENT') return null
+    if (error instanceof SyntaxError) throw new Error(`Invalid editor draft state: ${error.message}`)
     throw error
+  }
+
+  if (marker?.pendingPush) {
+    console.log('Git preview sync deferred because an editor commit is waiting to be pushed')
+    return { changed: false, deferred: true, published: false, reason: 'editor_pending_push' }
   }
 
   const { stdout } = await runGit(appDir, [
