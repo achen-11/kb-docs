@@ -3,6 +3,7 @@
  *
  * Usage:
  *   pnpm screenshots:product:console
+ *   KOOBOO_DOC_LOCALE=en pnpm screenshots:product:console
  *   KOOBOO_SCREENSHOT_SCOPE=ai-config pnpm screenshots:product:console
  *
  * Credentials: KOOBOO_PASS in env or kb-docs/.env (see load-env.mjs)
@@ -16,12 +17,28 @@ import { fileURLToPath } from 'node:url'
 const REPO_ROOT =
   process.env.KOOBOO_DOCS_ROOT ||
   path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
-const OUT_DIR = path.join(REPO_ROOT, 'docs', 'public', 'product', 'console')
-
 const BASE = process.env.KOOBOO_BASE || 'https://www.redev.cn'
 const USER = process.env.KOOBOO_USER || 'wg-gmail'
 const PASS = process.env.KOOBOO_PASS || ''
 const SCOPE = process.env.KOOBOO_SCREENSHOT_SCOPE || 'all'
+const DOC_LOCALE = normalizeLocale(process.env.KOOBOO_DOC_LOCALE || 'zh')
+const OUT_DIR =
+  DOC_LOCALE === 'en'
+    ? path.join(REPO_ROOT, 'docs', 'public', 'en', 'product', 'console')
+    : path.join(REPO_ROOT, 'docs', 'public', 'product', 'console')
+
+const LOCALE_CONFIG = {
+  zh: {
+    appLocale: 'zh',
+    browserLocale: 'zh-CN',
+    acceptLanguage: 'zh-CN,zh;q=0.9',
+  },
+  en: {
+    appLocale: 'en',
+    browserLocale: 'en-US',
+    acceptLanguage: 'en-US,en;q=0.9',
+  },
+}
 
 if (!PASS) {
   console.error('Set KOOBOO_PASS in the environment or kb-docs/.env')
@@ -29,6 +46,14 @@ if (!PASS) {
 }
 
 const shots = []
+
+function normalizeLocale(locale) {
+  return String(locale).toLowerCase().startsWith('en') ? 'en' : 'zh'
+}
+
+function apiUrl(pathname) {
+  return new URL(`/_api/v2/${pathname.replace(/^\/+/, '')}`, BASE).toString()
+}
 
 async function login(page) {
   await page.goto(`${BASE}/_Admin/login`, {
@@ -52,6 +77,48 @@ async function login(page) {
 
   await page.waitForURL(/\/_Admin\/(?!login)/, { timeout: 60000 })
   await page.waitForTimeout(2000)
+}
+
+async function fetchHeader(page) {
+  return page.evaluate(async (url) => {
+    const response = await fetch(url, { credentials: 'include' })
+    if (!response.ok) throw new Error(`Failed to load console header: ${response.status}`)
+    return response.json()
+  }, apiUrl('bar/header'))
+}
+
+async function changeUserLanguage(page, language) {
+  await page.evaluate(
+    async ({ url, language: nextLanguage }) => {
+      const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        body: JSON.stringify({ language: nextLanguage }),
+      })
+      if (!response.ok) throw new Error(`Failed to change language: ${response.status}`)
+    },
+    { url: apiUrl('user/ChangeLanguage'), language }
+  )
+}
+
+async function setLangCookie(context, language) {
+  await context.addCookies([{ name: '_cms_lang', value: language, url: BASE }])
+}
+
+async function applyUiLanguage(page, context) {
+  const language = LOCALE_CONFIG[DOC_LOCALE].appLocale
+  const previousLanguage = (await fetchHeader(page))?.user?.language || null
+  await setLangCookie(context, language)
+  if (previousLanguage !== language) await changeUserLanguage(page, language)
+  return previousLanguage
+}
+
+async function restoreUiLanguage(page, context, previousLanguage) {
+  if (!previousLanguage) return
+  await setLangCookie(context, previousLanguage)
+  const currentLanguage = (await fetchHeader(page))?.user?.language || null
+  if (currentLanguage !== previousLanguage) await changeUserLanguage(page, previousLanguage)
 }
 
 function consoleUrl(pathname = '') {
@@ -96,6 +163,14 @@ async function redactSensitive(page) {
       text = text.replace(emailRe, 'user@example.com')
       text = text.replace(domainRe, 'example.com')
       text = text.replace(currencyRe, '***')
+      text = text.replace(
+        /(Current balance:\s*)\d[\d,.]*(?=\s*[A-Z]{3}\b)/i,
+        '$1***'
+      )
+      text = text.replace(
+        /(当前余额[：:]?\s*)\d[\d,.]*(?=\s*[A-Z]{3}\b)/,
+        '$1***'
+      )
       node.nodeValue = text
     }
 
@@ -123,6 +198,16 @@ async function redactSensitive(page) {
     }
 
     const route = `${location.pathname}${location.search}`
+    if (route.includes('/balance')) {
+      for (const node of document.querySelectorAll('span, strong, b, div')) {
+        const text = (node.textContent || '').trim()
+        if (/^\d[\d,.]*$/.test(text) && node.children.length === 0) {
+          const context = node.parentElement?.textContent || ''
+          if (/Current balance|当前余额/i.test(context)) node.textContent = '***'
+        }
+      }
+    }
+
     if (route.includes('/organization')) {
       for (const item of document.querySelectorAll('ul li')) {
         if (/当前组织|Current Organization/i.test(item.textContent || '')) {
@@ -252,22 +337,26 @@ async function main() {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 900 },
     deviceScaleFactor: 1,
-    locale: 'zh-CN',
+    locale: LOCALE_CONFIG[DOC_LOCALE].browserLocale,
     extraHTTPHeaders: {
-      'Accept-Language': 'zh-CN,zh;q=0.9',
+      'Accept-Language': LOCALE_CONFIG[DOC_LOCALE].acceptLanguage,
     },
   })
   const page = await context.newPage()
 
   await login(page)
+  const previousLanguage = await applyUiLanguage(page, context)
 
-  for (const [name, capture] of CAPTURES) {
-    if (SCOPE !== 'all' && SCOPE !== name) continue
-    console.log('capture', name)
-    await capture(page)
+  try {
+    for (const [name, capture] of CAPTURES) {
+      if (SCOPE !== 'all' && SCOPE !== name) continue
+      console.log('capture', name)
+      await capture(page)
+    }
+  } finally {
+    await restoreUiLanguage(page, context, previousLanguage)
+    await browser.close()
   }
-
-  await browser.close()
   console.log('done:', shots.length, 'files')
 }
 

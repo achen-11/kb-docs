@@ -775,7 +775,8 @@ const zhNav = [
 ]
 
 const enNav = [
-  { text: 'Home', link: '/' },
+  { text: 'Quick Start', link: '/quick-start/' },
+  { text: 'Product Features', link: '/product/' },
   { text: 'Admin CMS', link: '/cms/' },
   { text: 'Template Engine', link: '/templateEngine/' },
   { text: 'Kooboo CLI', link: '/cli/' },
@@ -783,6 +784,32 @@ const enNav = [
 ]
 
 const englishSidebarTextMap = {
+  '产品功能': 'Product Features',
+  '控制台': 'Console',
+  '域名': 'Domains',
+  '组织': 'Organization',
+  '数据中心': 'Data Centers',
+  '会员': 'Membership',
+  'AI 配置': 'AI Configuration',
+  '订单': 'Orders',
+  '余额': 'Balance',
+  '续费': 'Renewals',
+  '邮箱': 'Mailbox',
+  '邮件列表': 'Messages',
+  '日历': 'Calendar',
+  '撰写邮件': 'Compose',
+  '邮箱地址': 'Mail Addresses',
+  '联系人': 'Contacts',
+  '安全报告': 'Security Reports',
+  '邮件扩展模块': 'Mail Extensions',
+  '市场': 'Marketplace',
+  '开发者模式': 'Developer Mode',
+  'AI 悬浮助手': 'AI Floating Assistant',
+  '创建第一个站点': 'Create Your First Site',
+  '做第一个页面': 'Build Your First Page',
+  '添加内容': 'Add Content',
+  '发布与域名': 'Publish and Domains',
+  '写第一个 KScript API': 'Write Your First KScript API',
   '后台 CMS': 'Admin CMS',
   '模板引擎': 'Template Engine',
   '快速开始': 'Quick Start',
@@ -829,6 +856,10 @@ const enSidebar = {
   '/en/cli': enCliSidebar,
   ...buildEnglishSidebarMap(
     {
+      '/quick-start/': quickStartSidebar,
+      '/quick-start': quickStartSidebar,
+      '/product/': productSidebar,
+      '/product': productSidebar,
       '/cms/': cmsSidebar,
       '/cms': cmsSidebar,
       '/templateEngine/': templateEngineSidebar,
@@ -912,7 +943,11 @@ export default defineConfig({
       description: 'Kooboo Documentation',
       themeConfig: {
         editLink: zhEditLink,
-        siteTitle: 'Kooboo',
+        logo: {
+          src: '/kooboo-logo.svg',
+          alt: 'Kooboo',
+        },
+        siteTitle: false,
         nav: zhNav,
         sidebar: zhSidebar,
         langMenuLabel: '语言',
@@ -926,7 +961,11 @@ export default defineConfig({
       description: 'Kooboo Documentation',
       themeConfig: {
         editLink: enEditLink,
-        siteTitle: 'Kooboo',
+        logo: {
+          src: '/kooboo-logo.svg',
+          alt: 'Kooboo',
+        },
+        siteTitle: false,
         nav: prefixLocaleNav(enNav, '/en'),
         sidebar: enSidebar,
         langMenuLabel: 'Languages',

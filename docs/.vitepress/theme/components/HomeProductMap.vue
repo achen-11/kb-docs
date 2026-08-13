@@ -10,6 +10,7 @@ interface ProductItem {
   description: string
   href: string
   icon: string
+  iconColored?: boolean
   image: string
   imageAlt: string
 }
@@ -80,6 +81,7 @@ const contentByLocale: Record<Locale, ProductContent> = {
         description: '对话建站、实时预览与自动化任务',
         href: '/product/ai-chat',
         icon: '/home/icons/ai-claw.svg',
+        iconColored: true,
         image: '/product/ai-chat/ai-chat-overview.png',
         imageAlt: 'AI Claw 对话建站与实时预览工作区',
       },
@@ -89,7 +91,7 @@ const contentByLocale: Record<Locale, ProductContent> = {
         title: '余额与订单',
         description: '充值、订单、会员续费在控制台完成',
         href: '/product/console/balance',
-        icon: '/home/icons/console.svg',
+        icon: '/home/icons/balance.svg',
         image: '/product/console/balance-overview.png',
         imageAlt: '控制台余额与收支记录界面',
       },
@@ -102,64 +104,65 @@ const contentByLocale: Record<Locale, ProductContent> = {
     openLabel: 'Open documentation',
     items: [
       {
-        id: 'domains',
-        eyebrow: 'Domains',
-        title: 'Domains',
-        description: 'Bind and manage domains for a site',
-        href: '/en/cms/settings/domains',
+        id: 'console',
+        eyebrow: 'Console',
+        title: 'Console',
+        description: 'Domains, organizations, data centers, orders, balance, and AI configuration',
+        href: '/en/product/console',
         icon: '/home/icons/console.svg',
-        image: '/cms/settings/settings-domains-overview.png',
-        imageAlt: 'Kooboo site domain management interface',
+        image: '/en/product/console/console-overview.png',
+        imageAlt: 'Kooboo Console domain list and navigation',
       },
       {
-        id: 'mail',
-        eyebrow: 'Mail',
-        title: 'Mail APIs',
-        description: 'Send and receive mail, IMAP / SMTP, and message parsing',
-        href: '/en/api/mail/',
+        id: 'mailbox',
+        eyebrow: 'Mailbox',
+        title: 'Mailbox',
+        description: 'Send and receive mail, manage contacts, IMAP / SMTP, and mail extensions',
+        href: '/en/product/mail',
         icon: '/home/icons/mail.svg',
-        image: '/product/mail/mail-overview.png',
+        image: '/en/product/mail/mail-overview.png',
         imageAlt: 'Kooboo mailbox inbox interface',
       },
       {
-        id: 'products',
-        eyebrow: 'Products',
-        title: 'Product Management',
-        description: 'Create products, variants, categories, and commerce content',
-        href: '/en/cms/commerce/product-management',
+        id: 'marketplace',
+        eyebrow: 'Marketplace',
+        title: 'Marketplace',
+        description: 'Browse templates, review template details, and manage your shared templates',
+        href: '/en/product/market',
         icon: '/home/icons/marketplace.svg',
-        image: '/cms/commerce/product-management-list.png',
-        imageAlt: 'Kooboo commerce product management interface',
+        image: '/en/product/market/templates-overview.png',
+        imageAlt: 'Kooboo Marketplace template browser',
       },
       {
         id: 'developer-mode',
         eyebrow: 'Dev Tools',
         title: 'Developer Mode',
         description: 'Edit pages, layouts, views, scripts, styles, and code together',
-        href: '/en/cms/development/',
+        href: '/en/product/developer-mode',
         icon: '/home/icons/developer-mode.svg',
-        image: '/cms/development/code-overview.png',
-        imageAlt: 'Kooboo development code management interface',
+        image: '/en/product/developer-mode/developer-mode-overview.png',
+        imageAlt: 'Developer Mode resource tree and editing workspace',
       },
       {
-        id: 'ai-service',
-        eyebrow: 'AI',
-        title: 'AI Service',
-        description: 'Configure AI providers and site-level AI settings',
-        href: '/en/cms/settings/ai-service',
+        id: 'ai-chat',
+        eyebrow: 'ChatBot',
+        title: 'AI Claw / AI Chat',
+        description: 'Build sites through conversation, preview changes live, and manage automated tasks',
+        href: '/en/product/ai-chat',
         icon: '/home/icons/ai-claw.svg',
-        image: '/cms/settings/settings-ai-service-overview.png',
-        imageAlt: 'Kooboo AI service settings interface',
+        iconColored: true,
+        image: '/en/product/ai-chat/ai-chat-overview.png',
+        imageAlt: 'AI Claw task overview and conversation workspace',
       },
       {
-        id: 'orders',
-        eyebrow: 'Orders',
-        title: 'Orders',
-        description: 'Track orders, payment status, fulfillment, and commerce operations',
-        href: '/en/cms/commerce/orders',
-        icon: '/home/icons/console.svg',
-        image: '/cms/commerce/orders-list.png',
-        imageAlt: 'Kooboo commerce order management interface',
+        id: 'balance',
+        eyebrow: 'Balance',
+        title: 'Balance & Orders',
+        description: 'Top up your balance, review orders, and renew memberships from the Console',
+        href: '/en/product/console/balance',
+        icon: '/home/icons/balance.svg',
+        image: '/en/product/console/balance-overview.png',
+        imageAlt: 'Kooboo Console balance and transaction history',
       },
     ],
   },
@@ -189,7 +192,15 @@ function activateItem(index: number) {
         >
           <span class="kb-doc-product__eyebrow">{{ item.eyebrow }}</span>
           <span class="kb-doc-product__title">
+            <img
+              v-if="item.iconColored"
+              class="kb-doc-product__icon kb-doc-product__icon--colored no-zoom"
+              :src="item.icon"
+              alt=""
+              aria-hidden="true"
+            >
             <span
+              v-else
               class="kb-doc-product__icon"
               :style="{ '--product-icon': `url(${item.icon})` }"
               aria-hidden="true"

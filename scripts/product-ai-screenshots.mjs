@@ -221,7 +221,7 @@ async function gotoSitePages(page) {
 }
 
 async function redactSensitive(page) {
-  await page.evaluate(() => {
+  await page.evaluate((docLocale) => {
     const emailRe = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi
     const domainRe = /\b(?:[a-z0-9-]+\.)+[a-z]{2,}\b/gi
     const urlRe = /https?:\/\/[^\s<>"']+/gi
@@ -254,6 +254,37 @@ async function redactSensitive(page) {
         text = text.replace(domainRe, 'example.com')
       }
       node.nodeValue = text
+    }
+
+    if (docLocale === 'en') {
+      const translations = new Map([
+        ['你好！我是Kooboo自助智能体，有什么可以帮助你的吗？', "Hi! I'm Kooboo Self-Service Agent. How can I help?"],
+        ['流量异常', 'Traffic anomaly'],
+        ['最近24小时流量下降了20%', 'Traffic fell by 20% in the last 24 hours'],
+        ['内容优化建议', 'Content optimization'],
+        ['发现5篇文章可以优化SEO', '5 articles could improve their SEO'],
+        ['同步订单数据', 'Sync order data'],
+        ['生成网站报告', 'Generate site report'],
+        ['向 AI 提问或要求更改任何内容...', 'Ask AI a question or request a change...'],
+      ])
+
+      for (const node of textNodes) {
+        if (shouldSkip(node)) continue
+        const text = (node.nodeValue || '').trim()
+        if (!text || !/[\u3400-\u9fff]/u.test(text)) continue
+
+        const translated = translations.get(text)
+        if (translated) {
+          node.nodeValue = (node.nodeValue || '').replace(text, translated)
+          continue
+        }
+
+        const parent = node.parentElement
+        const context = parent?.closest(
+          '.message-bubble, .ai-chat-input, .task-item, .task-card, .task-log-message, [class*="task"]'
+        )
+        if (context) node.nodeValue = 'Demo task'
+      }
     }
 
     for (const input of document.querySelectorAll('input, textarea, [contenteditable="true"]')) {
@@ -289,6 +320,13 @@ async function redactSensitive(page) {
 
       if ('value' in input) input.value = nextValue
       else input.textContent = nextValue
+
+      if (docLocale === 'en') {
+        const placeholder = input.getAttribute('placeholder') || ''
+        if (/[\u3400-\u9fff]/u.test(placeholder)) {
+          input.setAttribute('placeholder', 'Ask AI a question or request a change...')
+        }
+      }
     }
 
     document
@@ -315,7 +353,7 @@ async function redactSensitive(page) {
     for (const message of document.querySelectorAll('.el-message')) {
       message.remove()
     }
-  })
+  }, DOC_LOCALE)
 }
 
 async function snap(page, folder, name, options = {}) {

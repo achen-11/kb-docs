@@ -1,5 +1,5 @@
 const ENGLISH_DOC_PREFIX = '/en'
-const LOCALIZED_CMS_IMAGE_PREFIX = '/cms/'
+const LOCALIZED_DOC_IMAGE_PREFIXES = ['/cms/', '/product/']
 
 export function isEnglishDocRoute(pathname = '/') {
   return pathname === ENGLISH_DOC_PREFIX || pathname.startsWith(`${ENGLISH_DOC_PREFIX}/`)
@@ -18,7 +18,7 @@ export function resolveLocalizedDocImageSrc(src, pathname = '/') {
     return src
   }
 
-  if (src.startsWith(LOCALIZED_CMS_IMAGE_PREFIX)) {
+  if (LOCALIZED_DOC_IMAGE_PREFIXES.some((prefix) => src.startsWith(prefix))) {
     return `/en${src}`
   }
 
