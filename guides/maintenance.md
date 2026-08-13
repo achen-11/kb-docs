@@ -55,100 +55,123 @@ pnpm check:dead-links      # 死链扫描
 docs/*.md
   → vitepress build
   → docs/.vitepress/dist
-  → stabilize-vitepress-dist（去掉资源文件名 hash，避免全站 HTML 联动）
+  → stabilize-vitepress-dist（固定全局入口，并将页面模块 hash 统一为 stable）
   → export-vitepress-to-kooboo（写入 kb-remote-site/src/）
   → 同步 docs/public 配图 → kb-remote-site/images/
 ```
 
-Kooboo Page 的 `@k-url` 保留 `index.html` 路径，例如 `<!-- @k-url /cms/index.html -->`，避免 Page API 400。目录 URL（`/cms/`）由远端 **Request Hook** 处理。
+Kooboo Page 的 `@k-url` 保留 `index.html` 路径，例如 `<!-- @k-url /cms/index.html -->`，避免 Page API 400。导出器会把 VitePress 的站内相对链接、目录链接和无扩展名链接转换为实际 Page URL（例如 `/cms/index.html`、`/cms/site/pages.html`），因此站内导航不依赖 Request Hook。
 
-## 4. 部署到 Kooboo
+构建产物必须遵守以下稳定 URL 契约：
 
-### 4.1 推荐流程（增量）
-
-```bash
-git pull                                    # 拿到最新 last-manifest.json
-# … 修改 docs …
-pnpm docs:deploy:kooboo:dry-run             # 查看将 push 的文件
-pnpm docs:deploy:kooboo                     # 构建 + 增量 kb push + 更新 manifest
-git add docs/ .kooboo-deploy/last-manifest.json
-git commit -m "docs: ..."
-git push
+```text
+/assets/vitepress-app.js
+/assets/vitepress-style.css
+/assets/<page>.md.stable.js
+/assets/<page>.md.stable.lean.js
 ```
 
-改**一篇**文档时，通常只会 push 少量文件（例如该页 HTML、对应 `.lean.js`、本地搜索索引），而不是全站 2000+ 资源。
+页面模块不能直接去掉 hash 段。VitePress 运行时会根据 `window.__VP_HASH_MAP__` 拼接模块文件名，因此 stabilizer 必须同时重写物理文件名、`content-file/hashmap.json` 和每个 HTML 内联的 hash map。完整规则见 `.trellis/spec/kooboo-docs-deployment-sop.md`。
 
-### 4.2 相关命令
+## 4. 部署到 Kooboo（artifact 分支 + `kb deploy`）
+
+### 4.1 两个仓库状态
+
+发布流程使用两个独立 Git 状态：
+
+- `kb-docs/main`：Markdown、VitePress 配置和图片源码。
+- artifact 分支或独立 worktree：只保存最终 Kooboo 资源，例如 `src/page`、`src/js`、`src/css`、`content-file` 和 `images`。
+
+artifact worktree 必须与 `kb-docs` 分开。脚本不会创建分支、提交 commit 或修改部署基线。
+
+首次使用时准备一个已经初始化的 artifact worktree，并设置：
+
+```bash
+export KOOBOO_ARTIFACT_DIR=/absolute/path/to/kb-docs-kooboo-artifact
+```
+
+该目录需要是 Git worktree 根目录，并自行配置 `.env`。`.env` 和 `.kooboo/` 会被排除，不进入 artifact commit。
+
+### 4.2 推荐流程
+
+```bash
+# … 修改 docs …
+pnpm docs:artifact:prepare                  # 构建并同步最终资源到 artifact worktree
+
+# 在 artifact worktree 中检查并提交生成资源；由人工或 CI 完成 Git 操作
+
+export KOOBOO_DEPLOY_FROM=<last-successful-artifact-commit>
+export KOOBOO_DEPLOY_TO=<candidate-artifact-commit>
+pnpm docs:deploy:kooboo:dry-run             # 生成并预览部署计划
+pnpm docs:deploy:kooboo -- --apply-deletes # 上传、删除、校验并生成回执
+
+# 回执成功后仍必须验证真实 HTTP 路由和浏览器水合
+KOOBOO_VERIFY_URL=https://docs.localkooboo.com pnpm docs:verify:kooboo
+```
+
+CLI 对比的是上一次确认成功的 artifact commit 与本次 candidate commit，不依赖工作目录，也不是只看 candidate 的父 commit。部署成功后，CI 或发布人才能推进 `KOOBOO_DEPLOY_FROM` 对应的部署基线。
+
+默认回执保存在 artifact worktree 的 `.kooboo/deploy-receipt.json`。只要上传、删除或变更资源校验存在失败，命令都会返回非零退出码，部署基线不得推进。
+
+`Push success`、部署回执或 `kb check --level 1` 都不能单独证明站点可运行。曾出现远端资源对象与 `routeName` 均存在、CLI 也显示 `in_sync`，但 `/assets/app.js`、`/assets/style.css` 实际仍为 404。必须以 `docs:verify:kooboo` 的真实 HTTP 与浏览器结果作为最终发布闸门。
+
+### 4.3 相关命令
 
 | 命令 | 作用 |
 |------|------|
 | `pnpm docs:build:kooboo` | 仅构建并导出到 `kb-remote-site`，不 push |
-| `pnpm docs:deploy:kooboo` | 构建 + manifest diff + `kb push` + 更新 manifest |
-| `pnpm docs:deploy:kooboo:dry-run` | 不 push，只打印计划 |
-| `pnpm docs:manifest:diff` | 已构建前提下，只看与 baseline 的差异 |
-| `pnpm docs:manifest:refresh` | 只根据当前 `kb-remote-site` 重写 manifest（不 push） |
+| `pnpm docs:artifact:prepare` | 构建、导出并镜像到 artifact worktree，不提交、不部署 |
+| `pnpm docs:artifact:prepare:skip-build` | 已完成导出时只同步 artifact worktree |
+| `pnpm docs:deploy:kooboo:dry-run` | 根据 artifact commit range 生成计划，不写远端 |
+| `pnpm docs:deploy:kooboo` | 调用 `kb deploy` 执行计划并生成回执 |
+| `pnpm docs:deploy:kooboo:legacy` | 旧 manifest 发布器，仅用于迁移期应急 |
+| `pnpm docs:verify:kooboo` | 检查关键资源、页面水合、所有 HTTP 失败和浏览器错误 |
 | `pnpm docs:sync-images` | 仅把 `docs/public` 配图复制到 `kb-remote-site/images` |
 
 仅改配图、未改 Markdown 时：
 
 ```bash
 pnpm docs:sync-images
-cd kb-remote-site && kb push images/cms/某目录
-# 并更新 manifest：pnpm docs:manifest:refresh --skip-build
+pnpm docs:artifact:prepare:skip-build
+# 提交 artifact 变更后走同一套 dry-run / deploy 流程
 ```
 
-### 4.3 共享 manifest（多人协作）
+### 4.4 部署基线与多人协作
 
-- 文件：`.kooboo-deploy/last-manifest.json`（**纳入 Git**）
-- 含义：上次**成功部署到共享远端**的资源 SHA256 快照，含 `gitCommit`、`gitBranch`
-- 每人 deploy 成功后都应 **commit 此文件**，否则同事会重复 push 或基线错乱
+- artifact commit 是可审计的完整部署产物。
+- `KOOBOO_DEPLOY_FROM` 必须指向最后一次收到成功回执的 artifact commit。
+- `KOOBOO_DEPLOY_TO` 指向本次 candidate commit，未设置时脚本使用 artifact worktree 的 `HEAD`。
+- 同一站点只允许一个发布者同时运行；CI 应配置 concurrency group。
+- 失败时保留 receipt，但不得推进已部署基线。重跑同一个 `from → to` 即可补偿失败项。
 
-**merge 冲突**：两人都在各自分支部署并改了 manifest 时
+`.kooboo-deploy/last-manifest.json` 与 `docs:manifest:*` 仅保留给旧方案迁移和诊断。它们不能证明远端发布成功，不再作为推荐部署基线。
 
-1. 先解决 `docs/` 内容冲突  
-2. `pnpm docs:build:kooboo`  
-3. `pnpm docs:deploy:kooboo` 推到远端  
-4. 以 deploy 生成的新 manifest 为准提交  
+### 4.5 删除页面或资源
 
-若远端已是最新、只需对齐 Git： `pnpm docs:manifest:refresh`。
-
-### 4.4 删除页面或资源
-
-manifest 会列出 `removed` 项，但 **不会自动删远端**。需要时用 Kooboo CLI 对账清理：
+Git range 中的删除会进入部署计划，但实际执行前必须显式批准：
 
 ```bash
-cd kb-remote-site
-kb check -o check-report.json
-kb prune --report check-report.json        # 预览
-kb prune --report check-report.json --yes # 确认后删除远端多余资源
+pnpm docs:deploy:kooboo:dry-run
+pnpm docs:deploy:kooboo -- --apply-deletes
 ```
+
+CLI 会先上传支撑资源，再上传 Page；只有所有 upsert 成功后才执行删除。首页等受保护资源仍需按 CLI 的保护规则处理。命名迁移产生的旧页面模块必须等新版本通过 `docs:verify:kooboo` 后再精确清理，禁止在验收前宽范围 prune。
 
 ## 5. 路由 Hook（RouteFinding）
 
-VitePress 侧栏使用 `/cms/` 等形式；Kooboo Page 绑定的是 `/cms/index.html`。在站点后台配置 **请求 Hook → RouteFinding → DO**：
+导出后的站内链接已经指向 `/cms/index.html` 等实际 Page URL。若还希望用户直接输入、收藏或从外部访问 `/cms/` 这类简洁目录 URL，则在站点后台配置 **请求 Hook → RouteFinding → DO**：
 
 ```typescript
 // VitePress 目录页：/cms/ → /cms/index.html
-const url = k.event.url
+const url = k.event.url || '/'
 
-const slash = url.lastIndexOf('/')
-const dot = url.lastIndexOf('.')
-if (dot > slash) {
-  return
-}
+if (url !== '/' && url.endsWith('/')) {
+  const lastSlash = url.lastIndexOf('/')
+  const lastDot = url.lastIndexOf('.')
 
-if (url === '/') {
-  k.event.url = '/index.html'
-  return
-}
-
-if (url.endsWith('/')) {
-  k.event.url = url + 'index.html'
-  return
-}
-
-if (url.length > 1) {
-  k.event.url = url + '/index.html'
+  if (lastDot <= lastSlash) {
+    k.event.url = url + 'index.html'
+  }
 }
 ```
 
@@ -163,23 +186,34 @@ if (url.length > 1) {
 ```bash
 pnpm test:export:kooboo
 pnpm test:kooboo-manifest
+pnpm test:kooboo-artifact
 pnpm test:stabilize-vitepress
 ```
 
 修改 `scripts/export-vitepress-to-kooboo.mjs`、`kooboo-manifest.mjs` 等后请跑一遍。
 
+部署后还必须运行：
+
+```bash
+KOOBOO_VERIFY_URL=https://docs.localkooboo.com pnpm docs:verify:kooboo
+```
+
+该检查必须覆盖全局 JS/CSS、页面模块、VitePress 水合、全部 4xx/5xx、控制台 error 和未捕获异常，不能只确认 Page 返回 200。
+
 ## 8. 职责分工建议
 
 | 操作 | 谁来做 | 是否 commit manifest |
 |------|--------|----------------------|
-| 改单篇文档 | 作者 | 是（deploy 后） |
-| 改侧栏/导航 | 维护者 | 是 |
-| 全量重建 / 换站点 | 维护者牵头 | 是（全量后 refresh） |
-| 仅本地预览 | 任何人 | 否 |
+| 改单篇文档 | 作者 | 提交 docs；artifact 由发布者生成 |
+| 改侧栏/导航 | 维护者 | 提交 docs；artifact 由发布者生成 |
+| 生成 artifact commit | CI 或唯一发布者 | 是 |
+| 执行远端部署 | CI 或唯一发布者 | 成功后推进 deployed baseline |
+| 仅本地预览 | 任何人 | 不生成 artifact commit |
 
 ## 9. 相关内部文档
 
 - 配图细则：`.trellis/spec/documentation-images.md`
 - CMS 文档工作流：`.trellis/spec/cms-documentation-workflow.md`
 - API 文档工作流：`.trellis/spec/api-documentation-workflow.md`
+- Kooboo 发布与线上验收：`.trellis/spec/kooboo-docs-deployment-sop.md`
 - 环境安装： [setup.md](setup.md)

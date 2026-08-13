@@ -10,15 +10,17 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '..')
 
 export const distDir = path.join(projectRoot, 'docs', '.vitepress', 'dist')
-export const koobooSrcDir = path.join(projectRoot, 'kb-remote-site', 'src')
+export const koobooSiteDir = path.join(projectRoot, 'kb-remote-site')
+export const koobooSrcDir = path.join(koobooSiteDir, 'src')
 
 const generatedPaths = {
   pageDir: path.join(koobooSrcDir, 'page'),
   jsAssetsDir: path.join(koobooSrcDir, 'js', 'assets'),
   cssAssetsDir: path.join(koobooSrcDir, 'css', 'assets'),
-  contentFileAssetsDir: path.join(koobooSrcDir, 'content-file', 'assets'),
+  contentFileDir: path.join(koobooSiteDir, 'content-file'),
+  legacyContentFileDir: path.join(koobooSrcDir, 'content-file'),
   vpIconsCssFile: path.join(koobooSrcDir, 'css', 'vp-icons.css'),
-  hashMapFile: path.join(koobooSrcDir, 'content-file', 'hashmap.json')
+  hashMapFile: path.join(koobooSiteDir, 'content-file', 'hashmap.json')
 }
 
 function normalizeRelativePath(relativePath) {
@@ -58,6 +60,41 @@ export function toKoobooAssetRoute(distRelativePath) {
   }
 
   return `/${normalized}`
+}
+
+export function absolutizeDocumentRelativeUrls(html, distRelativePath, pageRelativePaths = new Set()) {
+  const normalized = normalizeRelativePath(distRelativePath).replace(/^\/+/, '')
+  const baseUrl = new URL(normalized, 'https://kooboo-export.local/')
+
+  return html.replace(
+    /(\b(?:href|src)=)(["'])([^"']*)\2/giu,
+    (_match, attribute, quote, value) => {
+      const isDocumentRelative = /^\.\.?\//u.test(value)
+      const isSiteRootHref = attribute.toLowerCase().startsWith('href') &&
+        value.startsWith('/') &&
+        !value.startsWith('//')
+
+      if (!isDocumentRelative && !isSiteRootHref) {
+        return `${attribute}${quote}${value}${quote}`
+      }
+
+      const resolved = new URL(value, baseUrl)
+      let pathname =
+        resolved.pathname !== '/' && resolved.pathname.endsWith('/')
+          ? `${resolved.pathname}index.html`
+          : resolved.pathname
+
+      if (
+        pathname !== '/' &&
+        !path.posix.extname(pathname) &&
+        pageRelativePaths.has(`${pathname.replace(/^\//, '')}.html`)
+      ) {
+        pathname = `${pathname}.html`
+      }
+
+      return `${attribute}${quote}${pathname}${resolved.search}${resolved.hash}${quote}`
+    }
+  )
 }
 
 export function injectPageRouteComment(html, route) {
@@ -109,7 +146,8 @@ async function resetGeneratedOutput() {
     rm(generatedPaths.pageDir, { recursive: true, force: true }),
     rm(generatedPaths.jsAssetsDir, { recursive: true, force: true }),
     rm(generatedPaths.cssAssetsDir, { recursive: true, force: true }),
-    rm(generatedPaths.contentFileAssetsDir, { recursive: true, force: true }),
+    rm(generatedPaths.contentFileDir, { recursive: true, force: true }),
+    rm(generatedPaths.legacyContentFileDir, { recursive: true, force: true }),
     rm(generatedPaths.vpIconsCssFile, { force: true }),
     rm(generatedPaths.hashMapFile, { force: true })
   ])
@@ -126,7 +164,7 @@ function getRootStaticTarget(distRelativePath) {
 
   return {
     type: 'content-file',
-    targetPath: path.join(koobooSrcDir, 'content-file', distRelativePath)
+    targetPath: path.join(koobooSiteDir, 'content-file', distRelativePath)
   }
 }
 
@@ -169,14 +207,14 @@ function getDistFileTarget(distRelativePath) {
 
     return {
       type: 'content-file',
-      targetPath: path.join(koobooSrcDir, 'content-file', normalized)
+      targetPath: path.join(koobooSiteDir, 'content-file', normalized)
     }
   }
 
   return getRootStaticTarget(normalized)
 }
 
-async function exportFile(sourcePath) {
+async function exportFile(sourcePath, pageRelativePaths) {
   const relativePath = normalizeRelativePath(path.relative(distDir, sourcePath))
   const target = getDistFileTarget(relativePath)
 
@@ -186,7 +224,8 @@ async function exportFile(sourcePath) {
 
   if (target.type === 'page') {
     const html = await readFile(sourcePath, 'utf8')
-    await writeTextFile(target.targetPath, injectPageRouteComment(html, target.route))
+    const normalizedHtml = absolutizeDocumentRelativeUrls(html, relativePath, pageRelativePaths)
+    await writeTextFile(target.targetPath, injectPageRouteComment(normalizedHtml, target.route))
     return
   }
 
@@ -209,8 +248,13 @@ export async function exportVitePressToKooboo() {
   await resetGeneratedOutput()
 
   const files = await walkFiles(distDir)
+  const pageRelativePaths = new Set(
+    files
+      .map((filePath) => normalizeRelativePath(path.relative(distDir, filePath)))
+      .filter((relativePath) => relativePath.endsWith('.html'))
+  )
   for (const filePath of files) {
-    await exportFile(filePath)
+    await exportFile(filePath, pageRelativePaths)
   }
 
   await syncPublicImagesToKooboo()

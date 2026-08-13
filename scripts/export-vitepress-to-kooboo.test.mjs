@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import {
+  absolutizeDocumentRelativeUrls,
   injectCssRouteComment,
   injectJsRouteComment,
   injectPageRouteComment,
@@ -30,14 +31,45 @@ test('injectPageRouteComment replaces existing page route comment', () => {
   assert.equal(result, '<!-- @k-url /new/ -->\n<!DOCTYPE html>')
 })
 
+test('absolutizeDocumentRelativeUrls protects links from Kooboo page normalization', () => {
+  const html = [
+    '<a href="./login.html#token">Login</a>',
+    '<a href="../index.html?lang=en">Index</a>',
+    '<img src="../../images/logo.png">',
+    '<a href="/api/">Directory</a>',
+    '<a href="/api/account/login">Clean URL</a>',
+    '<a href="/">Home</a>',
+    '<a href="https://example.com/docs.html">External</a>',
+  ].join('')
+
+  assert.equal(
+    absolutizeDocumentRelativeUrls(
+      html,
+      'api/account/index.html',
+      new Set(['api/account/login.html'])
+    ),
+    [
+      '<a href="/api/account/login.html#token">Login</a>',
+      '<a href="/api/index.html?lang=en">Index</a>',
+      '<img src="/images/logo.png">',
+      '<a href="/api/index.html">Directory</a>',
+      '<a href="/api/account/login.html">Clean URL</a>',
+      '<a href="/">Home</a>',
+      '<a href="https://example.com/docs.html">External</a>',
+    ].join('')
+  )
+})
+
 test('injectJsRouteComment replaces existing js route comment', () => {
   const result = injectJsRouteComment('// @k-url /old.js\nconsole.log("ok")\n', '/assets/app.js')
   assert.equal(result, '// @k-url /assets/app.js\nconsole.log("ok")\n')
 })
 
-test('isDocImagePath matches cms images only', () => {
+test('isDocImagePath matches localized documentation image roots', () => {
   assert.equal(isDocImagePath('cms/getting-started/01.png'), true)
   assert.equal(isDocImagePath('en/cms/getting-started/01.png'), true)
+  assert.equal(isDocImagePath('product/mail/overview.png'), true)
+  assert.equal(isDocImagePath('en/product/mail/overview.png'), true)
   assert.equal(isDocImagePath('assets/style.abc.css'), false)
   assert.equal(isDocImagePath('cms/readme.txt'), false)
 })
@@ -58,6 +90,30 @@ test('resolveLocalizedDocImageSrc switches CMS screenshots for English docs', ()
   assert.equal(
     resolveLocalizedDocImageSrc('/logo.svg', '/en/cms/content/content-types'),
     '/logo.svg'
+  )
+})
+
+test('resolveLocalizedDocImageSrc switches Product screenshots for English docs', () => {
+  assert.equal(
+    resolveLocalizedDocImageSrc(
+      '/product/console/membership-overview.png',
+      '/en/product/console/membership'
+    ),
+    '/en/product/console/membership-overview.png'
+  )
+  assert.equal(
+    resolveLocalizedDocImageSrc(
+      '/product/console/membership-overview.png',
+      '/product/console/membership'
+    ),
+    '/product/console/membership-overview.png'
+  )
+  assert.equal(
+    resolveLocalizedDocImageSrc(
+      '/en/product/console/membership-overview.png',
+      '/en/product/console/membership'
+    ),
+    '/en/product/console/membership-overview.png'
   )
 })
 

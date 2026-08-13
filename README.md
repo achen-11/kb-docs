@@ -15,8 +15,9 @@
 pnpm install
 pnpm docs:dev              # 本地预览（http://localhost:5173）
 pnpm docs:build            # 仅构建，检查是否能通过
-pnpm docs:deploy:kooboo:dry-run   # 预览将要 push 的文件
-pnpm docs:deploy:kooboo    # 构建 + 增量部署到 Kooboo
+pnpm docs:artifact:prepare # 构建并同步到部署产物 worktree
+pnpm docs:deploy:kooboo:dry-run   # 预览 artifact commit range 的部署计划
+pnpm docs:deploy:kooboo    # 执行并验证 artifact commit range
 pnpm check:dead-links      # 死链检查
 ```
 
@@ -27,7 +28,7 @@ docs/                 # VitePress 文档源码（Markdown）
 docs/public/          # 静态资源（配图等），映射到站点根路径
 docs/.vitepress/      # VitePress 配置与主题
 kb-remote-site/       # Kooboo CLI 项目（构建产物导出目录，src/ 由脚本生成）
-.kooboo-deploy/       # 团队共享的部署 manifest（Git 跟踪）
+.kooboo-deploy/       # 旧 manifest 发布方案的兼容状态
 scripts/              # 构建、导出、部署、截图脚本
 guides/               # 维护者文档（不发布到线上文档站）
 ```

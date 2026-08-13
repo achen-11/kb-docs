@@ -6,7 +6,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '..')
 
 /** docs/public/{name} → kb-remote-site/images/{name} */
-export const DOC_IMAGE_PUBLIC_DIRS = ['cms', 'product', 'en/cms']
+export const DOC_IMAGE_PUBLIC_DIRS = ['cms', 'product', 'en/cms', 'en/product']
 
 const docsPublicDir = path.join(projectRoot, 'docs', 'public')
 const koobooImagesDir = path.join(projectRoot, 'kb-remote-site', 'images')

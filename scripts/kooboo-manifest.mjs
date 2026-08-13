@@ -11,7 +11,7 @@ export const koobooSiteDir = path.join(projectRoot, 'kb-remote-site')
 export const baselineManifestPath = path.join(projectRoot, '.kooboo-deploy', 'last-manifest.json')
 
 /** kb push 路径前缀（相对 kb-remote-site 根目录） */
-export const manifestRoots = ['src/page', 'src/js', 'src/css', 'src/content-file', 'images']
+export const manifestRoots = ['src/page', 'src/js', 'src/css', 'content-file', 'images']
 
 function normalizeKey(relativePath) {
   return relativePath.replace(/\\/g, '/')
@@ -49,7 +49,7 @@ export function hashManifestContent(relativePath, content) {
 
   if (relativePath.startsWith('src/page/') && relativePath.endsWith('.html')) {
     normalized = normalizePageHtmlForManifest(content)
-  } else if (relativePath === 'src/content-file/hashmap.json') {
+  } else if (relativePath === 'content-file/hashmap.json') {
     normalized = normalizeHashmapJsonForManifest(content)
   }
 
@@ -60,7 +60,7 @@ async function hashFile(filePath, relativePath) {
   const useNormalizedTextHash =
     !relativePath.startsWith('images/') &&
     (relativePath.startsWith('src/page/') ||
-      relativePath === 'src/content-file/hashmap.json' ||
+      relativePath === 'content-file/hashmap.json' ||
       relativePath.endsWith('.js') ||
       relativePath.endsWith('.css'))
 
