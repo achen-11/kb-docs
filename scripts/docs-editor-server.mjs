@@ -1,5 +1,5 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
-import { readFile, realpath, stat } from 'node:fs/promises'
+import { mkdir, open, readFile, realpath, rename, rm, stat } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -12,6 +12,7 @@ import {
 } from './docs-editor-draft.mjs'
 import { WorkspaceOperationError, createWorkspaceCoordinator } from './docs-editor-workspace.mjs'
 import { DEFAULT_MAX_MEDIA_BYTES, MediaOperationError, createMediaCoordinator } from './docs-editor-media.mjs'
+import { withPreviewLock } from './run-with-preview-lock.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const defaultProjectRoot = path.resolve(__dirname, '..')
@@ -128,6 +129,93 @@ export async function readDocument(projectRoot, requestedPath) {
     bytes: Buffer.byteLength(content),
     modifiedAt: metadata.mtime.toISOString(),
   }
+}
+
+function localeDocumentPaths(requestedPath) {
+  const normalizedPath = normalizeDocumentPath(requestedPath)
+  if (normalizedPath.startsWith('docs/en/')) {
+    return { active: 'en', en: normalizedPath, zh: `docs/${normalizedPath.slice('docs/en/'.length)}` }
+  }
+  return { active: 'zh', en: `docs/en/${normalizedPath.slice('docs/'.length)}`, zh: normalizedPath }
+}
+
+async function documentExists(projectRoot, requestedPath) {
+  try {
+    await readDocument(projectRoot, requestedPath)
+    return true
+  } catch (error) {
+    if (error instanceof EditorHttpError && error.statusCode === 404) return false
+    throw error
+  }
+}
+
+export async function getDocumentLocales(projectRoot, requestedPath) {
+  const paths = localeDocumentPaths(requestedPath)
+  const [zhExists, enExists] = await Promise.all([
+    documentExists(projectRoot, paths.zh),
+    documentExists(projectRoot, paths.en),
+  ])
+  return {
+    active: paths.active,
+    zh: { path: paths.zh, exists: zhExists },
+    en: { path: paths.en, exists: enExists },
+  }
+}
+
+async function writeDraftMarker(draftStateFile, document) {
+  await mkdir(path.dirname(draftStateFile), { recursive: true })
+  const state = {
+    schemaVersion: 1,
+    active: true,
+    updatedAt: new Date().toISOString(),
+    lastDocument: document.path,
+    lastHash: document.hash,
+  }
+  const temporaryFile = `${draftStateFile}.${process.pid}.${randomBytes(8).toString('hex')}.tmp`
+  let handle
+  try {
+    handle = await open(temporaryFile, 'wx', 0o640)
+    await handle.writeFile(`${JSON.stringify(state, null, 2)}\n`, 'utf8')
+    await handle.sync()
+    await handle.close()
+    handle = undefined
+    await rename(temporaryFile, draftStateFile)
+  } catch (error) {
+    await handle?.close().catch(() => undefined)
+    await rm(temporaryFile, { force: true })
+    throw error
+  }
+}
+
+export async function createLocaleDocument(projectRoot, requestedPath, locale, draftStateFile) {
+  if (!['zh', 'en'].includes(locale)) throw new EditorHttpError(400, 'Locale must be zh or en')
+  const paths = localeDocumentPaths(requestedPath)
+  const targetPath = paths[locale]
+  if (await documentExists(projectRoot, targetPath)) throw new EditorHttpError(409, 'Locale document already exists')
+  const sourcePath = paths[locale === 'en' ? 'zh' : 'en']
+  const source = await readDocument(projectRoot, sourcePath)
+  const projectRealPath = await realpath(path.resolve(projectRoot))
+  const docsRoot = await realpath(path.join(projectRealPath, 'docs'))
+  const targetFile = path.resolve(projectRealPath, targetPath)
+  if (!isPathInside(docsRoot, targetFile)) throw new EditorHttpError(400, 'Document path escapes the docs directory')
+  await mkdir(path.dirname(targetFile), { recursive: true })
+  const temporaryFile = path.join(path.dirname(targetFile), `.${path.basename(targetFile)}.${process.pid}.${randomBytes(8).toString('hex')}.tmp`)
+  let handle
+  try {
+    handle = await open(temporaryFile, 'wx', 0o640)
+    await handle.writeFile(source.content, 'utf8')
+    await handle.sync()
+    await handle.close()
+    handle = undefined
+    await rename(temporaryFile, targetFile)
+  } catch (error) {
+    await handle?.close().catch(() => undefined)
+    await rm(temporaryFile, { force: true })
+    throw error
+  }
+  const document = await readDocument(projectRoot, targetPath)
+  if (draftStateFile) await writeDraftMarker(draftStateFile, document)
+  return document
 }
 
 function safeEqual(left, right) {
@@ -533,6 +621,31 @@ export async function createDocsEditorServer(input = {}) {
       }
       if (request.method === 'GET' && url.pathname === '/api/document') {
         sendJson(response, 200, await readDocument(config.projectRoot, url.searchParams.get('path')))
+        return
+      }
+      if (request.method === 'GET' && url.pathname === '/api/document/locales') {
+        sendJson(response, 200, await getDocumentLocales(config.projectRoot, url.searchParams.get('path')))
+        return
+      }
+      if (request.method === 'POST' && url.pathname === '/api/document/locale') {
+        const body = await readJsonBody(request)
+        const workspace = await workspaceCoordinator.getStatus()
+        if (workspace.pendingPush) {
+          throw new WorkspaceOperationError(409, 'PENDING_PUSH_EXISTS', '已有一个版本等待推送，请先在“改动与发布”中重试推送。')
+        }
+        try {
+          const document = await withPreviewLock(
+            { lockFile: config.lockFile, timeoutMs: config.lockTimeoutMs },
+            () => createLocaleDocument(config.projectRoot, body.path, body.locale, config.draftStateFile)
+          )
+          sendJson(response, 201, document)
+        } catch (error) {
+          if (error instanceof EditorHttpError) {
+            sendJson(response, error.statusCode, { error: error.message })
+            return
+          }
+          throw error
+        }
         return
       }
       if (request.method === 'PUT' && url.pathname === '/api/document') {

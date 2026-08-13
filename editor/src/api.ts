@@ -16,6 +16,12 @@ export interface DocumentPayload {
   modifiedAt: string
 }
 
+export interface DocumentLocalesPayload {
+  active: 'zh' | 'en'
+  zh: { path: string; exists: boolean }
+  en: { path: string; exists: boolean }
+}
+
 export interface PreviewStatusPayload {
   fast: {
     available: boolean
@@ -199,6 +205,17 @@ export function getEditorConfig() {
 
 export function getDocument(path: string) {
   return request<DocumentPayload>(`/api/document?path=${encodeURIComponent(path)}`)
+}
+
+export function getDocumentLocales(path: string) {
+  return request<DocumentLocalesPayload>(`/api/document/locales?path=${encodeURIComponent(path)}`)
+}
+
+export function createLocaleDocument(path: string, locale: 'zh' | 'en') {
+  return request<DocumentPayload>('/api/document/locale', {
+    method: 'POST',
+    body: JSON.stringify({ path, locale }),
+  })
 }
 
 export function saveDocument(path: string, content: string, expectedHash: string) {

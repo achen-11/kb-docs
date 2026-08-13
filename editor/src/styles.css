@@ -440,6 +440,10 @@ i[data-tone="working"] { background: #3478ed; animation: pulse 1.3s ease-in-out 
 .editor-title-line { display: flex; align-items: center; gap: 8px; }
 .editor-title-line h1 { max-width: min(740px, 56vw); margin: 0; overflow: hidden; color: #1d2940; font-size: 18px; letter-spacing: -0.025em; text-overflow: ellipsis; white-space: nowrap; }
 .editor-identity > span { display: block; margin-top: 5px; color: #8a95a6; font-size: 10px; }
+.locale-versions { display: flex; gap: 5px; margin-top: 8px; }
+.locale-versions button { min-height: 26px; padding: 0 9px; border: 1px solid #dce4ef; border-radius: 999px; color: #68758a; background: #f8fafc; cursor: pointer; font-size: 9px; font-weight: 800; }
+.locale-versions button.active { border-color: #93b6f2; color: #1958c7; background: #eef5ff; }
+.locale-versions button:disabled { cursor: wait; opacity: .55; }
 .path-button { padding: 5px 8px; border: 1px solid #dde4ed; border-radius: 6px; color: #68758a; background: #f7f9fb; font-size: 9px; }
 .path-button:hover { border-color: #b6c5d9; background: #fff; }
 .editor-actions { display: flex; align-items: flex-end; gap: 7px; }

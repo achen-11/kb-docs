@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import os from 'node:os'
 import path from 'node:path'
@@ -9,7 +9,9 @@ import { DocumentConflictError } from './docs-editor-draft.mjs'
 
 import {
   EditorHttpError,
+  createLocaleDocument,
   createDocsEditorServer,
+  getDocumentLocales,
   normalizeDocumentPath,
   readDocument,
 } from './docs-editor-server.mjs'
@@ -59,6 +61,27 @@ test('readDocument returns metadata and rejects symlink escapes', async (t) => {
     () => readDocument(root, 'docs/safe/escape.md'),
     /escapes the docs directory/u
   )
+})
+
+test('locale helpers report paired paths and create a missing translation draft', async (t) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'kb-docs-editor-locales-'))
+  t.after(() => rm(root, { recursive: true, force: true }))
+  await mkdir(path.join(root, 'docs', 'quick-start'), { recursive: true })
+  await writeFile(path.join(root, 'docs', 'quick-start', 'index.md'), '# 快速开始\n', 'utf8')
+  const stateFile = path.join(root, 'preview', '.editor-draft.json')
+
+  assert.deepEqual(await getDocumentLocales(root, 'docs/quick-start/index.md'), {
+    active: 'zh',
+    zh: { path: 'docs/quick-start/index.md', exists: true },
+    en: { path: 'docs/en/quick-start/index.md', exists: false },
+  })
+
+  const created = await createLocaleDocument(root, 'docs/quick-start/index.md', 'en', stateFile)
+  assert.equal(created.path, 'docs/en/quick-start/index.md')
+  assert.equal(created.content, '# 快速开始\n')
+  assert.equal(JSON.parse(await readFile(stateFile, 'utf8')).lastDocument, created.path)
+  assert.equal((await getDocumentLocales(root, created.path)).en.exists, true)
+  await assert.rejects(() => createLocaleDocument(root, created.path, 'en', stateFile), /already exists/u)
 })
 
 test('editor server authenticates, reads docs, proxies status, and serves the SPA', async (t) => {

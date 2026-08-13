@@ -3,10 +3,13 @@ import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef, watch } fr
 import { useRoute, useRouter } from 'vue-router'
 import {
   ApiError,
+  createLocaleDocument,
   getDocument,
+  getDocumentLocales,
   requestStableBuild,
   saveDocument,
   type DocumentPayload,
+  type DocumentLocalesPayload,
 } from '../api'
 import { useWorkspace } from '../app/workspace'
 import MediaBrowser from '../components/MediaBrowser.vue'
@@ -25,6 +28,8 @@ const noticeMessage = ref('')
 const previewRefreshKey = ref(0)
 const document = shallowRef<DocumentPayload | null>(null)
 const conflictDocument = shallowRef<DocumentPayload | null>(null)
+const documentLocales = shallowRef<DocumentLocalesPayload | null>(null)
+const creatingLocale = ref<'zh' | 'en' | null>(null)
 const previewFrame = shallowRef<HTMLIFrameElement | null>(null)
 const editorPreviewGrid = shallowRef<HTMLElement | null>(null)
 const previewCanvas = shallowRef<HTMLElement | null>(null)
@@ -105,6 +110,21 @@ function documentPreviewPath(sourcePath: string) {
   return `/${value}/`
 }
 
+function previewRouteDocumentPath(routePath: string) {
+  const rawPathname = routePath.split(/[?#]/u, 1)[0]
+  const pathname = rawPathname.replace(/^\/+|\/+$/gu, '')
+  if (!pathname) return 'docs/index.md'
+  return `docs/${pathname}${rawPathname.endsWith('/') ? '/index' : ''}.md`
+}
+
+async function refreshDocumentLocales(path = document.value?.path || requestedPath.value) {
+  try {
+    documentLocales.value = await getDocumentLocales(path)
+  } catch {
+    documentLocales.value = null
+  }
+}
+
 const fastPreviewUrl = computed(() => {
   if (!workspace.editorConfig.value?.fastPreviewBaseUrl || !document.value) return ''
   const url = new URL(documentPreviewPath(document.value.path), `${workspace.editorConfig.value.fastPreviewBaseUrl}/`)
@@ -143,6 +163,7 @@ async function loadDocument(documentPath: string, force = false, source: 'manual
       await router.replace({ name: 'editor', query: { path: payload.path } })
     }
     if (source === 'preview') noticeMessage.value = '已跟随右侧预览切换到对应 Markdown 文档。'
+    await refreshDocumentLocales(payload.path)
     pathPickerOpen.value = false
     return true
   } catch (error) {
@@ -153,6 +174,33 @@ async function loadDocument(documentPath: string, force = false, source: 'manual
     return false
   } finally {
     if (loadSequence === documentLoadSequence) loadingDocument.value = false
+  }
+}
+
+async function openLocale(locale: 'zh' | 'en') {
+  const target = documentLocales.value?.[locale]
+  if (!target) return
+  if (target.exists) {
+    await loadDocument(target.path, false, 'manual')
+    return
+  }
+  if (!document.value || dirty.value || creatingLocale.value) return
+  if (!window.confirm(`将复制现有${locale === 'en' ? '中文' : '英文'}源文创建${locale === 'en' ? '英文' : '中文'}版本。创建后请完成 1:1 重写再提交，是否继续？`)) return
+  creatingLocale.value = locale
+  resetMessages()
+  try {
+    const created = await createLocaleDocument(document.value.path, locale)
+    document.value = created
+    editorContent.value = created.content
+    requestedPath.value = created.path
+    await router.replace({ name: 'editor', query: { path: created.path } })
+    await refreshDocumentLocales(created.path)
+    await workspace.refreshWorkspaceStatus()
+    noticeMessage.value = `${locale === 'en' ? '英文' : '中文'}版本已从源文创建。当前内容仍是源语言，请完成 1:1 重写后再提交。`
+  } catch (error) {
+    setError(error)
+  } finally {
+    creatingLocale.value = null
   }
 }
 
@@ -252,13 +300,24 @@ function handlePanelResizeKeydown(event: KeyboardEvent) {
 function updatePreviewCanvasSize(element = previewCanvas.value) {
   if (element) previewCanvasSize.value = { width: element.clientWidth, height: element.clientHeight }
 }
-function handlePreviewRouteMessage(event: MessageEvent) {
+async function handlePreviewRouteMessage(event: MessageEvent) {
   if (!workspace.editorConfig.value?.fastPreviewBaseUrl || event.source !== previewFrame.value?.contentWindow) return
   if (event.origin !== new URL(workspace.editorConfig.value.fastPreviewBaseUrl).origin) return
-  const payload = event.data as { type?: unknown; version?: unknown; sourcePath?: unknown } | null
-  if (!payload || payload.type !== 'kooboo-docs:preview-route' || payload.version !== 1 ||
-    typeof payload.sourcePath !== 'string' || !payload.sourcePath.startsWith('docs/') ||
-    !payload.sourcePath.endsWith('.md') || payload.sourcePath === document.value?.path) return
+  const payload = event.data as { type?: unknown; version?: unknown; status?: unknown; sourcePath?: unknown; routePath?: unknown } | null
+  if (!payload || payload.type !== 'kooboo-docs:preview-route' || payload.version !== 2) return
+  if (payload.status === 'not-found' && typeof payload.routePath === 'string') {
+    const missingPath = previewRouteDocumentPath(payload.routePath)
+    const locales = await getDocumentLocales(missingPath).catch(() => null)
+    const counterpart = locales?.active === 'en' ? locales.zh : locales?.en
+    noticeMessage.value = counterpart?.exists
+      ? `该页面尚未创建${locales?.active === 'en' ? '英文' : '中文'}版本，已保留当前编辑内容。`
+      : '右侧预览打开了不存在的页面，已保留当前编辑内容。'
+    if (document.value) previewRefreshKey.value += 1
+    return
+  }
+  if (payload.status !== 'ready' || typeof payload.sourcePath !== 'string' ||
+    !payload.sourcePath.startsWith('docs/') || !payload.sourcePath.endsWith('.md') ||
+    payload.sourcePath === document.value?.path) return
   void loadDocument(payload.sourcePath, false, 'preview')
 }
 function handleKeydown(event: KeyboardEvent) {
@@ -342,6 +401,10 @@ onUnmounted(() => {
           <button class="path-button" type="button" @click="pathPickerOpen = !pathPickerOpen">切换文档</button>
         </div>
         <span v-if="document">{{ documentStats }} · 修改于 {{ new Date(document.modifiedAt).toLocaleString('zh-CN') }}</span>
+        <div v-if="documentLocales" class="locale-versions" aria-label="文档语言版本">
+          <button type="button" :class="{ active: documentLocales.active === 'zh' }" :disabled="creatingLocale !== null" @click="openLocale('zh')">中文 {{ documentLocales.zh.exists ? '✓' : '未创建' }}</button>
+          <button type="button" :class="{ active: documentLocales.active === 'en' }" :disabled="creatingLocale !== null" @click="openLocale('en')">English {{ documentLocales.en.exists ? '✓' : '未创建' }}</button>
+        </div>
       </div>
       <div class="editor-actions">
         <div v-if="document" class="hash-block"><span>SHA-256</span><code>{{ document.hash.slice(0, 12) }}…</code></div>
