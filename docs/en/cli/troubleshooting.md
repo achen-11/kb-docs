@@ -142,9 +142,51 @@ Do not add `--yes`. Check:
 
 Run `kb check --output <path>` again for the current site and generate a new cleanup preview from that report.
 
+## Deploy reports a plan digest mismatch
+
+The plan file changed after generation or its contents are damaged. Do not execute that file. Regenerate it from the original commit range:
+
+```bash
+kb deploy --from <from> --to <to> --dry-run \
+  --write-plan .kooboo/deploy-plan.json
+```
+
+If the regenerated plan is still unexpected, inspect `from`, `to`, and `.pushignore` in the candidate commit.
+
+## Deploy reports a site ID mismatch
+
+The CLI logged in to a site that differs from the plan or `KOOBOO_SITE_ID`, so it stopped before writing. Check:
+
+- `KOOBOO_SITE_URL` in the current project;
+- whether `KOOBOO_SITE_ID` belongs to the same site;
+- whether the plan was copied from another environment.
+
+Do not remove the site ID merely to bypass the check. Confirm the target environment, then regenerate the plan from the correct artifact project and commit range.
+
+## Deploy requires `--apply-deletes`
+
+The plan contains Git deletions or an old path removed by a rename. Run a dry run and review the deletion items first, then execute:
+
+```bash
+kb deploy --plan .kooboo/deploy-plan.json --apply-deletes
+```
+
+If those deletions are not acceptable, correct the candidate artifact commit instead of making the CLI ignore them and continue uploading.
+
+## A deploy receipt failed or the exit code is nonzero
+
+Do not advance the successful deployment baseline. Open the JSON file specified by `--output` and inspect:
+
+- `failed` and `skipped` items in `operations`;
+- missing resources or hash mismatches in `verification.items`;
+- the target site, commit range, and `planDigest`.
+
+After fixing credentials, resource content, or the remote failure, retry the same `from → to` range. Resources that already succeeded are aligned again, and resources already deleted are recorded as `already_absent`.
+
 ## Related documentation
 
 - [Before you start](./getting-started/preparation.md)
 - [Pull remote resources](./workflows/pull.md)
 - [Push local resources](./workflows/push.md)
+- [Deploy Git artifacts](./workflows/deploy.md)
 - [Continuous synchronization](./workflows/sync.md)

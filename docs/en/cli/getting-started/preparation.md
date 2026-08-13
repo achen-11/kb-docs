@@ -19,6 +19,7 @@ Create `.env` in the project root:
 KOOBOO_SITE_URL=https://example.com
 KOOBOO_USERNAME=your-username
 KOOBOO_PASSWORD=your-password
+KOOBOO_SITE_ID=your-site-id
 ```
 
 | Variable | Description |
@@ -26,8 +27,9 @@ KOOBOO_PASSWORD=your-password
 | `KOOBOO_SITE_URL` | The Kooboo site to connect to |
 | `KOOBOO_USERNAME` | Login username |
 | `KOOBOO_PASSWORD` | Login password |
+| `KOOBOO_SITE_ID` | Optional; used by `kb deploy` to confirm the actual target site |
 
-`pull` and `push` use these project environment variables directly. `sync`, `check`, `prune`, and `export` can also accept temporary connection options; see the corresponding pages for details.
+`pull` and `push` use the first three connection variables directly. `deploy`, `sync`, `check`, `prune`, and `export` can also accept temporary connection options; see the corresponding pages for details.
 
 ## Protect credentials
 
@@ -37,6 +39,7 @@ KOOBOO_PASSWORD=your-password
 KOOBOO_SITE_URL=https://example.com
 KOOBOO_USERNAME=YOUR_USERNAME
 KOOBOO_PASSWORD=YOUR_PASSWORD
+KOOBOO_SITE_ID=YOUR_SITE_ID
 ```
 
 Check before committing:
@@ -60,3 +63,4 @@ Before every remote operation, confirm that:
 
 - [Create or clone a project](./create-or-clone.md)
 - [Project resources and folders](../project/resources.md)
+- [Deploy Git artifacts](../workflows/deploy.md)

@@ -341,6 +341,7 @@ const cliSidebar = [
         items: [
           { text: '拉取远端资源', link: '/cli/workflows/pull' },
           { text: '推送本地资源', link: '/cli/workflows/push' },
+          { text: '部署 Git 产物', link: '/cli/workflows/deploy' },
           { text: '持续同步', link: '/cli/workflows/sync' },
         ],
       },
@@ -383,6 +384,7 @@ const enCliSidebar = [
         items: [
           { text: 'Pull Remote Resources', link: '/en/cli/workflows/pull' },
           { text: 'Push Local Resources', link: '/en/cli/workflows/push' },
+          { text: 'Deploy Git Artifacts', link: '/en/cli/workflows/deploy' },
           { text: 'Continuous Synchronization', link: '/en/cli/workflows/sync' },
         ],
       },

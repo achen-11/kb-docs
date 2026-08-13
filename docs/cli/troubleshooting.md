@@ -142,9 +142,51 @@ kb push code/server/order.ts
 
 重新对当前站点运行 `kb check --output <path>`，再根据新报告生成清理预览。
 
+## Deploy 提示计划 digest 不一致
+
+计划文件在生成后被修改，或文件内容损坏。不要继续执行该文件；使用原来的 commit 范围重新生成：
+
+```bash
+kb deploy --from <from> --to <to> --dry-run \
+  --write-plan .kooboo/deploy-plan.json
+```
+
+如果重新生成的计划与预期不一致，先检查 `from`、`to` 和候选 commit 中的 `.pushignore`。
+
+## Deploy 提示站点 ID 不一致
+
+CLI 已登录到与计划或 `KOOBOO_SITE_ID` 不同的站点，因此在写入前停止。检查：
+
+- 当前项目的 `KOOBOO_SITE_URL`；
+- `KOOBOO_SITE_ID` 是否来自同一个站点；
+- 计划是否从另一个环境复制而来。
+
+不要为了绕过检查而删除站点 ID。确认目标环境后，使用正确的 artifact 项目和 commit 范围重新生成计划。
+
+## Deploy 要求 `--apply-deletes`
+
+计划包含 Git 删除或重命名产生的旧路径删除。先执行 dry run 并审查删除项；确认后再运行：
+
+```bash
+kb deploy --plan .kooboo/deploy-plan.json --apply-deletes
+```
+
+如果不接受这些删除，应修正候选 artifact commit，而不是让 CLI 忽略计划中的删除后继续上传。
+
+## Deploy 回执失败或退出码非零
+
+不要推进成功部署基线。打开 `--output` 指定的 JSON 文件，检查：
+
+- `operations` 中的 `failed` 和 `skipped` 项；
+- `verification.items` 中的缺失资源或 hash 不一致；
+- 目标站点、commit 范围和 `planDigest`。
+
+修复认证、资源内容或远端故障后，可以重跑同一个 `from → to`。已经成功写入的资源会再次对齐，已经删除的资源会记为 `already_absent`。
+
 ## 相关文档
 
 - [使用前准备](./getting-started/preparation.md)
 - [拉取远端资源](./workflows/pull.md)
 - [推送本地资源](./workflows/push.md)
+- [部署 Git 产物](./workflows/deploy.md)
 - [持续同步](./workflows/sync.md)

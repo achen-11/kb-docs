@@ -1,6 +1,6 @@
 # Kooboo CLI
 
-Kooboo CLI is the local development tool for Kooboo. It stores site resources as local files and provides workflows for creating or cloning projects, pulling resources, pushing changes, continuous synchronization, resource comparison, and site export.
+Kooboo CLI is the local development tool for Kooboo. It stores site resources as local files and provides workflows for creating or cloning projects, pulling resources, pushing changes, Git artifact deployment, continuous synchronization, resource comparison, and site export.
 
 The full command name is `kooboo-cli`. For daily use, you can use the shorter `kb` command:
 
@@ -17,6 +17,7 @@ kb --help
 | Clone an existing site | `kb clone` | Bring an existing Kooboo site into local maintenance |
 | Pull resources | `kb pull` | Get the latest remote resources or refresh a specific scope |
 | Push resources | `kb push` | Write local resources to the remote site |
+| Deploy Git artifacts | `kb deploy` | Plan, execute, and verify a formal release by commit range |
 | Continuous synchronization | `kb sync` | Watch local file changes and write them to the remote site |
 | Compare resources | `kb check` | Compare local and remote resources |
 | Clean remote resources | `kb prune` | Preview or delete resources that exist only remotely |
@@ -29,11 +30,12 @@ kb --help
 3. Learn the [project resources and folders](./project/resources.md).
 4. Use [`kb pull`](./workflows/pull.md) to get remote changes.
 5. Use [`kb push`](./workflows/push.md) to publish local changes.
-6. Use [`kb sync`](./workflows/sync.md) only when you need live remote integration.
+6. Use [`kb deploy`](./workflows/deploy.md) for formal releases of immutable artifacts.
+7. Use [`kb sync`](./workflows/sync.md) only when you need live remote integration.
 
 ## Understand the remote impact first
 
-`kb pull` writes remote content into the local project. `kb push`, `kb sync`, and `kb prune` with `--yes` modify the remote site.
+`kb pull` writes remote content into the local project. `kb push`, `kb deploy`, `kb sync`, and `kb prune` with `--yes` modify the remote site.
 
 Before running these commands, confirm the current directory, the site URL in `.env`, and the resource scope you intend to operate on. In team projects, commit or otherwise protect local changes before a pull that may overwrite files.
 

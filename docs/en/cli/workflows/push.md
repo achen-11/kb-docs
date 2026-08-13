@@ -2,6 +2,8 @@
 
 `kb push` writes local resources from the current project to the remote site configured in `.env`. It can push all resources, a folder or file, or only Git changes.
 
+Use [`kb deploy`](./deploy.md) when you need an auditable release from the last successful version to a candidate version, explicit deletion approval, and a deployment receipt.
+
 ## Before you push
 
 Confirm that:
@@ -112,4 +114,5 @@ If the remote site rate-limits requests or reports repeated failures, reduce con
 
 - [Pull remote resources](./pull.md)
 - [Continuous synchronization](./sync.md)
+- [Deploy Git artifacts](./deploy.md)
 - [Compare and clean remote resources](./check-and-prune.md)

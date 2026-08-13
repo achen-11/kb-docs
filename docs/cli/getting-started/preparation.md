@@ -19,6 +19,7 @@ kb --version
 KOOBOO_SITE_URL=https://example.com
 KOOBOO_USERNAME=your-username
 KOOBOO_PASSWORD=your-password
+KOOBOO_SITE_ID=your-site-id
 ```
 
 | 变量 | 说明 |
@@ -26,8 +27,9 @@ KOOBOO_PASSWORD=your-password
 | `KOOBOO_SITE_URL` | 要连接的 Kooboo 站点地址 |
 | `KOOBOO_USERNAME` | 登录账号 |
 | `KOOBOO_PASSWORD` | 登录密码 |
+| `KOOBOO_SITE_ID` | 可选；`kb deploy` 用于确认实际目标站点 |
 
-`pull` 和 `push` 直接使用这些项目环境变量。`sync`、`check`、`prune` 和 `export` 还可以通过各自的命令参数临时指定连接信息，具体以对应页面为准。
+`pull` 和 `push` 直接使用前三项连接变量。`deploy`、`sync`、`check`、`prune` 和 `export` 还可以通过各自的命令参数临时指定连接信息，具体以对应页面为准。
 
 ## 保护登录信息
 
@@ -37,6 +39,7 @@ KOOBOO_PASSWORD=your-password
 KOOBOO_SITE_URL=https://example.com
 KOOBOO_USERNAME=YOUR_USERNAME
 KOOBOO_PASSWORD=YOUR_PASSWORD
+KOOBOO_SITE_ID=YOUR_SITE_ID
 ```
 
 提交前检查：
@@ -60,3 +63,4 @@ git check-ignore .env
 
 - [新建或克隆项目](./create-or-clone.md)
 - [项目资源与目录](../project/resources.md)
+- [部署 Git 产物](../workflows/deploy.md)
