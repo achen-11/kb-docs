@@ -79,7 +79,10 @@ async function login(page) {
   })
   await page.waitForTimeout(1200)
 
-  const userInput = page.locator('input:visible').first()
+  const userInput = page
+    .locator('input:visible')
+    .filter({ hasNot: page.locator('[type="password"]') })
+    .first()
   const passInput = page.locator('input[type="password"]:visible').first()
 
   await userInput.fill(USER)
@@ -170,7 +173,27 @@ async function resolveSiteId(page) {
     if (!response.ok) throw new Error(`Failed to load site list: ${response.status}`)
     return response.json()
   }, apiUrl('Site/list'))
-  SITE_ID = sites?.[0]?.siteId || ''
+  for (const site of sites || []) {
+    const siteId = site?.siteId || site?.id || ''
+    if (!siteId) continue
+    const hasPages = await page.evaluate(
+      async ({ url, siteId: candidateSiteId }) => {
+        const endpoint = new URL(url)
+        endpoint.searchParams.set('SiteId', candidateSiteId)
+        const response = await fetch(endpoint, { credentials: 'include' })
+        if (!response.ok) return false
+        const result = await response.json()
+        const list = Array.isArray(result) ? result : result?.list
+        return Array.isArray(list) && list.length > 0
+      },
+      { url: apiUrl('Page/list'), siteId }
+    )
+    if (hasPages) {
+      SITE_ID = siteId
+      break
+    }
+  }
+  SITE_ID ||= sites?.[0]?.siteId || sites?.[0]?.id || ''
   if (!SITE_ID) throw new Error('No site found. Set KOOBOO_SITE_ID explicitly.')
   return SITE_ID
 }
@@ -427,11 +450,31 @@ async function captureSettings(page) {
 
 async function captureWorkspaceCode(page) {
   await gotoAiChat(page)
-  const codeTab = page.locator('.workspace-mode-tabs__tab').nth(1)
-  if (await codeTab.count()) {
-    await codeTab.click()
-    await page.waitForTimeout(1500)
+  const newChat = page.locator('.icon-new-chat:visible').first()
+  if (await newChat.count()) {
+    await newChat.click()
+    await page.waitForTimeout(800)
   }
+  const expandWorkspace = page.getByRole('button', {
+    name: /expand workspace/i,
+  })
+  if (await expandWorkspace.count()) {
+    await expandWorkspace.click()
+    await page.waitForTimeout(800)
+  }
+  const codeTab = page.getByRole('tab', { name: /^code$/i }).first()
+  await codeTab.waitFor({ state: 'visible', timeout: 20000 })
+  await codeTab.click()
+  await page
+    .locator('.workspace-mode-tabs__tab[aria-selected="true"]')
+    .filter({ has: page.locator('.icon-code') })
+    .first()
+    .waitFor({ state: 'visible', timeout: 10000 })
+  await page.locator('.ai-chat-right-sidebar__code-preview:visible').waitFor({
+    state: 'visible',
+    timeout: 20000,
+  })
+  await page.waitForTimeout(1500)
   await snap(page, 'ai-chat', 'workspace-code.png')
 }
 
@@ -466,6 +509,7 @@ async function main() {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 900 },
     deviceScaleFactor: 1,
+    colorScheme: 'light',
     locale: LOCALE_CONFIG[DOC_LOCALE].browserLocale,
     extraHTTPHeaders: {
       'Accept-Language': LOCALE_CONFIG[DOC_LOCALE].acceptLanguage,
@@ -488,6 +532,9 @@ async function main() {
     await browser.close()
   }
 
+  if (shots.length === 0) {
+    throw new Error(`No screenshots captured for scope: ${SCOPE}`)
+  }
   console.log('done:', shots.length, 'files')
 }
 

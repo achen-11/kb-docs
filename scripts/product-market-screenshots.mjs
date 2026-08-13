@@ -570,6 +570,7 @@ async function main() {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 900 },
     deviceScaleFactor: 1,
+    colorScheme: 'light',
     locale: LOCALE_CONFIG[DOC_LOCALE].browserLocale,
     extraHTTPHeaders: {
       'Accept-Language': LOCALE_CONFIG[DOC_LOCALE].acceptLanguage,

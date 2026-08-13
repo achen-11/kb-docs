@@ -37,6 +37,7 @@
     "test:stabilize-vitepress": "node --test scripts/stabilize-vitepress-dist.test.mjs",
     "test:mermaid-diagram": "node --test scripts/mermaid-diagram.test.mjs",
     "check:dead-links": "node scripts/check-dead-links.mjs",
+    "check:translations": "python3 scripts/audit-en-translation.py",
     "screenshots:cms:site": "node scripts/cms-screenshots.mjs",
     "screenshots:cms:content": "node scripts/cms-content-screenshots.mjs",
     "screenshots:cms:commerce": "node scripts/cms-commerce-screenshots.mjs",

@@ -161,7 +161,7 @@ def main() -> None:
     lines.append("### 按模块分布\n")
     lines.append("| 模块 | 总数 | 未对齐 | 对齐率 |")
     lines.append("|------|------|--------|--------|")
-    for section in ["api", "cms", "templateEngine", "index"]:
+    for section in ["api", "cms", "templateEngine", "cli", "quick-start", "product", "index"]:
         sec = section_results(results, section)
         if not sec:
             continue
@@ -271,7 +271,7 @@ def main() -> None:
     lines.append("---\n")
     lines.append("## 详细问题清单（未对齐文档）\n")
 
-    for section in ["cms", "api", "templateEngine", "index"]:
+    for section in ["cms", "api", "templateEngine", "cli", "quick-start", "product", "index"]:
         sec_mis = [r for r in misaligned if r in section_results(results, section)]
         if not sec_mis:
             continue
