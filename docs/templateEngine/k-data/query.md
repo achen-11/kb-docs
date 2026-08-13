@@ -5,7 +5,7 @@
 通用属性见 [标签语法](./tags.md#query)。下文按数据源分类；`action` 均为 `item` / `list` / `paged` 之一。
 
 ::: warning 示例约定
-`<query>` 必须写在 `<k-data>` 内，并显式写 `</query>`。模板要使用查询结果时，还必须通过 `<export>` 导出。除明确包含 `<k-data>` 的完整示例外，下文单独出现的 `<query>` 代码块都是查询片段，只用于展示数据源特有属性。
+`<query>` 必须写在 `<k-data>` 内，并显式写 `</query>`。模板要使用查询结果时，在该 `<query>` 上添加 `export` 属性。除明确包含 `<k-data>` 的完整示例外，下文单独出现的 `<query>` 代码块都是查询片段，只用于展示数据源特有属性。
 :::
 
 ## content
@@ -23,8 +23,8 @@
         source="content"
         resource="article"
         action="list"
+        export
     ></query>
-    <export var="articles"></export>
 </k-data>
 
 <ul>
@@ -47,8 +47,8 @@
         action="list"
         select="id,title"
         where="{title:'News'}"
+        export
     ></query>
-    <export var="articles"></export>
 </k-data>
 ```
 
@@ -66,8 +66,8 @@
         action="item"
         id="article_id"
         select="id,title,body"
+        export
     ></query>
-    <export var="article"></export>
 </k-data>
 
 <article k-if="article">
@@ -90,8 +90,8 @@
         page-number="1"
         page-size="10"
         order-desc="create_time"
+        export
     ></query>
-    <export var="article_page"></export>
 </k-data>
 
 <div k-for="article in article_page.list">
@@ -172,8 +172,8 @@
         action="item"
         id="record_id"
         select="id,amount,status"
+        export
     ></query>
-    <export var="payment_record"></export>
 </k-data>
 ```
 
@@ -226,8 +226,8 @@
         resource="/products/detail"
         action="item"
         id="lang"
+        export
     ></query>
-    <export var="current_culture"></export>
 </k-data>
 
 <a k-attribute="href {current_culture.url}" k-content="current_culture.name"></a>
@@ -239,8 +239,7 @@
 
 ```html
 <k-data>
-    <query as="culture_urls" source="culture" resource="/products/detail" action="list"></query>
-    <export var="culture_urls"></export>
+    <query export as="culture_urls" source="culture" resource="/products/detail" action="list"></query>
 </k-data>
 
 <div k-for="item in culture_urls">

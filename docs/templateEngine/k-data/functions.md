@@ -82,11 +82,10 @@
 ```html
 <k-data>
     <let as="token" source="cookie" from="access_token" default="''" />
-    <let from="token" as="payload" use="jwtDecode" params='{"secret":"your-secret"}' />
+    <let from="token" as="payload" use="jwtDecode" params='{"secret":"your-secret"}' export />
     <when test="{payload:{$eq:null}}">
         <redirect to="'/login'" />
     </when>
-    <export var="payload"></export>
 </k-data>
 ```
 

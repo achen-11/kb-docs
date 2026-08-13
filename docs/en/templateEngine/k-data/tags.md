@@ -8,7 +8,7 @@ The root node for a data flow. Child tags run in order.
 
 ```html
 <k-data>
-    <!-- let / query / map / when / try / export -->
+    <!-- let / query / map / when / try / redirect -->
 </k-data>
 ```
 
@@ -36,6 +36,7 @@ Use `as` for the variable name and `default` for its default value:
 | `use` | No | Built-in function name. See [Built-in Functions](./functions.md) |
 | `params` | No | Function parameters as a JSON5 string, or a variable name |
 | `default` | No | Default value as JSON5 or a variable name |
+| `export` | No | Boolean attribute. When present and not `false`, exposes the `as` variable to the template layer |
 
 When `action="list"` returns a collection and you only need the first item: `<let from="items[0]" as="item" />`.
 
@@ -82,6 +83,7 @@ A paged query can specify filtering, page index, page size, and sorting:
 | `order-desc` | No | Descending sort field |
 | `page-number` | For `paged` | Page index as a variable name or integer |
 | `page-size` | For `paged` | Page size |
+| `export` | No | Boolean attribute. When present and not `false`, exposes the `as` result to the template layer |
 
 ### `action` and return shape
 
@@ -148,20 +150,16 @@ Performs a server-side redirect.
 |-----------|-------------|
 | `to` | Target path as a variable name or JSON5 string such as `"'/login'"` |
 
-## `export`
+## `export` Attribute
 
-Exposes a variable to template bindings **outside** `<k-data>`.
+`export` is a boolean attribute on `<query>` and `<let>`. It exposes the variable created by `as` to template bindings **outside** `<k-data>`.
 
 ```html
-<export var="articles"></export>
-<export var="article_page"></export>
+<query as="articles" source="content" resource="article" action="list" export></query>
+<let as="keyword" source="queryString" from="keyword" default="''" export />
 ```
 
-| Attribute | Required | Description |
-|-----------|----------|-------------|
-| `var` | Yes | An already defined variable name |
-
-Variables that are not exported are not visible in the template layer.
+Both `export` and `export="true"` expose the variable. With `export="false"` or without the attribute, the variable is visible only within the current `<k-data>` data flow.
 
 ## Related
 

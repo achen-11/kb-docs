@@ -4,7 +4,7 @@
 
 ## 概述
 
-**k-data** 用纯 HTML 标签（`<k-data>`、`<let>`、`<query>` 等）描述「读参数 → 查数据 → 整形 → 导出变量」，在**服务端**执行，结果通过 `<export>` 交给模板层的 `k-for`、`k-content`、`k-attribute` 使用。
+**k-data** 用纯 HTML 标签（`<k-data>`、`<let>`、`<query>` 等）描述「读参数 → 查数据 → 整形 → 暴露变量」，在**服务端**执行。需要交给模板层使用的结果，在生成变量的 `<query>` 或 `<let>` 上添加 `export` 属性。
 
 语法以 Kooboo **`kooboo-coding`** 技能包中 `references/Frontend/k-data/` 为准，本文档与其保持一致。
 
@@ -34,8 +34,8 @@
         source="content"
         resource="article"
         action="list"
+        export
     ></query>
-    <export var="articles"></export>
 </k-data>
 
 <ul>
@@ -48,7 +48,7 @@
 这段代码形成了最小闭环：
 
 1. `<query>` 查询数据，并把结果保存为 `articles`。
-2. `<export>` 将 `articles` 暴露给模板。
+2. `<query>` 上的 `export` 属性将 `articles` 暴露给模板。
 3. `k-for` 遍历结果，`k-content` 显示标题。
 
 ::: tip 运行前提
@@ -70,7 +70,7 @@
 1. 外部输入用 `source` + `from`（如 `queryString`、`cookie`）。
 2. 查询用 `source` + `resource` + `action`；分页统一 `page-number`、`page-size`。
 3. `action="paged"` 的列表在 `map` 里用 `from="结果.list"`。
-4. 模板层**只使用** `<export var="...">` 导出的变量。
+4. 模板层**只使用**通过 `export` 属性暴露的变量。
 5. `<when>` / `<else-if>` / `<else>` 只能写在 `<k-data>` 内；DOM 条件用 `k-if` / `k-else-if` / `k-else`。
 6. `k-attribute` 的 `{...}` 只做变量插值，不做运算；先 `<let use="add|subtract|...">` 再绑定。
 7. `<query>` 不是 HTML void element，必须写结束标签 `</query>`，不要使用 `<query ... />`。
@@ -86,7 +86,8 @@
 | `when` / `else-if` / `else` | k-data 内条件分支 |
 | `try` / `catch` | 异常处理 |
 | `redirect` | 重定向 |
-| `export` | 导出变量给模板层 |
+
+`export` 是 `<query>` 和 `<let>` 的布尔属性，用于将其 `as` 变量暴露给模板层。
 
 属性与用法见 [标签语法](./tags.md)。
 
@@ -94,7 +95,7 @@
 
 | 主题 | 说明 |
 |------|------|
-| [标签语法](./tags.md) | `let`、`query`、`map`、分支、导出 |
+| [标签语法](./tags.md) | `let`、`query`、`map`、分支、变量暴露 |
 | [query 数据源](./query.md) | content、commerce、sqlite、mysql、culture 等 |
 | [内置函数](./functions.md) | `dateFormat`、`jwtDecode`、数学与文本 |
 | [条件表达式](./condition.md) | JSON5 `where` / `test` |

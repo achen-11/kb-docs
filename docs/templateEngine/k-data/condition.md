@@ -64,8 +64,8 @@
         resource="article"
         action="list"
         where="{title:'News'}"
+        export
     ></query>
-    <export var="articles"></export>
 </k-data>
 ```
 
@@ -80,8 +80,8 @@
         resource="article"
         action="list"
         where="{title:{$contains:keyword}}"
+        export
     ></query>
-    <export var="articles"></export>
 </k-data>
 ```
 
@@ -102,12 +102,11 @@
 <k-data>
     <let as="status" source="queryString" from="status" default="'draft'" />
     <when test="{status:'published'}">
-        <let as="message" default="'Published'" />
+        <let as="message" default="'Published'" export />
         <else>
-            <let as="message" default="'Not published'" />
+            <let as="message" default="'Not published'" export />
         </else>
     </when>
-    <export var="message"></export>
 </k-data>
 ```
 

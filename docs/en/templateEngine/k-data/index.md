@@ -4,7 +4,7 @@
 
 ## Overview
 
-**k-data** uses plain HTML tags such as `<k-data>`, `<let>`, and `<query>` to describe a full server-side data flow: read request values, query data, shape the result, and expose variables to the template with `<export>`.
+**k-data** uses plain HTML tags such as `<k-data>`, `<let>`, and `<query>` to describe a full server-side data flow: read request values, query data, shape the result, and expose variables. Add the `export` attribute to the `<query>` or `<let>` that creates a value needed by the template.
 
 Compared with the old single-attribute **`k-query`** syntax, k-data:
 
@@ -32,8 +32,8 @@ This example does one thing: query `article` content and display each title.
         source="content"
         resource="article"
         action="list"
+        export
     ></query>
-    <export var="articles"></export>
 </k-data>
 
 <ul>
@@ -46,7 +46,7 @@ This example does one thing: query `article` content and display each title.
 This is the smallest complete data flow:
 
 1. `<query>` fetches data and stores the result in `articles`.
-2. `<export>` exposes `articles` to the template.
+2. The `export` attribute on `<query>` exposes `articles` to the template.
 3. `k-for` iterates over the result and `k-content` displays each title.
 
 ::: tip Before you run it
@@ -68,7 +68,7 @@ The site must have a Content Folder named `article` with a `title` field. Replac
 1. Read external input with `source` plus `from`, such as `queryString` or `cookie`.
 2. Use `source`, `resource`, and `action` for queries. Standardize pagination with `page-number` and `page-size`.
 3. For `action="paged"`, map the list with `from="result.list"`.
-4. In the template layer, use only variables that were exposed with `<export var="...">`.
+4. In the template layer, use only variables exposed with the `export` attribute.
 5. `<when>`, `<else-if>`, and `<else>` belong only inside `<k-data>`. In the DOM layer, use `k-if`, `k-else-if`, and `k-else`.
 6. The `{...}` syntax in `k-attribute` only interpolates variables. It does not perform calculations. Use `<let use="add|subtract|...">` first, then bind the result.
 7. `<query>` is not an HTML void element. Always include `</query>`; do not write `<query ... />`.
@@ -84,7 +84,8 @@ The site must have a Content Folder named `article` with a `title` field. Replac
 | `when` / `else-if` / `else` | Conditional branches inside `k-data` |
 | `try` / `catch` | Exception handling |
 | `redirect` | Server-side redirect |
-| `export` | Expose variables to the template layer |
+
+`export` is a boolean attribute on `<query>` and `<let>` that exposes their `as` variable to the template layer.
 
 See [Tag Syntax](./tags.md) for details.
 
@@ -92,7 +93,7 @@ See [Tag Syntax](./tags.md) for details.
 
 | Topic | Description |
 |-------|-------------|
-| [Tag Syntax](./tags.md) | `let`, `query`, `map`, branching, and export |
+| [Tag Syntax](./tags.md) | `let`, `query`, `map`, branching, and exposing variables |
 | [Query Sources](./query.md) | `content`, `commerce`, `sqlite`, `mysql`, `culture`, and more |
 | [Built-in Functions](./functions.md) | `dateFormat`, `jwtDecode`, math, and text helpers |
 | [Condition Expressions](./condition.md) | JSON5 `where` and `test` syntax |

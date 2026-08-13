@@ -8,7 +8,7 @@
 
 ```html
 <k-data>
-    <!-- let / query / map / when / try / export -->
+    <!-- let / query / map / when / try / redirect -->
 </k-data>
 ```
 
@@ -36,6 +36,7 @@
 | `use` | 否 | 内置函数名，见 [内置函数](./functions.md) |
 | `params` | 否 | 函数参数：JSON5 字符串，或变量名 |
 | `default` | 否 | 默认值（JSON5 或变量名） |
+| `export` | 否 | 布尔属性；存在且不为 `false` 时，将 `as` 变量暴露给模板层 |
 
 `action="list"` 只需第一条时：`<let from="items[0]" as="item" />`。
 
@@ -82,6 +83,7 @@
 | `order-desc` | 否 | 降序字段 |
 | `page-number` | `paged` 时 | 页码（变量名或整数） |
 | `page-size` | `paged` 时 | 每页条数 |
+| `export` | 否 | 布尔属性；存在且不为 `false` 时，将 `as` 结果暴露给模板层 |
 
 ### `action` 与返回结构
 
@@ -148,20 +150,16 @@
 |------|------|
 | `to` | 目标路径：变量名或 JSON5 字符串（如 `"'/login'"`） |
 
-## `export`
+## `export` 属性
 
-将变量暴露给 **k-data 外部的** 模板绑定。
+`export` 是 `<query>` 和 `<let>` 的布尔属性。添加后，该标签通过 `as` 创建的变量可供 **k-data 外部的** 模板绑定使用。
 
 ```html
-<export var="articles"></export>
-<export var="article_page"></export>
+<query as="articles" source="content" resource="article" action="list" export></query>
+<let as="keyword" source="queryString" from="keyword" default="''" export />
 ```
 
-| 属性 | 必填 | 说明 |
-|------|------|------|
-| `var` | 是 | 已存在的变量名 |
-
-未 `export` 的变量在模板层不可见。
+`export`、`export="true"` 都表示暴露变量；`export="false"` 或省略该属性时，变量只在当前 `<k-data>` 数据流程内可见。
 
 ## 相关文档
 

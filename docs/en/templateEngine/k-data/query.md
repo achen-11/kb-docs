@@ -5,7 +5,7 @@
 For common attributes, see [Tag Syntax](./tags.md#query). The sections below are organized by data source. In all cases, `action` is one of `item`, `list`, or `paged`.
 
 ::: warning Example convention
-`<query>` must be inside `<k-data>` and must include an explicit `</query>` end tag. Export a result with `<export>` before using it in the template. Unless an example explicitly includes `<k-data>`, a standalone `<query>` block below is only a query fragment that demonstrates source-specific attributes.
+`<query>` must be inside `<k-data>` and must include an explicit `</query>` end tag. Add the `export` attribute to a `<query>` whose result is used by the template. Unless an example explicitly includes `<k-data>`, a standalone `<query>` block below is only a query fragment that demonstrates source-specific attributes.
 :::
 
 ## `content`
@@ -23,8 +23,8 @@ The following is a complete list-query example that you can copy:
         source="content"
         resource="article"
         action="list"
+        export
     ></query>
-    <export var="articles"></export>
 </k-data>
 
 <ul>
@@ -47,8 +47,8 @@ Use `select` to limit returned fields and `where` to filter results:
         action="list"
         select="id,title"
         where="{title:'News'}"
+        export
     ></query>
-    <export var="articles"></export>
 </k-data>
 ```
 
@@ -66,8 +66,8 @@ Query one item from a URL parameter. `item` requires an `id`. This example reads
         action="item"
         id="article_id"
         select="id,title,body"
+        export
     ></query>
-    <export var="article"></export>
 </k-data>
 
 <article k-if="article">
@@ -90,8 +90,8 @@ Use `action="paged"` for a paged query:
         page-number="1"
         page-size="10"
         order-desc="create_time"
+        export
     ></query>
-    <export var="article_page"></export>
 </k-data>
 
 <div k-for="article in article_page.list">
@@ -172,8 +172,8 @@ These three sources share the same `<query>` attributes. `resource` is the **tab
         action="item"
         id="record_id"
         select="id,amount,status"
+        export
     ></query>
-    <export var="payment_record"></export>
 </k-data>
 ```
 
@@ -226,8 +226,8 @@ Used for multilingual links. Set `source="culture"`. `resource` is the **relativ
         resource="/products/detail"
         action="item"
         id="lang"
+        export
     ></query>
-    <export var="current_culture"></export>
 </k-data>
 
 <a k-attribute="href {current_culture.url}" k-content="current_culture.name"></a>
@@ -239,8 +239,7 @@ Returns an array of the same structure, which is useful for a language switcher.
 
 ```html
 <k-data>
-    <query as="culture_urls" source="culture" resource="/products/detail" action="list"></query>
-    <export var="culture_urls"></export>
+    <query export as="culture_urls" source="culture" resource="/products/detail" action="list"></query>
 </k-data>
 
 <div k-for="item in culture_urls">
