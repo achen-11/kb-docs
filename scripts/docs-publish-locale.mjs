@@ -28,6 +28,8 @@ export const UNPUBLISHED_EN_SRC_GLOBS = [
 
 export const UNPUBLISHED_INTERNAL_SRC_GLOBS = ['superpowers/**']
 
+export const UNPUBLISHED_PUBLIC_ROUTE_PREFIXES = ['/cli', '/product', '/superpowers']
+
 const ENGLISH_ASSET_PREFIXES = ['/en/cms/', '/en/product/']
 const ENGLISH_ASSET_EXTENSION = /\.(?:png|jpe?g|gif|webp|svg|avif|ico)$/iu
 
@@ -59,6 +61,13 @@ export function canonicalPathFromLegacyEnglish(pathname = '') {
   const next = stripEnglishUrlPrefix(pathOnly)
   if (next === pathOnly) return null
   return query ? `${next}?${query}` : next
+}
+
+export function isUnpublishedPublicRoute(pathname = '') {
+  const pathOnly = String(pathname || '').split(/[?#]/u)[0]
+  return UNPUBLISHED_PUBLIC_ROUTE_PREFIXES.some(
+    (prefix) => pathOnly === prefix || pathOnly.startsWith(`${prefix}/`)
+  )
 }
 
 export function rewriteLegacyEnglishHrefs(html = '') {

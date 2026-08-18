@@ -8,9 +8,11 @@ import {
   PUBLISHED_VERIFY_PATHS,
   UNPUBLISHED_EN_SRC_GLOBS,
   UNPUBLISHED_INTERNAL_SRC_GLOBS,
+  UNPUBLISHED_PUBLIC_ROUTE_PREFIXES,
   UNPUBLISHED_ZH_SRC_GLOBS,
   canonicalPathFromLegacyEnglish,
   isEnglishDocRoute,
+  isUnpublishedPublicRoute,
   rewriteLegacyEnglishHrefs,
   stripEnglishUrlPrefix,
   toEnglishSourcePath,
@@ -30,6 +32,11 @@ test('formal release excludes CLI and the current Product Features drafts', () =
   assert.ok(UNPUBLISHED_EN_SRC_GLOBS.includes('en/cli/**'))
   assert.ok(UNPUBLISHED_EN_SRC_GLOBS.includes('en/product/**'))
   assert.ok(UNPUBLISHED_INTERNAL_SRC_GLOBS.includes('superpowers/**'))
+  assert.deepEqual(UNPUBLISHED_PUBLIC_ROUTE_PREFIXES, ['/cli', '/product', '/superpowers'])
+  assert.equal(isUnpublishedPublicRoute('/cli/'), true)
+  assert.equal(isUnpublishedPublicRoute('/product/console?tab=billing'), true)
+  assert.equal(isUnpublishedPublicRoute('/superpowers/plans/example'), true)
+  assert.equal(isUnpublishedPublicRoute('/cms/'), false)
 })
 
 test('legacy /en/ page URLs rewrite to the English root', () => {

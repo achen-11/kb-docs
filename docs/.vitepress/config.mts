@@ -13,6 +13,7 @@ import {
   UNPUBLISHED_INTERNAL_SRC_GLOBS,
   UNPUBLISHED_ZH_SRC_GLOBS,
   canonicalPathFromLegacyEnglish,
+  isUnpublishedPublicRoute,
   rewriteLegacyEnglishHrefs,
   stripEnglishUrlPrefix,
 } from '../../scripts/docs-publish-locale.mjs'
@@ -51,6 +52,12 @@ function createLegacyEnglishRedirectPlugin() {
         const url = req.url || ''
         if (url.includes('.md') || url.includes('/@') || url.includes('/@fs/')) {
           next()
+          return
+        }
+        if (isUnpublishedPublicRoute(url)) {
+          res.statusCode = 404
+          res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+          res.end('Not Found')
           return
         }
         const location = canonicalPathFromLegacyEnglish(url)
