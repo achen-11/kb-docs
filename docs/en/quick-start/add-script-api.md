@@ -28,7 +28,7 @@ For your first attempt, start with an API page: enter a URL, save the script, an
 | Goal | Configure first |
 |------|-----------------|
 | Read a content list | [Content Types](/en/cms/content/content-types.md) and [Content Folders](/en/cms/content/contents-folders-list.md) |
-| Send email | [Mailbox](/en/product/mail.md) and [k.mail](/en/api/mail/) |
+| Send email | [k.mail](/en/api/mail/) |
 | Start a payment | [Payment Integration](/en/cms/settings/integrations/payment.md) and [k.payment](/en/api/payment/) |
 | Call an external service | [Open APIs](/en/cms/development/openapis.md) or [k.net.httpClient](/en/api/net/httpclient.md) |
 | Store business data | [Database](/en/cms/database/) and [k.DB](/en/api/database/) |

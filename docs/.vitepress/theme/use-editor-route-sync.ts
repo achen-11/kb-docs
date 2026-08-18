@@ -1,5 +1,6 @@
 import { onMounted, watch } from 'vue'
 import { useData, useRoute } from 'vitepress'
+import { toEnglishSourcePath } from '../../../scripts/docs-publish-locale.mjs'
 
 export const EDITOR_ROUTE_MESSAGE = 'kooboo-docs:preview-route'
 
@@ -24,7 +25,7 @@ export function useEditorRouteSync() {
       type: EDITOR_ROUTE_MESSAGE,
       version: 2,
       status: 'ready',
-      sourcePath: `docs/${relativePath}`,
+      sourcePath: `docs/${toEnglishSourcePath(relativePath)}`,
     }, '*')
   }
 

@@ -81,7 +81,7 @@ test('resolveLocalizedDocImageSrc switches CMS screenshots for English docs', ()
   )
   assert.equal(
     resolveLocalizedDocImageSrc('/cms/content/content-types-list.png', '/cms/content/content-types'),
-    '/cms/content/content-types-list.png'
+    '/en/cms/content/content-types-list.png'
   )
   assert.equal(
     resolveLocalizedDocImageSrc('/en/cms/content/content-types-list.png', '/en/cms/content/content-types'),
@@ -106,7 +106,7 @@ test('resolveLocalizedDocImageSrc switches Product screenshots for English docs'
       '/product/console/membership-overview.png',
       '/product/console/membership'
     ),
-    '/product/console/membership-overview.png'
+    '/en/product/console/membership-overview.png'
   )
   assert.equal(
     resolveLocalizedDocImageSrc(

@@ -18,7 +18,7 @@ After selecting **New**, give the page a clear name and URL. For the first page,
 |--------|-----------------|---------------|
 | Inline editing | Quickly adjust visual content | [Inline Editing](/en/cms/site/pages-inline-edit.md) |
 | Edit code | Maintain HTML, template bindings, and resource references directly | [Edit Code](/en/cms/site/pages-edit-code.md) |
-| Developer Mode | Edit pages, layouts, views, scripts, and styles together | [Developer Mode](/en/product/developer-mode.md) |
+| Development section | Edit pages, layouts, views, scripts, styles, and code from the site administration area | [Development](/en/cms/development/) |
 
 ## Understand Page Resources
 

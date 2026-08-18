@@ -1,8 +1,14 @@
+import { isEnglishDocRoute as isPublishedEnglishRoute } from '../../../scripts/docs-publish-locale.mjs'
+
 const ENGLISH_DOC_PREFIX = '/en'
 const LOCALIZED_DOC_IMAGE_PREFIXES = ['/cms/', '/product/']
 
 export function isEnglishDocRoute(pathname = '/') {
-  return pathname === ENGLISH_DOC_PREFIX || pathname.startsWith(`${ENGLISH_DOC_PREFIX}/`)
+  const pathOnly = String(pathname || '/').split('?')[0]
+  if (pathOnly === ENGLISH_DOC_PREFIX || pathOnly.startsWith(`${ENGLISH_DOC_PREFIX}/`)) {
+    return true
+  }
+  return isPublishedEnglishRoute(pathOnly)
 }
 
 export function resolveLocalizedDocImageSrc(src, pathname = '/') {

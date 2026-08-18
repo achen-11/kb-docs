@@ -11,7 +11,7 @@ title: Kooboo Documentation Center
 <h1 id="kb-doc-title" class="kb-doc-hero__title--en">Kooboo <span>Documentation Center</span></h1>
 <p class="kb-doc-subtitle">From AI site building to the admin CMS, the template engine, and the KScript API, Kooboo's product capabilities are tied together into a workflow you can actually ship.</p>
 <div class="kb-doc-hero__actions" aria-label="Main entry points">
-<a class="kb-doc-btn kb-doc-btn--primary" href="/en/cms/getting-started/create-site">Quick Start <span>Start</span></a>
+<a class="kb-doc-btn kb-doc-btn--primary" href="/cms/getting-started/create-site">Quick Start <span>Start</span></a>
 </div>
 </div>
 <HomeRouteTabs locale="en" />
@@ -21,14 +21,14 @@ title: Kooboo Documentation Center
 <section class="kb-doc-ecosystem" aria-labelledby="kb-doc-ecosystem-title">
 <h2 id="kb-doc-ecosystem-title">Build, use, and run Kooboo in one place</h2>
 <div class="kb-doc-ecosystem__grid">
-<a href="/en/cms/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/admin-cms.svg" alt=""></span><strong>Admin CMS</strong><em>Sites, content, commerce, development, databases, settings</em></a>
-<a href="/en/templateEngine/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/template-engine.svg" alt=""></span><strong>Template Engine</strong><em>Page resources, template binding, and k-data</em></a>
-<a href="/en/api/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/kscript-api.svg" alt=""></span><strong>KScript API</strong><em>Server-side k.* modules, data, business integrations, and tools</em></a>
-<a href="/en/api/mail/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/mail.svg" alt=""></span><strong>Mail APIs</strong><em>Send and receive mail, IMAP / SMTP, parsing, and anti-spam checks</em></a>
-<a href="/en/cms/development/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/developer-mode.svg" alt=""></span><strong>Developer Mode</strong><em>Edit pages, layouts, views, scripts, styles, and code together</em></a>
-<a href="/en/cms/settings/ai-service"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/ai-claw.svg" alt=""></span><strong>AI Service</strong><em>Configure AI service settings used by site features</em></a>
-<a href="/en/cms/commerce/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/marketplace.svg" alt=""></span><strong>Commerce</strong><em>Products, carts, orders, discounts, shipping, and payments</em></a>
-<a href="/en/cms/settings/domains"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/console.svg" alt=""></span><strong>Domains and Settings</strong><em>Domains, roles, hooks, and operational settings</em></a>
+<a href="/cms/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/admin-cms.svg" alt=""></span><strong>Admin CMS</strong><em>Sites, content, commerce, development, databases, settings</em></a>
+<a href="/templateEngine/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/template-engine.svg" alt=""></span><strong>Template Engine</strong><em>Page resources, template binding, and k-data</em></a>
+<a href="/api/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/kscript-api.svg" alt=""></span><strong>KScript API</strong><em>Server-side k.* modules, data, business integrations, and tools</em></a>
+<a href="/api/mail/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/mail.svg" alt=""></span><strong>Mail APIs</strong><em>Send and receive mail, IMAP / SMTP, parsing, and anti-spam checks</em></a>
+<a href="/cms/development/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/developer-mode.svg" alt=""></span><strong>Developer Mode</strong><em>Edit pages, layouts, views, scripts, styles, and code together</em></a>
+<a href="/cms/settings/ai-service"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/ai-claw.svg" alt=""></span><strong>AI Service</strong><em>Configure AI service settings used by site features</em></a>
+<a href="/cms/commerce/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/marketplace.svg" alt=""></span><strong>Commerce</strong><em>Products, carts, orders, discounts, shipping, and payments</em></a>
+<a href="/cms/settings/domains"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/console.svg" alt=""></span><strong>Domains and Settings</strong><em>Domains, roles, hooks, and operational settings</em></a>
 </div>
 </section>
 
@@ -46,19 +46,5 @@ title: Kooboo Documentation Center
 <li><span>04 · Operate</span><strong>Run automated site tasks</strong><em>Schedule inspections, maintain recurring work, and review execution records</em></li>
 </ol>
 </div>
-<div class="kb-doc-ai-capabilities">
-<div class="kb-doc-ai-capabilities__header">
-<strong>Kooboo AI capability map</strong>
-<p>Understand how the AI workspace, contextual assistant, and site-level services work together.</p>
-</div>
-<div class="kb-doc-ai-band__links">
-<a href="/product/ai-chat" hreflang="zh-CN"><span>Workspace</span><strong>AI Claw / AI Chat</strong><em>Conversational site building, live preview, code, and automated tasks</em></a>
-<a href="/product/ai-floating-assistant" hreflang="zh-CN"><span>Assistant</span><strong>AI floating assistant</strong><em>Context-aware assistance alongside the current admin page</em></a>
-<a href="/en/cms/settings/ai-service"><span>Service</span><strong>AI service</strong><em>MCP, AI functions, vector search, and AI-ready site output</em></a>
-<a href="/product/console/ai-config" hreflang="zh-CN"><span>Provider</span><strong>AI configuration</strong><em>Organization-level providers, models, and API keys</em></a>
-</div>
-</div>
 </section>
-
-<HomeProductMap locale="en" />
 </main>

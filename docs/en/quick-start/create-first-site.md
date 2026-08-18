@@ -22,7 +22,7 @@ Admin provides three common methods:
 | Import site | `/_Admin/create/import` | Import an existing site package, ZIP file, or migration source |
 | Clone site | `/_Admin/create/clone` | Copy an existing site as the starting point for a new project |
 
-To start from a template, open the [Marketplace](/en/product/market.md), select a template, and create the site from it.
+If template-based site creation is available in your environment, select a template from the site creation flow and review its name, domain, and source before creating the site.
 
 ## Enter Site Admin for the First Time
 

@@ -1,7 +1,9 @@
 import { chromium } from 'playwright'
 
+import { PUBLISHED_VERIFY_PATHS } from './docs-publish-locale.mjs'
+
 const siteUrl = process.env.KOOBOO_VERIFY_URL || process.argv[2]
-const paths = (process.env.KOOBOO_VERIFY_PATHS || '/,/api/utils/ip.html')
+const paths = (process.env.KOOBOO_VERIFY_PATHS || PUBLISHED_VERIFY_PATHS)
   .split(',')
   .map((value) => value.trim())
   .filter(Boolean)
@@ -77,10 +79,10 @@ try {
       vitePressStarted: await page.evaluate(() => window.__VITEPRESS__ === true),
       notFound: await page.getByText('PAGE NOT FOUND', { exact: true }).count(),
       appScript: await page
-        .locator('script[type="module"][src="/assets/vitepress-app.js"]')
+        .locator('script[type="module"][src^="/assets/vitepress-app.js"]')
         .count(),
       styleSheet: await page
-        .locator('link[rel~="stylesheet"][href="/assets/vitepress-style.css"]')
+        .locator('link[rel~="stylesheet"][href^="/assets/vitepress-style.css"]')
         .count(),
       failedResponses,
       consoleErrors,

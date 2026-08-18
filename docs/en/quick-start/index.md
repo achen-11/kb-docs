@@ -46,7 +46,6 @@ If you only want to get a site running, the first five steps do not require KScr
 | [Admin CMS](/en/cms/) | To find Admin menus and understand how to complete forms |
 | [Template Engine](/en/templateEngine/) | To understand Page, Layout, View, Script, and Style |
 | [API Details](/en/api/) | To look up `k.*` methods, parameters, return values, and script examples |
-| [Product Features](/en/product/) | To learn about Console, Mailbox, Marketplace, AI, and other features outside a site |
 
 ## Next Steps
 
@@ -58,4 +57,4 @@ After completing Quick Start, continue according to your role:
 | Implementation specialist | [Content](/en/cms/content/) and [Pages](/en/cms/site/pages) |
 | Frontend developer | [Template Engine](/en/templateEngine/) |
 | Server-side developer | [API Getting Started](/en/api/getting-started/) |
-| Operations or account administrator | [Product Features](/en/product/) and [Console](/en/product/console.md) |
+| Operations or account administrator | [Admin CMS menu overview](/en/cms/navigation.md) and [Site Settings](/en/cms/settings/) |

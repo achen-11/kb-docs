@@ -1,14 +1,40 @@
 import { defineConfig } from 'vitepress'
 import { diagramPlugin } from 'vitepress-plugin-mermaid-diagram'
 import { existsSync, readFileSync } from 'node:fs'
+import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createEditLinkConfig } from './editor-link.mjs'
+import {
+  PUBLISH_CLI,
+  PUBLISH_PRODUCT_FEATURES,
+  PUBLISH_ZH,
+  UNPUBLISHED_EN_SRC_GLOBS,
+  UNPUBLISHED_INTERNAL_SRC_GLOBS,
+  UNPUBLISHED_ZH_SRC_GLOBS,
+  canonicalPathFromLegacyEnglish,
+  rewriteLegacyEnglishHrefs,
+  stripEnglishUrlPrefix,
+} from '../../scripts/docs-publish-locale.mjs'
 
 const DOCS_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const EDITOR_BASE_URL = process.env.DOCS_EDITOR_BASE_URL
 const zhEditLink = createEditLinkConfig(EDITOR_BASE_URL, '在编辑平台打开')
 const enEditLink = createEditLinkConfig(EDITOR_BASE_URL, 'Open in documentation editor')
+const LEGACY_ENGLISH_REDIRECT_HTML = `<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="0;url=/">
+  <link rel="canonical" href="/">
+  <title>Kooboo Documentation</title>
+  <script>location.replace("/")</script>
+</head>
+<body>
+  <p><a href="/">Kooboo Documentation</a></p>
+</body>
+</html>
+`
 
 /**
  * 最佳实践（docs/guide/**）发布开关。
@@ -16,6 +42,50 @@ const enEditLink = createEditLinkConfig(EDITOR_BASE_URL, 'Open in documentation 
  * 恢复发布时改为 true 即可。
  */
 const PUBLISH_GUIDE = false
+
+function createLegacyEnglishRedirectPlugin() {
+  return {
+    name: 'kb-docs-legacy-english-redirect',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const url = req.url || ''
+        if (url.includes('.md') || url.includes('/@') || url.includes('/@fs/')) {
+          next()
+          return
+        }
+        const location = canonicalPathFromLegacyEnglish(url)
+        if (!location) {
+          next()
+          return
+        }
+        res.statusCode = 302
+        res.setHeader('Location', location)
+        res.end()
+      })
+    },
+  }
+}
+
+async function removeImageFiles(targetDir: string) {
+  let entries
+  try {
+    entries = await readdir(targetDir, { withFileTypes: true })
+  } catch (error) {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') return
+    throw error
+  }
+
+  await Promise.all(entries.map(async (entry) => {
+    const absolutePath = path.join(targetDir, entry.name)
+    if (entry.isDirectory()) {
+      await removeImageFiles(absolutePath)
+      return
+    }
+    if (/\.(?:png|jpe?g|gif|webp|svg|avif|ico)$/iu.test(entry.name)) {
+      await rm(absolutePath, { force: true })
+    }
+  }))
+}
 
 /** VitePress 左侧栏：路径前缀须匹配 `cms/**` 下的页面 */
 const cmsSidebar = [
@@ -362,41 +432,41 @@ const enCliSidebar = [
   {
     text: 'Kooboo CLI',
     items: [
-      { text: 'Overview', link: '/en/cli/' },
+      { text: 'Overview', link: '/cli/' },
       {
         text: 'Getting Started',
         collapsed: false,
         items: [
-          { text: 'Before You Start', link: '/en/cli/getting-started/preparation' },
-          { text: 'Create or Clone a Project', link: '/en/cli/getting-started/create-or-clone' },
+          { text: 'Before You Start', link: '/cli/getting-started/preparation' },
+          { text: 'Create or Clone a Project', link: '/cli/getting-started/create-or-clone' },
         ],
       },
       {
         text: 'Project',
         collapsed: false,
         items: [
-          { text: 'Project Resources and Folders', link: '/en/cli/project/resources' },
+          { text: 'Project Resources and Folders', link: '/cli/project/resources' },
         ],
       },
       {
         text: 'Synchronization and Deployment',
         collapsed: false,
         items: [
-          { text: 'Pull Remote Resources', link: '/en/cli/workflows/pull' },
-          { text: 'Push Local Resources', link: '/en/cli/workflows/push' },
-          { text: 'Deploy Git Artifacts', link: '/en/cli/workflows/deploy' },
-          { text: 'Continuous Synchronization', link: '/en/cli/workflows/sync' },
+          { text: 'Pull Remote Resources', link: '/cli/workflows/pull' },
+          { text: 'Push Local Resources', link: '/cli/workflows/push' },
+          { text: 'Deploy Git Artifacts', link: '/cli/workflows/deploy' },
+          { text: 'Continuous Synchronization', link: '/cli/workflows/sync' },
         ],
       },
       {
         text: 'Maintenance',
         collapsed: false,
         items: [
-          { text: 'Compare and Clean Remote Resources', link: '/en/cli/workflows/check-and-prune' },
-          { text: 'Export a Site', link: '/en/cli/workflows/export' },
+          { text: 'Compare and Clean Remote Resources', link: '/cli/workflows/check-and-prune' },
+          { text: 'Export a Site', link: '/cli/workflows/export' },
         ],
       },
-      { text: 'Troubleshooting', link: '/en/cli/troubleshooting' },
+      { text: 'Troubleshooting', link: '/cli/troubleshooting' },
     ],
   },
 ]
@@ -462,6 +532,7 @@ const productSidebar = [
 ]
 
 function prefixLocalePath(pathname: string, localePrefix: string) {
+  if (!localePrefix) return pathname
   if (!pathname.startsWith('/')) return pathname
   if (pathname === '/') return `${localePrefix}/`
   if (pathname === localePrefix || pathname.startsWith(`${localePrefix}/`)) return pathname
@@ -503,14 +574,17 @@ function prefixLocaleSidebarMap(sidebar: Record<string, any[]>, localePrefix: st
 
 function resolveDocPath(pathname: string) {
   const normalized = pathname.replace(/^\/+/, '')
-  const candidates = normalized.endsWith('.md')
-    ? [path.join(DOCS_ROOT, normalized)]
-    : [
-        path.join(DOCS_ROOT, normalized, 'index.md'),
-        path.join(DOCS_ROOT, `${normalized}.md`),
-      ]
+  const searchPaths = normalized.startsWith('en/') ? [normalized] : [`en/${normalized}`, normalized]
+  const files = searchPaths.flatMap((candidate) => (
+    candidate.endsWith('.md')
+      ? [path.join(DOCS_ROOT, candidate)]
+      : [
+          path.join(DOCS_ROOT, candidate, 'index.md'),
+          path.join(DOCS_ROOT, `${candidate}.md`),
+        ]
+  ))
 
-  return candidates.find((candidate) => existsSync(candidate)) || null
+  return files.find((candidate) => existsSync(candidate)) || null
 }
 
 function readDocTitle(pathname: string) {
@@ -768,20 +842,20 @@ const apiSidebar = [
 
 const zhNav = [
   { text: '快速开始', link: '/quick-start/' },
-  { text: '产品功能', link: '/product/' },
+  ...(PUBLISH_PRODUCT_FEATURES ? [{ text: '产品功能', link: '/product/' }] : []),
   { text: '后台 CMS', link: '/cms/' },
   { text: '模板引擎', link: '/templateEngine/' },
-  { text: 'Kooboo CLI', link: '/cli/' },
+  ...(PUBLISH_CLI ? [{ text: 'Kooboo CLI', link: '/cli/' }] : []),
   { text: 'API 详情', link: '/api/' },
   ...(PUBLISH_GUIDE ? [{ text: '最佳实践', link: '/guide/' }] : []),
 ]
 
 const enNav = [
   { text: 'Quick Start', link: '/quick-start/' },
-  { text: 'Product Features', link: '/product/' },
+  ...(PUBLISH_PRODUCT_FEATURES ? [{ text: 'Product Features', link: '/product/' }] : []),
   { text: 'Admin CMS', link: '/cms/' },
   { text: 'Template Engine', link: '/templateEngine/' },
-  { text: 'Kooboo CLI', link: '/cli/' },
+  ...(PUBLISH_CLI ? [{ text: 'Kooboo CLI', link: '/cli/' }] : []),
   { text: 'API Details', link: '/api/' },
 ]
 
@@ -837,16 +911,24 @@ const englishSidebarTextMap = {
 const zhSidebar = {
   '/quick-start/': quickStartSidebar,
   '/quick-start': quickStartSidebar,
-  '/product/': productSidebar,
-  '/product': productSidebar,
+  ...(PUBLISH_PRODUCT_FEATURES
+    ? {
+        '/product/': productSidebar,
+        '/product': productSidebar,
+      }
+    : {}),
   ...(PUBLISH_GUIDE
     ? {
         '/guide/': guideSidebar,
         '/guide': guideSidebar,
       }
     : {}),
-  '/cli/': cliSidebar,
-  '/cli': cliSidebar,
+  ...(PUBLISH_CLI
+    ? {
+        '/cli/': cliSidebar,
+        '/cli': cliSidebar,
+      }
+    : {}),
   '/cms/': cmsSidebar,
   '/cms': cmsSidebar,
   '/templateEngine/': templateEngineSidebar,
@@ -854,31 +936,101 @@ const zhSidebar = {
 }
 
 const enSidebar = {
-  '/en/cli/': enCliSidebar,
-  '/en/cli': enCliSidebar,
+  ...(PUBLISH_CLI
+    ? {
+        '/cli/': enCliSidebar,
+        '/cli': enCliSidebar,
+      }
+    : {}),
   ...buildEnglishSidebarMap(
     {
       '/quick-start/': quickStartSidebar,
       '/quick-start': quickStartSidebar,
-      '/product/': productSidebar,
-      '/product': productSidebar,
+      ...(PUBLISH_PRODUCT_FEATURES
+        ? {
+            '/product/': productSidebar,
+            '/product': productSidebar,
+          }
+        : {}),
       '/cms/': cmsSidebar,
       '/cms': cmsSidebar,
       '/templateEngine/': templateEngineSidebar,
       '/api/': apiSidebar,
       '/api': apiSidebar,
     },
-    '/en',
+    '',
     englishSidebarTextMap
   ),
+}
+
+const srcExclude = [
+  ...(PUBLISH_GUIDE ? [] : ['guide/**']),
+  ...(PUBLISH_ZH ? [] : UNPUBLISHED_ZH_SRC_GLOBS),
+  ...UNPUBLISHED_EN_SRC_GLOBS,
+  ...UNPUBLISHED_INTERNAL_SRC_GLOBS,
+]
+
+const zhLocale = {
+  label: '简体中文',
+  lang: 'zh-CN',
+  title: 'Kooboo',
+  description: 'Kooboo Documentation',
+  themeConfig: {
+    editLink: zhEditLink,
+    lastUpdated: {
+      text: '最后编辑时间',
+      formatOptions: {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        forceLocale: true,
+      },
+    },
+    logo: {
+      src: '/kooboo-logo.svg',
+      alt: 'Kooboo',
+    },
+    siteTitle: false,
+    nav: zhNav,
+    sidebar: zhSidebar,
+    langMenuLabel: '语言',
+  },
+}
+
+const enLocale = {
+  label: 'English',
+  lang: 'en-US',
+  title: 'Kooboo',
+  description: 'Kooboo Documentation',
+  themeConfig: {
+    editLink: enEditLink,
+    lastUpdated: {
+      text: 'Last edited',
+      formatOptions: {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        forceLocale: true,
+      },
+    },
+    logo: {
+      src: '/kooboo-logo.svg',
+      alt: 'Kooboo',
+    },
+    siteTitle: false,
+    nav: enNav,
+    sidebar: enSidebar,
+    langMenuLabel: 'Languages',
+  },
 }
 
 export default defineConfig({
   cacheDir: process.env.DOCS_VITEPRESS_CACHE_DIR || undefined,
   ignoreDeadLinks: true,
-  // 收起时排除 guide 源文件，避免生成 /guide/** 路由与 dist 产物
-  srcExclude: PUBLISH_GUIDE ? [] : ['guide/**'],
+  lastUpdated: true,
+  lang: 'en-US',
+  // English sources live in docs/en/** and are rewritten to `/`. Future Chinese will be `/zh/`.
+  srcExclude,
   vite: {
+    plugins: [createLegacyEnglishRedirectPlugin()],
     build: {
       rollupOptions: {
         output: {
@@ -894,12 +1046,38 @@ export default defineConfig({
       },
     },
   },
+  transformHtml(code) {
+    return rewriteLegacyEnglishHrefs(code)
+  },
+  async buildEnd(siteConfig) {
+    const legacyEnglishDir = path.join(siteConfig.outDir, 'en')
+    await mkdir(legacyEnglishDir, { recursive: true })
+    await writeFile(path.join(legacyEnglishDir, 'index.html'), LEGACY_ENGLISH_REDIRECT_HTML)
+    await Promise.all([
+      removeImageFiles(path.join(siteConfig.outDir, 'cms')),
+      removeImageFiles(path.join(siteConfig.outDir, 'product')),
+      ...(PUBLISH_PRODUCT_FEATURES
+        ? []
+        : [removeImageFiles(path.join(siteConfig.outDir, 'en', 'product'))]),
+    ])
+  },
   markdown: {
     config(md) {
       md.use(diagramPlugin, { preview: true })
+      const defaultOpen = md.renderer.rules.link_open
+      md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+        const hrefIndex = tokens[idx].attrIndex('href')
+        if (hrefIndex >= 0) {
+          tokens[idx].attrs[hrefIndex][1] = stripEnglishUrlPrefix(tokens[idx].attrs[hrefIndex][1])
+        }
+        return defaultOpen
+          ? defaultOpen(tokens, idx, options, env, self)
+          : self.renderToken(tokens, idx, options)
+      }
     },
   },
   rewrites: {
+    'en/:rest*': ':rest*',
     'api/core/api.md': 'api/api/index.md',
     'api/core/cache.md': 'api/cache/index.md',
     'api/core/cookie.md': 'api/cookie/index.md',
@@ -929,7 +1107,7 @@ export default defineConfig({
     'templateEngine/template-binding-syntax.md': 'templateEngine/binding/index.md',
   },
   themeConfig: {
-    editLink: zhEditLink,
+    editLink: enEditLink,
     search: {
       provider: 'local'
     },
@@ -938,40 +1116,7 @@ export default defineConfig({
     },
   },
   locales: {
-    root: {
-      label: '简体中文',
-      lang: 'zh-CN',
-      title: 'Kooboo',
-      description: 'Kooboo Documentation',
-      themeConfig: {
-        editLink: zhEditLink,
-        logo: {
-          src: '/kooboo-logo.svg',
-          alt: 'Kooboo',
-        },
-        siteTitle: false,
-        nav: zhNav,
-        sidebar: zhSidebar,
-        langMenuLabel: '语言',
-      },
-    },
-    en: {
-      label: 'English',
-      lang: 'en-US',
-      link: '/en/',
-      title: 'Kooboo',
-      description: 'Kooboo Documentation',
-      themeConfig: {
-        editLink: enEditLink,
-        logo: {
-          src: '/kooboo-logo.svg',
-          alt: 'Kooboo',
-        },
-        siteTitle: false,
-        nav: prefixLocaleNav(enNav, '/en'),
-        sidebar: enSidebar,
-        langMenuLabel: 'Languages',
-      },
-    },
-  }
+    root: enLocale,
+    ...(PUBLISH_ZH ? { zh: { ...zhLocale, link: '/zh/' } } : {}),
+  },
 })
