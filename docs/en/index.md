@@ -18,17 +18,6 @@ title: Kooboo Documentation Center
 </div>
 </section>
 
-<section class="kb-doc-path" aria-labelledby="kb-doc-path-title">
-<h2 id="kb-doc-path-title">Start Today</h2>
-<p>Find the right docs entry in minutes and complete a real site setup step by step.</p>
-<div class="kb-doc-path__grid">
-<a href="/en/cms/getting-started/create-site"><span>01</span><strong>Create a Site</strong><em>Start from blank, import, clone, or a market template</em></a>
-<a href="/en/cms/site/pages"><span>02</span><strong>Pages and Content</strong><em>Build accessible pages, content types, and content items</em></a>
-<a href="/en/templateEngine/"><span>03</span><strong>Template Rendering</strong><em>Understand Page, Layout, View, Script, and Style</em></a>
-<a href="/en/api/getting-started/"><span>04</span><strong>KScript API</strong><em>Write server-side APIs and integrate content, mail, payments, or databases</em></a>
-</div>
-</section>
-
 <section class="kb-doc-ecosystem" aria-labelledby="kb-doc-ecosystem-title">
 <h2 id="kb-doc-ecosystem-title">Build, use, and run Kooboo in one place</h2>
 <div class="kb-doc-ecosystem__grid">

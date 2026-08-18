@@ -18,17 +18,6 @@ title: Kooboo 文档中心
 </div>
 </section>
 
-<section class="kb-doc-path" aria-labelledby="kb-doc-path-title">
-<h2 id="kb-doc-path-title">Start Today</h2>
-<p>用几分钟找到正确文档入口，按步骤完成真实站点配置。</p>
-<div class="kb-doc-path__grid">
-<a href="/quick-start/create-first-site"><span>01</span><strong>创建站点</strong><em>空白、导入、克隆或从市场模板开始</em></a>
-<a href="/cms/site/pages"><span>02</span><strong>页面与内容</strong><em>建立可访问页面、内容类型和内容条目</em></a>
-<a href="/templateEngine/"><span>03</span><strong>模板渲染</strong><em>理解 Page、Layout、View、Script、Style</em></a>
-<a href="/quick-start/add-script-api"><span>04</span><strong>KScript API</strong><em>写服务端接口，接入内容、邮件、支付或数据库</em></a>
-</div>
-</section>
-
 <section class="kb-doc-ecosystem" aria-labelledby="kb-doc-ecosystem-title">
 <h2 id="kb-doc-ecosystem-title">Build, use, and run Kooboo in one place</h2>
 <div class="kb-doc-ecosystem__grid">
