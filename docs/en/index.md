@@ -47,4 +47,6 @@ title: Kooboo Documentation Center
 </ol>
 </div>
 </section>
+
+<HomeProductMap locale="en" />
 </main>
