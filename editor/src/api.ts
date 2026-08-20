@@ -6,6 +6,7 @@ export interface EditorConfig {
   fastPreviewBaseUrl: string
   stablePreviewBaseUrl: string
   productionPublishAvailable: boolean
+  productionPublishTarget: string
 }
 
 export interface DocumentPayload {
@@ -121,6 +122,38 @@ export interface WorkspaceSubmitPayload {
   pushed: boolean
   remote: string
   workspace: WorkspaceStatusPayload
+}
+
+export type PublishState =
+  | 'idle'
+  | 'queued'
+  | 'preparing'
+  | 'planning'
+  | 'approval_required'
+  | 'deploying'
+  | 'verifying'
+  | 'succeeded'
+  | 'failed'
+
+export interface PublishStatusPayload {
+  status: PublishState
+  operationId?: string
+  sourceCommit?: string
+  targetUrl?: string
+  message: string
+  startedAt?: string
+  finishedAt?: string
+  errorCode?: string
+  summary?: {
+    upsert: number
+    delete: number
+    skipped: number
+  }
+  receipt?: {
+    deploymentId: string | null
+    succeeded: number
+    verified: number
+  }
 }
 
 export interface MediaItemPayload {
@@ -268,6 +301,17 @@ export function submitWorkspace(message: string, expectedFingerprint: string) {
 
 export function retryWorkspacePush() {
   return request<WorkspaceSubmitPayload>('/api/workspace/push', { method: 'POST' })
+}
+
+export function getPublishStatus() {
+  return request<PublishStatusPayload>('/api/publish-status')
+}
+
+export function requestProductionPublish(expectedCommit: string, applyDeletes = false) {
+  return request<PublishStatusPayload>('/api/publish', {
+    method: 'POST',
+    body: JSON.stringify({ expectedCommit, applyDeletes }),
+  })
 }
 
 export function getMediaList(options: { root?: string; search?: string; page?: number; pageSize?: number } = {}) {

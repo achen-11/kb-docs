@@ -26,6 +26,14 @@ const buildLabel = computed(() => {
   return labels[workspace.buildStatus.value.status]
 })
 
+const publishLabel = computed(() => {
+  const labels: Record<string, string> = {
+    queued: '发布已排队', preparing: '准备发布', planning: '检查计划', deploying: '正在发布',
+    verifying: '线上验收', approval_required: '待确认删除', succeeded: '已发布', failed: '发布失败',
+  }
+  return labels[workspace.publishStatus.value.status] || ''
+})
+
 function toggleNavigation() {
   navigationCollapsed.value = !navigationCollapsed.value
   window.localStorage.setItem('kb-docs-studio-navigation', navigationCollapsed.value ? 'collapsed' : 'expanded')
@@ -62,6 +70,10 @@ watch(() => route.fullPath, () => {
           <span>{{ buildLabel }}</span>
         </a>
         <span v-if="workspace.hasDraft.value" class="global-status draft-status"><i data-tone="warning"></i><span>Git 同步暂停</span></span>
+        <RouterLink v-if="publishLabel" to="/workflow" class="global-status">
+          <i :data-tone="workspace.publishStatus.value.status === 'succeeded' ? 'success' : workspace.publishStatus.value.status === 'failed' || workspace.publishStatus.value.status === 'approval_required' ? 'warning' : 'working'"></i>
+          <span>{{ publishLabel }}</span>
+        </RouterLink>
         <button class="user-menu" type="button" @click="signOut"><span>内部用户</span><small>退出</small></button>
       </div>
     </header>

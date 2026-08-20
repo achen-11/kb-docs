@@ -3,6 +3,8 @@ import net from 'node:net'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { PUBLISHED_VERIFY_PATHS } from './docs-publish-locale.mjs'
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '..')
 const templatesDir = path.join(projectRoot, 'deploy', 'editor', 'templates')
@@ -75,6 +77,10 @@ function renderTemplate(template, replacements) {
 export function normalizeDocsEditorConfig(input) {
   const configDir = assertAbsolutePath(input.configDir, 'config directory')
   const previewRoot = assertAbsolutePath(input.previewRoot || '/srv/kb-docs-preview', 'preview root')
+  const productionPublishEnabled = Boolean(input.productionPublishEnabled)
+  if (productionPublishEnabled && !input.koobooTargetUrl) {
+    throw new Error('Kooboo target URL is required when production publishing is enabled')
+  }
   return {
     appDir: assertAbsolutePath(input.appDir, 'app directory'),
     authTokenFile: assertAbsolutePath(
@@ -84,6 +90,17 @@ export function normalizeDocsEditorConfig(input) {
     bindHost: assertBindHost(input.bindHost || '127.0.0.1'),
     configDir,
     editorPort: readPort(input.editorPort || '4174'),
+    koobooArtifactDir: assertAbsolutePath(
+      input.koobooArtifactDir || '/srv/kb-docs-kooboo-artifact',
+      'Kooboo artifact directory'
+    ),
+    koobooBaselineFile: assertAbsolutePath(
+      input.koobooBaselineFile || path.join(previewRoot, 'kooboo-deploy-baseline.json'),
+      'Kooboo baseline file'
+    ),
+    koobooInitialBaseline: String(input.koobooInitialBaseline || ''),
+    koobooTargetUrl: input.koobooTargetUrl ? assertHttpUrl(input.koobooTargetUrl, 'Kooboo target URL') : '',
+    koobooVerifyPaths: String(input.koobooVerifyPaths || PUBLISHED_VERIFY_PATHS),
     outputDir: path.resolve(input.outputDir),
     auditLog: assertAbsolutePath(
       input.auditLog || path.join(previewRoot, 'editor-audit.jsonl'),
@@ -106,6 +123,7 @@ export function normalizeDocsEditorConfig(input) {
       'fast preview public URL'
     ),
     previewRoot,
+    productionPublishEnabled: productionPublishEnabled ? 'true' : 'false',
     stableBuildDebounceMs: readPositiveInteger(
       input.stableBuildDebounceMs,
       8_000,
@@ -148,8 +166,14 @@ export async function renderDocsEditorConfig(input) {
     EDITOR_PORT: config.editorPort,
     FAST_PREVIEW_HEALTH_URL: config.fastPreviewHealthUrl,
     FAST_PREVIEW_PUBLIC_URL: config.fastPreviewPublicUrl,
+    KOOBOO_ARTIFACT_DIR: config.koobooArtifactDir,
+    KOOBOO_BASELINE_FILE: config.koobooBaselineFile,
+    KOOBOO_INITIAL_BASELINE: config.koobooInitialBaseline,
+    KOOBOO_TARGET_URL: config.koobooTargetUrl,
+    KOOBOO_VERIFY_PATHS: config.koobooVerifyPaths,
     PREVIEW_ENV_FILE: config.previewEnvFile,
     PREVIEW_ROOT: config.previewRoot,
+    PRODUCTION_PUBLISH_ENABLED: config.productionPublishEnabled,
     STABLE_BUILD_DEBOUNCE_MS: config.stableBuildDebounceMs,
     STABLE_PREVIEW_PUBLIC_URL: config.stablePreviewPublicUrl,
     STABLE_PREVIEW_STATUS_URL: config.stablePreviewStatusUrl,
@@ -191,6 +215,11 @@ async function main() {
     bindHost: readArg(argv, '--bind-host') || '127.0.0.1',
     configDir,
     editorPort: readArg(argv, '--port') || '4174',
+    koobooArtifactDir: readArg(argv, '--kooboo-artifact-dir') || '/srv/kb-docs-kooboo-artifact',
+    koobooBaselineFile: readArg(argv, '--kooboo-baseline-file'),
+    koobooInitialBaseline: readArg(argv, '--kooboo-initial-baseline') || '',
+    koobooTargetUrl: readArg(argv, '--kooboo-target-url') || '',
+    koobooVerifyPaths: readArg(argv, '--kooboo-verify-paths') || PUBLISHED_VERIFY_PATHS,
     outputDir:
       readArg(argv, '--output-dir') || path.join(projectRoot, '.local-preview', 'editor-config'),
     previewEnvFile:
@@ -200,6 +229,7 @@ async function main() {
     fastPreviewPublicUrl:
       readArg(argv, '--fast-preview-url') || readArg(argv, '--preview-url') || 'http://127.0.0.1:4173',
     previewRoot: readArg(argv, '--preview-root') || '/srv/kb-docs-preview',
+    productionPublishEnabled: argv.includes('--enable-production-publish'),
     stableBuildDebounceMs: readArg(argv, '--stable-build-debounce-ms') || '8000',
     stablePreviewPublicUrl:
       readArg(argv, '--stable-preview-url') || 'http://127.0.0.1:4175',

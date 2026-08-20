@@ -12,6 +12,8 @@ import {
 } from './docs-editor-draft.mjs'
 import { WorkspaceOperationError, createWorkspaceCoordinator } from './docs-editor-workspace.mjs'
 import { DEFAULT_MAX_MEDIA_BYTES, MediaOperationError, createMediaCoordinator } from './docs-editor-media.mjs'
+import { PublishOperationError, createPublishCoordinator } from './docs-editor-publish.mjs'
+import { PUBLISHED_VERIFY_PATHS } from './docs-publish-locale.mjs'
 import { withPreviewLock } from './run-with-preview-lock.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -53,6 +55,19 @@ function readPositiveInteger(value, fallback, name, maximum = Number.MAX_SAFE_IN
 function assertBindHost(value) {
   if (!value || /[\r\n\0]/u.test(value)) throw new Error('editor host is invalid')
   return value
+}
+
+function readBoolean(value, fallback = false) {
+  if (value === undefined || value === null || value === '') return fallback
+  if (typeof value === 'boolean') return value
+  if (String(value).toLowerCase() === 'true') return true
+  if (String(value).toLowerCase() === 'false') return false
+  throw new Error('boolean configuration must be true or false')
+}
+
+function assertAbsolutePath(value, name) {
+  if (!path.isAbsolute(value) || /[\r\n\0]/u.test(value)) throw new Error(`${name} must be an absolute path`)
+  return path.normalize(value)
 }
 
 function assertHttpUrl(value, name) {
@@ -364,6 +379,15 @@ async function normalizeConfig(input = {}) {
       'http://127.0.0.1:4175',
     'stable preview public URL'
   ).replace(/\/$/u, '')
+  const productionPublishEnabled = readBoolean(
+    input.productionPublishEnabled ?? process.env.DOCS_EDITOR_PRODUCTION_PUBLISH_ENABLED,
+    false
+  )
+  const productionPublishTargetValue =
+    input.productionPublishTarget || process.env.DOCS_EDITOR_KOOBOO_TARGET_URL || ''
+  if (productionPublishEnabled && !productionPublishTargetValue) {
+    throw new Error('DOCS_EDITOR_KOOBOO_TARGET_URL is required when production publishing is enabled')
+  }
   return {
     authToken: await readAuthToken({
       authToken: input.authToken,
@@ -427,6 +451,24 @@ async function normalizeConfig(input = {}) {
     ),
     previewFrameOrigin: new URL(fastPreviewBaseUrl).origin,
     previewRoot,
+    productionPublishEnabled,
+    productionPublishTarget: productionPublishTargetValue
+      ? assertHttpUrl(productionPublishTargetValue, 'Kooboo publish target URL').replace(/\/$/u, '')
+      : '',
+    publishArtifactDir: assertAbsolutePath(
+      input.publishArtifactDir || process.env.DOCS_EDITOR_KOOBOO_ARTIFACT_DIR || '/srv/kb-docs-kooboo-artifact',
+      'Kooboo artifact directory'
+    ),
+    publishBaselineFile: assertAbsolutePath(
+      input.publishBaselineFile ||
+        process.env.DOCS_EDITOR_KOOBOO_BASELINE_FILE ||
+        path.join(previewRoot, 'kooboo-deploy-baseline.json'),
+      'Kooboo deployment baseline file'
+    ),
+    publishInitialBaselineCommit:
+      input.publishInitialBaselineCommit || process.env.DOCS_EDITOR_KOOBOO_INITIAL_BASELINE || '',
+    publishVerifyPaths:
+      input.publishVerifyPaths || process.env.DOCS_EDITOR_KOOBOO_VERIFY_PATHS || PUBLISHED_VERIFY_PATHS,
     stablePreviewBaseUrl,
     stablePreviewStatusUrl: assertHttpUrl(
       input.stablePreviewStatusUrl ||
@@ -479,6 +521,18 @@ async function resolvePreviewStatus(config) {
 
 function publicFetchError(error) {
   return error instanceof Error ? error.message : String(error)
+}
+
+function publicPublishStatus(status) {
+  if (!status || typeof status !== 'object') return status
+  const {
+    artifactCommit: _privateArtifactCommit,
+    fromArtifactCommit: _privateFromArtifactCommit,
+    logTail: _privateLogTail,
+    planDigest: _privatePlanDigest,
+    ...publicStatus
+  } = status
+  return publicStatus
 }
 
 async function sendStaticFile(config, request, requestPath, response) {
@@ -558,6 +612,20 @@ export async function createDocsEditorServer(input = {}) {
       lockTimeoutMs: config.lockTimeoutMs,
       maximumBytes: config.maximumMediaBytes,
     })
+  const publishCoordinator =
+    input.publishCoordinator ||
+    createPublishCoordinator({
+      enabled: config.productionPublishEnabled,
+      projectRoot: config.projectRoot,
+      artifactDir: config.publishArtifactDir,
+      baselineFile: config.publishBaselineFile,
+      initialBaselineCommit: config.publishInitialBaselineCommit,
+      targetUrl: config.productionPublishTarget,
+      verifyPaths: config.publishVerifyPaths,
+      auditLog: config.auditLog,
+      lockFile: config.lockFile,
+      lockTimeoutMs: Math.max(config.lockTimeoutMs, 3_600_000),
+    })
 
   return createServer(async (request, response) => {
     try {
@@ -607,6 +675,15 @@ export async function createDocsEditorServer(input = {}) {
       if (url.pathname.startsWith('/api/') && !authenticated) {
         throw new EditorHttpError(401, 'Authentication required')
       }
+      const publishProtectedMutation =
+        (request.method === 'PUT' && url.pathname === '/api/document') ||
+        (request.method === 'POST' && [
+          '/api/document/locale', '/api/build', '/api/media/upload', '/api/workspace/revert',
+          '/api/workspace/commit', '/api/workspace/push',
+        ].includes(url.pathname))
+      if (publishProtectedMutation && publishCoordinator.isRunning?.()) {
+        throw new PublishOperationError(409, 'PUBLISH_IN_PROGRESS', 'Kooboo 发布正在执行，请等待线上验收完成后再修改文档。')
+      }
       if (request.method === 'GET' && url.pathname === '/api/config') {
         sendJson(response, 200, {
           mode: 'draft',
@@ -615,7 +692,8 @@ export async function createDocsEditorServer(input = {}) {
           maximumMediaBytes: config.maximumMediaBytes,
           fastPreviewBaseUrl: config.fastPreviewBaseUrl,
           stablePreviewBaseUrl: config.stablePreviewBaseUrl,
-          productionPublishAvailable: false,
+          productionPublishAvailable: publishCoordinator.available,
+          productionPublishTarget: publishCoordinator.targetUrl,
         })
         return
       }
@@ -770,6 +848,26 @@ export async function createDocsEditorServer(input = {}) {
         sendJson(response, 200, await workspaceCoordinator.retryPush({ actor: request.socket.remoteAddress || 'unknown' }))
         return
       }
+      if (request.method === 'GET' && url.pathname === '/api/publish-status') {
+        sendJson(response, 200, publicPublishStatus(await publishCoordinator.getStatus()))
+        return
+      }
+      if (request.method === 'POST' && url.pathname === '/api/publish') {
+        const body = await readJsonBody(request)
+        const workspace = await workspaceCoordinator.getStatus()
+        if (workspace.changedFiles || workspace.pendingPush || workspace.stagedFiles || workspace.outOfScopeFiles) {
+          throw new PublishOperationError(409, 'PUBLISH_WORKSPACE_NOT_READY', '请先提交并推送全部改动，再发布到 Kooboo。')
+        }
+        if (workspace.head !== body.expectedCommit) {
+          throw new PublishOperationError(409, 'PUBLISH_HEAD_CHANGED', '服务器版本已经变化，请刷新后重新发布。', { head: workspace.head })
+        }
+        sendJson(response, 202, publicPublishStatus(await publishCoordinator.start({
+          actor: request.socket.remoteAddress || 'unknown',
+          expectedCommit: body.expectedCommit,
+          applyDeletes: body.applyDeletes === true,
+        })))
+        return
+      }
       if (request.method === 'GET' && url.pathname === '/api/preview-status') {
         sendJson(response, 200, await resolvePreviewStatus(config))
         return
@@ -781,9 +879,9 @@ export async function createDocsEditorServer(input = {}) {
 
       await sendStaticFile(config, request, url.pathname, response)
     } catch (error) {
-      const statusCode = error instanceof EditorHttpError || error instanceof WorkspaceOperationError || error instanceof MediaOperationError ? error.statusCode : 500
+      const statusCode = error instanceof EditorHttpError || error instanceof WorkspaceOperationError || error instanceof MediaOperationError || error instanceof PublishOperationError ? error.statusCode : 500
       const message =
-        error instanceof EditorHttpError || error instanceof WorkspaceOperationError || error instanceof MediaOperationError
+        error instanceof EditorHttpError || error instanceof WorkspaceOperationError || error instanceof MediaOperationError || error instanceof PublishOperationError
           ? error.message
           : 'Internal editor server error'
       if (statusCode >= 500) console.error(error)
@@ -791,6 +889,7 @@ export async function createDocsEditorServer(input = {}) {
         error: message,
         ...(error instanceof WorkspaceOperationError ? { code: error.code, ...error.details } : {}),
         ...(error instanceof MediaOperationError ? { code: error.code } : {}),
+        ...(error instanceof PublishOperationError ? { code: error.code, ...error.details } : {}),
       })
       else response.destroy()
     }

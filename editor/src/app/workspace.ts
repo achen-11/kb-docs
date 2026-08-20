@@ -3,6 +3,7 @@ import {
   getBuildStatus,
   getEditorConfig,
   getPreviewStatus,
+  getPublishStatus,
   getSession,
   getWorkspaceStatus,
   login,
@@ -10,6 +11,7 @@ import {
   type BuildStatusPayload,
   type EditorConfig,
   type PreviewStatusPayload,
+  type PublishStatusPayload,
   type WorkspaceStatusPayload,
 } from '../api'
 
@@ -19,9 +21,11 @@ const editorConfig = shallowRef<EditorConfig | null>(null)
 const previewStatus = shallowRef<PreviewStatusPayload | null>(null)
 const buildStatus = shallowRef<BuildStatusPayload>({ status: 'idle', queued: 0 })
 const workspaceStatus = shallowRef<WorkspaceStatusPayload | null>(null)
+const publishStatus = shallowRef<PublishStatusPayload>({ status: 'idle', message: '尚未开始发布。' })
 let previewTimer: number | undefined
 let buildTimer: number | undefined
 let workspaceTimer: number | undefined
+let publishTimer: number | undefined
 
 const hasDraft = computed(() => workspaceStatus.value
   ? Boolean(workspaceStatus.value.changedFiles || workspaceStatus.value.pendingPush)
@@ -61,23 +65,36 @@ async function refreshWorkspaceStatus() {
   }
 }
 
+async function refreshPublishStatus() {
+  if (!editorConfig.value?.productionPublishAvailable) return
+  try {
+    publishStatus.value = await getPublishStatus()
+  } catch {
+    // Publishing remains usable after transient polling failures.
+  }
+}
+
 function startPolling() {
   window.clearInterval(previewTimer)
   window.clearInterval(buildTimer)
+  window.clearInterval(workspaceTimer)
+  window.clearInterval(publishTimer)
   previewTimer = window.setInterval(refreshPreviewStatus, 10_000)
   buildTimer = window.setInterval(refreshBuildStatus, 1_000)
   workspaceTimer = window.setInterval(refreshWorkspaceStatus, 5_000)
+  publishTimer = window.setInterval(refreshPublishStatus, 2_000)
 }
 
 function stopPolling() {
   window.clearInterval(previewTimer)
   window.clearInterval(buildTimer)
   window.clearInterval(workspaceTimer)
+  window.clearInterval(publishTimer)
 }
 
 async function initializeWorkspace() {
   editorConfig.value = await getEditorConfig()
-  await Promise.all([refreshPreviewStatus(), refreshBuildStatus(), refreshWorkspaceStatus()])
+  await Promise.all([refreshPreviewStatus(), refreshBuildStatus(), refreshWorkspaceStatus(), refreshPublishStatus()])
   startPolling()
 }
 
@@ -106,6 +123,7 @@ async function signOut() {
   previewStatus.value = null
   buildStatus.value = { status: 'idle', queued: 0 }
   workspaceStatus.value = null
+  publishStatus.value = { status: 'idle', message: '尚未开始发布。' }
 }
 
 export function useWorkspace() {
@@ -116,6 +134,7 @@ export function useWorkspace() {
     previewStatus,
     buildStatus,
     workspaceStatus,
+    publishStatus,
     hasDraft,
     stableReleaseId,
     stableCommit,
@@ -123,6 +142,7 @@ export function useWorkspace() {
     refreshPreviewStatus,
     refreshBuildStatus,
     refreshWorkspaceStatus,
+    refreshPublishStatus,
     signIn,
     signOut,
   }

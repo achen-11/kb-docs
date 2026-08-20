@@ -18,7 +18,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectHome=true
 ProtectSystem=strict
-ReadWritePaths={{APP_DIR}} {{PREVIEW_ROOT}}
+ReadWritePaths={{APP_DIR}} {{PREVIEW_ROOT}} -{{KOOBOO_ARTIFACT_DIR}}
 
 [Install]
 WantedBy=multi-user.target

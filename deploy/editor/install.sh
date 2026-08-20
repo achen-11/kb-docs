@@ -23,6 +23,12 @@ SERVICE_USER="kb-docs-preview"
 SYSTEMD_UNIT="/etc/systemd/system/kb-docs-editor.service"
 APPLY="false"
 SECURE_COOKIE="false"
+PRODUCTION_PUBLISH_ENABLED="false"
+KOOBOO_TARGET_URL=""
+KOOBOO_ARTIFACT_DIR="/srv/kb-docs-kooboo-artifact"
+KOOBOO_BASELINE_FILE=""
+KOOBOO_INITIAL_BASELINE=""
+KOOBOO_VERIFY_PATHS="/,/cms/index.html,/api/utils/ip.html"
 
 usage() {
   echo "Usage: bash deploy/editor/install.sh [options]"
@@ -47,6 +53,12 @@ usage() {
   echo "  --service-user NAME"
   echo "  --systemd-unit PATH"
   echo "  --secure-cookie"
+  echo "  --enable-production-publish"
+  echo "  --kooboo-target-url URL"
+  echo "  --kooboo-artifact-dir PATH"
+  echo "  --kooboo-baseline-file PATH"
+  echo "  --kooboo-initial-baseline COMMIT"
+  echo "  --kooboo-verify-paths PATHS"
   echo "  --apply"
 }
 
@@ -70,6 +82,12 @@ while [[ $# -gt 0 ]]; do
     --service-user) SERVICE_USER="$2"; shift 2 ;;
     --systemd-unit) SYSTEMD_UNIT="$2"; shift 2 ;;
     --secure-cookie) SECURE_COOKIE="true"; shift ;;
+    --enable-production-publish) PRODUCTION_PUBLISH_ENABLED="true"; shift ;;
+    --kooboo-target-url) KOOBOO_TARGET_URL="$2"; shift 2 ;;
+    --kooboo-artifact-dir) KOOBOO_ARTIFACT_DIR="$2"; shift 2 ;;
+    --kooboo-baseline-file) KOOBOO_BASELINE_FILE="$2"; shift 2 ;;
+    --kooboo-initial-baseline) KOOBOO_INITIAL_BASELINE="$2"; shift 2 ;;
+    --kooboo-verify-paths) KOOBOO_VERIFY_PATHS="$2"; shift 2 ;;
     --apply) APPLY="true"; shift ;;
     --help|-h) usage; exit 0 ;;
     *) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
@@ -96,10 +114,20 @@ RENDER_ARGS=(
   --preview-env-file "${PREVIEW_ENV_FILE}"
   --preview-root "${PREVIEW_ROOT}"
   --lock-timeout "${LOCK_TIMEOUT}"
+  --kooboo-artifact-dir "${KOOBOO_ARTIFACT_DIR}"
+  --kooboo-initial-baseline "${KOOBOO_INITIAL_BASELINE}"
+  --kooboo-target-url "${KOOBOO_TARGET_URL}"
+  --kooboo-verify-paths "${KOOBOO_VERIFY_PATHS}"
   --user "${SERVICE_USER}"
 )
+if [[ -n "${KOOBOO_BASELINE_FILE}" ]]; then
+  RENDER_ARGS+=(--kooboo-baseline-file "${KOOBOO_BASELINE_FILE}")
+fi
 if [[ "${SECURE_COOKIE}" == "true" ]]; then
   RENDER_ARGS+=(--secure-cookie)
+fi
+if [[ "${PRODUCTION_PUBLISH_ENABLED}" == "true" ]]; then
+  RENDER_ARGS+=(--enable-production-publish)
 fi
 node "${PROJECT_DIR}/scripts/render-docs-editor-config.mjs" "${RENDER_ARGS[@]}"
 
@@ -132,6 +160,34 @@ if [[ ! -f "${AUTH_TOKEN_FILE}" ]]; then
   echo "Editor authentication token does not exist: ${AUTH_TOKEN_FILE}" >&2
   echo "Create a root-owned 0640 token file before applying the installation." >&2
   exit 1
+fi
+if [[ "${PRODUCTION_PUBLISH_ENABLED}" == "true" ]]; then
+  for required_command in git kb; do
+    if ! command -v "${required_command}" >/dev/null 2>&1; then
+      echo "Production publishing requires command: ${required_command}" >&2
+      exit 1
+    fi
+  done
+  if [[ -z "${KOOBOO_TARGET_URL}" ]]; then
+    echo "--kooboo-target-url is required with --enable-production-publish" >&2
+    exit 1
+  fi
+  if [[ ! -d "${KOOBOO_ARTIFACT_DIR}" ]]; then
+    echo "Kooboo artifact worktree does not exist: ${KOOBOO_ARTIFACT_DIR}" >&2
+    exit 1
+  fi
+  if ! runuser -u "${SERVICE_USER}" -- test -w "${KOOBOO_ARTIFACT_DIR}"; then
+    echo "Kooboo artifact worktree is not writable by ${SERVICE_USER}: ${KOOBOO_ARTIFACT_DIR}" >&2
+    exit 1
+  fi
+  if ! runuser -u "${SERVICE_USER}" -- test -r "${KOOBOO_ARTIFACT_DIR}/.env"; then
+    echo "Kooboo artifact credentials are not readable by ${SERVICE_USER}: ${KOOBOO_ARTIFACT_DIR}/.env" >&2
+    exit 1
+  fi
+  if [[ ! -f "${KOOBOO_BASELINE_FILE:-${PREVIEW_ROOT}/kooboo-deploy-baseline.json}" && ! "${KOOBOO_INITIAL_BASELINE}" =~ ^[a-f0-9]{40}$ ]]; then
+    echo "Provide --kooboo-initial-baseline when no deployment baseline file exists." >&2
+    exit 1
+  fi
 fi
 if ! runuser -u "${SERVICE_USER}" -- test -r "${AUTH_TOKEN_FILE}"; then
   echo "Editor authentication token is not readable by ${SERVICE_USER}: ${AUTH_TOKEN_FILE}" >&2

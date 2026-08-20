@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process'
 import { execFileSync } from 'node:child_process'
+import { realpathSync } from 'node:fs'
 import { cp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -42,32 +43,41 @@ async function pathExists(targetPath) {
   }
 }
 
-export function assertArtifactGitRoot(artifactDir) {
-  const resolved = path.resolve(artifactDir)
+function canonicalPath(targetPath) {
+  try {
+    return realpathSync(path.resolve(targetPath))
+  } catch (error) {
+    if (error?.code === 'ENOENT') return path.resolve(targetPath)
+    throw error
+  }
+}
+
+export function assertArtifactGitRoot(artifactDir, sourceRoot = projectRoot, generatedSiteDir = koobooSiteDir) {
+  const resolved = canonicalPath(artifactDir)
   const gitRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], {
     cwd: resolved,
     encoding: 'utf-8'
   }).trim()
-  if (path.resolve(gitRoot) !== resolved) {
+  if (canonicalPath(gitRoot) !== resolved) {
     throw new Error(`Artifact directory must be the Git worktree root: ${resolved}`)
   }
-  if (resolved === path.resolve(projectRoot) || resolved === path.resolve(koobooSiteDir)) {
+  if (resolved === canonicalPath(sourceRoot) || resolved === canonicalPath(generatedSiteDir)) {
     throw new Error('Artifact directory must be a separate Git worktree')
   }
-  const artifactCommonDir = path.resolve(
+  const artifactCommonDir = canonicalPath(path.resolve(
     resolved,
     execFileSync('git', ['rev-parse', '--git-common-dir'], {
       cwd: resolved,
       encoding: 'utf-8'
     }).trim()
-  )
-  const sourceCommonDir = path.resolve(
-    projectRoot,
+  ))
+  const sourceCommonDir = canonicalPath(path.resolve(
+    sourceRoot,
     execFileSync('git', ['rev-parse', '--git-common-dir'], {
-      cwd: projectRoot,
+      cwd: sourceRoot,
       encoding: 'utf-8'
     }).trim()
-  )
+  ))
   if (artifactCommonDir !== sourceCommonDir) {
     throw new Error('Artifact directory must be a worktree of the kb-docs Git repository')
   }

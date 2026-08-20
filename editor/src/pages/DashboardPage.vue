@@ -55,13 +55,13 @@ const buildText = computed(() => {
           <li class="done"><span>1</span><div><strong>保存草稿</strong><p>原子写入 Markdown，并立即更新 4173。</p></div></li>
           <li :class="{ current: workspace.hasDraft.value }"><span>2</span><div><strong>构建稳定预览</strong><p>显式运行完整构建，成功后更新 4175。</p></div></li>
           <li :class="{ current: workspace.hasDraft.value }"><span>3</span><div><strong>检查并提交</strong><p>在“改动与发布”中查看 diff、撤销错误改动或推送版本。</p></div></li>
-          <li><span>4</span><div><strong>候选与生产</strong><p>Phase D/E 接入 artifact、Kooboo 候选验收和线上发布。</p></div></li>
+          <li :class="{ done: workspace.publishStatus.value.status === 'succeeded' }"><span>4</span><div><strong>发布到 Kooboo</strong><p>提交完成后，一键构建、部署并验证远程站点。</p></div></li>
         </ol>
       </article>
       <article class="next-panel">
         <p class="section-kicker">下一步建设</p>
-        <h2>图片资源与编辑器插入</h2>
-        <p>Git 闭环完成后，下一阶段将接入图片浏览、上传、粘贴、引用检查和编辑器友好插入。</p>
+        <h2>{{ workspace.editorConfig.value?.productionPublishAvailable ? '准备发布远程站点' : 'Kooboo 发布需要管理员配置' }}</h2>
+        <p>{{ workspace.editorConfig.value?.productionPublishAvailable ? '先提交全部改动，再从“改动与发布”直接发布到 Kooboo。' : '目标站点和部署基线配置完成后，发布按钮会自动启用。' }}</p>
         <RouterLink to="/workflow">进入改动与发布</RouterLink>
       </article>
     </section>

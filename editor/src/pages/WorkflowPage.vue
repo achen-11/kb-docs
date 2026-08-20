@@ -5,6 +5,7 @@ import {
   ApiError,
   getWorkspaceCommits,
   getWorkspaceDiff,
+  requestProductionPublish,
   retryWorkspacePush,
   revertWorkspaceFiles,
   submitWorkspace,
@@ -29,6 +30,29 @@ type DiffLayout = 'line-by-line' | 'side-by-side'
 const diffLayout = ref<DiffLayout>(window.localStorage.getItem('kb-docs-studio-diff-layout') === 'side-by-side' ? 'side-by-side' : 'line-by-line')
 
 const status = computed(() => workspace.workspaceStatus.value)
+const publish = computed(() => workspace.publishStatus.value)
+const publishAvailable = computed(() => Boolean(workspace.editorConfig.value?.productionPublishAvailable))
+const publishRunning = computed(() => ['queued', 'preparing', 'planning', 'deploying', 'verifying'].includes(publish.value.status))
+const canPublish = computed(() => Boolean(
+  publishAvailable.value && status.value && !mutating.value && !publishRunning.value &&
+  !status.value.changedFiles && !status.value.pendingPush && !status.value.stagedFiles && !status.value.outOfScopeFiles
+))
+const publishButtonLabel = computed(() => {
+  const labels: Record<string, string> = {
+    queued: '发布已排队…', preparing: '正在准备资源…', planning: '正在检查计划…',
+    deploying: '正在发布…', verifying: '正在验收…', succeeded: '重新发布', failed: '重试发布',
+  }
+  if (publish.value.status === 'approval_required') return `确认 ${publish.value.summary?.delete || 0} 个删除并发布`
+  return labels[publish.value.status] || '发布到 Kooboo'
+})
+const publishStatusTitle = computed(() => {
+  const labels: Record<string, string> = {
+    idle: '等待发布', queued: '发布任务已排队', preparing: '正在生成 Kooboo 资源', planning: '正在核对发布计划',
+    approval_required: '需要确认删除项', deploying: '正在上传远程站点', verifying: '正在执行线上验收',
+    succeeded: '远程站点已发布', failed: '发布失败',
+  }
+  return labels[publish.value.status] || '发布状态'
+})
 const selectedFile = computed(() => status.value?.files.find((file) => file.path === selectedPath.value) || null)
 const canMutate = computed(() => Boolean(
   status.value && !mutating.value && status.value.stagedFiles === 0 && status.value.outOfScopeFiles === 0
@@ -153,6 +177,26 @@ async function retryPush() {
   }
 }
 
+async function publishToKooboo() {
+  if (!status.value || !canPublish.value) return
+  const applyDeletes = publish.value.status === 'approval_required'
+  const deleteText = applyDeletes
+    ? `\n\n本次会删除 ${publish.value.summary?.delete || 0} 个远程资源。`
+    : ''
+  const target = workspace.editorConfig.value?.productionPublishTarget || 'Kooboo 站点'
+  if (!window.confirm(`将版本 ${status.value.head.slice(0, 8)} 发布到 ${target}。系统会自动构建、上传并验收。${deleteText}\n\n确定继续吗？`)) return
+  mutating.value = true
+  clearMessages()
+  try {
+    workspace.publishStatus.value = await requestProductionPublish(status.value.head, applyDeletes)
+    noticeMessage.value = '发布任务已经开始，可以停留在本页查看进度。'
+  } catch (error) {
+    setError(error)
+  } finally {
+    mutating.value = false
+  }
+}
+
 function dismissGuide() {
   guideOpen.value = false
   window.localStorage.setItem('kb-docs-studio-guide-dismissed', 'true')
@@ -163,7 +207,9 @@ function setDiffLayout(layout: DiffLayout) {
   window.localStorage.setItem('kb-docs-studio-diff-layout', layout)
 }
 
-onMounted(loadWorkspace)
+onMounted(async () => {
+  await Promise.all([loadWorkspace(), workspace.refreshPublishStatus()])
+})
 </script>
 
 <template>
@@ -175,7 +221,7 @@ onMounted(loadWorkspace)
         <ol>
           <li><span>1</span><p><strong>保存草稿</strong>在编辑器按 ⌘/Ctrl + S，4173 会立即更新。</p></li>
           <li><span>2</span><p><strong>核对改动</strong>在本页逐个查看差异，需要时撤销错误修改。</p></li>
-          <li><span>3</span><p><strong>提交版本</strong>填写一句修改说明并提交；生产发布由后续受控流程处理。</p></li>
+          <li><span>3</span><p><strong>提交并发布</strong>先提交版本，再点击“发布到 Kooboo”；系统会自动构建和验收。</p></li>
         </ol>
       </div>
       <button type="button" @click="dismissGuide">我知道了</button>
@@ -250,7 +296,7 @@ onMounted(loadWorkspace)
       <div>
         <p class="section-kicker">提交版本</p>
         <h2>用一句话说明这次改了什么</h2>
-        <p>提交后会生成 Git commit 并推送到当前审核分支。这里不会直接发布到线上。</p>
+        <p>提交后会生成 Git commit 并推送到当前审核分支；工作区干净后即可在下方直接发布。</p>
       </div>
       <form @submit.prevent="submitChanges">
         <label for="commit-message">修改说明</label>
@@ -259,9 +305,25 @@ onMounted(loadWorkspace)
       </form>
     </section>
 
-    <section class="workflow-later">
-      <div><p class="section-kicker">后续流程</p><h2>审核、候选与生产发布</h2><p>普通维护人员完成提交后即可结束。稳定构建、候选部署和生产发布会继续保留独立权限，但通过本任务流按需展开，不再占满左侧菜单。</p></div>
-      <ol><li class="available"><span>4175</span><p><strong>稳定构建</strong>{{ workspace.stableReleaseId.value || '等待构建' }}</p></li><li><span>候选</span><p><strong>Kooboo 验收</strong>Phase D</p></li><li><span>生产</span><p><strong>线上发布</strong>Phase E</p></li></ol>
+    <section class="production-publish" :data-status="publish.status">
+      <div class="production-publish-copy">
+        <p class="section-kicker">远程发布</p>
+        <h2>{{ publishAvailable ? publishStatusTitle : 'Kooboo 发布尚未配置' }}</h2>
+        <p v-if="publishAvailable">{{ publish.message }}</p>
+        <p v-else>管理员完成目标站点、凭据和部署基线配置后，这里会出现可用的发布按钮。</p>
+        <div v-if="publishAvailable" class="publish-meta">
+          <span>目标 {{ workspace.editorConfig.value?.productionPublishTarget }}</span>
+          <span v-if="publish.sourceCommit">版本 {{ publish.sourceCommit.slice(0, 8) }}</span>
+          <span v-if="publish.summary">上传 {{ publish.summary.upsert }} · 删除 {{ publish.summary.delete }}</span>
+        </div>
+      </div>
+      <div class="production-publish-action">
+        <button class="publish-button" type="button" :disabled="!canPublish" @click="publishToKooboo">{{ publishButtonLabel }}</button>
+        <small v-if="status?.changedFiles || status?.pendingPush">请先完成上方“提交并推送”</small>
+        <small v-else-if="publishRunning">发布期间请勿提交新的文档改动</small>
+        <small v-else-if="publish.status === 'succeeded' && publish.finishedAt">完成于 {{ new Date(publish.finishedAt).toLocaleString('zh-CN') }}</small>
+        <small v-else>点击后自动构建、部署并验证线上页面</small>
+      </div>
     </section>
 
     <section class="recent-commits">

@@ -99,6 +99,9 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
   })
   const previewUrl = await listen(previewServer)
   t.after(() => close(previewServer))
+  let workspaceChanged = true
+  let workspaceHead = 'a'.repeat(40)
+  let publishing = false
 
   const editorServer = await createDocsEditorServer({
     authToken: 'editor-test-token-123',
@@ -131,11 +134,11 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
       },
     },
     workspaceCoordinator: {
-      async getStatus() { return { branch: 'main', remote: 'origin', remoteBranch: 'main', head: 'a'.repeat(40), fingerprint: 'b'.repeat(64), changedFiles: 1, stagedFiles: 0, outOfScopeFiles: 0, pendingPush: false, pendingPushCommit: null, ahead: 0, behind: 0, files: [{ path: 'docs/index.md', originalPath: null, status: 'modified', staged: false, additions: 1, deletions: 1, binary: false }] } },
+      async getStatus() { return { branch: 'main', remote: 'origin', remoteBranch: 'main', head: workspaceHead, fingerprint: 'b'.repeat(64), changedFiles: workspaceChanged ? 1 : 0, stagedFiles: 0, outOfScopeFiles: 0, pendingPush: false, pendingPushCommit: null, ahead: 0, behind: 0, files: workspaceChanged ? [{ path: 'docs/index.md', originalPath: null, status: 'modified', staged: false, additions: 1, deletions: 1, binary: false }] : [] } },
       async getDiff(filePath) { return { path: filePath, binary: false, truncated: false, diff: '@@ -1 +1 @@\n-old\n+new\n' } },
       async getRecentCommits() { return [{ hash: 'c'.repeat(40), shortHash: 'ccccccc', author: 'Docs Studio', authoredAt: new Date(0).toISOString(), subject: 'docs: test' }] },
       async revert() { return { changedFiles: 0, files: [], fingerprint: 'd'.repeat(64) } },
-      async commit() { return { branch: 'main', commit: 'e'.repeat(40), pushed: true, remote: 'origin', workspace: { changedFiles: 0, files: [] } } },
+      async commit() { workspaceChanged = false; workspaceHead = 'e'.repeat(40); return { branch: 'main', commit: workspaceHead, pushed: true, remote: 'origin', workspace: { changedFiles: 0, files: [] } } },
       async retryPush() { return { branch: 'main', commit: 'e'.repeat(40), pushed: true, remote: 'origin', workspace: { changedFiles: 0, files: [] } } },
     },
     mediaCoordinator: {
@@ -143,6 +146,18 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
       async content() { return { body: Buffer.from([137, 80, 78, 71]), contentType: 'image/png' } },
       async references() { return { path: 'docs/public/cms/login.png', url: '/cms/login.png', references: [{ path: 'docs/index.md', line: 1 }] } },
       async upload(input) { assert.equal(input.directory, 'cms'); return { path: 'docs/public/cms/new.png', url: '/cms/new.png', name: 'new.png', bytes: 4, modifiedAt: new Date(0).toISOString() } },
+    },
+    publishCoordinator: {
+      available: true,
+      targetUrl: 'https://docs.example.com',
+      isRunning() { return publishing },
+      async getStatus() { return { status: 'idle', targetUrl: 'https://docs.example.com', message: '尚未开始发布。' } },
+      async start(input) {
+        assert.equal(input.expectedCommit, 'e'.repeat(40))
+        assert.equal(input.applyDeletes, false)
+        publishing = true
+        return { status: 'queued', operationId: 'publish-test', sourceCommit: input.expectedCommit, targetUrl: 'https://docs.example.com', message: '发布任务已进入队列。' }
+      },
     },
   })
   const editorUrl = await listen(editorServer)
@@ -204,7 +219,8 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
     maximumMediaBytes: 8388608,
     fastPreviewBaseUrl: 'http://preview.example:4173',
     stablePreviewBaseUrl: 'http://preview.example:4175',
-    productionPublishAvailable: false,
+    productionPublishAvailable: true,
+    productionPublishTarget: 'https://docs.example.com',
   })
 
   const saveResponse = await fetch(`${editorUrl}/api/document`, {
@@ -288,6 +304,22 @@ test('editor server authenticates, reads docs, proxies status, and serves the SP
   })
   assert.equal(commitResponse.status, 201)
   assert.equal((await commitResponse.json()).pushed, true)
+
+  const publishStatusResponse = await fetch(`${editorUrl}/api/publish-status`, { headers: authenticatedHeaders })
+  assert.equal(publishStatusResponse.status, 200)
+  assert.equal((await publishStatusResponse.json()).status, 'idle')
+  const publishResponse = await fetch(`${editorUrl}/api/publish`, {
+    method: 'POST', headers: { ...authenticatedHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ expectedCommit: 'e'.repeat(40), applyDeletes: false }),
+  })
+  assert.equal(publishResponse.status, 202)
+  assert.equal((await publishResponse.json()).status, 'queued')
+  const saveDuringPublishResponse = await fetch(`${editorUrl}/api/document`, {
+    method: 'PUT', headers: { ...authenticatedHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: 'docs/index.md', content: '# Blocked\n', expectedHash: document.hash }),
+  })
+  assert.equal(saveDuringPublishResponse.status, 409)
+  assert.equal((await saveDuringPublishResponse.json()).code, 'PUBLISH_IN_PROGRESS')
 
   const statusResponse = await fetch(`${editorUrl}/api/preview-status`, {
     headers: authenticatedHeaders,

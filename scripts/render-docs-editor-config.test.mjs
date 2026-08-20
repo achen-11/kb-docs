@@ -15,11 +15,15 @@ test('renderDocsEditorConfig creates a complete draft editor service configurati
       bindHost: '0.0.0.0',
       configDir: '/etc/kb-docs-editor',
       editorPort: '4174',
+      koobooArtifactDir: '/srv/kb-docs-kooboo-artifact',
+      koobooInitialBaseline: '0'.repeat(40),
+      koobooTargetUrl: 'https://docs.example.com',
       fastPreviewHealthUrl: 'http://127.0.0.1:4173/',
       fastPreviewPublicUrl: 'http://192.168.10.75:4173',
       outputDir,
       previewEnvFile: '/etc/kb-docs-preview/preview.env',
       previewRoot: '/srv/kb-docs-preview',
+      productionPublishEnabled: true,
       stableBuildDebounceMs: '6000',
       stablePreviewPublicUrl: 'http://192.168.10.75:4175',
       stablePreviewStatusUrl: 'http://127.0.0.1:4175/__preview/status',
@@ -40,11 +44,16 @@ test('renderDocsEditorConfig creates a complete draft editor service configurati
     assert.match(environment, /DOCS_EDITOR_STABLE_BUILD_DEBOUNCE_MS=6000/u)
     assert.match(environment, /DOCS_EDITOR_DRAFT_STATE_FILE=\/srv\/kb-docs-preview\/\.editor-draft\.json/u)
     assert.match(environment, /DOCS_EDITOR_UPDATE_LOCK_FILE=\/srv\/kb-docs-preview\/\.update\.lock/u)
+    assert.match(environment, /DOCS_EDITOR_PRODUCTION_PUBLISH_ENABLED=true/u)
+    assert.match(environment, /DOCS_EDITOR_KOOBOO_TARGET_URL=https:\/\/docs\.example\.com/u)
+    assert.match(environment, /DOCS_EDITOR_KOOBOO_ARTIFACT_DIR=\/srv\/kb-docs-kooboo-artifact/u)
+    assert.match(environment, /DOCS_EDITOR_KOOBOO_INITIAL_BASELINE=0000000000000000000000000000000000000000/u)
+    assert.match(environment, /DOCS_EDITOR_KOOBOO_VERIFY_PATHS=\/,\/cms\/index.html,\/api\/utils\/ip.html/u)
     assert.match(service, /User=kb-docs-preview/u)
     assert.match(service, /docs-editor-server\.mjs/u)
     assert.match(service, /EnvironmentFile=-\/etc\/kb-docs-preview\/preview\.env/u)
     assert.match(service, /ProtectSystem=strict/u)
-    assert.match(service, /ReadWritePaths=\/opt\/kb-docs-git \/srv\/kb-docs-preview/u)
+    assert.match(service, /ReadWritePaths=\/opt\/kb-docs-git \/srv\/kb-docs-preview -\/srv\/kb-docs-kooboo-artifact/u)
     assert.doesNotMatch(`${environment}${service}`, /\{\{/u)
   } finally {
     await rm(outputDir, { recursive: true, force: true })
@@ -72,5 +81,9 @@ test('normalizeDocsEditorConfig rejects unsafe deployment values', () => {
   assert.throws(
     () => normalizeDocsEditorConfig({ ...valid, serviceUser: 'root;touch' }),
     /Linux user/u
+  )
+  assert.throws(
+    () => normalizeDocsEditorConfig({ ...valid, productionPublishEnabled: true }),
+    /target URL/u
   )
 })

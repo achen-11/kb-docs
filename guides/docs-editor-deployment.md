@@ -1,13 +1,15 @@
 # 内网文档编辑平台部署
 
-Phase 3 编辑平台是独立的认证服务：
+文档编辑平台是独立的认证服务：
 
 - VitePress Dev 快速预览运行在 `4173`；
 - 编辑平台默认运行在 `4174`；
 - 不可变生产构建预览运行在 `4175`；
 - 浏览器可以读取和保存现有 `docs/**/*.md`，保存必须携带上次读取的 SHA-256；
-- 保存立即返回，4175 稳定构建在后台 debounce；
-- 不提供 Git 提交、推送或 Kooboo API；
+- 保存立即返回，4175 稳定构建由用户显式触发；
+- “改动与发布”支持 Git 提交、审核分支推送，以及可选的一键发布到 Kooboo；
+- Kooboo 发布只在工作区干净时启用，并自动执行 artifact、dry-run、部署回执和浏览器验收；
+- 公开预览与线上站点只发布英文版；中文 Markdown 仍可在编辑器中打开，但不进入 `4173` / `4175` / Kooboo 产物；
 - 访问口令只保存在服务器的 root-owned 文件中。
 
 ## 创建访问口令
@@ -47,6 +49,36 @@ sudo bash deploy/editor/install.sh \
   --service-group kb-docs-preview \
   --apply
 ```
+
+## 启用“发布到 Kooboo”按钮
+
+发布按钮默认关闭。启用前需要准备一个由 `kb-docs` 仓库创建的独立 artifact worktree，并在该目录的 `.env` 中配置 Kooboo 站点凭据。`.env` 必须对 `kb-docs-preview` 服务账户可读，但不能提交到 Git。
+
+首次启用时还要提供最后一次已经确认成功的 artifact commit。之后每次发布成功，编辑器会自动把新基线写入 `/srv/kb-docs-preview/kooboo-deploy-baseline.json`。
+
+```bash
+sudo bash deploy/editor/install.sh \
+  --app-dir /opt/kb-docs-git \
+  --bind-host 0.0.0.0 \
+  --port 4174 \
+  --fast-preview-url http://192.168.10.75:4173 \
+  --stable-preview-url http://192.168.10.75:4175 \
+  --enable-production-publish \
+  --kooboo-target-url https://doc-kooboo-us.kooboo.io \
+  --kooboo-artifact-dir /srv/kb-docs-kooboo-artifact \
+  --kooboo-initial-baseline <last-successful-artifact-commit> \
+  --kooboo-verify-paths /,/cms/index.html,/api/utils/ip.html \
+  --apply
+```
+
+4174 中的操作流程保持简单：
+
+1. 保存文档；
+2. 在“改动与发布”填写说明，点击“提交并推送”；
+3. 工作区干净后点击“发布到 Kooboo”；
+4. 若计划没有删除，系统自动完成发布和线上验收；若包含删除，系统暂停并要求再次确认。
+
+远程凭据、artifact 路径、部署 commit 范围和命令日志不会暴露给普通浏览器用户。
 
 ## 让内网预览显示编辑链接
 
