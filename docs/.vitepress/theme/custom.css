@@ -1,3 +1,21 @@
+:root {
+  --vp-font-family-base: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --vp-font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Keep generated controls and code metadata above WCAG AA contrast in light mode. */
+.vp-diagram-preview .vp-dp-tab:not(.active),
+.vp-doc div[class*="language-"] > span.lang {
+  color: var(--vp-c-text-2);
+}
+
+html:not(.dark) .vp-doc .shiki span[style*="--shiki-light:#22863A"] {
+  --shiki-light: #187332 !important;
+}
+
+html:not(.dark) .vp-doc .shiki span[style*="--shiki-light:#D73A49"] {
+  --shiki-light: #c42f3f !important;
+}
 
 .higher {
   border-color: #42b883;
@@ -175,7 +193,7 @@ body.doc-image-preview-open {
 .kb-doc-home {
   --doc-title: #1d2b42;
   --doc-body: #516176;
-  --doc-muted: #748196;
+  --doc-muted: #65758b;
   --doc-line: #e6eef5;
   --doc-blue: #1f6cf0;
   --doc-cyan: #2cb8e6;

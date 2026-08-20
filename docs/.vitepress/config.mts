@@ -1050,6 +1050,9 @@ export default defineConfig({
   ignoreDeadLinks: true,
   lastUpdated: true,
   lang: 'en-US',
+  head: [
+    ['link', { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+  ],
   // English sources live in docs/en/** and are rewritten to `/`. Future Chinese will be `/zh/`.
   srcExclude,
   vite: {
@@ -1070,7 +1073,15 @@ export default defineConfig({
     },
   },
   transformHtml(code) {
-    return rewriteLegacyEnglishHrefs(code)
+    const rewritten = rewriteLegacyEnglishHrefs(code)
+    return rewritten.replace(
+      /<svg([^>]*\srole="img"[^>]*)>/g,
+      (svg, attributes) => (
+        /\baria-(?:label|labelledby)=/.test(attributes)
+          ? svg
+          : `<svg${attributes} aria-label="Diagram">`
+      )
+    )
   },
   async buildEnd(siteConfig) {
     const legacyEnglishDir = path.join(siteConfig.outDir, 'en')
