@@ -1,8 +1,8 @@
 # 资源对账与远端清理
 
-`kb check` 比较本地项目和远端站点。`kb prune` 根据对账结果查找只存在于远端的资源，并在明确确认后删除。
+`kb check` 比较本地项目和远端站点。`kb prune` 根据对账结果审计只存在于远端的漂移资源，并在通过安全检查和明确确认后删除。
 
-建议始终先运行 `check`，确认目标站点和差异清单，再考虑 `prune`。
+`prune` 是高风险维护工具，不是正式发布步骤。Git 中明确删除的资源应通过 [`kb deploy`](./deploy.md) 发布；只有清理旧部署残留、后台手工遗留或其他远端漂移时才使用 `prune`。
 
 ## 运行资源对账
 
@@ -53,33 +53,34 @@ kb check --level 3 --output .kooboo/check-report.json
 | `--format silent` | 不在终端打印对账表 |
 | `--output <path>` | 将完整报告写入文件 |
 
-`.pushignore` 匹配的本地文件会在报告中标记为已忽略。
+`.pushignore` 匹配的本地或远端资源会在报告中标记为已忽略，不会进入清理计划。
 
 ## 预览远端清理
 
 ```bash
 kb prune
+kb prune --output .kooboo/prune-plan.json
 ```
 
 不加 `--yes` 时，`kb prune` 只生成清理计划，不删除远端资源。限定范围：
 
 ```bash
 kb prune js
-kb prune module/shop
+kb prune module/shop --allow-modules
 ```
 
-使用已保存的对账报告：
+使用已保存的限定范围对账报告：
 
 ```bash
-kb check --level 3 --output .kooboo/check-report.json
+kb check js --level 3 --output .kooboo/check-report.json
 kb prune --report .kooboo/check-report.json
 ```
 
-使用报告时，确认报告中的站点与当前连接的站点一致。
+使用报告预览时，仍应确认报告中的站点、项目目录和目标范围。真正执行删除前，CLI 会重新进行实时 level 1 对账；报告与当前目标不一致时拒绝执行。
 
 ## 执行删除
 
-确认预览清单无误后：
+全站 `kb prune` 只允许预览。执行删除必须指定 target，或使用由带 target 的 `kb check` 生成的报告。确认预览清单无误后：
 
 ```bash
 kb prune --report .kooboo/check-report.json --yes
@@ -97,7 +98,35 @@ kb prune js --yes
 kb prune --report .kooboo/check-report.json --yes --force
 ```
 
-`--force` 会扩大可删除范围。执行前保存站点版本或导出备份，并逐项检查清理计划。
+`--force` 只解除首页等受保护页面的限制，不会解除模块保护或删除数量上限。
+
+单次默认最多删除 20 项。计划超过该数量时，必须审查完整计划并显式提高上限：
+
+```bash
+kb prune js \
+  --output .kooboo/prune-result.json \
+  --max-delete 50 \
+  --yes
+```
+
+模块文件默认受保护，并且不能通过全站或整个 `module` 范围批量解锁。必须限定到具体模块：
+
+```bash
+kb prune module/shop --allow-modules
+kb prune module/shop --allow-modules --yes
+```
+
+如果该范围没有任何本地模块资源，CLI 会拒绝删除整个仅远程模块。模块在 Git 中被明确删除时应使用 `kb deploy --apply-deletes`；需要删除整个远端模块时应在后台单独审查。
+
+以下情况会失败关闭，不执行任何删除：
+
+- 本地资源无法识别或扫描失败；
+- 执行删除时没有限定 target；
+- 远端模块清单不完整；
+- check 报告来自其他项目或已与实时对账不一致；
+- 模块没有本地基线；
+- 删除项超过 `--max-delete`；
+- 报告与当前站点不一致。
 
 ## 临时指定连接信息
 
@@ -116,15 +145,18 @@ kb check \
 
 ```bash
 git status --short
-kb check --level 3 --output .kooboo/check-report.json
+kb check js --level 3 --output .kooboo/check-report.json
 kb prune --report .kooboo/check-report.json
 # 人工检查清理计划
-kb prune --report .kooboo/check-report.json --yes
-kb check --level 3
+kb prune --report .kooboo/check-report.json \
+  --output .kooboo/prune-result.json \
+  --yes
+kb check js --level 3
 ```
 
 ## 相关文档
 
 - [推送本地资源](./push.md)
+- [部署 Git 产物](./deploy.md)
 - [导出站点](./export.md)
 - [常见问题](../troubleshooting.md)

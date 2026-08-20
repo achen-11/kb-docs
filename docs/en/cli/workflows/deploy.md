@@ -4,6 +4,8 @@
 
 Unlike `kb push --git --commit`, `kb deploy` is designed for formal releases. It processes an explicit commit range, requires separate approval for deletions, and returns a nonzero exit code when any write or verification fails.
 
+Formal release deletions should also go through `deploy`. It deletes only resources explicitly removed in the Git range and does not clean unrelated remote extras. [`kb prune`](./check-and-prune.md) is reserved for remote drift audits outside the release workflow and does not replace deterministic Git deployment.
+
 ## Prerequisites
 
 The current directory must be a Git project containing the final Kooboo resources, and the candidate artifact must already be committed. Deployment does not read uncommitted worktree content.

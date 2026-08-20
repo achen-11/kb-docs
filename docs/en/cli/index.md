@@ -20,7 +20,7 @@ kb --help
 | Deploy Git artifacts | `kb deploy` | Plan, execute, and verify a formal release by commit range |
 | Continuous synchronization | `kb sync` | Watch local file changes and write them to the remote site |
 | Compare resources | `kb check` | Compare local and remote resources |
-| Clean remote resources | `kb prune` | Preview or delete resources that exist only remotely |
+| Clean remote drift | `kb prune` | Audit and explicitly clean remote-only resources outside deployment |
 | Export a site | `kb export` | Select resources and download a site archive |
 
 ## Recommended learning path
