@@ -4,7 +4,7 @@
 
 Kooboo 模板绑定在**服务器端**求值，需配合 **`env="server"`**（见下文）。用于 [Page](../page/)、[View](../view/) 等 HTML 资源，与浏览器中的 Vue/React 无关。
 
-## env="server"
+## env="server" {#env-server}
 
 将元素及其子树切换到服务端渲染模式（适用于普通标签或 `<script>`）。
 
@@ -34,6 +34,17 @@ Kooboo 模板绑定在**服务器端**求值，需配合 **`env="server"`**（�
 <div env="server" k-content="msg"></div>
 ```
 
+## k-define
+
+在模板中声明一个值，供当前元素及后续绑定使用。语法为 `变量名 值`；字符串使用引号，JSON 对象使用反引号包裹。
+
+```html
+<div k-define='profile `{"name":"Kooboo","role":"admin"}`'>
+    <strong k-content="profile.name"></strong>
+    <span k-content="profile.role"></span>
+</div>
+```
+
 ## k-if
 
 按条件输出元素。
@@ -45,6 +56,30 @@ Kooboo 模板绑定在**服务器端**求值，需配合 **`env="server"`**（�
     </script>
     <div k-if="isShow">hello</div>
 </div>
+```
+
+## k-else-if
+
+在前面的同级 `k-if` 条件不成立时继续判断。条件分支应放在同一 DOM 层级，并按顺序组成一条分支链。
+
+```html
+<script env="server">
+    var isAdmin = false;
+    var isMember = true;
+</script>
+
+<p k-if="isAdmin">Administrator</p>
+<p k-else-if="isMember">Member</p>
+<p k-else>Guest</p>
+```
+
+## k-else
+
+当前面同级的 `k-if` 和 `k-else-if` 均不成立时渲染，不需要填写属性值。
+
+```html
+<p k-if="isLoggedIn">Welcome back</p>
+<p k-else>Please sign in</p>
 ```
 
 ## k-for

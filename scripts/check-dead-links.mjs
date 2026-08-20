@@ -46,15 +46,16 @@ function resolveInternal(href, fromFile) {
   if (!href || href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('#')) {
     return null
   }
-  if (href.startsWith('/')) {
-    if (href === '/') return 'index.md'
-    let rel = href.slice(1)
+  const [pathname] = href.split('#')
+  if (pathname.startsWith('/')) {
+    if (pathname === '/') return 'index.md'
+    let rel = pathname.slice(1)
     if (rel.endsWith('/')) rel = `${rel}index.md`
     else if (!rel.endsWith('.md') && !rel.includes('.')) rel = `${rel}.md`
     return rel
   }
   const fromDir = path.dirname(path.relative(docsDir, fromFile))
-  let resolved = path.normalize(path.join(fromDir, href))
+  let resolved = path.normalize(path.join(fromDir, pathname))
   if (resolved.endsWith('/')) resolved = `${resolved}index.md`
   else if (!path.extname(resolved)) resolved = `${resolved}.md`
   return resolved

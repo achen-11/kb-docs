@@ -668,7 +668,23 @@ const templateEngineSidebar = [
         text: '语法与数据',
         collapsed: false,
         items: [
-          { text: '模板绑定语法', link: '/templateEngine/binding/' },
+          {
+            text: '模板绑定语法',
+            link: '/templateEngine/binding/',
+            collapsed: false,
+            items: [
+              { text: 'env="server"', link: '/templateEngine/binding/#env-server' },
+              { text: 'k-define', link: '/templateEngine/binding/#k-define' },
+              { text: 'k-if', link: '/templateEngine/binding/#k-if' },
+              { text: 'k-else-if', link: '/templateEngine/binding/#k-else-if' },
+              { text: 'k-else', link: '/templateEngine/binding/#k-else' },
+              { text: 'k-for', link: '/templateEngine/binding/#k-for' },
+              { text: 'k-content', link: '/templateEngine/binding/#k-content' },
+              { text: 'k-attribute', link: '/templateEngine/binding/#k-attribute' },
+              { text: 'k-label', link: '/templateEngine/binding/#k-label' },
+              { text: 'type="module"', link: '/templateEngine/binding/#type-module' },
+            ]
+          },
           {
             text: 'k-data',
             collapsed: false,

@@ -4,7 +4,7 @@
 
 Kooboo template bindings are evaluated on the **server** and must be used with **`env="server"`**. They are meant for HTML resources such as [Page](../page/) and [View](../view/), not for Vue or React running in the browser.
 
-## `env="server"`
+## `env="server"` {#env-server}
 
 Switches an element and its subtree into server-rendering mode. You can use it on normal elements or on `<script>`.
 
@@ -34,6 +34,17 @@ Page-level variables can also live directly on a script tag:
 <div env="server" k-content="msg"></div>
 ```
 
+## `k-define`
+
+Declares a value in the template for the current element and subsequent bindings. The syntax is `name value`. Quote strings and wrap JSON objects in backticks.
+
+```html
+<div k-define='profile `{"name":"Kooboo","role":"admin"}`'>
+    <strong k-content="profile.name"></strong>
+    <span k-content="profile.role"></span>
+</div>
+```
+
 ## `k-if`
 
 Renders an element only when the condition is true.
@@ -45,6 +56,30 @@ Renders an element only when the condition is true.
     </script>
     <div k-if="isShow">hello</div>
 </div>
+```
+
+## `k-else-if`
+
+Tests another condition when the preceding sibling `k-if` branch does not render. Keep all branches at the same DOM level and in branch order.
+
+```html
+<script env="server">
+    var isAdmin = false;
+    var isMember = true;
+</script>
+
+<p k-if="isAdmin">Administrator</p>
+<p k-else-if="isMember">Member</p>
+<p k-else>Guest</p>
+```
+
+## `k-else`
+
+Renders when the preceding sibling `k-if` and `k-else-if` branches do not render. It does not need an attribute value.
+
+```html
+<p k-if="isLoggedIn">Welcome back</p>
+<p k-else>Please sign in</p>
 ```
 
 ## `k-for`
