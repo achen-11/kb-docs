@@ -5,6 +5,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import {
+  PUBLISH_CLI,
+  PUBLISH_PRODUCT_FEATURES,
+  PUBLISH_ZH,
+} from './docs-publish-locale.mjs'
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const docsDir = path.join(root, 'docs')
@@ -26,6 +31,16 @@ function loadRewrites() {
 }
 
 const rewrites = loadRewrites()
+
+function isDisabledConfigRoute(href) {
+  const pathname = String(href || '').split(/[?#]/u)[0]
+  if (!PUBLISH_ZH && (pathname === '/zh' || pathname.startsWith('/zh/'))) return true
+  if (!PUBLISH_CLI && (pathname === '/cli' || pathname.startsWith('/cli/'))) return true
+  if (!PUBLISH_PRODUCT_FEATURES && (pathname === '/product' || pathname.startsWith('/product/'))) {
+    return true
+  }
+  return false
+}
 
 function existsDoc(relativePath) {
   const normalized = relativePath.replace(/^\//, '').replace(/\/$/, '')
@@ -115,6 +130,7 @@ const configText = fs.readFileSync(configPath, 'utf8')
 let sm
 SIDEBAR_LINK_RE.lastIndex = 0
 while ((sm = SIDEBAR_LINK_RE.exec(configText)) !== null) {
+  if (isDisabledConfigRoute(sm[1])) continue
   const issue = checkHref(sm[1], configPath, 'sidebar')
   if (issue) {
     issue.from = '.vitepress/config.mts (sidebar)'

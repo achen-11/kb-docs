@@ -3,6 +3,23 @@
 > 适用范围：将本仓库 VitePress 产物发布为 Kooboo Page、Script、Style 和 Content File。
 > 核心原则：构建成功、`kb push` 成功、CLI 对账同步，都不等于线上站点可运行；发布必须通过真实 HTTP 与浏览器水合验收。
 
+## 0. 发布语言与目标站
+
+当前公开站点**只发布英文版**（`docs/en/**`）。中文 Markdown 保留在仓库，便于对照和后续恢复，但不进入 VitePress dist、kbdev 预览或 Kooboo 产物。
+
+| 目标 | 地址 | 语言 |
+|------|------|------|
+| kbdev 快速预览 | `4173` | 英文 |
+| kbdev 稳定预览 | `4175` | 英文 |
+| 线上 | https://doc-kooboo-us.kooboo.io | 英文 |
+| redev | https://docs.redev.cn | 英文 |
+
+英文页面发布在站点根路径：`docs/en/cms/index.md` 对应 `/cms/`，不携带 `/en/`。旧的 `/en/...` 文档 URL 会跳转到去掉前缀的路径。截图资源仍在 `/en/cms/` 与 `/en/product/`。日后中文将放在 `/zh/`，现在不发布。
+
+开关位于 `scripts/docs-publish-locale.mjs` 的 `PUBLISH_ZH`。恢复中文发布时改为 `true`。
+
+下一次对已有双语站点的 Git 发布会把中文 Page 记为删除项，需要 `--apply-deletes` 或编辑器二次确认后才会从远端移除。
+
 ## 1. 构建产物契约
 
 ### 1.1 全局入口使用项目专属稳定 URL
@@ -115,14 +132,14 @@ SafeMemoryMappedViewHandle
 部署后运行：
 
 ```bash
-KOOBOO_VERIFY_URL=https://docs.localkooboo.com pnpm docs:verify:kooboo
+KOOBOO_VERIFY_URL=https://doc-kooboo-us.kooboo.io pnpm docs:verify:kooboo
 ```
 
-默认检查首页与 `/api/utils/ip.html`。需要增加路径时：
+默认检查首页跳转后的英文首页与英文 API 页。需要增加路径时：
 
 ```bash
-KOOBOO_VERIFY_URL=https://docs.localkooboo.com \
-KOOBOO_VERIFY_PATHS=/,/api/utils/ip.html,/en/index.html \
+KOOBOO_VERIFY_URL=https://doc-kooboo-us.kooboo.io \
+KOOBOO_VERIFY_PATHS=/,/cms/index.html,/api/utils/ip.html \
 pnpm docs:verify:kooboo
 ```
 

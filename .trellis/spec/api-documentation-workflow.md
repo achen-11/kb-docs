@@ -1,6 +1,7 @@
 # API 文档重构流程
 
 > 完整流程：从源码到可发布文档
+> 公开站点只发布英文 `docs/en/api/**`；中文 `docs/api/**` 保留对照，不进入 kbdev / 线上产物。
 
 ## TaskBanner（KB-Docs 项目）
 
