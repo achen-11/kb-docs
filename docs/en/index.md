@@ -27,8 +27,8 @@ title: Kooboo Documentation Center
 <a href="/api/mail/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/mail.svg" alt=""></span><strong>Mail APIs</strong><em>Send and receive mail, IMAP / SMTP, parsing, and anti-spam checks</em></a>
 <a href="/cms/development/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/developer-mode.svg" alt=""></span><strong>Developer Mode</strong><em>Edit pages, layouts, views, scripts, styles, and code together</em></a>
 <a href="/cms/settings/ai-service"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/ai-claw.svg" alt=""></span><strong>AI Service</strong><em>Configure AI service settings used by site features</em></a>
-<a href="/cms/commerce/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/marketplace.svg" alt=""></span><strong>Commerce</strong><em>Products, carts, orders, discounts, shipping, and payments</em></a>
-<a href="/cms/settings/domains"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/console.svg" alt=""></span><strong>Domains and Settings</strong><em>Domains, roles, hooks, and operational settings</em></a>
+<a href="/cms/commerce/"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/commerce.svg" alt=""></span><strong>Commerce</strong><em>Products, carts, orders, discounts, shipping, and payments</em></a>
+<a href="/cms/settings/domains"><span class="kb-doc-ecosystem__icon" aria-hidden="true"><img class="no-zoom" src="/home/icons/domains-settings.svg" alt=""></span><strong>Domains and Settings</strong><em>Domains, roles, hooks, and operational settings</em></a>
 </div>
 </section>
 
