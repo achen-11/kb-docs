@@ -3,17 +3,20 @@
 > 完整流程：从源码到可发布文档
 > 公开站点只发布英文 `docs/en/api/**`；中文 `docs/api/**` 保留对照，不进入 kbdev / 线上产物。
 
+KScript 范围判定先执行 [KScript 智能提示与文档对齐 SOP](./kscript-intellisense-doc-alignment-sop.md)。当前分区、暂停项和实施顺序见 [KScript 文档补全分区计划（2026-08）](./kscript-doc-completion-plan-2026-08.md)。
+
 ## TaskBanner（KB-Docs 项目）
 
 文档站任务使用 TaskBanner 项目 **KB-Docs**（`project_id`: `736837a913b24f248d39ff056c198b04`）。  
 Kooboo 平台源码相关任务放在 **Kooboo** 项目，避免与 `kb-docs` 仓库工作混淆。  
-Backlog 清单：`.trellis/spec/kscript-api-backlog.md`。
+Backlog 清单：[kscript-api-backlog.md](./kscript-api-backlog.md)。
 
-## 范围与约定（2026-05 确认）
+## 范围与约定（2026-08 更新）
 
 ### 文档范围
 
 - **本期只做服务端 KScript API**（`k.*` 运行时 API），路径 `docs/api/**`
+- **只文档化当前智能提示中仍被推荐的 API**；运行时兼容但无提示的入口不写
 - **模板引擎**（`docs/templateEngine/**`）与最佳实践指南后续单独里程碑
 
 ### 模块粒度与提交
@@ -24,8 +27,9 @@ Backlog 清单：`.trellis/spec/kscript-api-backlog.md`。
 
 ### 验证（强制）
 
-- **每个模块都必须** 完成 ai-check 测试 + `curl` 交叉验证（见 Step 4–6）
+- **每个公开代码示例都必须** 完成 ai-check 测试 + `curl` 或真实站点交叉验证（见 Step 4–6）
 - 不允许仅凭方法返回值判断成功
+- 只有源码或类型定义、但没有实际运行证据的示例不得合入公开文档
 
 ### CLI 语法 vs 站点文档（重要）
 
@@ -53,11 +57,12 @@ Backlog 清单：`.trellis/spec/kscript-api-backlog.md`。
 
 **写法**：用「`k.site.views` 管理站点中的视图资源」替代「对应 `ViewRepository.cs`」。能力差异用 API 列表说明（例如「没有 `getByUrl`」），不要引用源码类名或文件路径。
 
-### 废弃与兼容 API（不写进用户文档）
+### 废弃、兼容与暂停 API（不写进用户文档）
 
 - 源码带 **`[Obsolete]`**，或 d.ts 注释 **Obsolete please use …** 的成员：正文与示例均不文档化（如 `k.account.user.login` → 应写 `k.account.login`）。
 - 仅运行时兼容、**智能提示中已移除** 的顶层入口（如历史上的 `k.sms`、`k.task`）：不写。
-- 完成一批文档后，维护者可对照 **方法清单** 在 IDE 中逐项确认是否仍有智能提示；无提示的从文档移除。
+- 产品明确暂停推荐的智能提示区域也不写；当前暂停项以分区计划为准。
+- 每批开始前从真实站点 `KScript/GetDefine` 取得当前提示面；无提示的从推荐文档移除。
 
 ### 文档正文表述规范（全模块适用）
 
@@ -85,12 +90,21 @@ VitePress 标题自带上边框，**勿在 `##` / `###` 前后加 `---`**，以�
 
 | 优先级 | 来源 | 路径 / 说明 |
 |--------|------|-------------|
-| **1（真相）** | **Kooboo 服务端源码** | 本机如 `../Kooboo/`（`Kooboo.Sites/Scripting/`、`Payment/` 等）。以 C# 实现为准：`k.cs`、`*Repository.cs`、`[CodeDescription]` |
-| 2 | TypeScript 定义 | `old-source/kooboo.d.ts`（可能滞后或与运行时命名不一致） |
-| 3 | 旧版迁移文档 | `old-source/api/`（表述与示例，需与源码交叉验证） |
-| 4 | kooboo-coding skill | `Kooboo.Sites/AI/Skills/packages/kooboo-coding/references/K-Script/`（已验证的业务写法） |
+| **1（范围真相）** | **最终智能提示定义** | `k.cs` → `TypeDefineConverter` → `KScriptService.GetDefine(WebSite)` → 真实站点 `KScript/GetDefine`；决定哪些 API 可进入候选范围 |
+| **2（行为真相）** | **Kooboo 服务端源码** | 本机如 `../Kooboo/`（`Kooboo.Sites/Scripting/`、`Payment/` 等）；核对实现、参数、返回值、`KIgnore`、`KeepCase`、`Obsolete` |
+| 3 | 实际运行证据 | ai-check + `curl` / 真实站点执行；决定示例与行为描述能否公开 |
+| 4 | TypeScript 定义 | `old-source/kooboo.d.ts`（可能滞后，只用于发现类型和漂移） |
+| 5 | 旧版迁移文档 | `old-source/api/`（表述与示例线索，需重新验证） |
+| 6 | kooboo-coding skill | `Kooboo.Sites/AI/Skills/packages/kooboo-coding/references/K-Script/`（业务写法线索，仍需当前版本验证） |
 
-**编写顺序建议**：先打开对应 `*Repository.cs` / `k.cs` 列出公开 API → 再对照 d.ts 补类型 → 最后参考旧文档与 skill 的示例措辞。
+**编写顺序建议**：先从真实站点最终提示锁定候选 API → 用 `k.cs`、生成器和对应实现核对签名与行为 → 运行 ai-check / live 验证 → 最后参考 d.ts、旧文档与 skill 的措辞。
+
+### 中英双语 1:1（强制）
+
+- `docs/api/**` 与 `docs/en/api/**` 必须同步创建、修改和删除。
+- 文件路径、标题层级、API 列表、表格、代码示例和链接保持 1:1。
+- API 名、参数、返回字段、代码和 URL 不翻译。
+- 当前只发布英文不等于可以停止维护中文；任何单边完成都不满足 DoD。
 
 ### 源码与本地资源
 
@@ -107,10 +121,10 @@ VitePress 标题自带上边框，**勿在 `##` / `###` 前后加 `---`**，以�
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Step 1: 阅读源码（按优先级）                                      │
-│  · Kooboo C# 源码（Kooboo.Sites/Scripting/…）← 首选              │
-│  · kooboo.d.ts                                                   │
-│  · 旧文档 (old-source/api/)                                      │
+│  Step 1: 锁定当前智能提示面并阅读源码                               │
+│  · 真实站点 KScript/GetDefine                                    │
+│  · k.cs / TypeDefineConverter / 具体实现                          │
+│  · kooboo.d.ts / 旧文档仅作漂移和措辞参考                           │
 └─────────────────────────────┬───────────────────────────────────┘
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
@@ -122,8 +136,8 @@ VitePress 标题自带上边框，**勿在 `##` / `###` 前后加 `---`**，以�
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │  Step 3: 重构/创建文档                                             │
-│  · 基于 kooboo.d.ts 完整定义                                       │
-│  · 包含所有方法（含重载）                                           │
+│  · 基于当前最终智能提示范围                                          │
+│  · 包含本模块所有推荐方法（含重载）                                   │
 │  · 包含结构体定义                                                  │
 └─────────────────────────────┬───────────────────────────────────┘
                               ▼
@@ -150,7 +164,9 @@ VitePress 标题自带上边框，**勿在 `##` / `###` 前后加 `---`**，以�
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## Step 1: 阅读源码
+## Step 1: 锁定智能提示面并阅读源码
+
+先按 [KScript 智能提示与文档对齐 SOP](./kscript-intellisense-doc-alignment-sop.md) 采集当前站点 `KScript/GetDefine`，确认本模块确实存在于最终提示、大小写正确、未被产品暂停，再进入源码和旧文档核对。
 
 ### 旧文档
 
@@ -214,7 +230,7 @@ ls docs/api/{category}/
 
 ### 必须包含的内容
 
-1. **所有方法** - 包括重载版本
+1. **所有当前推荐方法** - 包括重载版本；无提示、兼容或暂停项不写
 2. **参数说明** - 含类型、是否必填、说明
 3. **返回类型** - 引用结构体
 4. **代码示例** - 经验证的
@@ -454,9 +470,12 @@ k.api.post(() => {
 
 ## 模块完成定义（DoD）
 
-- [ ] `kooboo.d.ts` 中该模块公开 API 均已文档化（含重载、子模块）
-- [ ] `docs/api` 示例与 ai-check + curl 结果一致，且 **无 CLI 专用语法**
-- [ ] `docs/.vitepress/config.mts` 与 `docs/api/index.md` 无死链
+- [ ] 当前真实站点智能提示中该模块所有应推荐 API 均已文档化（含重载、子模块）
+- [ ] 文档未推荐无提示、兼容、废弃或产品暂停的 API
+- [ ] 每个公开示例都与 ai-check + curl / live 结果一致，且 **无 CLI 专用语法**
+- [ ] 写操作均有独立读取的 before / after 验证
+- [ ] `docs/api/**` 与 `docs/en/api/**` 文件、结构、示例和链接 1:1
+- [ ] `docs/.vitepress/config.mts`、中文索引与英文索引无死链
 - [ ] `npm run docs:build` 通过
 
 ## 相关资源

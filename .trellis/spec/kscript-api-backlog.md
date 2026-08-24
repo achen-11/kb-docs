@@ -1,7 +1,12 @@
 # KScript API 文档 Backlog
 
+> **当前决策（2026-08-24）**：本文件早期统计和 Sprint 表是 2026-05 历史快照，不能直接作为当前智能提示真相。每批先按 [KScript 智能提示与文档对齐 SOP](./kscript-intellisense-doc-alignment-sop.md) 重建提示面；当前分区、顺序和暂停项以 [KScript 文档补全分区计划（2026-08）](./kscript-doc-completion-plan-2026-08.md) 为准。
+>
+> **产品暂停**：`k.ai`、`k.integration`、`k.integrateCommerce`、`k.market` 暂不加入公开文档。`k.ai.app` 为过时能力，恢复 `k.ai` 文档前先完成产品侧清理和重新审计。
+>
 > 生成日期：2026-05-27  
-> **权威来源（优先级）**：**Kooboo 服务端 C# 源码**（如 `Kooboo.Sites/Scripting/k.cs`、`*Repository.cs`）→ `old-source/kooboo.d.ts` → `old-source/api/` → kooboo-coding skill。详见 `.trellis/spec/api-documentation-workflow.md`「数据源优先级」。  
+> **权威来源（优先级）**：真实站点最终智能提示 → Kooboo 服务端源码 → 当前运行证据 → `old-source/kooboo.d.ts` / 旧文档 / skill。详见 `.trellis/spec/api-documentation-workflow.md`「数据源优先级」。
+>
 > **范围**：仅服务端 `k.*` API（不含模板引擎）
 
 ## TaskBanner 项目划分
@@ -118,13 +123,14 @@ k.xxx.yyy
 | `k.storage` | `KStorage` | ✅ | data/storage.md | | |
 | `k.cache` | `KCache` | ✅ | core/cache.md | | |
 | `k.template` | `KTemplate` | 🔴 | k-template.md | | 模板市场，非页面模板 |
-| `k.market` | `KMarket` | 🔴 | k-market.md | | |
+| `k.market` | `KMarket` | ⏸️ 产品暂停 | k-market.md | | 当前不公开文档化 |
 | `k.state` | `kState` | ✅ | core/state.md | | |
-| `k.integration` | `KIntegration` | 🔴 | — | | |
+| `k.integration` | `KIntegration` | ⏸️ 产品暂停 | — | | 当前不公开文档化 |
+| `k.integrateCommerce` | `KIntegrateCommerce` | ⏸️ 产品暂停 | — | | 当前不公开文档化 |
 | `k.privacy` | `KPrivacy` | 🔴 | — | | cookieConsent |
 | `k.analytics` | `kAnalytics` | 🔴 | — | | |
 | `k.google` | `KGoogle` | ✅ | — | | `google/index.md`；PageSpeed/Lighthouse + Firebase 入口 |
-| `k.ai` | `KAI` | 🔴 | — | | |
+| `k.ai` | `KAI` | ⏸️ 产品暂停 | — | | `k.ai.app` 过时；整个区域先不处理 |
 | `k.media` | `KMedia` | ✅ | site/media.md | | |
 | `k.utils` | `KUtils` | ✅ | utils/* | | 按子模块单文件 |
 | `k.inlineEditor` | `KInline` | 🔴 | k-inlineEditor.md | | |
@@ -243,13 +249,14 @@ k.xxx.yyy
 | `k.storage` | `data/storage.md` | k-storage.md | ✅ |
 | `k.cache` | `core/cache.md` | k-cache.md | ✅ |
 | `k.template` (商店) | `store/template.md` | k-template.md | P3 |
-| `k.market` | `store/market.md` | k-market.md | P3 |
+| `k.market` | `store/market.md` | k-market.md | ⏸️ 产品暂停 |
 | `k.state` | `core/state.md` | k-state.md | ✅ |
-| `k.integration` | `integration/index.md` | — | P3 |
+| `k.integration` | `integration/index.md` | — | ⏸️ 产品暂停 |
+| `k.integrateCommerce` | — | — | ⏸️ 产品暂停 |
 | `k.privacy` | `privacy/index.md` | — | P3 |
 | `k.analytics` | `analytics/index.md` | — | P3 |
 | `k.google` | `google/index.md` | — | ✅ |
-| `k.ai` | `ai/index.md` | — | P3 |
+| `k.ai` | `ai/index.md` | — | ⏸️ 产品暂停 |
 | `k.media` | `site/media.md` | — | ✅ |
 | `k.inlineEditor` | `editor/inline.md` | k-inlineEditor.md | P3 |
 | `k.starter` | — | — | 不文档化（已移出公开入口） |
@@ -286,7 +293,7 @@ k.xxx.yyy
 
 ### P3 — 长尾
 
-10. analytics, privacy, ai, media, integration, koobox…
+10. history, template, sandbox, privacy, analytics, inlineEditor 等长尾；`ai`、`integration`、`integrateCommerce`、`market` 不在当前队列
 
 ---
 
@@ -311,10 +318,10 @@ DoD: 文档无 @k-url / code/ 路径；build 通过；侧边栏无死链
 
 | 字段 | 值 |
 |------|-----|
-| 项目名 | **Kooboo** |
-| `project_id` | `8c4166c325be4c87a2a29700a3bcfc5c` |
+| 项目名 | **KB-Docs** |
+| `project_id` | `736837a913b24f248d39ff056c198b04` |
 
-> 现有任务 #1001–#1007 多为 `references/K-Script/utils/`（另一文档树）。**kb-docs** 任务标题建议前缀：`[kb-docs]`，避免与旧路径混淆。
+> 本仓库的 VitePress 文档、ai-check 和 backlog 任务统一归 **KB-Docs**。只有 Kooboo 平台源码改动才归 Kooboo 项目。
 
 ### 三层分工（避免重复记账）
 
@@ -353,7 +360,7 @@ DoD: 文档无 @k-url / code/ 路径；build 通过；侧边栏无死链
 
 ```text
 k_list_projects          → 取 project_id / module_ids / tag_ids
-k_list_tasks             → project_id=8c4166c325be4c87a2a29700a3bcfc5c, status=todo
+k_list_tasks             → project_id=736837a913b24f248d39ff056c198b04, status=todo
 k_create_task            → 新建 [kb-docs] 模块任务
 k_update_task            → status / progress / content
 k_add_comment            → ai_completion 记录验证结果
@@ -361,7 +368,7 @@ k_add_comment            → ai_completion 记录验证结果
 
 ### 优化建议（TaskBanner / 流程）
 
-1. **在 Kooboo 项目下配置 modules**（如 `core` / `data` / `site` / `net` / `utils`），创建任务时填 `module_ids`，看板可按域筛选。（当前 `modules: []` 为空）
+1. **在 KB-Docs 项目下配置 modules**（如 `core` / `data` / `site` / `net` / `utils`），创建任务时填 `module_ids`，看板可按域筛选。
 2. **配置 tags**：`p0-debt` `needs-check` `blocked` `d.ts-gap`，便于过滤。
 3. **标题规范**：`[kb-docs] <k.path> — <动作>`，例如 `[kb-docs] k.net.httpClient — 文档+ai-check`。
 4. **content 固定四段**：目标 / 源码路径 / 验收（DoD）/ TaskBanner task_id 写回 backlog 可选。
@@ -373,5 +380,5 @@ k_add_comment            → ai_completion 记录验证结果
 ## 维护
 
 - 完成模块后在本文件将对应行 `🔴` → `✅`，并注明 commit / ai-check / **TaskBanner #displayId**
-- 发现 d.ts 与源码不一致时，在「来源对照」表追加一行，**文档以源码为准**
+- 发现最终智能提示、源码、d.ts 或文档不一致时，在「来源对照」表追加一行；范围以最终提示和产品决策为准，行为以源码与当前运行证据为准
 - Kooboo 源码路径：`/Users/achen/Priv/Yardi/Kooboo/`（本机）；协作者需自行 clone
