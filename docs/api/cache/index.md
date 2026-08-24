@@ -19,6 +19,7 @@
 
 ```ts
 interface KCache {
+  readonly group: string;
   set(key: string, value: any, seconds: number): void;
   set(key: string, value: any): void;
   set(key: string, value: any, options: CacheOptions): void;
@@ -42,6 +43,18 @@ interface CacheCascade {
   key: string;
   removeChangeToken: boolean;
 }
+```
+
+## group
+
+当前站点缓存使用的只读分组标识。同一站点内该值保持稳定，并用于将缓存键与其他站点隔离。请将它视为不透明字符串，不要解析或依赖其具体格式。
+
+**返回：** `string`。
+
+```ts
+k.api.get(() => {
+    return { group: k.cache.group }
+})
 ```
 
 ## set()

@@ -79,6 +79,14 @@
 
 ### Batch 1：Zone A — 低风险核心与根方法
 
+**状态：已完成（2026-08-24）**
+
+| 项目 | 当前分类 | 处理结果 |
+|------|----------|----------|
+| `k.fromSite(nameOrId)` | `needs-runtime-evidence` | 已验证当前站点按 ID / 名称可取得绑定后的 `k`，不存在时返回 `undefined`；测试环境没有可安全验证的第二站点，且源码未在该方法内执行用户权限检查，暂不公开文档化 |
+| `k.output(value)` | `compatibility-cleanup` | 普通 API 调用不会把 `output()` 的值作为响应；当前消费方仅见于配置脚本执行流程，不作为通用 KScript API 推荐 |
+| `k.cache.group` | `group-existing` | 已验证为稳定的站点级只读字符串，并补入现有中英文 `k.cache` 页面 |
+
 建议顺序：
 
 1. `k.fromSite(nameOrId)`：先验证站点查找、无权限或不存在时的行为。
@@ -197,7 +205,7 @@
 
 ## 6. 当前下一步
 
-1. 进入 Batch 1，先处理 `k.fromSite(nameOrId)` 的只读与权限行为。
-2. Batch 1 验收后进入 Batch 2，补 `k.site` 只读/context 子模块，并为 `k.site.get()` 建立认证场景证据。
+1. 进入 Batch 2，补 `k.site` 只读/context 子模块，并为 `k.site.get()` 建立认证场景证据。
+2. `k.fromSite` 保留在运行证据队列；`k.output` 不进入通用 API 文档。
 3. 每批开始前重新核对 Kooboo 当前版本和真实提示，若提示面变化，先更新计划再写正文。
 4. 四个 `product-hold` 区域只有在维护者明确恢复后才能进入新批次。

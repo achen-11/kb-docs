@@ -19,6 +19,7 @@ On a miss, `get` returns **`undefined`** (used with `containsKey`).
 
 ```ts
 interface KCache {
+  readonly group: string;
   set(key: string, value: any, seconds: number): void;
   set(key: string, value: any): void;
   set(key: string, value: any, options: CacheOptions): void;
@@ -42,6 +43,18 @@ interface CacheCascade {
   key: string;
   removeChangeToken: boolean;
 }
+```
+
+## group
+
+The read-only group identifier used by the current site's cache. The value remains stable within the same site and scopes cache keys away from other sites. Treat it as an opaque string; do not parse it or rely on its format.
+
+**Returns:** `string`.
+
+```ts
+k.api.get(() => {
+    return { group: k.cache.group }
+})
 ```
 
 ## set()

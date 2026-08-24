@@ -121,7 +121,7 @@ k.xxx.yyy
 | `k.emailMarketing` | `KEmailMarketing` | 🔴 | k-emailMarketing.md | | |
 | `k.account` | `KAccount` | ✅ | k-account.md | | login/user/org/oauth |
 | `k.storage` | — | 🧹 已清理 | — | 旧测试运行失败 | 当前提示无该根对象；2026-08-24 已删除公开文档 |
-| `k.cache` | `KCache` | ✅ | core/cache.md | | |
+| `k.cache` | `KCache` | ✅ | core/cache.md | `group` 已实测 | 2026-08-24 补齐只读站点分组属性 |
 | `k.template` | `KTemplate` | 🔴 | k-template.md | | 模板市场，非页面模板 |
 | `k.market` | `KMarket` | ⏸️ 产品暂停 | k-market.md | | 当前不公开文档化 |
 | `k.state` | `kState` | ✅ | core/state.md | | |
@@ -135,7 +135,8 @@ k.xxx.yyy
 | `k.utils` | `KUtils` | ✅ | utils/* | | 按子模块单文件 |
 | `k.inlineEditor` | `KInline` | 🔴 | k-inlineEditor.md | | |
 | `k.starter` | `KKoobox` | ⚪ | — | | 已从公开根入口移除，不文档化 |
-| `fromSite` | 方法 | 🔴 | k-fromSite.md | | |
+| `fromSite` | 方法 | ⏳ 需跨站证据 | k-fromSite.md | 当前站点 / 不存在路径已实测 | 源码未在方法内检查用户权限；取得安全第二站点并确认权限语义后再公开 |
+| `output` | 方法 | ⚪ 不推荐 | — | 普通 API 响应已实测 | 仅配置脚本执行流程消费返回值，不作为通用 KScript API 文档化 |
 | `k.openApi` | `KOpenApi` | ⚪ | k-openApi.md | | C# `[KIgnore]`，低优 |
 | `k.stapScript` | StapTest | ⚪ | — | | 扩展测试，低优 |
 | getting-started/auth | — | 🔴 侧边栏 | — | | 需新建 |
