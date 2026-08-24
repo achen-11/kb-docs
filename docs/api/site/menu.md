@@ -234,7 +234,7 @@ k.api.post(() => {
     </script>
     <nav class="site-nav">
         <ul>
-            <li k-for="item in items" repeat-self>
+            <li k-for="item in items">
                 <a k-attribute="href {item.url}" k-content="item.name"></a>
             </li>
         </ul>
@@ -255,7 +255,7 @@ k.api.post(() => {
     });
 </script>
 <ul>
-    <li k-for="item in items" repeat-self>
+    <li k-for="item in items">
         <a k-attribute="href {item.url}" k-content="item.name"></a>
     </li>
 </ul>

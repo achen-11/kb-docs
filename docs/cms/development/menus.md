@@ -119,7 +119,7 @@
         var items = nav && nav.children ? nav.children : [];
     </script>
     <ul>
-        <li k-for="item in items" repeat-self>
+        <li k-for="item in items">
             <a k-attribute="href {item.url}" k-content="item.name"></a>
         </li>
     </ul>

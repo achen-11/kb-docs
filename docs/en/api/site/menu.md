@@ -234,7 +234,7 @@ Read the menu in the server script and use [Template Binding Syntax](/en/templat
     </script>
     <nav class="site-nav">
         <ul>
-            <li k-for="item in items" repeat-self>
+            <li k-for="item in items">
                 <a k-attribute="href {item.url}" k-content="item.name"></a>
             </li>
         </ul>
@@ -255,7 +255,7 @@ Example of multilingual display name:
     });
 </script>
 <ul>
-    <li k-for="item in items" repeat-self>
+    <li k-for="item in items">
         <a k-attribute="href {item.url}" k-content="item.name"></a>
     </li>
 </ul>

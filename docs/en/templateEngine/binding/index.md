@@ -21,7 +21,7 @@ Declare `env="server"` once on a parent or higher ancestor. Child elements inher
     </script>
     <div k-content="msg"></div>
     <img k-attribute="src imageUrl">
-    <div k-for="item in list" repeat-self k-content="item.title"></div>
+    <div k-for="item in list" k-content="item.title"></div>
 </div>
 ```
 
@@ -84,14 +84,14 @@ Renders when the preceding sibling `k-if` and `k-else-if` branches do not render
 
 ## `k-for`
 
-Renders a loop. `repeat-self` means the current element itself is reused as the container for each repeated item.
+Renders a loop.
 
 ```html
 <div env="server">
     <script>
         var list = [{ label: "apple" }, { label: "orange" }];
     </script>
-    <div k-for="item in list" repeat-self k-content="item.label"></div>
+    <div k-for="item in list" k-content="item.label"></div>
 </div>
 ```
 

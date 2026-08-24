@@ -21,7 +21,7 @@ Kooboo 模板绑定在**服务器端**求值，需配合 **`env="server"`**（�
     </script>
     <div k-content="msg"></div>
     <img k-attribute="src imageUrl">
-    <div k-for="item in list" repeat-self k-content="item.title"></div>
+    <div k-for="item in list" k-content="item.title"></div>
 </div>
 ```
 
@@ -84,14 +84,14 @@ Kooboo 模板绑定在**服务器端**求值，需配合 **`env="server"`**（�
 
 ## k-for
 
-循环渲染；`repeat-self` 表示复用当前元素本身作为循环项容器。
+循环渲染。
 
 ```html
 <div env="server">
     <script>
         var list = [{ label: "apple" }, { label: "orange" }];
     </script>
-    <div k-for="item in list" repeat-self k-content="item.label"></div>
+    <div k-for="item in list" k-content="item.label"></div>
 </div>
 ```
 
