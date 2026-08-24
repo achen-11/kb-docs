@@ -9,7 +9,7 @@
 ::: warning 与 k.file、CMS 文件库的区别
 - **k.site**：站点结构化资源（页面、布局、View、Script 等），带版本与路由。
 - **k.file**：站点磁盘目录上的文件 KScript 读写，**无**后台专用管理页，见 [k.file](../file/file.md)。
-- **内容 → 文件**（CmsFile）：后台 [CMS 文件库](/cms/content/files)，有 URL、**无**对应 `k.site.files` / `k.file` 路径，见 [后台：文件](/cms/content/files)。
+- **k.site.files**：后台 [CMS 文件库](/cms/content/files)中的版本化文件资源，与站点磁盘目录的 `k.file` 不同。
 :::
 
 ## 子模块导航
@@ -27,33 +27,17 @@
 
 ## 常用方法（节选）
 
-### List()
+### list()
 
-列出当前用户可访问的站点摘要（多站点场景）。
+列出当前登录用户可访问的站点摘要（多站点场景）。该方法需要用户和当前组织上下文；没有组织上下文时可能返回 `null`。
 
 **参数：** 无。
 
-**返回：** `Site[]` 或站点摘要数组（以运行时返回为准）。
+**返回：** `SiteSummaryViewModel[] | null`。
 
 ```ts
 k.api.get("sites", () => {
-    return k.site.List()
-})
-```
-
-### createSite() / Get()
-
-创建或按名称获取站点数据库实例（多站点管理场景；日常业务通常直接使用当前站点的 `k.site`）。
-
-| 方法 | 参数 | 返回 | 说明 |
-|------|------|------|------|
-| `createSite(name)` | `name: string` | `any` | 创建站点数据库实例 |
-| `Get(name)` | `name: string` | `any` | 按名称获取站点数据库实例 |
-
-```ts
-k.api.get("site", () => {
-    const name = k.request.queryString.get("name")
-    return k.site.Get(name)
+    return k.site.list() || []
 })
 ```
 

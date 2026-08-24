@@ -38,7 +38,6 @@ Complete reference for Kooboo server-side `k.*` APIs. The English structure mirr
 | `k.session` | [session/](./session/) | Session state |
 | `k.site` | [site/](./site/) | Pages, layouts, views, scripts, styles, codes, and menus |
 | `k.state` | [state/](./state/) | Per-request view state |
-| `k.storage` | [storage/](./storage/) | Cloud object storage |
 | `k.utils` | [utils/](./utils/) | Utility modules |
 | SPA multilingual | [spa-multilingual/](./spa-multilingual/) | `/_spa/lang/{lang}` dictionaries |
 

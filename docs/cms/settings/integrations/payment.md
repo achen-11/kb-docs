@@ -3,7 +3,7 @@
 > Group：**Payment**  
 > 深链：`/_Admin/system/config?SiteId={站点GUID}&group=Payment`
 
-**Payment** 分组启用并配置各 **支付渠道** 的商户密钥、回调与证书。保存后，Code 与电商通过 **`k.payment.get('…')`** 或 **`k.payment.alipayForm`** 等属性调用；配置项 **名称** 须与 API 属性名一致。
+**Payment** 分组启用并配置各 **支付渠道** 的商户密钥、回调与证书。保存后，Code 与电商通过 **`k.payment.alipayForm`**、**`k.payment.wechat`** 等智能提示中提供的属性调用；配置项 **名称** 须与 API 属性名一致。
 
 <DocImage src="/cms/settings/settings-integrations-payment.png" alt="Payment 分组（文档配图已打码）" width="1120" />
 

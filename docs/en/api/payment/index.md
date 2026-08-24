@@ -38,29 +38,6 @@
 
 `k.commerce.currency.list()` returns the site's configured currency; each provider also has `supportedCurrency`. The intersection of the two should be taken before initiating payment. WeChat/Alipay usually only **CNY**.
 
-## get()
-
-Get the payment method object based on the payment method name.
-
-```ts
-k.api.get(() => {
-    const payment = k.payment.get('alipayForm')
-    return {
-        name: payment.name,
-        displayName: payment.displayName,
-        supportedCurrency: payment.supportedCurrency
-    }
-})
-```
-
-**Parameters**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| paymentMethod | `string` | Yes | Payment method property name such as `alipayForm` or `stripeCheckout` |
-
-**Return:** `IPaymentMethod`
-
 ## getRequest()
 
 Get the payment request record based on `requestId`.

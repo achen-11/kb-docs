@@ -26,7 +26,8 @@ interface KDB {
     /** Site IndexedDB dynamic tables (table name as property) */
     indexedDb: IDatabase;
     sqlite: SQLiteDB;
-    getDB(dbType: DbType): GenericDB;
+    mysql: MysqlDatabase;
+    sqlServer: SqlServerDatabase;
 }
 
 interface SQLiteDB {
@@ -50,7 +51,7 @@ interface SQLiteDB {
 - **The IndexedDB table has been built in the background and we hope to use objects to read and write** → [k.DB.indexedDb](../indexed-db/)
 - **Simple string key value, no table structure** → [k.DB.keyValue](../key-value/)
 - **Requires handwriting SQL or operating SQLite file tables** → [k.DB.sqlite](../sqlite/)
-- **Connecting to MySQL / SQL Server** → After configuring the connection, use `getDB` (see type definition), see [CMS Database](/en/cms/database/) in the background
+- **Connecting to MySQL / SQL Server** → After configuring the connection, use `k.DB.mysql` / `k.DB.sqlServer`; see [CMS Database](/en/cms/database/)
 
 ## Related Docs
 

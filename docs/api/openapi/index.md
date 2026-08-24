@@ -38,8 +38,6 @@ k.openApi
         └── …                // 规范中的 model 类型（OpenApi.*）
 ```
 
-`k.openApi` 与 `k.openApi.get('{name}')` 等价。
-
 ## 操作名（operationId）
 
 由规范中 **路径 + HTTP 方法** 生成，规则为：

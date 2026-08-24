@@ -830,7 +830,6 @@ const apiSidebar = [
         ]
       },
       { text: 'k.state', link: '/api/state/' },
-      { text: 'k.storage', link: '/api/storage/' },
       {
         text: 'k.utils',
         collapsed: true,
@@ -1122,7 +1121,6 @@ export default defineConfig({
     'api/core/state.md': 'api/state/index.md',
     'api/data/content.md': 'api/content/index.md',
     'api/data/database.md': 'api/database/index.md',
-    'api/data/storage.md': 'api/storage/index.md',
     'api/data/sqlite/index.md': 'api/sqlite/index.md',
     'api/business/mail.md': 'api/mail/index.md',
     'api/logger/k-logger.md': 'api/logger/index.md',

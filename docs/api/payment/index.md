@@ -38,29 +38,6 @@
 
 `k.commerce.currency.list()` 返回站点已配置货币；每个 provider 还有 `supportedCurrency`。发起支付前应取两者交集。微信 / 支付宝通常仅 **CNY**。
 
-## get()
-
-根据支付方式名称获取支付方式对象。
-
-```ts
-k.api.get(() => {
-    const payment = k.payment.get('alipayForm')
-    return {
-        name: payment.name,
-        displayName: payment.displayName,
-        supportedCurrency: payment.supportedCurrency
-    }
-})
-```
-
-**参数：**
-
-| 参数 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| paymentMethod | `string` | 是 | 支付方式属性名，如 `alipayForm`、`stripeCheckout` |
-
-**返回：** `IPaymentMethod`
-
 ## getRequest()
 
 根据 `requestId` 获取支付请求记录。

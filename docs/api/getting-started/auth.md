@@ -6,10 +6,6 @@
 
 Kooboo 中与「当前用户是否已登录」相关的操作主要通过 `k.account` 完成；请求级会话见 [k.session](../session/)，Cookie 见 [k.cookie](../cookie/)。加密与令牌见 [k.security](../security/)。
 
-::: tip
-`k.user` 上部分属性已标记为过时，新代码请使用 `k.account` / `k.account.user`。
-:::
-
 ## k.account.isLogin
 
 判断当前请求是否已登录。

@@ -36,13 +36,12 @@ KScript API 完整参考（服务端 `k.*`）。文档路径与模块名一致�
 | `k.response` | [response/](./response/) | HTTP 响应 |
 | `k.security` | [security/](./security/) | 加密与哈希 |
 | `k.session` | [session/](./session/) | 会话 |
-| SPA 多语言 | [spa-multilingual/](./spa-multilingual/) | `/_spa/lang/{lang}` 词典（无 `k.*` CRUD） |
 | `k.site` | [site/](./site/) | 页面、布局、视图、脚本、样式、codes |
 | `k.state` | [state/](./state/) | 当前请求视图数据 |
-| `k.storage` | [storage/](./storage/) | 云对象存储 |
 | `k.utils` | [utils/](./utils/) | 工具集（子模块见 utils 索引） |
+| SPA 多语言 | [spa-multilingual/](./spa-multilingual/) | `/_spa/lang/{lang}` 词典（无 `k.*` CRUD） |
 
-### k.site 子资源（`site/` 目录内）
+## `k.site` 子资源
 
 | 成员 | 文档 |
 |------|------|
@@ -55,14 +54,13 @@ KScript API 完整参考（服务端 `k.*`）。文档路径与模块名一致�
 | `k.site.menus` | [menu.md](./site/menu.md) |
 | `k.site.runJob` | [job.md](./site/job.md) |
 
-### k.file 子页
+## `k.file` 子页
 
 [folder](./file/file-folder.md) · [resumable](./file/file-resumable.md) · [数据结构](./file/file-info.md)
 
-### k.commerce / k.payment / k.net / k.utils
+## 相关区域
 
-各模块子页见对应目录内侧边栏或 [utils 索引](./utils/index.md)。
-
-## 后续补充
-
-尚未单独成页的能力会继续按模块补充到本目录。
+| 场景 | 后续文档 |
+|------|----------|
+| 需要先准备内容模型或站点设置 | [CMS 后台](/cms/) |
+| 需要先了解 Page / Layout / View 渲染规则 | [模板引擎](/templateEngine/) |

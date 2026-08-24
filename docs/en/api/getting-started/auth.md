@@ -6,10 +6,6 @@
 
 Operations related to "whether the current user is logged in" in Kooboo are mainly completed through `k.account`; see [k.session](../session/) for request-level sessions, and [k.cookie](../cookie/) for cookies. For encryption and tokens see [k.security](../security/).
 
-::: tip
-Some attributes on `k.user` have been marked as obsolete, please use `k.account` / `k.account.user` for new code.
-:::
-
 ## k.account.isLogin
 
 Determine whether the current request has been logged in.

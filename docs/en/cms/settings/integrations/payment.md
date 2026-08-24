@@ -3,7 +3,7 @@
 > Group: **Payment**  
 > Deep link: `/_Admin/system/config?SiteId={siteGuid}&group=Payment`
 
-The **Payment** group enables and configures **payment channels**: merchant keys, callbacks, certificates. After save, Code and Commerce call **`k.payment.get('…')`** or properties like **`k.payment.alipayForm`**; item **names** must match API property names.
+The **Payment** group enables and configures **payment channels**: merchant keys, callbacks, and certificates. After saving, Code and Commerce call properties exposed by completion, such as **`k.payment.alipayForm`** and **`k.payment.wechat`**; item **names** must match API property names.
 
 <DocImage src="/cms/settings/settings-integrations-payment.png" alt="Payment group (sensitive fields redacted in doc image)" width="1120" />
 

@@ -90,7 +90,7 @@ k.xxx.yyy
 |----|------|-------------|------|
 | `k.media` | ❌ 顶层未列出 | ✅ `KMedia Media` | 需补文档与 d.ts 生成流程 |
 | `k.user` / `k.organization` | 在 `k.account` 内 | `[KIgnore]` 独立属性 | 文档归 `k.account` |
-| `k.sql` / `k.mysql` 等 | 部分在 `KDB` | 多数字段 `[KIgnore]` | 文档写 `k.DB.sqlite` + `k.DB.getDB()` |
+| `k.sql` / `k.mysql` 等 | 部分在 `KDB` | 顶层兼容字段多为 `[KIgnore]` | 文档使用当前提示中的 `k.DB.sqlite`、`k.DB.mysql`、`k.DB.sqlServer` 等属性 |
 | `k.site` 类型名 | `kSiteDb` | `class kSiteDb` | d.ts 可能用别名，以 C# 成员为准 |
 | `k.payment` | `kPay` | `Kooboo.Sites.Payment.kPay` + 动态 provider | 提供商列表查 `PaymentContainer` / IOC |
 | `k.starter` | 仍可能出现在旧快照 | 已从公开根入口移除 | 不文档化；等待定义快照刷新 |
@@ -120,7 +120,7 @@ k.xxx.yyy
 | `k.mail` | `Mail` | ✅ | mail/index.md | | |
 | `k.emailMarketing` | `KEmailMarketing` | 🔴 | k-emailMarketing.md | | |
 | `k.account` | `KAccount` | ✅ | k-account.md | | login/user/org/oauth |
-| `k.storage` | `KStorage` | ✅ | data/storage.md | | |
+| `k.storage` | — | 🧹 已清理 | — | 旧测试运行失败 | 当前提示无该根对象；2026-08-24 已删除公开文档 |
 | `k.cache` | `KCache` | ✅ | core/cache.md | | |
 | `k.template` | `KTemplate` | 🔴 | k-template.md | | 模板市场，非页面模板 |
 | `k.market` | `KMarket` | ⏸️ 产品暂停 | k-market.md | | 当前不公开文档化 |
@@ -155,7 +155,7 @@ k.xxx.yyy
 | `k.DB.mongo` | `docs/api/mongo/` | 🔴 | `KDB.Mongo` |
 | `k.DB.indexedDb` | `docs/api/indexed-db/` | ✅ | `kDatabase` / `KTable` |
 | `k.DB` worm (`SequenceDb`) | `docs/api/database/` 或独立页 | 🔴 | `KWormDb` |
-| `k.DB.getDB(type)` | 合入 database 概述 | 🔴 | `KDB.getDB` |
+| `k.DB.getDB(type)` | — | 🧹 已清理 | 当前提示无该方法；文档改为直接 provider 属性 |
 
 ### 文件 `k.file`
 
@@ -183,7 +183,7 @@ k.xxx.yyy
 | `k.payment` 概述 | `payment/index.md` | 🟡 | 工作区未提交 |
 | alipay, wechat, paypal, stripe… | `payment/*.md` | 🟡 | 10 篇 |
 | wechat H5 流程 | `payment/wechat-h5-flow.md` | 🟡 | 需清理文档内 `@k-url` |
-| 动态 `k.payment.get(name)` | 合入 index | 🔴 | 查 `IPaymentMethod` 实现类 |
+| 动态 `k.payment.get(name)` | — | 🧹 已清理 | 当前 `kPay` 提示无该方法；使用具体 provider 属性 |
 
 ### 站点 `k.site`（**建议 8–10 次提交**）
 
@@ -198,7 +198,7 @@ k.xxx.yyy
 | `k.site.scripts` | `site/js.md` | k-site/scripts.md | ✅ |
 | `k.site.styles` | `site/css.md` | k-site/styles.md | ✅ |
 | `k.site.codes` | `site/code.md` | k-site/codes.md | ✅ |
-| `k.site.files` | 与 `k.file` 交叉说明 | k-site/files.md | 🔴 |
+| `k.site.files` | 与 `k.file` 交叉说明；Batch 2 补完整页 | k-site/files.md | 🟡 已确认存在 |
 | `k.site.formValues` | `site/form-values.md` | k-site/formValues.md | 🔴 |
 | `k.site.editLog` | `site/edit-log.md` | k-site/editLog.md | 🔴 |
 | `k.site.event` | — | — | ⏸️ 已下架：事件在控制台配置，暂不写 KScript 文档 |
@@ -246,7 +246,7 @@ k.xxx.yyy
 | `k.mail` | `mail/index.md` | k-mail.md | ✅ |
 | `k.emailMarketing` | `business/email-marketing.md` | k-emailMarketing.md | P2 |
 | `k.account` | `account/index.md` + login/user/org/oauth | k-account.md | ✅ |
-| `k.storage` | `data/storage.md` | k-storage.md | ✅ |
+| `k.storage` | — | k-storage.md | 🧹 已清理（当前提示无根对象） |
 | `k.cache` | `core/cache.md` | k-cache.md | ✅ |
 | `k.template` (商店) | `store/template.md` | k-template.md | P3 |
 | `k.market` | `store/market.md` | k-market.md | ⏸️ 产品暂停 |
@@ -288,7 +288,7 @@ k.xxx.yyy
 ### P2 — 数据扩展与业务
 
 7. `k.DB.mysql` / sqlServer / mongo（若产品仍支持）
-8. `k.mail`, `k.emailMarketing`, `k.account`, `k.storage`
+8. `k.mail`, `k.emailMarketing`, `k.account`
 9. `k.utils` 基础组 + Web 组
 
 ### P3 — 长尾

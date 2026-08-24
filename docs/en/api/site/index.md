@@ -9,7 +9,7 @@
 ::: tip Difference from `k.file` and the CMS file library
 - **`k.site`** manages structured site resources with versioning and routing.
 - **`k.file`** reads and writes ordinary files in the site directory. See [k.file](../file/file.md).
-- **Content -> Files** manages the [CMS file library](/en/cms/content/files), which is separate from both `k.site` and `k.file`.
+- **`k.site.files`** manages versioned resources in the [CMS file library](/en/cms/content/files). It is separate from ordinary site-directory files exposed by `k.file`.
 :::
 
 ## Submodule Navigation
@@ -27,33 +27,17 @@
 
 ## Commonly Used Methods
 
-### List()
+### list()
 
-Lists sites accessible to the current user. This is mainly useful in multi-site automation scenarios.
+Lists sites accessible to the current signed-in user. This is mainly useful in multi-site automation scenarios. The method requires user and current-organization context and may return `null` when that context is unavailable.
 
 **Parameters:** None.
 
-**Returns:** `Site[]` or a site summary array, depending on runtime output.
+**Returns:** `SiteSummaryViewModel[] | null`.
 
 ```ts
 k.api.get("sites", () => {
-    return k.site.List()
-})
-```
-
-### createSite() / Get()
-
-Creates or gets a site database instance by name. Most business logic uses the current site's `k.site` directly.
-
-| Method | Parameters | Returns | Description |
-|------|------|------|------|
-| `createSite(name)` | `name: string` | `any` | Creates a site database instance |
-| `Get(name)` | `name: string` | `any` | Gets a site database instance by name |
-
-```ts
-k.api.get("site", () => {
-    const name = k.request.queryString.get("name")
-    return k.site.Get(name)
+    return k.site.list() || []
 })
 ```
 
