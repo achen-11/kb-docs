@@ -10,7 +10,9 @@ const paths = (process.env.KOOBOO_VERIFY_PATHS || PUBLISHED_VERIFY_PATHS)
 
 const requiredAssets = [
   '/assets/vitepress-app.js',
-  '/assets/vitepress-style.css'
+  '/assets/vitepress-style.css',
+  '/assets/vitepress-local-search.js',
+  '/assets/@localSearchIndexroot.js'
 ]
 
 if (!siteUrl) {
@@ -24,7 +26,41 @@ const baseUrl = new URL(siteUrl)
 const results = {
   siteUrl: baseUrl.origin,
   assets: [],
-  pages: []
+  pages: [],
+  search: null
+}
+
+async function verifySearch(page) {
+  const result = {
+    buttonFound: false,
+    inputFound: false,
+    query: 'k.net',
+    resultCount: 0,
+    error: null
+  }
+
+  try {
+    const button = page.getByRole('button', { name: 'Search', exact: true })
+    result.buttonFound = (await button.count()) > 0
+    if (!result.buttonFound) throw new Error('Search button not found')
+
+    await button.first().click()
+    const input = page.locator('#localsearch-input')
+    await input.waitFor({ state: 'visible', timeout: 10_000 })
+    result.inputFound = true
+    await input.fill(result.query)
+    await page.waitForFunction(
+      () => document.querySelectorAll('.VPLocalSearchBox .result').length > 0,
+      null,
+      { timeout: 15_000 }
+    )
+    result.resultCount = await page.locator('.VPLocalSearchBox .result').count()
+    await page.keyboard.press('Escape')
+  } catch (error) {
+    result.error = error instanceof Error ? error.message : String(error)
+  }
+
+  return result
 }
 
 let browser
@@ -72,6 +108,10 @@ try {
     })
     await page.waitForTimeout(1_000)
 
+    if (results.search === null) {
+      results.search = await verifySearch(page)
+    }
+
     results.pages.push({
       requestedUrl: url.href,
       finalUrl: page.url(),
@@ -115,7 +155,15 @@ const failures = [
       pageFailures.push(`${page.finalUrl}: page errors detected`)
     }
     return pageFailures
-  })
+  }),
+  ...(
+    results.search?.buttonFound &&
+    results.search?.inputFound &&
+    results.search?.resultCount > 0 &&
+    !results.search?.error
+      ? []
+      : [`Local search verification failed: ${results.search?.error || 'no results'}`]
+  )
 ]
 
 console.log(JSON.stringify({ ...results, ok: failures.length === 0, failures }, null, 2))

@@ -7,6 +7,10 @@ export const distDir = path.join(path.resolve(__dirname, '..'), 'docs', '.vitepr
 export const stablePageChunkHash = 'stable'
 
 const renameRules = [
+  {
+    pattern: /^VPLocalSearchBox(?:\.[A-Za-z0-9_-]+)?\.js$/,
+    stable: 'vitepress-local-search.js'
+  },
   { pattern: /^(.+\.md)\.[A-Za-z0-9_-]+\.lean\.js$/, stable: '$1.stable.lean.js' },
   { pattern: /^(.+\.md)\.[A-Za-z0-9_-]+\.js$/, stable: '$1.stable.js' },
   { pattern: /^app\.[A-Za-z0-9_-]+\.js$/, stable: 'vitepress-app.js' },
@@ -63,6 +67,12 @@ function buildReplacementMap(renameMap) {
     const toUrl = `/${to}`
     replacements.push([from, to])
     replacements.push([fromUrl, toUrl])
+
+    const fromAssetPath = from.replace(/^assets\//, '')
+    const toAssetPath = to.replace(/^assets\//, '')
+    if (!fromAssetPath.includes('/') && !toAssetPath.includes('/')) {
+      replacements.push([`./${fromAssetPath}`, `./${toAssetPath}`])
+    }
   }
 
   return replacements.sort((a, b) => b[0].length - a[0].length)

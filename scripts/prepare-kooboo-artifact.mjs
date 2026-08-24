@@ -108,7 +108,7 @@ export async function syncArtifactResources({ sourceDir, artifactDir }) {
   const existingGitignore = (await pathExists(gitignorePath))
     ? await readFile(gitignorePath, 'utf-8')
     : ''
-  const requiredIgnores = ['.env', '.kooboo/']
+  const requiredIgnores = ['.env', '.kooboo/', '.DS_Store']
   const missingIgnores = requiredIgnores.filter(
     (item) => !existingGitignore.split(/\r?\n/).includes(item)
   )

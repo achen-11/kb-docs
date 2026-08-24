@@ -31,6 +31,16 @@ test('stabilizeVitePressDist renames hashed assets and updates html references',
       'utf8'
     )
     await writeFile(
+      path.join(distDir, 'assets', 'VPLocalSearchBox.js'),
+      'export const localSearch = true\n',
+      'utf8'
+    )
+    await writeFile(
+      path.join(distDir, 'assets', 'theme.js'),
+      'export const loadSearch = () => import("./VPLocalSearchBox.js")\n',
+      'utf8'
+    )
+    await writeFile(
       path.join(distDir, 'hashmap.json'),
       JSON.stringify({ 'cms_index.md': 'CjSAPaXE' }),
       'utf8'
@@ -42,13 +52,21 @@ test('stabilizeVitePressDist renames hashed assets and updates html references',
     )
 
     const result = await stabilizeVitePressDist(distDir)
-    assert.equal(result.renamed, 3)
+    assert.equal(result.renamed, 4)
 
     const html = await readFile(path.join(distDir, 'cms', 'index.html'), 'utf8')
     assert.match(html, /\/assets\/vitepress-app\.js/)
     assert.match(html, /\/assets\/vitepress-style\.css/)
     assert.match(html, /\/assets\/cms_index\.md\.stable\.lean\.js/)
     assert.match(html, /window\.__VP_HASH_MAP__=JSON\.parse\("\{\\"cms_index\.md\\":\\"stable\\"\}"\)/)
+    assert.equal(
+      await readFile(path.join(distDir, 'assets', 'vitepress-local-search.js'), 'utf8'),
+      'export const localSearch = true\n'
+    )
+    assert.match(
+      await readFile(path.join(distDir, 'assets', 'theme.js'), 'utf8'),
+      /import\("\.\/vitepress-local-search\.js"\)/
+    )
     assert.equal(
       await readFile(path.join(distDir, 'hashmap.json'), 'utf8'),
       JSON.stringify({ 'cms_index.md': 'stable' })

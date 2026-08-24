@@ -29,6 +29,8 @@ VitePress 全局入口固定为：
 ```text
 /assets/vitepress-app.js
 /assets/vitepress-style.css
+/assets/vitepress-local-search.js
+/assets/@localSearchIndexroot.js
 ```
 
 不要改回 `/assets/app.js` 或 `/assets/style.css`。Kooboo 可能存在资源对象和 `routeName`，但真实 HTTP 路由没有命中；此时重复 push 同名资源仍可能继续返回 404。项目专属名称也能避免与站点中其他通用入口冲突。
@@ -72,6 +74,8 @@ pnpm docs:build:kooboo
 
 ```text
 kb-remote-site/src/js/assets/vitepress-app.js
+kb-remote-site/src/js/assets/vitepress-local-search.js
+kb-remote-site/src/js/assets/@localSearchIndexroot.js
 kb-remote-site/src/css/assets/vitepress-style.css
 kb-remote-site/src/js/assets/<page>.md.stable.lean.js
 ```
@@ -113,6 +117,29 @@ SafeMemoryMappedViewHandle
 
 这是 Kooboo 服务端读取资源清单时的瞬时错误。降低并发后重试；不要据此修改或回滚本地产物。
 
+### 3.1 资源清单损坏时的固定计划恢复发布
+
+如果 `Page/all`、`Script/External` 或 `Route/ListByType` 持续返回 `Arg_NullReferenceException`，标准 `kb deploy` 会在写入前加载远端清单，因此无法继续。此时只允许对已经审核、冻结的 deploy plan 执行精确恢复，禁止重新生成计划或改用宽范围同步。
+
+恢复前必须同时锁定并校验：
+
+- artifact commit；
+- deploy plan digest；
+- `expectedSite.id` 与当前登录站点 ID；
+- 每个 upsert 文件的本地 SHA-256；
+- 删除项的精确资源类型、名称和路径。
+
+恢复流程使用精确对象接口，不依赖损坏的列表接口：
+
+1. Script 使用 `Script/Get` 按精确名称读取，使用真实 ID 调用 `Script/Update`；新资源才使用空 GUID。写入后再次读取并对 body 计算 SHA-256。
+2. Script 路由使用 `Route/Resolve?url=<公开路径>` 验证，解析结果的 ID、名称和类型必须与目标 Script 一致。
+3. Page 使用 `Page/Get` 按精确名称获取真实 Page ID，先用 `Route/Post` 将目标 URL 绑定到该 ID，再调用 `Page/Post`。
+4. 每个阶段必须写结构化 receipt，记录 plan digest、站点 ID、成功数、失败项和回读结果。
+
+不要使用 `Route/Get?name=...` 验证公开路径。`Route/Get` 的受支持查询参数是 Route ID；按 `name` 查询可能返回空值或滞后一请求的结果，容易把已经正确的路由误判为失败。公开 URL 是否指向正确对象，以 `Route/Resolve` 和真实 HTTP 响应为准。
+
+Page 的 Route 刚重绑后，`Page/Post` 仍可能暂时返回 `Arg_NullReferenceException`。若精确 Page ID 和 Route 绑定都已确认，不要重建计划，也不要扩大重试范围；等待 Route 写入可见后，对同一固定 Page 集合做一次幂等重试，并保留首次失败和重试 receipt。
+
 ## 4. 成功证据分级
 
 以下证据不能互相替代：
@@ -146,12 +173,14 @@ pnpm docs:verify:kooboo
 验收命令必须同时满足：
 
 - `vitepress-app.js` 与 `vitepress-style.css` 返回 200；
+- `vitepress-local-search.js` 与 `@localSearchIndexroot.js` 返回 200；
 - 页面引用的是上述项目专属 URL；
 - `window.__VITEPRESS__ === true`，证明客户端入口已执行；
 - 等待网络稳定和水合后没有 `PAGE NOT FOUND`；
 - 所有网络响应均无 4xx/5xx；
 - 控制台没有 error；
 - 页面没有未捕获异常。
+- 点击 Search、输入 `k.net` 后能显示至少一条搜索结果。
 
 任何一项失败，发布不得标记完成，也不得推进部署基线。
 
@@ -172,6 +201,10 @@ pnpm docs:verify:kooboo
 
 如果 `kb check` 显示同步但 HTTP 仍为 404，不要反复保存同一个异常 URL。创建项目专属新 URL、先验证新 URL 为 200，再更新 Page 引用。
 
+### 搜索按钮存在，但点击后没有弹出搜索框
+
+检查浏览器是否无法动态导入 `/assets/vitepress-local-search.js`，并确认 `/assets/@localSearchIndexroot.js` 返回 200。搜索模块是懒加载资源，只检查首页首次加载无法发现它缺失；必须执行真实点击和查询验收。
+
 ### `app.js` 返回脚本文本错误而不是 JavaScript
 
 检查 RouteFinding Hook。Hook 只能重写以 `/` 结尾的目录 URL，不得包含顶层 `return`，也不得改写带扩展名的 JS、CSS、字体或图片请求。
@@ -187,6 +220,14 @@ assets/*.md.lean.js
 
 清理前必须确认所有待删除项都符合预期生成文件模式，先运行 preview，再显式确认删除。不要用宽范围 prune 顺手删除其他站点资源。
 
+如果删除 API 返回 `Arg_NullReferenceException`，不能仅凭 HTTP 400 判断删除未发生。应立即按精确名称重新读取对象，并检查旧公开 URL：
+
+- 对象仍存在且 Route 缺失：先把旧 URL 临时绑定回真实对象 ID，再重试精确删除；
+- 对象已不存在：对同一固定删除项做幂等重试，receipt 应记录为 `already_absent`；
+- 只有对象不存在且旧 URL 返回 404，才能确认清理完成。
+
+删除后必须再次运行完整浏览器验收，确认新资源、页面水合和搜索仍然正常。
+
 ## 8. 发布收口清单
 
 - [ ] stabilizer 测试通过；
@@ -194,8 +235,12 @@ assets/*.md.lean.js
 - [ ] 全局入口使用项目专属 URL；
 - [ ] 页面模块、内联 hash map、`hashmap.json` 都使用 `stable`；
 - [ ] 支撑资源先于 Page 发布；
+- [ ] 固定计划的 digest、artifact commit 和目标站点 ID 已核对；
+- [ ] 支撑资源路由通过 `Route/Resolve` 指向正确对象；
 - [ ] `docs:verify:kooboo` 通过；
 - [ ] Preflight 无 BLOCKER；
 - [ ] `git diff --check` 通过；
 - [ ] 旧资源只在验收后精确清理；
+- [ ] 删除项的对象状态和旧 URL 404 已复核；
+- [ ] 清理后再次运行 `docs:verify:kooboo`；
 - [ ] 部署基线只在所有检查通过后推进。
