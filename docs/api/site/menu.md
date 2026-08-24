@@ -227,19 +227,17 @@ k.api.post(() => {
 在服务端脚本中取出菜单，再用 [模板绑定语法](/templateEngine/binding/) 的 `k-for` 渲染，结构完全由模板控制。
 
 ```html
-<div env="server">
-    <script>
-        var nav = k.site.menus.get("main");
-        var items = nav && nav.children ? nav.children : [];
-    </script>
-    <nav class="site-nav">
-        <ul>
-            <li k-for="item in items">
-                <a k-attribute="href {item.url}" k-content="item.name"></a>
-            </li>
-        </ul>
-    </nav>
-</div>
+<script env="server">
+    var nav = k.site.menus.get("main");
+    var items = nav && nav.children ? nav.children : [];
+</script>
+<nav class="site-nav">
+    <ul>
+        <li k-for="item in items">
+            <a k-attribute="href {item.url}" k-content="item.name"></a>
+        </li>
+    </ul>
+</nav>
 ```
 
 多级子菜单可对 `item.children` 再套一层 `k-for`，或拆成 [View](/templateEngine/view/) 片段递归引用。
@@ -269,6 +267,6 @@ k.api.post(() => {
 
 - [k.site](./) — 站点资源总览
 - [菜单（CMS）](/cms/development/menus) — 后台创建菜单、菜单项、HTML 模板与权限
-- [模板绑定语法](/templateEngine/binding/) — `env="server"`、`k-for`、`k-content`
+- [模板绑定语法](/templateEngine/binding/) — `<script env="server">`、`k-for`、`k-content`
 - [k.site.pages](./page.md) — 菜单项常链接的页面资源
 - [开发概述](/cms/development/) — 开发分组与菜单入口

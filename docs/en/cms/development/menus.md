@@ -110,20 +110,18 @@ Optional `menulevel` limits depth (e.g. `menulevel="2"`). Dragging **Menu** from
 
 ### `k.site.menus` + `k-for` (custom structure)
 
-In `env="server"` script, read menu and build HTML with [template binding](/en/templateEngine/binding/) `k-for` for CSS-tight navigation.
+Read the menu in `<script env="server">`, then build CSS-specific navigation HTML with the template binding `k-for` directive.
 
 ```html
-<div env="server">
-    <script>
-        var nav = k.site.menus.get("main");
-        var items = nav && nav.children ? nav.children : [];
-    </script>
-    <ul>
-        <li k-for="item in items">
-            <a k-attribute="href {item.url}" k-content="item.name"></a>
-        </li>
-    </ul>
-</div>
+<script env="server">
+    var nav = k.site.menus.get("main");
+    var items = nav && nav.children ? nav.children : [];
+</script>
+<ul>
+    <li k-for="item in items">
+        <a k-attribute="href {item.url}" k-content="item.name"></a>
+    </li>
+</ul>
 ```
 
 Methods, `createSubMenu`, multilingual `getName`, etc.: **[k.site.menus](/en/api/site/menu.md)**. Do not use deprecated `k-query` / `v-query` for menus.

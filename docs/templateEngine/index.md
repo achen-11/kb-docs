@@ -6,7 +6,7 @@
 
 在 Kooboo 中，**可访问的 HTML 页面**由 **Page** 定义；**Layout** 提供整站共用的 HTML 骨架（`<head>`、导航、占位区）；**View** 是可复用的 HTML 片段；**Script** / **Style** 是带路由的独立 `.js` / `.css` 资源，供布局或页面引用。
 
-服务端数据与 DOM 绑定使用 **`env="server"`** 与 `k-content`、`k-for` 等指令（见 [模板绑定语法](./binding/)）。声明式数据查询使用 **[k-data](./k-data/)**（替代已弃用的 `k-query`）。
+`k-content`、`k-for` 等模板指令会自动在服务端求值；只有模板需要执行 KScript 时才使用 **`<script env="server">`**（见 [模板绑定语法](./binding/)）。声明式数据查询使用 **[k-data](./k-data/)**（替代已弃用的 `k-query`）。
 
 ## 资源关系
 
@@ -51,7 +51,7 @@ flowchart TB
 | [View](./view/) | `<view id="...">`、拆分原则 |
 | [Script](./js/) | 站点 JS 资源、`type="module"` |
 | [Style](./css/) | 站点 CSS、与 Tailwind 等配合 |
-| [模板绑定语法](./binding/) | `env="server"`、`k-content`、`k-for` 等 |
+| [模板绑定语法](./binding/) | `<script env="server">`、`k-content`、`k-for` 等 |
 | [k-data](./k-data/) | `<k-data>`、`<query>`、JSON5 条件 |
 
 ## 与 KScript API 的分工

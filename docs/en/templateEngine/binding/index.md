@@ -2,27 +2,25 @@
 
 > Server-side `k-*` directives for binding data and attributes inside Layout, Page, and View templates.
 
-Kooboo template bindings are evaluated on the **server** and must be used with **`env="server"`**. They are meant for HTML resources such as [Page](../page/) and [View](../view/), not for Vue or React running in the browser.
+Kooboo template bindings such as `k-if`, `k-for`, `k-content`, and `k-attribute` are evaluated on the **server** automatically. Use **`env="server"`** only on a `<script>` that needs to execute KScript. These bindings are meant for HTML resources such as [Page](../page/) and [View](../view/), not for Vue or React running in the browser.
 
 ## `env="server"` {#env-server}
 
-Switches an element and its subtree into server-rendering mode. You can use it on normal elements or on `<script>`.
+Executes a `<script>` as server-side KScript. Put the attribute directly on the script that needs it.
 
-::: tip Inheritance
-Declare `env="server"` once on a parent or higher ancestor. Child elements inherit it automatically, so you do not need to repeat it.
+::: warning Do not put it on ordinary containers
+`k-if`, `k-for`, `k-content`, and `k-attribute` do not need `env="server"` on a parent element. Although the server environment is inherited by descendants, putting it on a `<div>`, `<section>`, or other UI container can cause a nested browser script to be processed as KScript.
 :::
 
 ```html
-<div env="server">
-    <script>
-        var msg = "hello";
-        var imageUrl = "/images/logo.png";
-        var list = [{ title: "apple" }, { title: "orange" }];
-    </script>
-    <div k-content="msg"></div>
-    <img k-attribute="src imageUrl">
-    <div k-for="item in list" k-content="item.title"></div>
-</div>
+<script env="server">
+    var msg = "hello";
+    var imageUrl = "/images/logo.png";
+    var list = [{ title: "apple" }, { title: "orange" }];
+</script>
+<div k-content="msg"></div>
+<img k-attribute="src imageUrl">
+<div k-for="item in list" k-content="item.title"></div>
 ```
 
 Page-level variables can also live directly on a script tag:
@@ -31,7 +29,7 @@ Page-level variables can also live directly on a script tag:
 <script env="server">
     var msg = "hello";
 </script>
-<div env="server" k-content="msg"></div>
+<div k-content="msg"></div>
 ```
 
 ## `k-define`
@@ -50,12 +48,10 @@ Declares a value in the template for the current element and subsequent bindings
 Renders an element only when the condition is true.
 
 ```html
-<div env="server">
-    <script>
-        var isShow = true;
-    </script>
-    <div k-if="isShow">hello</div>
-</div>
+<script env="server">
+    var isShow = true;
+</script>
+<div k-if="isShow">hello</div>
 ```
 
 ## `k-else-if`
@@ -87,12 +83,10 @@ Renders when the preceding sibling `k-if` and `k-else-if` branches do not render
 Renders a loop.
 
 ```html
-<div env="server">
-    <script>
-        var list = [{ label: "apple" }, { label: "orange" }];
-    </script>
-    <div k-for="item in list" k-content="item.label"></div>
-</div>
+<script env="server">
+    var list = [{ label: "apple" }, { label: "orange" }];
+</script>
+<div k-for="item in list" k-content="item.label"></div>
 ```
 
 ## `k-content`
@@ -100,12 +94,10 @@ Renders a loop.
 Binds text content.
 
 ```html
-<div env="server">
-    <script>
-        var blogTitle = "hello";
-    </script>
-    <h1 k-content="blogTitle"></h1>
-</div>
+<script env="server">
+    var blogTitle = "hello";
+</script>
+<h1 k-content="blogTitle"></h1>
 ```
 
 ## `k-attribute`
@@ -113,16 +105,16 @@ Binds text content.
 The unified syntax for attribute binding. Separate multiple attributes with `;`.
 
 ```html
-<div env="server">
-    <script>
-        var imageUrl = "/images/logo.png";
-        var linkHref = "/about";
-        var isActive = true;
-        var itemId = 123;
-        var classObj = { active: true, 'text-danger': false };
-        var attrsObj = { id: 'container', class: 'wrapper' };
-    </script>
+<script env="server">
+    var imageUrl = "/images/logo.png";
+    var linkHref = "/about";
+    var isActive = true;
+    var itemId = 123;
+    var classObj = { active: true, 'text-danger': false };
+    var attrsObj = { id: 'container', class: 'wrapper' };
+</script>
 
+<div>
     <a k-attribute="href linkHref">About Us</a>
     <img k-attribute="src imageUrl">
     <img k-attribute="src imageUrl; alt 'Logo'">
@@ -169,9 +161,7 @@ Server-side module scripts can `import` other CodeBlocks and `export` symbols ba
     const blogDetail = getBlogDetail();
     export { blogDetail }
 </script>
-<div env="server">
-    <div k-content="blogDetail.title"></div>
-</div>
+<div k-content="blogDetail.title"></div>
 ```
 
 ## Related

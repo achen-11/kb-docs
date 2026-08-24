@@ -36,10 +36,10 @@
 
 | 类型 | 写法 | 执行环境 |
 |------|------|----------|
-| 服务端 KScript | `<script env="server">` 或父级 `env="server"` 内的 `<script>` | 服务器渲染 |
+| 服务端 KScript | `<script env="server">` | 服务器渲染 |
 | 前端 JS | 独立 Script 资源，或 Page 内 `<script>` / `<script type="module">` | 浏览器 |
 
-**推荐**：数据准备在 View/Page 顶部的 `env="server"`；交互逻辑放在 View 底部或 Script 资源。
+不要依赖父级容器继承，应把 `env="server"` 直接写在 KScript 标签上。**推荐**：数据准备使用 View/Page 顶部的 `<script env="server">`；交互逻辑放在 View 底部或 Script 资源。
 
 ## ES Module + importmap（常见架构）
 

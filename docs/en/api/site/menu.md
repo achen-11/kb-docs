@@ -227,19 +227,17 @@ Dragging **Menu** into the components panel of the layout/page designer has the 
 Read the menu in the server script and use [Template Binding Syntax](/en/templateEngine/binding/)'s `k-for` to render it. The structure is completely controlled by the template.
 
 ```html
-<div env="server">
-    <script>
-        var nav = k.site.menus.get("main");
-        var items = nav && nav.children ? nav.children : [];
-    </script>
-    <nav class="site-nav">
-        <ul>
-            <li k-for="item in items">
-                <a k-attribute="href {item.url}" k-content="item.name"></a>
-            </li>
-        </ul>
-    </nav>
-</div>
+<script env="server">
+    var nav = k.site.menus.get("main");
+    var items = nav && nav.children ? nav.children : [];
+</script>
+<nav class="site-nav">
+    <ul>
+        <li k-for="item in items">
+            <a k-attribute="href {item.url}" k-content="item.name"></a>
+        </li>
+    </ul>
+</nav>
 ```
 
 Multi-level submenus can cover `item.children` with another layer of `k-for`, or split it into [View](/en/templateEngine/view/) fragments for recursive reference.
@@ -269,6 +267,6 @@ Calling `create`, `createSubMenu`, etc. in CodeBlock or `k.api` is suitable for 
 
 - [k.site](./) — Overview of site resources
 - [Menus (CMS)](/en/cms/development/menus) — Create menus, menu items, HTML templates, and permissions in the admin UI
-- [Template Binding Syntax](/en/templateEngine/binding/) — `env="server"`, `k-for`, `k-content`
+- [Template Binding Syntax](/en/templateEngine/binding/) — `<script env="server">`, `k-for`, `k-content`
 - [k.site.pages](./page.md) — Page resources that menu items often link to
 - [Develop Overview](/en/cms/development/) — Development grouping and menu entry

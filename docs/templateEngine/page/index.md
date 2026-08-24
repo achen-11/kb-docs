@@ -25,13 +25,11 @@
     <title>关于我们</title>
 </head>
 <body>
-    <div env="server">
-        <script>
-            var title = '关于我们';
-        </script>
-        <h1 k-content="title"></h1>
-        <view id="hero"></view>
-    </div>
+    <script env="server">
+        var title = '关于我们';
+    </script>
+    <h1 k-content="title"></h1>
+    <view id="hero"></view>
 </body>
 </html>
 ```
@@ -58,7 +56,7 @@ Page **body** 只写布局引用与占位内容，公共 head/导航在 Layout �
 |------|------|
 | `<layout id="...">` | `id` = Layout 资源名称，与后台 Layout 名一致 |
 | `<placeholder id="...">` | `id` = Layout 里某个 `k-placeholder` 的名称 |
-| 占位内部 | 普通 HTML，可含 `<view>`、`env="server"`、内联 script |
+| 占位内部 | 普通 HTML，可含 `<view>`、内联 script，以及 `<script env="server">` |
 
 ::: tip 名称对齐
 Layout 中 `k-placeholder="Main"` 与 Page 中 `<placeholder id="Main">` 必须一致。拼写或大小写不一致会导致占位区空白。
@@ -79,7 +77,7 @@ Layout 中 `k-placeholder="Main"` 与 Page 中 `<placeholder id="Main">` 必须�
 - **全局**：在 Layout 的 `<head>` 用 `<link href="...">`、`<script src="...">` 引用 [Style](../css/) / [Script](../js/) 的路由 URL
 - **本页**：可在 Page 内写 `<script env="server">`（KScript）或 `<script type="module">`（前端 ES Module）
 
-推荐结构：`env="server"` 的数据脚本放在区块顶部，前端交互 script 放在 View 底部或独立 [Script](../js/) 资源。
+推荐结构：`<script env="server">` 数据脚本放在区块顶部，前端交互 script 放在 View 底部或独立 [Script](../js/) 资源。
 
 ## 组件拆分原则
 

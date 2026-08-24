@@ -110,20 +110,18 @@
 
 ### 使用 `k.site.menus` + `k-for`（自定义结构）
 
-在 `env="server"` 脚本中读取菜单，再用 [模板绑定语法](/templateEngine/binding/) 的 `k-for` 自行拼 HTML，适合与站点 CSS 强耦合的导航栏。
+在 `<script env="server">` 中读取菜单，再用 [模板绑定语法](/templateEngine/binding/) 的 `k-for` 自行拼 HTML，适合与站点 CSS 强耦合的导航栏。
 
 ```html
-<div env="server">
-    <script>
-        var nav = k.site.menus.get("main");
-        var items = nav && nav.children ? nav.children : [];
-    </script>
-    <ul>
-        <li k-for="item in items">
-            <a k-attribute="href {item.url}" k-content="item.name"></a>
-        </li>
-    </ul>
-</div>
+<script env="server">
+    var nav = k.site.menus.get("main");
+    var items = nav && nav.children ? nav.children : [];
+</script>
+<ul>
+    <li k-for="item in items">
+        <a k-attribute="href {item.url}" k-content="item.name"></a>
+    </li>
+</ul>
 ```
 
 方法说明、`createSubMenu`、多语言 `getName` 等见 **[k.site.menus](/api/site/menu.md)**。请勿使用已弃用的 `k-query` / `v-query` 取菜单。

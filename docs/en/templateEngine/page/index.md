@@ -23,13 +23,11 @@ Use a complete HTML document when the page does not need a shared layout:
     <title>About us</title>
 </head>
 <body>
-    <div env="server">
-        <script>
-            var title = "About us";
-        </script>
-        <h1 k-content="title"></h1>
-        <view id="hero"></view>
-    </div>
+    <script env="server">
+        var title = "About us";
+    </script>
+    <h1 k-content="title"></h1>
+    <view id="hero"></view>
 </body>
 </html>
 ```
@@ -56,7 +54,7 @@ For multi-page sites, the recommended pattern is to keep the shared shell inside
 |---------|-------------|
 | `<layout id="...">` | References the Layout resource by name |
 | `<placeholder id="...">` | Must match a `k-placeholder` defined by the Layout |
-| Placeholder body | Can contain normal HTML, `<view>`, `env="server"`, and inline scripts |
+| Placeholder body | Can contain normal HTML, `<view>`, and inline scripts including `<script env="server">` |
 
 ## Referencing Views
 

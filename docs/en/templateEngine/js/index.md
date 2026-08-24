@@ -37,10 +37,10 @@ When the resource is created, you can configure `async` and `defer`, which becom
 
 | Type | Syntax | Runtime |
 |------|--------|---------|
-| Server-side KScript | `<script env="server">`, or `<script>` inside an ancestor with `env="server"` | Server render |
+| Server-side KScript | `<script env="server">` | Server render |
 | Frontend JS | A standalone Script resource, or `<script>` / `<script type="module">` inside a Page | Browser |
 
-Recommended split: prepare data near the top of a View or Page with `env="server"`, and keep interactive behavior at the bottom of the View or in Script resources.
+Put `env="server"` directly on the KScript tag instead of relying on an ancestor. Recommended split: prepare data near the top of a View or Page with `<script env="server">`, and keep interactive behavior at the bottom of the View or in Script resources.
 
 ## ES Module + `importmap` Pattern
 

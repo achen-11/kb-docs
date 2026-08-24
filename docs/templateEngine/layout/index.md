@@ -54,7 +54,7 @@ Layout 正文中至少要有一个占位元素，用于接收 Page 注入的内�
 `<head>` 内**不要**写 `<view id="...">`（例如在 head 里挂 Tailwind View）。请用 `k.response.renderView("<view id='...'></view>")` 或 `<script env="server" view="视图名"></script>`，详见 [View — 在 head 中引用](../view/#在-head-中引用-view)。
 :::
 
-Layout 里也可以写 **`env="server"`** 与 `k-content` 等，用于全站共享的服务端变量（例如站点名），详见 [模板绑定语法](../binding/)。
+Layout 里也可以写 **`<script env="server">`** 准备全站共享的服务端变量（例如站点名），再通过 `k-content` 等模板指令使用，详见 [模板绑定语法](../binding/)。
 
 ## 与 Page 的配合
 

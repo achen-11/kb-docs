@@ -2,27 +2,25 @@
 
 > 服务端 `k-*` 指令：在 Layout / Page / View 中绑定数据与属性
 
-Kooboo 模板绑定在**服务器端**求值，需配合 **`env="server"`**（见下文）。用于 [Page](../page/)、[View](../view/) 等 HTML 资源，与浏览器中的 Vue/React 无关。
+Kooboo 的 `k-if`、`k-for`、`k-content`、`k-attribute` 等模板绑定会自动在**服务器端**求值。只有需要执行 KScript 的 `<script>` 才使用 **`env="server"`**。这些绑定用于 [Page](../page/)、[View](../view/) 等 HTML 资源，与浏览器中的 Vue/React 无关。
 
 ## env="server" {#env-server}
 
-将元素及其子树切换到服务端渲染模式（适用于普通标签或 `<script>`）。
+让 `<script>` 作为服务端 KScript 执行。应把该属性直接写在需要执行的脚本上。
 
-::: tip 继承
-在**父级或更高祖先**声明一次即可，子元素自动继承，无需重复写 `env="server"`。
+::: warning 不要写在普通容器上
+`k-if`、`k-for`、`k-content`、`k-attribute` 不需要父元素声明 `env="server"`。虽然服务端环境会向后代继承，但把它写在 `<div>`、`<section>` 等 UI 容器上，可能导致内部的浏览器脚本被当成 KScript 处理。
 :::
 
 ```html
-<div env="server">
-    <script>
-        var msg = "hello";
-        var imageUrl = "/images/logo.png";
-        var list = [{ title: "apple" }, { title: "orange" }];
-    </script>
-    <div k-content="msg"></div>
-    <img k-attribute="src imageUrl">
-    <div k-for="item in list" k-content="item.title"></div>
-</div>
+<script env="server">
+    var msg = "hello";
+    var imageUrl = "/images/logo.png";
+    var list = [{ title: "apple" }, { title: "orange" }];
+</script>
+<div k-content="msg"></div>
+<img k-attribute="src imageUrl">
+<div k-for="item in list" k-content="item.title"></div>
 ```
 
 页面级变量可单独写在脚本标签上：
@@ -31,7 +29,7 @@ Kooboo 模板绑定在**服务器端**求值，需配合 **`env="server"`**（�
 <script env="server">
     var msg = "hello";
 </script>
-<div env="server" k-content="msg"></div>
+<div k-content="msg"></div>
 ```
 
 ## k-define
@@ -50,12 +48,10 @@ Kooboo 模板绑定在**服务器端**求值，需配合 **`env="server"`**（�
 按条件输出元素。
 
 ```html
-<div env="server">
-    <script>
-        var isShow = true;
-    </script>
-    <div k-if="isShow">hello</div>
-</div>
+<script env="server">
+    var isShow = true;
+</script>
+<div k-if="isShow">hello</div>
 ```
 
 ## k-else-if
@@ -87,12 +83,10 @@ Kooboo 模板绑定在**服务器端**求值，需配合 **`env="server"`**（�
 循环渲染。
 
 ```html
-<div env="server">
-    <script>
-        var list = [{ label: "apple" }, { label: "orange" }];
-    </script>
-    <div k-for="item in list" k-content="item.label"></div>
-</div>
+<script env="server">
+    var list = [{ label: "apple" }, { label: "orange" }];
+</script>
+<div k-for="item in list" k-content="item.label"></div>
 ```
 
 ## k-content
@@ -100,12 +94,10 @@ Kooboo 模板绑定在**服务器端**求值，需配合 **`env="server"`**（�
 绑定文本内容。
 
 ```html
-<div env="server">
-    <script>
-        var blogTitle = "hello";
-    </script>
-    <h1 k-content="blogTitle"></h1>
-</div>
+<script env="server">
+    var blogTitle = "hello";
+</script>
+<h1 k-content="blogTitle"></h1>
 ```
 
 ## k-attribute
@@ -113,16 +105,16 @@ Kooboo 模板绑定在**服务器端**求值，需配合 **`env="server"`**（�
 统一用于属性绑定；多个属性用 `;` 分隔。
 
 ```html
-<div env="server">
-    <script>
-        var imageUrl = "/images/logo.png";
-        var linkHref = "/about";
-        var isActive = true;
-        var itemId = 123;
-        var classObj = { active: true, 'text-danger': false };
-        var attrsObj = { id: 'container', class: 'wrapper' };
-    </script>
+<script env="server">
+    var imageUrl = "/images/logo.png";
+    var linkHref = "/about";
+    var isActive = true;
+    var itemId = 123;
+    var classObj = { active: true, 'text-danger': false };
+    var attrsObj = { id: 'container', class: 'wrapper' };
+</script>
 
+<div>
     <a k-attribute="href linkHref">About Us</a>
     <img k-attribute="src imageUrl">
     <img k-attribute="src imageUrl; alt 'Logo'">
@@ -169,9 +161,7 @@ Kooboo 模板绑定在**服务器端**求值，需配合 **`env="server"`**（�
     const blogDetail = getBlogDetail();
     export { blogDetail }
 </script>
-<div env="server">
-    <div k-content="blogDetail.title"></div>
-</div>
+<div k-content="blogDetail.title"></div>
 ```
 
 ## 相关文档
