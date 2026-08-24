@@ -1,4 +1,4 @@
-# k.utils.sftpClient
+# k.net.sftpClient
 
 > SFTP 文件上传与下载
 
@@ -22,7 +22,7 @@
 **返回：** `void`。在 `callback` 内通过 `ConnectedClient` 上传或下载。
 
 ```ts
-k.utils.sftpClient.passwordConnect(
+k.net.sftpClient.passwordConnect(
     "sftp.example.com",
     "deploy",
     "password",
@@ -42,7 +42,7 @@ k.utils.sftpClient.passwordConnect(
 ```ts
 const privateKey = k.file.read("keys/deploy_rsa.pem")
 
-k.utils.sftpClient.privateKeyConnect(
+k.net.sftpClient.privateKeyConnect(
     "sftp.example.com",
     "deploy",
     privateKey,
@@ -68,7 +68,7 @@ k.utils.sftpClient.privateKeyConnect(
 **返回：** `upload()` 返回 `void`；`download()` 返回 `number[]`。
 
 ```ts
-k.utils.sftpClient.passwordConnect(host, user, password, client => {
+k.net.sftpClient.passwordConnect(host, user, password, client => {
     const bytes = client.download("/exports/orders.csv")
     const text = k.utils.bytesToString(bytes, "utf-8")
 
@@ -78,4 +78,4 @@ k.utils.sftpClient.passwordConnect(host, user, password, client => {
 
 ## 相关文档
 
-- [k.utils.sshClient](./sshClient.md)
+- [k.net.sshClient](./sshClient.md)

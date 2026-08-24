@@ -1,6 +1,6 @@
 # k.net
 
-> Outbound HTTP, WebSocket, DNS and IP geolocation
+> HTTP, WebSocket, DNS, IP, and remote connections
 
 ## Overview
 
@@ -13,6 +13,10 @@
 | [webSocket](./websocket.md) | `k.net.webSocket` | Upgrade the current request to WebSocket and manage the connection |
 | [DNS](./dns.md) | `k.net.DNS` | Parse A/MX/NS, reverse DNS, Whois (note case) |
 | [IP](./ip.md) | `k.net.IP` | Current request IP, IP geographic information (note case) |
+| [ping](./ping.md) | `k.net.ping` | Probe ICMP connectivity and round-trip time |
+| [sshClient](./sshClient.md) | `k.net.sshClient` | Execute commands over SSH |
+| [sftpClient](./sftpClient.md) | `k.net.sftpClient` | Upload and download files over SFTP |
+| [telnetClient](./telnetClient.md) | `k.net.telnetClient` | Read and write Telnet sessions |
 
 ::: tip selection: httpClient and url
 | scene | suggestion |
@@ -21,11 +25,10 @@
 | Batch download, need `KHttpResponse.save` to download | **`k.net.httpClient`** (including batch) |
 | Fast GET remote **image/file binary** | **`k.net.url.getAsBinary(url)`** |
 | One line GET string or JSON | `k.net.url.get` / `k.net.url.getJson` |
-
-ICMP probes use **`k.utils.ping`** (not under `k.net`). SSH/SFTP/Telnet see **`k.utils`** (document to be added).
 :::
 
 ## Related Docs
 
 - [k.file](../file/file.md) — site disk file (different from outbound HTTP)
 - [k.request](../request/) — Current inbound request
+- [k.utils](../utils/) — General utilities such as byte encoding conversion

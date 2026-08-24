@@ -58,4 +58,4 @@ return {
 
 ## Related Docs
 
-- [k.utils.google](./google.md)
+- [k.google](../google/)

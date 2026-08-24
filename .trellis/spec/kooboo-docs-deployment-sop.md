@@ -139,7 +139,7 @@ KOOBOO_VERIFY_URL=https://doc-kooboo-us.kooboo.io pnpm docs:verify:kooboo
 
 ```bash
 KOOBOO_VERIFY_URL=https://doc-kooboo-us.kooboo.io \
-KOOBOO_VERIFY_PATHS=/,/cms/index.html,/api/utils/ip.html \
+KOOBOO_VERIFY_PATHS=/,/cms/index.html,/api/net/ip.html \
 pnpm docs:verify:kooboo
 ```
 

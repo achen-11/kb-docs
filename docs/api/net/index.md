@@ -1,6 +1,6 @@
 # k.net
 
-> 出站 HTTP、WebSocket、DNS 与 IP 地理信息
+> HTTP、WebSocket、DNS、IP 与远程连接
 
 ## 概述
 
@@ -13,6 +13,10 @@
 | [webSocket](./websocket.md) | `k.net.webSocket` | 升级当前请求为 WebSocket、管理连接 |
 | [DNS](./dns.md) | `k.net.DNS` | 解析 A/MX/NS、反向 DNS、Whois（注意大小写） |
 | [IP](./ip.md) | `k.net.IP` | 当前请求 IP、IP 地理信息（注意大小写） |
+| [ping](./ping.md) | `k.net.ping` | ICMP 主机连通性与往返时间探测 |
+| [sshClient](./sshClient.md) | `k.net.sshClient` | SSH 命令执行 |
+| [sftpClient](./sftpClient.md) | `k.net.sftpClient` | SFTP 文件上传与下载 |
+| [telnetClient](./telnetClient.md) | `k.net.telnetClient` | Telnet 会话读写 |
 
 ::: tip 选型：httpClient 与 url
 | 场景 | 建议 |
@@ -21,11 +25,10 @@
 | 批量下载、需 `KHttpResponse.save` 落盘 | **`k.net.httpClient`**（含 batch） |
 | 快速 GET 远程**图片/文件二进制** | **`k.net.url.getAsBinary(url)`** |
 | 一行 GET 字符串或 JSON | `k.net.url.get` / `k.net.url.getJson` |
-
-ICMP 探测使用 **`k.utils.ping`**（不在 `k.net` 下）。SSH/SFTP/Telnet 见 **`k.utils`**（文档待补充）。
 :::
 
 ## 相关文档
 
 - [k.file](../file/file.md) — 站点磁盘文件（与出站 HTTP 不同）
 - [k.request](../request/) — 当前入站请求
+- [k.utils](../utils/) — 编码转换等通用工具

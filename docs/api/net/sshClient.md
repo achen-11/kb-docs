@@ -1,17 +1,17 @@
-# k.utils.sshClient
+# k.net.sshClient
 
 > SSH 命令执行
 
 ## 概述
 
-`k.utils.sshClient` 建立 SSH 连接并在回调中执行命令。
+`k.net.sshClient` 建立 SSH 连接并在回调中执行命令。
 
 ## passwordConnect() / privateKeyConnect()
 
 `passwordConnect(host, user, password, callback, timeout?)` 使用密码连接；`privateKeyConnect(host, user, privateKey, callback, timeout?)` 使用 PEM 私钥字符串连接。
 
 ```ts
-k.utils.sshClient.passwordConnect(host, user, password, (client) => {
+k.net.sshClient.passwordConnect(host, user, password, (client) => {
     const output = client.runCommand("uname -a")
 }, 30)
 ```
@@ -29,7 +29,7 @@ k.utils.sshClient.passwordConnect(host, user, password, (client) => {
 
 ```ts
 const privateKey = k.file.read("keys/deploy_rsa.pem")
-k.utils.sshClient.privateKeyConnect(host, user, privateKey, client => {
+k.net.sshClient.privateKeyConnect(host, user, privateKey, client => {
     const output = client.runCommand("systemctl status nginx", 10)
     k.logger.information("SSH", output)
 })
@@ -47,7 +47,7 @@ k.utils.sshClient.privateKeyConnect(host, user, privateKey, client => {
 **返回：** `string`，命令输出。
 
 ```ts
-k.utils.sshClient.passwordConnect(host, user, password, client => {
+k.net.sshClient.passwordConnect(host, user, password, client => {
     const disk = client.runCommand("df -h /", 10)
     const kernel = client.runCommand("uname -a")
 
@@ -60,4 +60,4 @@ k.utils.sshClient.passwordConnect(host, user, password, client => {
 
 ## 相关文档
 
-- [k.utils.sftpClient](./sftpClient.md)
+- [k.net.sftpClient](./sftpClient.md)

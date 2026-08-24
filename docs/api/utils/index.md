@@ -11,14 +11,12 @@
 | 方法 | 说明 |
 |------|------|
 | `sleep(ms)` | 阻塞当前线程指定毫秒 |
-| `ping(host)` | ICMP ping，返回 `{ ip, time, success }` |
 | `bytesToString(bytes, encoding)` | 字节数组按编码转字符串 |
 | `stringToBytes(content, encoding)` | 字符串按编码转字节数组 |
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | `ms` | `number` | 是 | 暂停毫秒数 |
-| `host` | `string` | 是 | 要 ping 的主机名或 IP |
 | `bytes` | `number[]` | 是 | 要转换的字节数组 |
 | `content` | `string` | 是 | 要转换的文本 |
 | `encoding` | `string` | 是 | 字符编码，如 `utf-8` |
@@ -26,13 +24,11 @@
 | 方法 | 返回 |
 |------|------|
 | `sleep(ms)` | `void` |
-| `ping(host)` | `{ ip: string, time: number, success: boolean }` |
 | `bytesToString(bytes, encoding)` | `string` |
 | `stringToBytes(content, encoding)` | `number[]` |
 
 ```ts
 k.utils.sleep(100)
-const result = k.utils.ping("kooboo.com")
 ```
 
 编码转换常用于处理远程下载、压缩包或文本文件的字节数组：
@@ -59,26 +55,22 @@ return { text }
 | `CRM` | [crm](./crm.md) |
 | `date` | [date](./date.md) |
 | `dom` | [dom](./dom.md) |
-| `google` | [google](./google.md) |
 | `image` | [image](./image.md) |
 | `inlineHtml` | [inlineHtml](./inlineHtml.md) |
-| `IP` | [ip](./ip.md) |
 | `mime` | [mime](./mime.md) |
 | `ninjible` | [ninjible](./ninjible.md) |
 | `office` | [office](./office.md) |
 | `puppeteer` | [puppeteer](./puppeteer.md) |
 | `screenShot` | [screenShot](./screenShot.md) |
-| `sftpClient` | [sftpClient](./sftpClient.md) |
 | `sitemap` | [sitemap](./sitemap.md) |
 | `sms` | [sms](./sms.md) |
-| `sshClient` | [sshClient](./sshClient.md) |
 | `string` | [string](./string.md) |
-| `telnetClient` | [telnetClient](./telnetClient.md) |
 | `template` | [template](./template.md) |
 | `uri` | [uri](./uri.md) |
 | `xml` | [xml](./xml.md) |
 
 ## 相关文档
 
-- [k.net.IP](../net/ip.md) — 与 `k.utils.IP` 能力重叠时的网络模块说明
+- [k.net](../net/) — IP、Ping、SSH、SFTP 与 Telnet
+- [k.google](../google/) — PageSpeed/Lighthouse 与 Firebase
 - [k.file](../file/file.md) — 站点文件读写

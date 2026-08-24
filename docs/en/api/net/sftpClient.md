@@ -1,17 +1,17 @@
-# k.utils.sftpClient
+# k.net.sftpClient
 
 > SFTP file upload and download
 
 ## Overview
 
-The connection method is the same as [sshClient](./sshClient.md); use `ConnectedClient` inside the callback.
+The connection methods are the same as [sshClient](./sshClient.md); use `ConnectedClient` inside the callback.
 
 ## passwordConnect() / privateKeyConnect()
 
-`passwordConnect(host, user, password, callback, timeout?)` connects with a password; `privateKeyConnect(host, user, privateKey, callback, timeout?)` connects with a PEM private key string. Operate on files inside the callback; the connection is closed after the callback finishes.
+`passwordConnect(host, user, password, callback, timeout?)` connects with a password; `privateKeyConnect(host, user, privateKey, callback, timeout?)` connects with a PEM private key string. Operate on files inside the callback; the connection closes after the callback finishes.
 
 | Parameter | Type | Required | Description |
-|------|------|------|------|
+|-----------|------|----------|-------------|
 | `host` | `string` | Yes | SFTP host name or IP |
 | `user` | `string` | Yes | Login user |
 | `password` | `string` | Yes | Login password |
@@ -22,7 +22,7 @@ The connection method is the same as [sshClient](./sshClient.md); use `Connected
 **Returns:** `void`. Use `ConnectedClient` inside `callback` to upload or download files.
 
 ```ts
-k.utils.sftpClient.passwordConnect(
+k.net.sftpClient.passwordConnect(
     "sftp.example.com",
     "deploy",
     "password",
@@ -42,7 +42,7 @@ When using key authentication, pass the private key content as a string:
 ```ts
 const privateKey = k.file.read("keys/deploy_rsa.pem")
 
-k.utils.sftpClient.privateKeyConnect(
+k.net.sftpClient.privateKeyConnect(
     "sftp.example.com",
     "deploy",
     privateKey,
@@ -56,19 +56,19 @@ k.utils.sftpClient.privateKeyConnect(
 ## ConnectedClient
 
 | Method | Description |
-|------|------|
-| `upload(data, path)` | Upload bytes to remote path |
-| `download(path)` | Download remote file as byte array |
+|--------|-------------|
+| `upload(data, path)` | Upload bytes to a remote path |
+| `download(path)` | Download a remote file as a byte array |
 
 | Parameter | Type | Required | Description |
-|------|------|------|------|
+|-----------|------|----------|-------------|
 | `data` | `number[]` | Yes | Bytes to upload |
 | `path` | `string` | Yes | Remote file path |
 
 **Returns:** `upload()` returns `void`; `download()` returns `number[]`.
 
 ```ts
-k.utils.sftpClient.passwordConnect(host, user, password, client => {
+k.net.sftpClient.passwordConnect(host, user, password, client => {
     const bytes = client.download("/exports/orders.csv")
     const text = k.utils.bytesToString(bytes, "utf-8")
 
@@ -78,4 +78,4 @@ k.utils.sftpClient.passwordConnect(host, user, password, client => {
 
 ## Related Docs
 
-- [k.utils.sshClient](./sshClient.md)
+- [k.net.sshClient](./sshClient.md)

@@ -1,23 +1,23 @@
-# k.utils.sshClient
+# k.net.sshClient
 
 > SSH command execution
 
 ## Overview
 
-`k.utils.sshClient` Establishes an SSH connection and executes the command in the callback.
+`k.net.sshClient` establishes an SSH connection and executes commands inside the callback.
 
 ## passwordConnect() / privateKeyConnect()
 
 `passwordConnect(host, user, password, callback, timeout?)` connects with a password; `privateKeyConnect(host, user, privateKey, callback, timeout?)` connects with a PEM private key string.
 
 ```ts
-k.utils.sshClient.passwordConnect(host, user, password, (client) => {
+k.net.sshClient.passwordConnect(host, user, password, (client) => {
     const output = client.runCommand("uname -a")
 }, 30)
 ```
 
 | Parameter | Type | Required | Description |
-|------|------|------|------|
+|-----------|------|----------|-------------|
 | `host` | `string` | Yes | SSH host name or IP |
 | `user` | `string` | Yes | Login user |
 | `password` | `string` | Yes | Login password |
@@ -29,7 +29,7 @@ k.utils.sshClient.passwordConnect(host, user, password, (client) => {
 
 ```ts
 const privateKey = k.file.read("keys/deploy_rsa.pem")
-k.utils.sshClient.privateKeyConnect(host, user, privateKey, client => {
+k.net.sshClient.privateKeyConnect(host, user, privateKey, client => {
     const output = client.runCommand("systemctl status nginx", 10)
     k.logger.information("SSH", output)
 })
@@ -37,17 +37,17 @@ k.utils.sshClient.privateKeyConnect(host, user, privateKey, client => {
 
 ## ConnectedClient.runCommand()
 
-Execute a shell command and return an output string.
+Execute a shell command and return its output.
 
 | Parameter | Type | Required | Description |
-|------|------|------|------|
+|-----------|------|----------|-------------|
 | `command` | `string` | Yes | Shell command to execute |
 | `timeout` | `number` | No | Command timeout in seconds; default is 30 |
 
 **Returns:** `string`, command output.
 
 ```ts
-k.utils.sshClient.passwordConnect(host, user, password, client => {
+k.net.sshClient.passwordConnect(host, user, password, client => {
     const disk = client.runCommand("df -h /", 10)
     const kernel = client.runCommand("uname -a")
 
@@ -60,4 +60,4 @@ k.utils.sshClient.passwordConnect(host, user, password, client => {
 
 ## Related Docs
 
-- [k.utils.sftpClient](./sftpClient.md)
+- [k.net.sftpClient](./sftpClient.md)

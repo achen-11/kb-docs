@@ -28,7 +28,7 @@ KOOBOO_TARGET_URL=""
 KOOBOO_ARTIFACT_DIR="/srv/kb-docs-kooboo-artifact"
 KOOBOO_BASELINE_FILE=""
 KOOBOO_INITIAL_BASELINE=""
-KOOBOO_VERIFY_PATHS="/,/cms/index.html,/api/utils/ip.html"
+KOOBOO_VERIFY_PATHS="/,/cms/index.html,/api/net/ip.html"
 
 usage() {
   echo "Usage: bash deploy/editor/install.sh [options]"

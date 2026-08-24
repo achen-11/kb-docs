@@ -9,7 +9,7 @@ export const PUBLISH_ZH = false
 export const PUBLISH_CLI = false
 export const PUBLISH_PRODUCT_FEATURES = false
 
-export const PUBLISHED_VERIFY_PATHS = '/,/cms/index.html,/api/utils/ip.html'
+export const PUBLISHED_VERIFY_PATHS = '/,/cms/index.html,/api/net/ip.html'
 
 export const UNPUBLISHED_ZH_SRC_GLOBS = [
   'index.md',

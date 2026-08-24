@@ -20,7 +20,7 @@ import {
 
 test('published sites verify English pages at the site root', () => {
   assert.equal(PUBLISH_ZH, false)
-  assert.equal(PUBLISHED_VERIFY_PATHS, '/,/cms/index.html,/api/utils/ip.html')
+  assert.equal(PUBLISHED_VERIFY_PATHS, '/,/cms/index.html,/api/net/ip.html')
   assert.ok(UNPUBLISHED_ZH_SRC_GLOBS.includes('index.md'))
   assert.ok(UNPUBLISHED_ZH_SRC_GLOBS.includes('cms/**'))
   assert.ok(!UNPUBLISHED_ZH_SRC_GLOBS.some((pattern) => pattern.startsWith('en/')))

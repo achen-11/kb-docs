@@ -88,6 +88,8 @@ k.xxx.yyy
 | `k.sql` / `k.mysql` 等 | 部分在 `KDB` | 多数字段 `[KIgnore]` | 文档写 `k.DB.sqlite` + `k.DB.getDB()` |
 | `k.site` 类型名 | `kSiteDb` | `class kSiteDb` | d.ts 可能用别名，以 C# 成员为准 |
 | `k.payment` | `kPay` | `Kooboo.Sites.Payment.kPay` + 动态 provider | 提供商列表查 `PaymentContainer` / IOC |
+| `k.starter` | 仍可能出现在旧快照 | 已从公开根入口移除 | 不文档化；等待定义快照刷新 |
+| `k.utils.google` / 网络成员 | 仍可能出现在旧快照 | `[KIgnore]` / `[Obsolete]` 兼容入口 | 文档使用 `k.google` 与 `k.net` |
 
 ### 顶层 `k` 对象（源码 + d.ts 合并）
 
@@ -121,12 +123,12 @@ k.xxx.yyy
 | `k.integration` | `KIntegration` | 🔴 | — | | |
 | `k.privacy` | `KPrivacy` | 🔴 | — | | cookieConsent |
 | `k.analytics` | `kAnalytics` | 🔴 | — | | |
-| `k.google` | `KGoogle` | 🔴 | — | | |
+| `k.google` | `KGoogle` | ✅ | — | | `google/index.md`；PageSpeed/Lighthouse + Firebase 入口 |
 | `k.ai` | `KAI` | 🔴 | — | | |
 | `k.media` | `KMedia` | ✅ | site/media.md | | |
 | `k.utils` | `KUtils` | ✅ | utils/* | | 按子模块单文件 |
 | `k.inlineEditor` | `KInline` | 🔴 | k-inlineEditor.md | | |
-| `k.starter` | `KKoobox` | 🔴 | — | | koobox |
+| `k.starter` | `KKoobox` | ⚪ | — | | 已从公开根入口移除，不文档化 |
 | `fromSite` | 方法 | 🔴 | k-fromSite.md | | |
 | `k.openApi` | `KOpenApi` | ⚪ | k-openApi.md | | C# `[KIgnore]`，低优 |
 | `k.stapScript` | StapTest | ⚪ | — | | 扩展测试，低优 |
@@ -219,13 +221,17 @@ k.xxx.yyy
 | `k.net.url` (Curl) | `net/url.md` | k-net/url.md | ✅ |
 | `k.net.DNS` | `net/dns.md` | k-net/DNS.md | ✅ |
 | `k.net.IP` | `net/ip.md` | k-net/IP.md | ✅ |
+| `k.net.ping` | `net/ping.md` | — | ✅ |
+| `k.net.sshClient` | `net/sshClient.md` | — | ✅ |
+| `k.net.sftpClient` | `net/sftpClient.md` | — | ✅ |
+| `k.net.telnetClient` | `net/telnetClient.md` | — | ✅ |
 
 ### 工具 `k.utils`（按子模块单文件，`docs/api/utils/`）
 
 | 子模块 | 文档 | 状态 |
 |--------|------|------|
 | 根方法 + 索引 | `utils/index.md` | ✅ |
-| `CDN` … `xml`（26 个子模块） | `utils/{name}.md` | ✅ |
+| `CDN` … `xml`（保留的工具子模块） | `utils/{name}.md` | ✅ |
 
 ### 业务 / 运营类
 
@@ -242,11 +248,11 @@ k.xxx.yyy
 | `k.integration` | `integration/index.md` | — | P3 |
 | `k.privacy` | `privacy/index.md` | — | P3 |
 | `k.analytics` | `analytics/index.md` | — | P3 |
-| `k.google` | `integration/google.md` | — | P3 |
+| `k.google` | `google/index.md` | — | ✅ |
 | `k.ai` | `ai/index.md` | — | P3 |
 | `k.media` | `site/media.md` | — | ✅ |
 | `k.inlineEditor` | `editor/inline.md` | k-inlineEditor.md | P3 |
-| `k.starter` | `koobox/starter.md` | — | P3 |
+| `k.starter` | — | — | 不文档化（已移出公开入口） |
 
 ### 入门与其它
 

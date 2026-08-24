@@ -67,7 +67,7 @@ sudo bash deploy/editor/install.sh \
   --kooboo-target-url https://doc-kooboo-us.kooboo.io \
   --kooboo-artifact-dir /srv/kb-docs-kooboo-artifact \
   --kooboo-initial-baseline <last-successful-artifact-commit> \
-  --kooboo-verify-paths /,/cms/index.html,/api/utils/ip.html \
+  --kooboo-verify-paths /,/cms/index.html,/api/net/ip.html \
   --apply
 ```
 

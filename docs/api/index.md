@@ -21,13 +21,14 @@ KScript API 完整参考（服务端 `k.*`）。文档路径与模块名一致�
 | `k.cookie` | [cookie/](./cookie/) | Cookie |
 | `k.DB` | [database/](./database/) · [indexed-db/](./indexed-db/) · [key-value/](./key-value/) · [sqlite/](./sqlite/) | 数据库、IndexedDB、键值、SQLite |
 | `k.file` | [file/](./file/file.md) | 站点目录文件 |
+| `k.google` | [google/](./google/) | PageSpeed/Lighthouse 与 Firebase |
 | `k.label` | [label/](./label/) | 多语言 `k.t` / `k.label` |
 | `k.logger` | [logger/](./logger/) | 代码日志 |
 | `k.mail` | [mail/](./mail/) | 发信、IMAP、SES |
 | `k.media` | [media/](./media/) | 媒体库 |
 | `k.module` | [module/](./module/) | 模块包：`config`、`task`、`localFile`、导入导出 |
 | `k.openApi` | [openapi/](./openapi/) | 外部 OpenAPI 定义调用与授权 |
-| `k.net` | [net/](./net/) | httpClient、url、webSocket、DNS、IP |
+| `k.net` | [net/](./net/) | HTTP、WebSocket、DNS、IP、Ping、SSH、SFTP、Telnet |
 | `k.page` | [page/](./page/) | 当前页 title / meta |
 | `k.paramConfig` | [param-config/](./param-config/) | 参数配置（结构化 JSON） |
 | `k.payment` | [payment/](./payment/) | 支付集成 |

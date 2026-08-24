@@ -21,13 +21,14 @@ Complete reference for Kooboo server-side `k.*` APIs. The English structure mirr
 | `k.cookie` | [cookie/](./cookie/) | Cookies |
 | `k.DB` | [database/](./database/), [indexed-db/](./indexed-db/), [key-value/](./key-value/), [sqlite/](./sqlite/) | Database access, IndexedDB tables, key-value storage, and SQLite |
 | `k.file` | [file/](./file/file.md) | Files in the site directory |
+| `k.google` | [google/](./google/) | PageSpeed/Lighthouse and Firebase |
 | `k.label` | [label/](./label/) | Multilingual `k.t` and `k.label` |
 | `k.logger` | [logger/](./logger/) | Code logs |
 | `k.mail` | [mail/](./mail/) | Sending mail, IMAP, SES, and parsing |
 | `k.media` | [media/](./media/) | Media library files and folders |
 | `k.module` | [module/](./module/) | Script modules, config, tasks, and packaging |
 | `k.openApi` | [openapi/](./openapi/) | External OpenAPI definitions, auth, and calls |
-| `k.net` | [net/](./net/) | `httpClient`, `url`, `webSocket`, DNS, and IP |
+| `k.net` | [net/](./net/) | HTTP, WebSocket, DNS, IP, Ping, SSH, SFTP, and Telnet |
 | `k.page` | [page/](./page/) | Current page title and meta |
 | `k.paramConfig` | [param-config/](./param-config/) | Structured JSON parameter config |
 | `k.payment` | [payment/](./payment/) | Payment integrations |

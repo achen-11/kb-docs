@@ -1,10 +1,10 @@
-# k.utils.telnetClient
+# k.net.telnetClient
 
 > Telnet 会话
 
 ## 概述
 
-`k.utils.telnetClient.connect` 建立 Telnet 连接，在回调中读写终端。
+`k.net.telnetClient.connect` 建立 Telnet 连接，在回调中读写终端。
 
 ## connect()
 
@@ -18,7 +18,7 @@
 **返回：** `void`。
 
 ```ts
-k.utils.telnetClient.connect(host, port, (client) => {
+k.net.telnetClient.connect(host, port, (client) => {
     client.writeLine("help")
     const text = client.read(10)
 }, 30)
@@ -40,7 +40,7 @@ k.utils.telnetClient.connect(host, port, (client) => {
 | `terminatedRead(terminator, timeout?)` | `string, number?` | `string` |
 
 ```ts
-k.utils.telnetClient.connect("smtp.example.com", 25, client => {
+k.net.telnetClient.connect("smtp.example.com", 25, client => {
     const hello = client.terminatedRead("\r\n", 10)
     client.writeLine("HELO kooboo.local")
     const response = client.read(10)
@@ -50,4 +50,4 @@ k.utils.telnetClient.connect("smtp.example.com", 25, client => {
 
 ## 相关文档
 
-- [k.utils 概述](./index.md)
+- [k.net 概述](./index.md)

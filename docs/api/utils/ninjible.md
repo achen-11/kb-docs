@@ -58,4 +58,4 @@ return {
 
 ## 相关文档
 
-- [k.utils.google](./google.md)
+- [k.google](../google/)
