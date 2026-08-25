@@ -110,11 +110,19 @@ export KOOBOO_DEPLOY_TO=<candidate-artifact-commit>
 # 先生成计划，不写远端
 pnpm docs:deploy:kooboo:dry-run
 
-# 确认后执行；计划包含删除时必须显式批准
-pnpm docs:deploy:kooboo -- --apply-deletes
+# 确认站点 ID、plan digest、操作数量和 hash 后，执行同一份固定计划
+pnpm docs:deploy:kooboo:exact
+
+# 计划包含删除时必须显式批准
+pnpm docs:deploy:kooboo:exact -- --apply-deletes
+
+# 中断或部分失败后保留原 plan/receipt，只重试未完成项
+pnpm docs:deploy:kooboo:exact -- --resume
 ```
 
-成功回执位于 artifact worktree 的 `.kooboo/deploy-receipt.json`。回执成功且命令退出码为 0 后，还必须运行真实站点验收：
+计划默认位于 artifact worktree 的 `.kooboo/deploy-plan.json`，成功回执位于 `.kooboo/deploy-receipt.json`。`exact` 不读取全量远端资源清单；`resume` 会校验 plan digest 并跳过回执中已经成功的操作。图片较多时建议从 `--concurrency 2` 开始。
+
+回执成功且命令退出码为 0 后，还必须运行真实站点验收：
 
 ```bash
 KOOBOO_VERIFY_URL=https://docs.localkooboo.com pnpm docs:verify:kooboo

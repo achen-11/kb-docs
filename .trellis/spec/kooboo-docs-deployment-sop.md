@@ -11,7 +11,7 @@
 |------|------|------|
 | kbdev 快速预览 | `4173` | 英文 |
 | kbdev 稳定预览 | `4175` | 英文 |
-| 线上 | https://doc-kooboo-us.kooboo.io | 英文 |
+| 线上 | https://docs.kooboo.com | 英文 |
 | redev | https://docs.redev.cn | 英文 |
 
 英文页面发布在站点根路径：`docs/en/cms/index.md` 对应 `/cms/`，不携带 `/en/`。旧的 `/en/...` 文档 URL 会跳转到去掉前缀的路径。截图资源仍在 `/en/cms/` 与 `/en/product/`。日后中文将放在 `/zh/`，现在不发布。
@@ -31,6 +31,7 @@ VitePress 全局入口固定为：
 /assets/vitepress-style.css
 /assets/vitepress-local-search.js
 /assets/@localSearchIndexroot.js
+/assets/vitepress-runtime-data.js
 ```
 
 不要改回 `/assets/app.js` 或 `/assets/style.css`。Kooboo 可能存在资源对象和 `routeName`，但真实 HTTP 路由没有命中；此时重复 push 同名资源仍可能继续返回 404。项目专属名称也能避免与站点中其他通用入口冲突。
@@ -55,7 +56,9 @@ VitePress 客户端会根据 `window.__VP_HASH_MAP__` 动态拼接：
 
 1. `assets/` 中的物理文件名；
 2. `content-file/hashmap.json`；
-3. 每个 HTML 内联的 `window.__VP_HASH_MAP__`。
+3. 公共 `/assets/vitepress-runtime-data.js` 中的 `window.__VP_HASH_MAP__`。
+
+`window.__VP_HASH_MAP__` 与 `window.__VP_SITE_DATA__` 必须从页面 HTML 外置到这份公共阻塞 Script。每个 HTML 只引用一次 `/assets/vitepress-runtime-data.js`，避免任意全局数据变化导致约 210 个 Page 全部进入增量计划。
 
 如果只改物理文件名，SSR HTML 会短暂显示正确内容，随后客户端水合请求不存在的 hash 模块并切换到 VitePress 404。
 
@@ -76,6 +79,7 @@ pnpm docs:build:kooboo
 kb-remote-site/src/js/assets/vitepress-app.js
 kb-remote-site/src/js/assets/vitepress-local-search.js
 kb-remote-site/src/js/assets/@localSearchIndexroot.js
+kb-remote-site/src/js/assets/vitepress-runtime-data.js
 kb-remote-site/src/css/assets/vitepress-style.css
 kb-remote-site/src/js/assets/<page>.md.stable.lean.js
 ```
@@ -87,7 +91,7 @@ kb-remote-site/src/js/assets/<page>.md.stable.lean.js
 <script type="module" src="/assets/vitepress-app.js"></script>
 ```
 
-并且其内联 hash map 对应页面值为 `stable`。
+并且在 VitePress app 入口之前引用 `/assets/vitepress-runtime-data.js`，该 Script 中页面 hash 值为 `stable`；页面 HTML 不再内联 `__VP_HASH_MAP__` 或 `__VP_SITE_DATA__`。
 
 ## 3. 发布顺序
 
@@ -101,12 +105,14 @@ kb-remote-site/src/js/assets/<page>.md.stable.lean.js
 5. 预览并清理旧资源
 ```
 
-禁止先发布 Page，再上传其引用的 JS/CSS。全量本地推送可从以下保守参数开始：
+禁止先发布 Page，再上传其引用的 JS/CSS。图片较多的全量本地推送应从以下保守参数开始：
 
 ```bash
-export KOOBOO_PUSH_CONCURRENCY=10
-export KOOBOO_PUSH_INTERVAL_MS=30
+export KOOBOO_PUSH_CONCURRENCY=2
+export KOOBOO_PUSH_INTERVAL_MS=100
 ```
+
+本次本地测试中，并发 5 触发了 `Upload/Image: Collection was modified`；使用同一 plan/receipt 以并发 2 resume 后完成 1482/1482 写入和精确校验。只有目标环境连续稳定后才提高并发。
 
 若资源列表请求出现以下服务端错误：
 
@@ -120,6 +126,8 @@ SafeMemoryMappedViewHandle
 ### 3.1 资源清单损坏时的固定计划恢复发布
 
 如果 `Page/all`、`Script/External` 或 `Route/ListByType` 持续返回 `Arg_NullReferenceException`，标准 `kb deploy` 会在写入前加载远端清单，因此无法继续。此时只允许对已经审核、冻结的 deploy plan 执行精确恢复，禁止重新生成计划或改用宽范围同步。
+
+先根据响应形态判断是否值得增加 timeout：如果请求一直等待到客户端 timeout，可以延长 `--timeout` 取证；如果在 1 秒内快速返回 HTTP 400 `Arg_NullReferenceException`，延长 timeout 不会改变结果。本次生产站点在 30 秒和 120 秒 timeout 下都在 1 秒内返回同样的 400，而纯净本地站点的 211 个 Page 可在约 134ms 完成 `Page/all`。结论是坏 Page、Route 或 Relation 才是直接原因，Page 数量只会放大触发概率。
 
 恢复前必须同时锁定并校验：
 
@@ -135,6 +143,18 @@ SafeMemoryMappedViewHandle
 2. Script 路由使用 `Route/Resolve?url=<公开路径>` 验证，解析结果的 ID、名称和类型必须与目标 Script 一致。
 3. Page 使用 `Page/Get` 按精确名称获取真实 Page ID，先用 `Route/Post` 将目标 URL 绑定到该 ID，再调用 `Page/Post`。
 4. 每个阶段必须写结构化 receipt，记录 plan digest、站点 ID、成功数、失败项和回读结果。
+
+推荐命令：
+
+```bash
+pnpm docs:deploy:kooboo:dry-run
+pnpm docs:deploy:kooboo:exact
+
+# 中断或部分失败后，必须继续使用原 plan 和原 receipt
+pnpm docs:deploy:kooboo:exact -- --resume
+```
+
+`--resume` 必须先校验 receipt 的 plan digest，只跳过已成功操作并重试失败或未完成项。不得为了“重新开始”而生成新计划。普通单篇文档更新的本地实测计划仅包含搜索索引、当前页面模块和当前 Page 共 3 项，写入及校验约 1058ms；如果出现约 210 个 Page，应先排查 runtime data 是否重新内联或是否确有全局配置变化。
 
 不要使用 `Route/Get?name=...` 验证公开路径。`Route/Get` 的受支持查询参数是 Route ID；按 `name` 查询可能返回空值或滞后一请求的结果，容易把已经正确的路由误判为失败。公开 URL 是否指向正确对象，以 `Route/Resolve` 和真实 HTTP 响应为准。
 
@@ -159,13 +179,13 @@ Page 的 Route 刚重绑后，`Page/Post` 仍可能暂时返回 `Arg_NullReferen
 部署后运行：
 
 ```bash
-KOOBOO_VERIFY_URL=https://doc-kooboo-us.kooboo.io pnpm docs:verify:kooboo
+KOOBOO_VERIFY_URL=https://docs.kooboo.com pnpm docs:verify:kooboo
 ```
 
 默认检查首页跳转后的英文首页与英文 API 页。需要增加路径时：
 
 ```bash
-KOOBOO_VERIFY_URL=https://doc-kooboo-us.kooboo.io \
+KOOBOO_VERIFY_URL=https://docs.kooboo.com \
 KOOBOO_VERIFY_PATHS=/,/cms/index.html,/api/net/ip.html \
 pnpm docs:verify:kooboo
 ```
@@ -173,7 +193,7 @@ pnpm docs:verify:kooboo
 验收命令必须同时满足：
 
 - `vitepress-app.js` 与 `vitepress-style.css` 返回 200；
-- `vitepress-local-search.js` 与 `@localSearchIndexroot.js` 返回 200；
+- `vitepress-runtime-data.js`、`vitepress-local-search.js` 与 `@localSearchIndexroot.js` 返回 200；
 - 页面引用的是上述项目专属 URL；
 - `window.__VITEPRESS__ === true`，证明客户端入口已执行；
 - 等待网络稳定和水合后没有 `PAGE NOT FOUND`；
@@ -188,7 +208,7 @@ pnpm docs:verify:kooboo
 
 ### SSR 页面一闪而过，随后变成 VitePress 404
 
-优先检查页面模块命名、内联 `__VP_HASH_MAP__` 与 `content-file/hashmap.json` 是否一致。不要先修改 RouteFinding Hook。
+优先检查页面模块命名、`vitepress-runtime-data.js` 中的 `__VP_HASH_MAP__` 与 `content-file/hashmap.json` 是否一致。不要先修改 RouteFinding Hook。
 
 ### 页面有 HTML，但完全没有样式或交互
 
@@ -233,7 +253,8 @@ assets/*.md.lean.js
 - [ ] stabilizer 测试通过；
 - [ ] Kooboo 构建与导出通过；
 - [ ] 全局入口使用项目专属 URL；
-- [ ] 页面模块、内联 hash map、`hashmap.json` 都使用 `stable`；
+- [ ] 页面模块、公共 runtime data 的 hash map、`hashmap.json` 都使用 `stable`；
+- [ ] 页面 HTML 不再内联 `__VP_HASH_MAP__` 或 `__VP_SITE_DATA__`；
 - [ ] 支撑资源先于 Page 发布；
 - [ ] 固定计划的 digest、artifact commit 和目标站点 ID 已核对；
 - [ ] 支撑资源路由通过 `Route/Resolve` 指向正确对象；

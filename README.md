@@ -17,7 +17,8 @@ pnpm docs:dev              # 本地预览（http://localhost:5173）
 pnpm docs:build            # 仅构建，检查是否能通过
 pnpm docs:artifact:prepare # 构建并同步到部署产物 worktree
 pnpm docs:deploy:kooboo:dry-run   # 预览 artifact commit range 的部署计划
-pnpm docs:deploy:kooboo    # 执行并验证 artifact commit range
+pnpm docs:deploy:kooboo:exact     # 执行已审核的固定计划并验证
+pnpm docs:deploy:kooboo:exact -- --resume # 从原回执继续失败或未完成项
 pnpm check:dead-links      # 死链检查
 ```
 

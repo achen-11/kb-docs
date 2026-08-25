@@ -22,6 +22,7 @@
     "docs:artifact:prepare": "node scripts/prepare-kooboo-artifact.mjs",
     "docs:artifact:prepare:skip-build": "node scripts/prepare-kooboo-artifact.mjs --skip-build",
     "docs:deploy:kooboo": "node scripts/deploy-kooboo-artifact.mjs",
+    "docs:deploy:kooboo:exact": "node scripts/deploy-kooboo-artifact.mjs --exact --plan .kooboo/deploy-plan.json",
     "docs:deploy:kooboo:dry-run": "node scripts/deploy-kooboo-artifact.mjs --dry-run",
     "docs:deploy:kooboo:legacy": "node scripts/deploy-kooboo.mjs",
     "docs:verify:kooboo": "node scripts/verify-kooboo-site.mjs",

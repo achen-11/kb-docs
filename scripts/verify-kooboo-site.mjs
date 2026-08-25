@@ -11,6 +11,7 @@ const paths = (process.env.KOOBOO_VERIFY_PATHS || PUBLISHED_VERIFY_PATHS)
 const requiredAssets = [
   '/assets/vitepress-app.js',
   '/assets/vitepress-style.css',
+  '/assets/vitepress-runtime-data.js',
   '/assets/vitepress-local-search.js',
   '/assets/@localSearchIndexroot.js'
 ]
@@ -27,6 +28,7 @@ const results = {
   siteUrl: baseUrl.origin,
   assets: [],
   pages: [],
+  home: null,
   search: null
 }
 
@@ -83,8 +85,16 @@ try {
     const failedResponses = []
     const consoleErrors = []
     const pageErrors = []
+    const productImageResponses = []
 
     page.on('response', (response) => {
+      if (
+        /\/(?:dashboard|content-types-list|product-management-list|code-edit-overview|visitor-logs-overview|ai-claw-overview)\.(?:png|webp)(?:\?|$)/.test(
+          response.url()
+        )
+      ) {
+        productImageResponses.push(response.url())
+      }
       if (response.status() >= 400) {
         failedResponses.push({
           status: response.status(),
@@ -110,6 +120,29 @@ try {
 
     if (results.search === null) {
       results.search = await verifySearch(page)
+    }
+
+    if (results.home === null && new URL(page.url()).pathname === '/') {
+      const productImages = await page
+        .locator('.kb-doc-product__thumb img, .kb-doc-product__stage-frame img')
+        .evaluateAll((images) =>
+          images.map((image) => ({
+            src: image.getAttribute('src'),
+            loading: image.getAttribute('loading'),
+            decoding: image.getAttribute('decoding'),
+            fetchPriority: image.getAttribute('fetchpriority')
+          }))
+        )
+      results.home = {
+        officialSiteLinks: await page
+          .locator('a[href="https://www.kooboo.com/"]')
+          .count(),
+        officialAiLinks: await page
+          .locator('a[href="https://www.kooboo.com/articles/native-ai"][target="_blank"]')
+          .count(),
+        productImages,
+        requestedProductImages: [...new Set(productImageResponses)]
+      }
     }
 
     results.pages.push({
@@ -163,6 +196,33 @@ const failures = [
     !results.search?.error
       ? []
       : [`Local search verification failed: ${results.search?.error || 'no results'}`]
+  ),
+  ...(
+    results.home?.officialSiteLinks > 0
+      ? []
+      : ['Homepage official-site link was not found']
+  ),
+  ...(
+    results.home?.officialAiLinks > 0
+      ? []
+      : ['Homepage official AI article link was not found']
+  ),
+  ...(
+    results.home?.productImages?.length > 0 &&
+    results.home.productImages.every(
+      (image) =>
+        image.src?.endsWith('.webp') &&
+        image.loading === 'lazy' &&
+        image.decoding === 'async' &&
+        image.fetchPriority === 'low'
+    )
+      ? []
+      : ['Homepage product images are not optimized WebP lazy-load resources']
+  ),
+  ...(
+    results.home?.requestedProductImages?.length <= 1
+      ? []
+      : ['Homepage eagerly requested more than one product preview image']
   )
 ]
 

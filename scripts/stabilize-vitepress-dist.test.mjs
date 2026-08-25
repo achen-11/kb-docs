@@ -5,6 +5,9 @@ import path from 'node:path'
 import { tmpdir } from 'node:os'
 
 import {
+  extractInlineRuntimeData,
+  replaceInlineRuntimeData,
+  runtimeDataRelativePath,
   stabilizeVitePressDist,
   stabilizeVitePressHashMap
 } from './stabilize-vitepress-dist.mjs'
@@ -47,7 +50,7 @@ test('stabilizeVitePressDist renames hashed assets and updates html references',
     )
     await writeFile(
       path.join(distDir, 'cms', 'index.html'),
-      '<link rel="stylesheet" href="/assets/style.css"><script src="/assets/app.C-s7rvUH.js"></script><script src="/assets/cms_index.md.CjSAPaXE.lean.js"></script><script>window.__VP_HASH_MAP__=JSON.parse("{\\"cms_index.md\\":\\"CjSAPaXE\\"}");</script>',
+      '<link rel="stylesheet" href="/assets/style.css"><script src="/assets/app.C-s7rvUH.js"></script><script src="/assets/cms_index.md.CjSAPaXE.lean.js"></script><script>window.__VP_HASH_MAP__=JSON.parse("{\\"cms_index.md\\":\\"CjSAPaXE\\"}");window.__VP_SITE_DATA__=JSON.parse("{\\"lang\\":\\"en-US\\"}");</script>',
       'utf8'
     )
 
@@ -58,7 +61,12 @@ test('stabilizeVitePressDist renames hashed assets and updates html references',
     assert.match(html, /\/assets\/vitepress-app\.js/)
     assert.match(html, /\/assets\/vitepress-style\.css/)
     assert.match(html, /\/assets\/cms_index\.md\.stable\.lean\.js/)
-    assert.match(html, /window\.__VP_HASH_MAP__=JSON\.parse\("\{\\"cms_index\.md\\":\\"stable\\"\}"\)/)
+    assert.match(html, /<script src="\/assets\/vitepress-runtime-data\.js"><\/script>/)
+    assert.doesNotMatch(html, /window\.__VP_HASH_MAP__/)
+    assert.doesNotMatch(html, /window\.__VP_SITE_DATA__/)
+    const runtimeData = await readFile(path.join(distDir, runtimeDataRelativePath), 'utf8')
+    assert.match(runtimeData, /window\.__VP_HASH_MAP__=JSON\.parse\("\{\\"cms_index\.md\\":\\"stable\\"\}"\)/)
+    assert.match(runtimeData, /window\.__VP_SITE_DATA__=JSON\.parse\("\{\\"lang\\":\\"en-US\\"\}"\)/)
     assert.equal(
       await readFile(path.join(distDir, 'assets', 'vitepress-local-search.js'), 'utf8'),
       'export const localSearch = true\n'
@@ -81,4 +89,16 @@ test('stabilizeVitePressHashMap uses the runtime-compatible stable token', () =>
     'a.md': 'stable',
     'b.md': 'stable'
   })
+})
+
+test('runtime data helpers preserve the assignments and externalize the blocking script', () => {
+  const html = '<script>window.__VP_HASH_MAP__=JSON.parse("{}");window.__VP_SITE_DATA__=JSON.parse("{\\"lang\\":\\"en-US\\"}");</script>'
+  assert.equal(
+    extractInlineRuntimeData(html),
+    'window.__VP_HASH_MAP__=JSON.parse("{}");window.__VP_SITE_DATA__=JSON.parse("{\\"lang\\":\\"en-US\\"}");\n'
+  )
+  assert.equal(
+    replaceInlineRuntimeData(html),
+    '<script src="/assets/vitepress-runtime-data.js"></script>'
+  )
 })

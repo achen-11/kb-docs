@@ -52,26 +52,22 @@ async function main() {
     readArg(argv, '--artifact-dir') || process.env.KOOBOO_ARTIFACT_DIR
   const from = readArg(argv, '--from') || process.env.KOOBOO_DEPLOY_FROM
   const to = readArg(argv, '--to') || process.env.KOOBOO_DEPLOY_TO || 'HEAD'
+  const plan = readArg(argv, '--plan')
 
   if (!artifactDirValue) {
     throw new Error('Provide --artifact-dir or KOOBOO_ARTIFACT_DIR')
   }
-  if (!from) {
+  if (!from && !plan) {
     throw new Error('Provide --from or KOOBOO_DEPLOY_FROM as the last successful artifact commit')
   }
 
   const artifactDir = assertGitRoot(artifactDirValue)
   const dryRun = argv.includes('--dry-run')
   const command = process.env.KOOBOO_CLI_BIN || 'kb'
-  const commandArgs = [
-    'deploy',
-    '--from',
-    from,
-    '--to',
-    to,
-    '--format',
-    'table'
-  ]
+  const commandArgs = ['deploy']
+  if (plan) commandArgs.push('--plan', plan)
+  else commandArgs.push('--from', from, '--to', to)
+  commandArgs.push('--format', 'table')
 
   if (dryRun) {
     commandArgs.push(
@@ -87,6 +83,18 @@ async function main() {
   }
   if (argv.includes('--apply-deletes')) commandArgs.push('--apply-deletes')
   if (argv.includes('--no-verify')) commandArgs.push('--no-verify')
+  if (argv.includes('--exact')) commandArgs.push('--exact')
+  if (argv.includes('--resume')) commandArgs.push('--resume')
+  for (const option of [
+    '--timeout',
+    '--concurrency',
+    '--interval-ms',
+    '--page-retry-count',
+    '--page-retry-delay-ms'
+  ]) {
+    const value = readArg(argv, option)
+    if (value !== undefined) commandArgs.push(option, value)
+  }
 
   await runCommand(command, commandArgs, artifactDir)
 }

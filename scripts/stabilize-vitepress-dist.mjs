@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export const distDir = path.join(path.resolve(__dirname, '..'), 'docs', '.vitepress', 'dist')
 export const stablePageChunkHash = 'stable'
+export const runtimeDataRelativePath = 'assets/vitepress-runtime-data.js'
 
 const renameRules = [
   {
@@ -98,6 +99,29 @@ function replaceInlineHashMap(content, stableHashMap) {
   )
 }
 
+const inlineRuntimeDataPattern =
+  /<script>(window\.__VP_HASH_MAP__=JSON\.parse\("(?:\\.|[^"\\])*"\);\s*window\.__VP_SITE_DATA__=JSON\.parse\("(?:\\.|[^"\\])*"\);)<\/script>/g
+
+export function extractInlineRuntimeData(content) {
+  const matches = [...content.matchAll(inlineRuntimeDataPattern)]
+  if (matches.length !== 1 || !matches[0]?.[1]) {
+    throw new Error('Expected exactly one inline VitePress runtime data block')
+  }
+  return `${matches[0][1]}\n`
+}
+
+export function replaceInlineRuntimeData(content, runtimeUrl = `/${runtimeDataRelativePath}`) {
+  let count = 0
+  const next = content.replace(inlineRuntimeDataPattern, () => {
+    count += 1
+    return `<script src="${runtimeUrl}"></script>`
+  })
+  if (count !== 1) {
+    throw new Error('Expected exactly one inline VitePress runtime data block')
+  }
+  return next
+}
+
 /**
  * 将 VitePress dist 中带 hash 的资源文件名稳定化，并回写 HTML/JS/CSS 引用。
  */
@@ -136,17 +160,32 @@ export async function stabilizeVitePressDist(rootDir = distDir) {
   )
 
   let updatedFiles = 0
+  let runtimeData
   for (const filePath of textFiles) {
     const original = await readFile(filePath, 'utf8')
     const replaced = applyReplacements(original, replacements)
-    const next = filePath.endsWith('.html')
-      ? replaceInlineHashMap(replaced, stableHashMap)
-      : replaced
+    let next = replaced
+    if (filePath.endsWith('.html')) {
+      next = replaceInlineHashMap(next, stableHashMap)
+      if (next.includes('window.__VP_HASH_MAP__') || next.includes('window.__VP_SITE_DATA__')) {
+        const currentRuntimeData = extractInlineRuntimeData(next)
+        if (runtimeData !== undefined && runtimeData !== currentRuntimeData) {
+          throw new Error('VitePress HTML files contain different runtime data blocks')
+        }
+        runtimeData = currentRuntimeData
+        next = replaceInlineRuntimeData(next)
+      }
+    }
     if (next !== original) {
       await writeFile(filePath, next, 'utf8')
       updatedFiles += 1
     }
   }
+
+  if (runtimeData === undefined) {
+    throw new Error('No VitePress HTML runtime data block was found')
+  }
+  await writeFile(path.join(rootDir, runtimeDataRelativePath), runtimeData, 'utf8')
 
   await writeFile(hashMapPath, JSON.stringify(stableHashMap), 'utf8')
 
