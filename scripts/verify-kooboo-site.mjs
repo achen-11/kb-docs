@@ -211,7 +211,7 @@ const failures = [
     results.home?.productImages?.length > 0 &&
     results.home.productImages.every(
       (image) =>
-        image.src?.endsWith('.webp') &&
+        /\.webp(?:[?#]|$)/i.test(image.src || '') &&
         image.loading === 'lazy' &&
         image.decoding === 'async' &&
         image.fetchPriority === 'low'
