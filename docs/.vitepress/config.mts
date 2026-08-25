@@ -870,6 +870,7 @@ const zhNav = [
   ...(PUBLISH_CLI ? [{ text: 'Kooboo CLI', link: '/cli/' }] : []),
   { text: 'API 详情', link: '/api/' },
   ...(PUBLISH_GUIDE ? [{ text: '最佳实践', link: '/guide/' }] : []),
+  { text: '官网', link: 'https://www.kooboo.com/' },
 ]
 
 const enNav = [
@@ -879,6 +880,7 @@ const enNav = [
   { text: 'Template Engine', link: '/templateEngine/' },
   ...(PUBLISH_CLI ? [{ text: 'Kooboo CLI', link: '/cli/' }] : []),
   { text: 'API Details', link: '/api/' },
+  { text: 'Official Site', link: 'https://www.kooboo.com/' },
 ]
 
 const englishSidebarTextMap = {

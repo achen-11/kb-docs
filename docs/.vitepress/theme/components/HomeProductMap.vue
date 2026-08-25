@@ -9,6 +9,7 @@ interface ProductItem {
   title: string
   description: string
   href: string
+  external?: boolean
   icon: string
   iconColored?: boolean
   image: string
@@ -41,7 +42,7 @@ const contentByLocale: Record<Locale, ProductContent> = {
         description: '管理站点、页面、媒体、内容、电商、开发与设置',
         href: '/cms/',
         icon: '/home/icons/admin-cms.svg',
-        image: '/cms/site/dashboard.png',
+        image: '/cms/site/dashboard.webp',
         imageAlt: 'Kooboo 站点后台控制面板',
       },
       {
@@ -51,7 +52,7 @@ const contentByLocale: Record<Locale, ProductContent> = {
         description: '建立结构化内容模型并维护可复用的内容条目',
         href: '/cms/content/',
         icon: '/home/icons/mail.svg',
-        image: '/cms/content/content-types-list.png',
+        image: '/cms/content/content-types-list.webp',
         imageAlt: 'Kooboo 内容类型管理界面',
       },
       {
@@ -61,7 +62,7 @@ const contentByLocale: Record<Locale, ProductContent> = {
         description: '管理商品、购物车、订单、折扣、配送与支付',
         href: '/cms/commerce/',
         icon: '/home/icons/marketplace.svg',
-        image: '/cms/commerce/product-management-list.png',
+        image: '/cms/commerce/product-management-list.webp',
         imageAlt: 'Kooboo 电商商品管理界面',
       },
       {
@@ -71,7 +72,7 @@ const contentByLocale: Record<Locale, ProductContent> = {
         description: '使用页面、布局、视图、脚本、样式、代码与 API',
         href: '/cms/development/',
         icon: '/home/icons/developer-mode.svg',
-        image: '/cms/development/code-edit-overview.png',
+        image: '/cms/development/code-edit-overview.webp',
         imageAlt: 'Kooboo 代码编辑界面',
       },
       {
@@ -79,10 +80,11 @@ const contentByLocale: Record<Locale, ProductContent> = {
         eyebrow: 'AI Claw',
         title: 'AI Claw / AI Chat',
         description: '对话建站、实时预览与自动化任务',
-        href: '/cms/settings/ai-service',
+        href: 'https://www.kooboo.com/articles/native-ai',
+        external: true,
         icon: '/home/icons/ai-claw.svg',
         iconColored: true,
-        image: '/home/ai-claw-overview.png',
+        image: '/home/ai-claw-overview.webp',
         imageAlt: 'AI Claw 首页与对话输入区域',
       },
       {
@@ -92,7 +94,7 @@ const contentByLocale: Record<Locale, ProductContent> = {
         description: '查看流量、保护资源、分析交互并审计变更',
         href: '/cms/operations/',
         icon: '/home/icons/console.svg',
-        image: '/cms/operations/visitor-logs-overview.png',
+        image: '/cms/operations/visitor-logs-overview.webp',
         imageAlt: 'Kooboo 访问统计与站点运维界面',
       },
     ],
@@ -110,7 +112,7 @@ const contentByLocale: Record<Locale, ProductContent> = {
         description: 'Manage sites, pages, media, content, commerce, development, and settings',
         href: '/cms/',
         icon: '/home/icons/admin-cms.svg',
-        image: '/en/cms/site/dashboard.png',
+        image: '/en/cms/site/dashboard.webp',
         imageAlt: 'Kooboo site administration dashboard',
       },
       {
@@ -120,7 +122,7 @@ const contentByLocale: Record<Locale, ProductContent> = {
         description: 'Model structured content and maintain reusable content entries',
         href: '/cms/content/',
         icon: '/home/icons/mail.svg',
-        image: '/en/cms/content/content-types-list.png',
+        image: '/en/cms/content/content-types-list.webp',
         imageAlt: 'Kooboo content type management interface',
       },
       {
@@ -130,7 +132,7 @@ const contentByLocale: Record<Locale, ProductContent> = {
         description: 'Manage products, carts, orders, discounts, shipping, and payments',
         href: '/cms/commerce/',
         icon: '/home/icons/marketplace.svg',
-        image: '/en/cms/commerce/product-management-list.png',
+        image: '/en/cms/commerce/product-management-list.webp',
         imageAlt: 'Kooboo commerce product management interface',
       },
       {
@@ -140,7 +142,7 @@ const contentByLocale: Record<Locale, ProductContent> = {
         description: 'Work with pages, layouts, views, scripts, styles, code, and APIs',
         href: '/cms/development/',
         icon: '/home/icons/developer-mode.svg',
-        image: '/en/cms/development/code-edit-overview.png',
+        image: '/en/cms/development/code-edit-overview.webp',
         imageAlt: 'Kooboo code editing interface',
       },
       {
@@ -148,10 +150,11 @@ const contentByLocale: Record<Locale, ProductContent> = {
         eyebrow: 'AI Claw',
         title: 'AI Claw / AI Chat',
         description: 'Build sites through conversation, preview changes live, and manage automated tasks',
-        href: '/cms/settings/ai-service',
+        href: 'https://www.kooboo.com/articles/native-ai',
+        external: true,
         icon: '/home/icons/ai-claw.svg',
         iconColored: true,
-        image: '/home/ai-claw-overview.png',
+        image: '/home/ai-claw-overview.webp',
         imageAlt: 'AI Claw home screen and conversation composer',
       },
       {
@@ -161,7 +164,7 @@ const contentByLocale: Record<Locale, ProductContent> = {
         description: 'Review traffic, protect resources, inspect interactions, and audit changes',
         href: '/cms/operations/',
         icon: '/home/icons/console.svg',
-        image: '/en/cms/operations/visitor-logs-overview.png',
+        image: '/en/cms/operations/visitor-logs-overview.webp',
         imageAlt: 'Kooboo visitor analytics and site operations interface',
       },
     ],
@@ -186,6 +189,8 @@ function activateItem(index: number) {
           v-for="(item, index) in content.items"
           :key="item.id"
           :href="item.href"
+          :target="item.external ? '_blank' : undefined"
+          :rel="item.external ? 'noreferrer' : undefined"
           :class="{ 'is-active': activeIndex === index }"
           @mouseenter="activateItem(index)"
           @focus="activateItem(index)"
@@ -209,7 +214,14 @@ function activateItem(index: number) {
           </span>
           <em>{{ item.description }}</em>
           <span class="kb-doc-product__thumb" aria-hidden="true">
-            <img class="no-zoom" :src="item.image" alt="">
+            <img
+              class="no-zoom"
+              :src="item.image"
+              alt=""
+              decoding="async"
+              fetchpriority="low"
+              loading="lazy"
+            >
           </span>
         </a>
       </nav>
@@ -217,6 +229,8 @@ function activateItem(index: number) {
       <a
         class="kb-doc-product__stage"
         :href="activeItem.href"
+        :target="activeItem.external ? '_blank' : undefined"
+        :rel="activeItem.external ? 'noreferrer' : undefined"
         :aria-label="`${content.openLabel}: ${activeItem.title}`"
       >
         <span class="kb-doc-product__stage-caption">
@@ -233,6 +247,9 @@ function activateItem(index: number) {
               class="no-zoom"
               :src="activeItem.image"
               :alt="activeItem.imageAlt"
+              decoding="async"
+              fetchpriority="low"
+              loading="lazy"
             >
           </Transition>
         </span>
