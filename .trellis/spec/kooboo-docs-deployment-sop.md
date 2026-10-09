@@ -24,14 +24,18 @@
 
 ### 1.1 全局入口使用项目专属稳定 URL
 
+以下 `<release>` 是导出器根据资源内容生成的版本目录。同一目录不可覆盖为不同内容，旧版本资源保留供回滚。发布顺序为：固定快照和两个计划 → 上传并验证 supporting resources → 更新并验证 pages。不要在页面切换前覆盖旧运行时资源。
+
+canonical 使用 `@k-canonical` 指令写入 Page `customHeader`，避免当前 Kooboo 渲染器吞掉 body 中的 canonical link；必须验证公开 HTML。保持既有 Site ID、域名和访问日志设置。
+
 VitePress 全局入口固定为：
 
 ```text
-/assets/vitepress-app.js
-/assets/vitepress-style.css
-/assets/vitepress-local-search.js
-/assets/@localSearchIndexroot.js
-/assets/vitepress-runtime-data.js
+/assets/releases/<release>/vitepress-app.js
+/assets/releases/<release>/vitepress-style.css
+/assets/releases/<release>/vitepress-local-search.js
+/assets/releases/<release>/@localSearchIndexroot.js
+/assets/releases/<release>/vitepress-runtime-data.js
 ```
 
 不要改回 `/assets/app.js` 或 `/assets/style.css`。Kooboo 可能存在资源对象和 `routeName`，但真实 HTTP 路由没有命中；此时重复 push 同名资源仍可能继续返回 404。项目专属名称也能避免与站点中其他通用入口冲突。
@@ -56,9 +60,9 @@ VitePress 客户端会根据 `window.__VP_HASH_MAP__` 动态拼接：
 
 1. `assets/` 中的物理文件名；
 2. `content-file/hashmap.json`；
-3. 公共 `/assets/vitepress-runtime-data.js` 中的 `window.__VP_HASH_MAP__`。
+3. 公共 `/assets/releases/<release>/vitepress-runtime-data.js` 中的 `window.__VP_HASH_MAP__`。
 
-`window.__VP_HASH_MAP__` 与 `window.__VP_SITE_DATA__` 必须从页面 HTML 外置到这份公共阻塞 Script。每个 HTML 只引用一次 `/assets/vitepress-runtime-data.js`，避免任意全局数据变化导致约 210 个 Page 全部进入增量计划。
+`window.__VP_HASH_MAP__` 与 `window.__VP_SITE_DATA__` 必须从页面 HTML 外置到这份公共阻塞 Script。每个 HTML 只引用一次 `/assets/releases/<release>/vitepress-runtime-data.js`，避免在每页重复全站数据；资源版本切换仍会更新所有页面引用。
 
 如果只改物理文件名，SSR HTML 会短暂显示正确内容，随后客户端水合请求不存在的 hash 模块并切换到 VitePress 404。
 
@@ -76,22 +80,22 @@ pnpm docs:build:kooboo
 构建后至少确认：
 
 ```text
-kb-remote-site/src/js/assets/vitepress-app.js
-kb-remote-site/src/js/assets/vitepress-local-search.js
-kb-remote-site/src/js/assets/@localSearchIndexroot.js
-kb-remote-site/src/js/assets/vitepress-runtime-data.js
-kb-remote-site/src/css/assets/vitepress-style.css
-kb-remote-site/src/js/assets/<page>.md.stable.lean.js
+kb-remote-site/src/js/assets/releases/<release>/vitepress-app.js
+kb-remote-site/src/js/assets/releases/<release>/vitepress-local-search.js
+kb-remote-site/src/js/assets/releases/<release>/@localSearchIndexroot.js
+kb-remote-site/src/js/assets/releases/<release>/vitepress-runtime-data.js
+kb-remote-site/src/css/assets/releases/<release>/vitepress-style.css
+kb-remote-site/src/js/assets/releases/<release>/<page>.md.stable.lean.js
 ```
 
 任取一个导出 Page，必须同时引用：
 
 ```html
-<link rel="preload stylesheet" href="/assets/vitepress-style.css" as="style">
-<script type="module" src="/assets/vitepress-app.js"></script>
+<link rel="preload stylesheet" href="/assets/releases/<release>/vitepress-style.css" as="style">
+<script type="module" src="/assets/releases/<release>/vitepress-app.js"></script>
 ```
 
-并且在 VitePress app 入口之前引用 `/assets/vitepress-runtime-data.js`，该 Script 中页面 hash 值为 `stable`；页面 HTML 不再内联 `__VP_HASH_MAP__` 或 `__VP_SITE_DATA__`。
+并且在 VitePress app 入口之前引用 `/assets/releases/<release>/vitepress-runtime-data.js`，该 Script 中页面 hash 值为 `stable`；页面 HTML 不再内联 `__VP_HASH_MAP__` 或 `__VP_SITE_DATA__`。
 
 ## 3. 发布顺序
 
@@ -154,7 +158,7 @@ pnpm docs:deploy:kooboo:exact
 pnpm docs:deploy:kooboo:exact -- --resume
 ```
 
-`--resume` 必须先校验 receipt 的 plan digest，只跳过已成功操作并重试失败或未完成项。不得为了“重新开始”而生成新计划。普通单篇文档更新的本地实测计划仅包含搜索索引、当前页面模块和当前 Page 共 3 项，写入及校验约 1058ms；如果出现约 210 个 Page，应先排查 runtime data 是否重新内联或是否确有全局配置变化。
+`--resume` 必须先校验 receipt 的 plan digest，只跳过已成功操作并重试失败或未完成项。不得为了“重新开始”而生成新计划。默认资源版本目录会随内容变化，因此单篇修改也可能产生完整资源集和约 210 个 Page 更新；应先核对版本引用与完整计划，按资源、页面两个阶段发布。
 
 不要使用 `Route/Get?name=...` 验证公开路径。`Route/Get` 的受支持查询参数是 Route ID；按 `name` 查询可能返回空值或滞后一请求的结果，容易把已经正确的路由误判为失败。公开 URL 是否指向正确对象，以 `Route/Resolve` 和真实 HTTP 响应为准。
 
@@ -215,15 +219,15 @@ pnpm docs:verify:kooboo
 检查所有全局资源，而不只检查 `.md.*` 页面模块：
 
 ```text
-/assets/vitepress-app.js
-/assets/vitepress-style.css
+/assets/releases/<release>/vitepress-app.js
+/assets/releases/<release>/vitepress-style.css
 ```
 
 如果 `kb check` 显示同步但 HTTP 仍为 404，不要反复保存同一个异常 URL。创建项目专属新 URL、先验证新 URL 为 200，再更新 Page 引用。
 
 ### 搜索按钮存在，但点击后没有弹出搜索框
 
-检查浏览器是否无法动态导入 `/assets/vitepress-local-search.js`，并确认 `/assets/@localSearchIndexroot.js` 返回 200。搜索模块是懒加载资源，只检查首页首次加载无法发现它缺失；必须执行真实点击和查询验收。
+检查浏览器是否无法动态导入 `/assets/releases/<release>/vitepress-local-search.js`，并确认 `/assets/releases/<release>/@localSearchIndexroot.js` 返回 200。搜索模块是懒加载资源，只检查首页首次加载无法发现它缺失；必须执行真实点击和查询验收。
 
 ### `app.js` 返回脚本文本错误而不是 JavaScript
 

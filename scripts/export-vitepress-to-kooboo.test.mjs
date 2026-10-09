@@ -6,8 +6,19 @@ import {
   injectCssRouteComment,
   injectJsRouteComment,
   injectPageRouteComment,
+  releaseAssetPath,
+  rewriteReleaseAssetReferences,
   toKoobooPageRoute
 } from './export-vitepress-to-kooboo.mjs'
+
+test('versioned export isolates assets and preserves documentation page routes', () => {
+  assert.equal(releaseAssetPath('assets/framework.js', 'seo-20261009'), 'assets/releases/seo-20261009/framework.js')
+  assert.equal(releaseAssetPath('cms/index.html', 'seo-20261009'), 'cms/index.html')
+  assert.throws(() => releaseAssetPath('assets/app.js', '../unsafe'))
+  assert.equal(rewriteReleaseAssetReferences('t=`${base}assets/${page}.js`', 'assets/framework.js', 'r1'), 't=`${base}assets/releases/r1/${page}.js`')
+  assert.equal(rewriteReleaseAssetReferences('<script src="/assets/app.js"></script><code>/assets/example.js</code>', 'index.html', 'r1'), '<script src="/assets/releases/r1/app.js"></script><code>/assets/example.js</code>')
+  assert.equal(rewriteReleaseAssetReferences('const example="/assets/example.js"', 'assets/api.md.stable.js', 'r1'), 'const example="/assets/example.js"')
+})
 import {
   getCmsScreenshotLocaleConfig,
   resolveCmsScreenshotOutputDir
@@ -29,6 +40,11 @@ test('toKoobooPageRoute keeps html extension for non-index pages', () => {
 test('injectPageRouteComment replaces existing page route comment', () => {
   const result = injectPageRouteComment('<!-- @k-url /old -->\n<!DOCTYPE html>', '/new/')
   assert.equal(result, '<!-- @k-url /new/ -->\n<!DOCTYPE html>')
+})
+
+test('canonical is exported as an explicit Kooboo Page header setting', () => {
+  const result = injectPageRouteComment('<head><link rel="canonical" href="https://docs.kooboo.com/cms/index.html"></head>', '/cms/index.html')
+  assert.equal(result, '<!-- @k-url /cms/index.html -->\n<!-- @k-canonical https://docs.kooboo.com/cms/index.html -->\n<head></head>')
 })
 
 test('absolutizeDocumentRelativeUrls protects links from Kooboo page normalization', () => {

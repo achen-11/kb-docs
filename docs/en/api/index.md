@@ -1,6 +1,6 @@
 # API Details
 
-Complete reference for Kooboo server-side `k.*` APIs. The English structure mirrors the Chinese `/api/` section and keeps the same module layout for easier lookup.
+Complete reference for Kooboo server-side `k.*` APIs, including authentication, content, databases, commerce, and site resources.
 
 ## Getting Started
 

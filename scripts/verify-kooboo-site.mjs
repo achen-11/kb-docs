@@ -1,6 +1,7 @@
 import { chromium } from 'playwright'
 
 import { PUBLISHED_VERIFY_PATHS } from './docs-publish-locale.mjs'
+import { releaseAssetPath } from './export-vitepress-to-kooboo.mjs'
 
 const siteUrl = process.env.KOOBOO_VERIFY_URL || process.argv[2]
 const paths = (process.env.KOOBOO_VERIFY_PATHS || PUBLISHED_VERIFY_PATHS)
@@ -8,22 +9,23 @@ const paths = (process.env.KOOBOO_VERIFY_PATHS || PUBLISHED_VERIFY_PATHS)
   .map((value) => value.trim())
   .filter(Boolean)
 
+if (!siteUrl) {
+  console.error('Missing site URL. Set KOOBOO_VERIFY_URL or pass the URL as the first argument.')
+  process.exit(1)
+}
+const baseUrl = new URL(siteUrl)
+const landingHtml = await fetch(new URL('/index.html', baseUrl)).then((response) => response.text())
+const assetRelease = process.env.KOOBOO_VERIFY_ASSET_RELEASE || landingHtml.match(/\/assets\/releases\/([^/]+)\/vitepress-app\.js/)?.[1]
 const requiredAssets = [
   '/assets/vitepress-app.js',
   '/assets/vitepress-style.css',
   '/assets/vitepress-runtime-data.js',
   '/assets/vitepress-local-search.js',
   '/assets/@localSearchIndexroot.js'
-]
+].map((assetPath) => `/${releaseAssetPath(assetPath.slice(1), assetRelease)}`)
+const appScriptPath = requiredAssets[0]
+const styleSheetPath = requiredAssets[1]
 
-if (!siteUrl) {
-  console.error(
-    'Missing site URL. Set KOOBOO_VERIFY_URL or pass the URL as the first argument.'
-  )
-  process.exit(1)
-}
-
-const baseUrl = new URL(siteUrl)
 const results = {
   siteUrl: baseUrl.origin,
   assets: [],
@@ -152,10 +154,10 @@ try {
       vitePressStarted: await page.evaluate(() => window.__VITEPRESS__ === true),
       notFound: await page.getByText('PAGE NOT FOUND', { exact: true }).count(),
       appScript: await page
-        .locator('script[type="module"][src^="/assets/vitepress-app.js"]')
+        .locator(`script[type="module"][src^="${appScriptPath}"]`)
         .count(),
       styleSheet: await page
-        .locator('link[rel~="stylesheet"][href^="/assets/vitepress-style.css"]')
+        .locator(`link[rel~="stylesheet"][href^="${styleSheetPath}"]`)
         .count(),
       failedResponses,
       consoleErrors,

@@ -65,16 +65,20 @@ Kooboo Page 的 `@k-url` 保留 `index.html` 路径，例如 `<!-- @k-url /cms/i
 构建产物必须遵守以下稳定 URL 契约：
 
 ```text
-/assets/vitepress-app.js
-/assets/vitepress-style.css
-/assets/vitepress-runtime-data.js
-/assets/<page>.md.stable.js
-/assets/<page>.md.stable.lean.js
+/assets/releases/<release>/vitepress-app.js
+/assets/releases/<release>/vitepress-style.css
+/assets/releases/<release>/vitepress-runtime-data.js
+/assets/releases/<release>/<page>.md.stable.js
+/assets/releases/<release>/<page>.md.stable.lean.js
 ```
 
-页面模块不能直接去掉 hash 段。VitePress 运行时会根据 `window.__VP_HASH_MAP__` 拼接模块文件名，因此 stabilizer 必须同时重写物理文件名、`content-file/hashmap.json` 和公共 `/assets/vitepress-runtime-data.js`。页面 HTML 只引用这份公共 Script，不再重复内联全站 hash map 和 site data。完整规则见 `.trellis/spec/kooboo-docs-deployment-sop.md`。
+页面模块不能直接去掉 hash 段。VitePress 运行时会根据 `window.__VP_HASH_MAP__` 拼接模块文件名，因此 stabilizer 必须同时重写物理文件名、`content-file/hashmap.json` 和公共 `/assets/releases/<release>/vitepress-runtime-data.js`。页面 HTML 只引用这份公共 Script，不再重复内联全站 hash map 和 site data。完整规则见 `.trellis/spec/kooboo-docs-deployment-sop.md`。
 
 ## 4. 部署到 Kooboo（artifact 分支 + `kb deploy`）
+
+导出器默认根据资源内容生成 `<release>`，所有运行时资源发布到 `/assets/releases/<release>/`。先执行并完整验证资源计划，再执行页面计划；保留旧版本资源以支持页面逐步切换和回滚。同一版本路径不得覆盖为不同内容。每次发布固定 plan、源快照和 receipt，失败时只用原计划恢复。
+
+页面的 canonical 通过 `@k-canonical` 导出指令写入 Kooboo Page 的 `customHeader`，保留其他自定义头部；验收需检查公开 HTTP 中实际输出的 canonical。生产发布必须锁定现有 Site ID，不创建站点或换绑域名。
 
 ### 4.1 两个仓库状态
 
@@ -198,9 +202,9 @@ if (url !== '/' && url.endsWith('/')) {
 
 ### 7.1 先看计划规模
 
-普通单篇文档更新通常只产生约 3 个 upsert：搜索索引、当前页面模块和当前 Page。本次本地实测为 3 项全部写入并校验，耗时约 1.1 秒。
+版本目录发布中，单篇文档改变也可能生成新 `<release>`，因此完整资源集和引用它们的页面都会进入计划。先检查版本路径和计划范围，再执行分阶段上传与验证。
 
-如果单篇文档改动却出现约 210 个 Page 变化，先检查 `/assets/vitepress-runtime-data.js` 是否被重新内联进每个 HTML，或全局配置、搜索索引是否确实发生了全站变化，不要直接开始发布。
+如果约 210 个 Page 都发生变化，确认是资源版本切换带来的引用变化；同时检查运行时数据没有重新内联进每个 HTML。固定完整快照后再发布。
 
 ### 7.2 `Page/all` 失败不是一律增加 timeout
 

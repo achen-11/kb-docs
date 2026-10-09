@@ -88,7 +88,16 @@ async function main() {
   for (const option of [
     '--timeout',
     '--concurrency',
+    '--image-concurrency',
+    '--supporting-concurrency',
+    '--page-concurrency',
+    '--verify-concurrency',
     '--interval-ms',
+    '--image-interval-ms',
+    '--supporting-interval-ms',
+    '--page-interval-ms',
+    '--verify-interval-ms',
+    '--checkpoint-interval-ms',
     '--page-retry-count',
     '--page-retry-delay-ms'
   ]) {

@@ -1,6 +1,7 @@
 ---
 layout: page
 title: Kooboo Documentation Center
+description: Learn to build and manage Kooboo websites with Admin CMS tutorials, template engine guides, and the KScript API reference.
 ---
 <main class="kb-doc-home">
 <section class="kb-doc-hero" aria-labelledby="kb-doc-title">

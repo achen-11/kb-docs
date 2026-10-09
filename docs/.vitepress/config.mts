@@ -5,6 +5,8 @@ import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createEditLinkConfig } from './editor-link.mjs'
+import { exportPublishedMarkdown } from '../../scripts/export-published-markdown.mjs'
+import { canonicalDocPath, createDocSeo, DOCS_ORIGIN } from '../../scripts/docs-seo.mjs'
 import {
   PUBLISH_CLI,
   PUBLISH_PRODUCT_FEATURES,
@@ -28,6 +30,7 @@ const LEGACY_ENGLISH_REDIRECT_HTML = `<!DOCTYPE html>
   <meta charset="utf-8">
   <meta http-equiv="refresh" content="0;url=/">
   <link rel="canonical" href="/">
+  <meta name="robots" content="noindex">
   <title>Kooboo Documentation</title>
   <script>location.replace("/")</script>
 </head>
@@ -988,6 +991,7 @@ const enSidebar = {
 }
 
 const srcExclude = [
+  'public/**',
   ...(PUBLISH_GUIDE ? [] : ['guide/**']),
   ...(PUBLISH_ZH ? [] : UNPUBLISHED_ZH_SRC_GLOBS),
   ...UNPUBLISHED_EN_SRC_GLOBS,
@@ -1050,6 +1054,32 @@ export default defineConfig({
   cacheDir: process.env.DOCS_VITEPRESS_CACHE_DIR || undefined,
   ignoreDeadLinks: true,
   lastUpdated: true,
+  sitemap: {
+    hostname: DOCS_ORIGIN,
+    transformItems(items) {
+      return items.filter((item) => item.url !== '404.html' && item.url !== '/404.html')
+        .map((item) => ({
+          ...item,
+          url: canonicalDocPath(item.url.endsWith('/') || !item.url ? `${item.url}index.md` : item.url),
+        }))
+    },
+  },
+  transformPageData(pageData, { siteConfig }) {
+    if (pageData.relativePath === '404.md') {
+      pageData.frontmatter.head = [...(pageData.frontmatter.head || []), ['meta', { name: 'robots', content: 'noindex' }]]
+      return
+    }
+    const sourcePath = siteConfig.rewrites.inv[pageData.relativePath] || pageData.relativePath
+    const seo = createDocSeo(pageData, readFileSync(path.join(siteConfig.srcDir, sourcePath), 'utf8'))
+    pageData.title = seo.title
+    pageData.description = seo.description
+    pageData.frontmatter.title = seo.title
+    pageData.frontmatter.description = seo.description
+    pageData.frontmatter.head = [
+      ...(pageData.frontmatter.head || []).filter(([tag, attrs]) => !(tag === 'link' && attrs.rel === 'canonical')),
+      ['link', { rel: 'canonical', href: seo.canonical }],
+    ]
+  },
   lang: 'en-US',
   head: [
     ['link', { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
@@ -1085,9 +1115,11 @@ export default defineConfig({
     )
   },
   async buildEnd(siteConfig) {
+    await exportPublishedMarkdown(siteConfig)
     const legacyEnglishDir = path.join(siteConfig.outDir, 'en')
     await mkdir(legacyEnglishDir, { recursive: true })
     await writeFile(path.join(legacyEnglishDir, 'index.html'), LEGACY_ENGLISH_REDIRECT_HTML)
+    await writeFile(path.join(siteConfig.outDir, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${DOCS_ORIGIN}/sitemap.xml\n`)
     await Promise.all([
       removeImageFiles(path.join(siteConfig.outDir, 'cms')),
       removeImageFiles(path.join(siteConfig.outDir, 'product')),

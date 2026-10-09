@@ -1,6 +1,7 @@
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { createHash } from 'node:crypto'
 import {
   isDocImagePath,
   syncPublicImagesToKooboo
@@ -21,6 +22,24 @@ const generatedPaths = {
   legacyContentFileDir: path.join(koobooSrcDir, 'content-file'),
   vpIconsCssFile: path.join(koobooSrcDir, 'css', 'vp-icons.css'),
   hashMapFile: path.join(koobooSiteDir, 'content-file', 'hashmap.json')
+}
+
+export function releaseAssetPath(relativePath, release) {
+  if (!release || !relativePath.startsWith('assets/')) return relativePath
+  if (!/^[a-z0-9-]{1,64}$/.test(release)) throw new Error('Invalid asset release identifier')
+  return relativePath.replace(/^assets\//, `assets/releases/${release}/`)
+}
+
+export function rewriteReleaseAssetReferences(content, relativePath, release) {
+  if (!release) return content
+  releaseAssetPath('assets/check', release)
+  // Runtime loaders construct page URLs and preload dependency URLs dynamically.
+  // Page modules retain their code examples; their imports are already relative.
+  if (relativePath.endsWith('.js') && !relativePath.includes('.md.')) {
+    return content.replaceAll('assets/', `assets/releases/${release}/`)
+  }
+  return content.replace(/((?:href|src)=["']\/?)assets\//g, `$1assets/releases/${release}/`)
+    .replace(/(url\(["']?\/)assets\//g, `$1assets/releases/${release}/`)
 }
 
 function normalizeRelativePath(relativePath) {
@@ -99,7 +118,11 @@ export function absolutizeDocumentRelativeUrls(html, distRelativePath, pageRelat
 
 export function injectPageRouteComment(html, route) {
   const body = removeLeadingRouteComment(html, 'html')
-  return `<!-- @k-url ${route} -->\n${body}`
+  const canonical = body.match(/<link\s+rel="canonical"\s+href="([^"]+)"\s*\/?\s*>/)
+  // Older Kooboo renderers omit canonical links parsed from the document head.
+  // Exact deployment writes this explicit setting into the Page custom header.
+  const canonicalConfig = canonical ? `<!-- @k-canonical ${new URL(canonical[1], 'https://docs.kooboo.com').href} -->\n` : ''
+  return `<!-- @k-url ${route} -->\n${canonicalConfig}${canonical ? body.replace(canonical[0], '') : body}`
 }
 
 export function injectJsRouteComment(code, route) {
@@ -214,29 +237,29 @@ function getDistFileTarget(distRelativePath) {
   return getRootStaticTarget(normalized)
 }
 
-async function exportFile(sourcePath, pageRelativePaths) {
+async function exportFile(sourcePath, pageRelativePaths, release) {
   const relativePath = normalizeRelativePath(path.relative(distDir, sourcePath))
-  const target = getDistFileTarget(relativePath)
+  const target = getDistFileTarget(releaseAssetPath(relativePath, release))
 
   if (!target) {
     return
   }
 
   if (target.type === 'page') {
-    const html = await readFile(sourcePath, 'utf8')
+    const html = rewriteReleaseAssetReferences(await readFile(sourcePath, 'utf8'), relativePath, release)
     const normalizedHtml = absolutizeDocumentRelativeUrls(html, relativePath, pageRelativePaths)
     await writeTextFile(target.targetPath, injectPageRouteComment(normalizedHtml, target.route))
     return
   }
 
   if (target.type === 'js') {
-    const code = await readFile(sourcePath, 'utf8')
+    const code = rewriteReleaseAssetReferences(await readFile(sourcePath, 'utf8'), relativePath, release)
     await writeTextFile(target.targetPath, injectJsRouteComment(code, target.route))
     return
   }
 
   if (target.type === 'css') {
-    const css = await readFile(sourcePath, 'utf8')
+    const css = rewriteReleaseAssetReferences(await readFile(sourcePath, 'utf8'), relativePath, release)
     await writeTextFile(target.targetPath, injectCssRouteComment(css, target.route))
     return
   }
@@ -244,17 +267,27 @@ async function exportFile(sourcePath, pageRelativePaths) {
   await copyBinaryFile(sourcePath, target.targetPath)
 }
 
-export async function exportVitePressToKooboo() {
+export async function exportVitePressToKooboo({ assetRelease = process.env.KOOBOO_ASSET_RELEASE } = {}) {
+  if (assetRelease) releaseAssetPath('assets/check', assetRelease)
   await resetGeneratedOutput()
 
   const files = await walkFiles(distDir)
+  if (!assetRelease) {
+    const digest = createHash('sha256')
+    for (const filePath of files.filter((filePath) => path.relative(distDir, filePath).startsWith(`assets${path.sep}`)).sort()) {
+      digest.update(normalizeRelativePath(path.relative(distDir, filePath)))
+      digest.update('\0')
+      digest.update(await readFile(filePath))
+    }
+    assetRelease = digest.digest('hex').slice(0, 12)
+  }
   const pageRelativePaths = new Set(
     files
       .map((filePath) => normalizeRelativePath(path.relative(distDir, filePath)))
       .filter((relativePath) => relativePath.endsWith('.html'))
   )
   for (const filePath of files) {
-    await exportFile(filePath, pageRelativePaths)
+    await exportFile(filePath, pageRelativePaths, assetRelease)
   }
 
   await syncPublicImagesToKooboo()
