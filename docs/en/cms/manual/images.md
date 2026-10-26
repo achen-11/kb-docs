@@ -2,25 +2,20 @@
 
 Site images live in the left **Media library**. Create folders first, then upload into the matching folder so assets stay organized.
 
-<!-- TODO: screenshots pending under /workspace/kb-docs-shots/images/ → bake to docs/public/{,en/}cms/manual/images/*.jpg -->
-
 ## Create folders for categories
 
-Open **Media library**. Click **New folder**, name folders by use (for example banners or product shots), then upload into the right folder.
+Open **Media library**. Click **New folder**, and name folders by use. Folder names may only use letters, numbers, and `.-_` (for example `product`).
 
-<!-- TODO -->
-<DocImage src="/cms/manual/images/folders.jpg" alt="Create folders in the media library to categorize images" />
+<DocImage src="/cms/manual/images/folders.jpg" alt="Click New folder to create a category folder such as product" />
 
 ## Upload into a folder
 
-Open the target folder, click **Upload**, and choose local images. Confirm they appear in the list when done.
+Open the folder, click **Upload**, and choose local images. Confirm they appear in the list when done.
 
-<!-- TODO -->
-<DocImage src="/cms/manual/images/upload.jpg" alt="Open a folder and click Upload to add images" />
+<DocImage src="/cms/manual/images/upload.jpg" alt="Inside a folder, click Upload to add images" />
 
 ## Edit an image
 
-Hover an image, click the **Edit** icon to open the image editor, then crop, rotate, or adjust as needed.
+Hover an image, click **Edit** to open **Edit image**. Pick a crop ratio, set **Angle** to rotate, then click **Crop**. Click **Save** when finished.
 
-<!-- TODO -->
-<DocImage src="/cms/manual/images/edit.jpg" alt="Hover an image, click Edit, then crop or rotate" />
+<DocImage src="/cms/manual/images/edit.jpg" alt="On Edit image, adjust crop ratio and Angle, then click Crop" />
