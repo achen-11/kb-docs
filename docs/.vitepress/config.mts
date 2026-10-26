@@ -114,6 +114,7 @@ const cmsSidebar = [
         items: [
           { text: '手册', link: '/cms/manual/' },
           { text: '在线编辑页面', link: '/cms/manual/edit-page' },
+          { text: '列表型数据管理', link: '/cms/manual/list-data' },
         ],
       },
       {
@@ -931,6 +932,7 @@ const englishSidebarTextMap = {
   '操作手册': 'User Manual',
   '手册': 'Manual',
   '在线编辑页面': 'Edit a Page Visually',
+  '列表型数据管理': 'Manage List Content',
   '模板引擎': 'Template Engine',
   '快速开始': 'Quick Start',
   'KScript 语言与运行时': 'KScript Language and Runtime',
