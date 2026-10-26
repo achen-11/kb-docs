@@ -1,26 +1,27 @@
 # Manage form submissions
 
-After a visitor submits a form on the page, the data usually lands in **Database → IndexedDB Tables** (or **Database → SQLite Tables**) in the admin.
-
-<!-- TODO: screenshots pending under /workspace/kb-docs-shots/form-data/ → bake to docs/public/{,en/}cms/manual/form-data/*.jpg -->
+After a visitor submits a form on the page, the data usually appears under **Database → IndexedDB Tables** (or **Database → SQLite Tables**) in the admin. Open those tables to view and manage the records.
 
 ## Open the database tables
 
 Open **Database → IndexedDB Tables** (or **Database → SQLite Tables**). Click a table name to open its data list.
 
-<!-- TODO -->
-<DocImage src="/cms/manual/form-data/tables.jpg" alt="Click a table name in the database table list" />
+<DocImage src="/cms/manual/form-data/tables.jpg" alt="Open IndexedDB Tables, then click a table name" />
 
-## View submission rows
+## View rows in the table
 
-Inside the table, browse each submission. Edit a row when needed, or check rows and delete them from the toolbar.
+Browse the rows in the table. Click the pencil on a row to open the detail view.
 
-<!-- TODO -->
-<DocImage src="/cms/manual/form-data/rows.jpg" alt="Browse form submission rows in the table data list" />
+<DocImage src="/cms/manual/form-data/rows.jpg" alt="Browse table rows and click the pencil to open a record" />
+
+## Open a record
+
+Review or edit the fields, then click **Save**.
+
+<DocImage src="/cms/manual/form-data/detail.jpg" alt="View fields in the record detail and save" />
 
 ## Show the Database menu
 
-If **Database** is missing from the left sidebar: click **Edit menu** at the bottom left, then check the items you want to show.
+If **Database** is missing from the left sidebar: click **Edit menu** at the bottom left, then check the items you want to show (for example **IndexedDB Tables**).
 
-<!-- TODO -->
-<DocImage src="/cms/manual/form-data/edit-menu.jpg" alt="Use Edit menu at the bottom left to show Database items" />
+<DocImage src="/cms/manual/form-data/edit-menu.jpg" alt="Use Edit menu at the bottom left and check IndexedDB Tables" />
