@@ -1109,6 +1109,8 @@ const publishedRewrites = {
 }
 
 export default defineConfig({
+  // GitHub Pages project site: DOCS_BASE=/kb-docs/ vitepress build docs
+  base: process.env.DOCS_BASE || '/',
   cacheDir: process.env.DOCS_VITEPRESS_CACHE_DIR || undefined,
   ignoreDeadLinks: true,
   lastUpdated: true,
