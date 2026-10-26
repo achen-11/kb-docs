@@ -62,6 +62,14 @@ Site-level deep links are written as:
 
 See [Menu overview](./navigation.md) for details.
 
+## User Manual
+
+For click-by-click UI guidance with screenshots:
+
+- [Edit a Page Visually](./manual/edit-page.md) — change a heading, replace an image, and set alt text on the preview canvas
+
+More chapters: [User Manual home](./manual/).
+
 ## Related
 
 - [Login and site list](./getting-started/login-and-site-list.md)
