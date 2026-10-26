@@ -104,6 +104,14 @@ const cmsSidebar = [
     items: [
       { text: '概述', link: '/cms/' },
       {
+        text: '操作手册',
+        collapsed: false,
+        items: [
+          { text: '手册首页', link: '/cms/manual/' },
+          { text: '在线编辑页面', link: '/cms/manual/edit-page' },
+        ],
+      },
+      {
         text: '入门',
         collapsed: false,
         items: [
@@ -915,6 +923,9 @@ const englishSidebarTextMap = {
   '发布与域名': 'Publish and Domains',
   '写第一个 KScript API': 'Write Your First KScript API',
   '后台 CMS': 'Admin CMS',
+  '操作手册': 'User Manual',
+  '手册首页': 'Manual Home',
+  '在线编辑页面': 'Edit a Page Visually',
   '模板引擎': 'Template Engine',
   '快速开始': 'Quick Start',
   'KScript 语言与运行时': 'KScript Language and Runtime',

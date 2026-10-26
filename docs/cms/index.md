@@ -62,6 +62,14 @@ flowchart LR
 
 详见 [菜单总览](./navigation.md)。
 
+## 操作手册
+
+需要按界面一步步点选时，可看图文手册：
+
+- [在线编辑页面](./manual/edit-page.md) — 在预览画布上改标题、换图并填写 alt
+
+更多章节见 [操作手册首页](./manual/)。
+
 ## 相关
 
 - [登录与站点列表](./getting-started/login-and-site-list.md)
