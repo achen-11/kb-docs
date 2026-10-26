@@ -117,6 +117,7 @@ const cmsSidebar = [
           { text: '列表型数据管理', link: '/cms/manual/list-data' },
           { text: '表单数据管理', link: '/cms/manual/form-data' },
           { text: '图片管理', link: '/cms/manual/images' },
+          { text: '域名管理', link: '/cms/manual/domains' },
         ],
       },
       {
@@ -937,6 +938,7 @@ const englishSidebarTextMap = {
   '列表型数据管理': 'Manage List Content',
   '表单数据管理': 'Manage form submissions',
   '图片管理': 'Manage images',
+  '域名管理': 'Domains',
   '模板引擎': 'Template Engine',
   '快速开始': 'Quick Start',
   'KScript 语言与运行时': 'KScript Language and Runtime',

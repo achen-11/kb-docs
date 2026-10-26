@@ -8,3 +8,4 @@ Follow the real admin screen and complete one task from the pictures.
 | Manage list-type content data | [Manage List Content](./list-data.md) |
 | View form submission data | [Manage form submissions](./form-data.md) |
 | Categorize and edit media library images | [Manage images](./images.md) |
+| Buy, bind, and troubleshoot domains | [Domains](./domains.md) |
