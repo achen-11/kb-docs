@@ -252,7 +252,7 @@ PUBLISH_CLI = false
 PUBLISH_PRODUCT_FEATURES = false
 ```
 
-英文源 `docs/en/cms/manual/` 经 rewrite 发布到 `/cms/manual/`，中文源保留但不发布。不要为了预览中文而意外开启生产中文发布。
+英文源 `docs/en/cms/manual/` 经 rewrite 发布到 `/cms/manual/`，中文源保留但不发布。不要把 `PUBLISH_ZH` 改成 `true`。本地看中文用 `DOCS_PREVIEW_ZH=1 pnpm docs:dev`，样章在 `/zh/cms/manual/edit-page`。构建和部署忽略该变量，仍然只发布英文。
 
 ## 9. 接手建议顺序与验证
 
@@ -302,4 +302,4 @@ git diff --check
 
 本次交接时 HEAD：`4f16c80`（`docs: 补全 KScript 运行时文档并修正中英文 API 示例`）。当前工作区主要是本交接列出的规范清理、任务归档、ManualImage 和中文截图，另有待核对来源的 `artifacts/`。
 
-**完成状态：清理已实施但未最终验证；样章基础组件与部分中文截图已完成；正文、导航、英文截图和完整验证尚未完成。**
+**2026-10-26 v2：** 中英「在线编辑页面」改用 `ManualImage` + `:marks` 百分比红框（与截图上的框对齐；中文已补 `save-page.jpg`）。保留 `docs:dev:zh` / `DOCS_PREVIEW_ZH`（仅本地预览，`PUBLISH_ZH` 仍为 false）。侧栏与手册首页已挂上。

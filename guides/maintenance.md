@@ -18,7 +18,7 @@
 ### 2.1 基本约定
 
 - 链接优先**省略扩展名**：`[页面](/cms/site/pages)`，与 VitePress 一致。
-- 当前只发布英文：源文件在 `docs/en/...`，页面映射到站点根路径。中文源文件同步维护，暂不发布；开关见 `scripts/docs-publish-locale.mjs`。
+- 当前只发布英文：源文件在 `docs/en/...`，页面映射到站点根路径。中文源文件同步维护，暂不发布；开关见 `scripts/docs-publish-locale.mjs`。本地预览中文用 `DOCS_PREVIEW_ZH=1 pnpm docs:dev`（或 `pnpm docs:dev:zh`），页面在 `/zh/`。构建和部署忽略该变量。
 - API 文档遵循 `.trellis/spec/api-documentation-workflow.md`（无 `@k-url`、无 `code/` 路径等）。
 
 ### 2.2 配图

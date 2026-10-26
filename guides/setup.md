@@ -70,6 +70,14 @@ kb pull type    # 生成 kooboo.d.ts
 pnpm docs:dev
 ```
 
+要在本地同时看中文，用 `DOCS_PREVIEW_ZH=1`。中文页面在 `/zh/`，例如 `http://localhost:5173/zh/cms/manual/edit-page`。这个变量只在 `vitepress dev` 生效；`pnpm docs:build` 和部署会忽略它，站点仍然只发布英文。
+
+```bash
+DOCS_PREVIEW_ZH=1 pnpm docs:dev
+# 或
+pnpm docs:dev:zh
+```
+
 浏览器打开终端提示的地址（通常 `http://localhost:5173`）。
 
 - 文档源文件在 `docs/`，改 Markdown 会热更新。

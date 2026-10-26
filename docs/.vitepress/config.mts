@@ -15,10 +15,15 @@ import {
   UNPUBLISHED_INTERNAL_SRC_GLOBS,
   UNPUBLISHED_ZH_SRC_GLOBS,
   canonicalPathFromLegacyEnglish,
+  isLocalChinesePreview,
   isUnpublishedPublicRoute,
+  prefixLocalChineseDocHref,
   rewriteLegacyEnglishHrefs,
   stripEnglishUrlPrefix,
+  withLocalChinesePreviewRewrites,
 } from '../../scripts/docs-publish-locale.mjs'
+
+const localChinesePreview = isLocalChinesePreview()
 
 const DOCS_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const EDITOR_BASE_URL = process.env.DOCS_EDITOR_BASE_URL
@@ -107,7 +112,7 @@ const cmsSidebar = [
         text: '操作手册',
         collapsed: false,
         items: [
-          { text: '手册首页', link: '/cms/manual/' },
+          { text: '手册', link: '/cms/manual/' },
           { text: '在线编辑页面', link: '/cms/manual/edit-page' },
         ],
       },
@@ -924,7 +929,7 @@ const englishSidebarTextMap = {
   '写第一个 KScript API': 'Write Your First KScript API',
   '后台 CMS': 'Admin CMS',
   '操作手册': 'User Manual',
-  '手册首页': 'Manual Home',
+  '手册': 'Manual',
   '在线编辑页面': 'Edit a Page Visually',
   '模板引擎': 'Template Engine',
   '快速开始': 'Quick Start',
@@ -1006,7 +1011,7 @@ const enSidebar = {
 const srcExclude = [
   'public/**',
   ...(PUBLISH_GUIDE ? [] : ['guide/**']),
-  ...(PUBLISH_ZH ? [] : UNPUBLISHED_ZH_SRC_GLOBS),
+  ...(PUBLISH_ZH || localChinesePreview ? [] : UNPUBLISHED_ZH_SRC_GLOBS),
   ...UNPUBLISHED_EN_SRC_GLOBS,
   ...UNPUBLISHED_INTERNAL_SRC_GLOBS,
 ]
@@ -1037,6 +1042,16 @@ const zhLocale = {
   },
 }
 
+const zhPreviewLocale = {
+  ...zhLocale,
+  link: '/zh/',
+  themeConfig: {
+    ...zhLocale.themeConfig,
+    nav: prefixLocaleNav(zhNav, '/zh'),
+    sidebar: prefixLocaleSidebarMap(zhSidebar, '/zh'),
+  },
+}
+
 const enLocale = {
   label: 'English',
   lang: 'en-US',
@@ -1061,6 +1076,36 @@ const enLocale = {
     sidebar: enSidebar,
     langMenuLabel: 'Languages',
   },
+}
+
+const publishedRewrites = {
+  'en/:rest*': ':rest*',
+  'api/core/api.md': 'api/api/index.md',
+  'api/core/cache.md': 'api/cache/index.md',
+  'api/core/cookie.md': 'api/cookie/index.md',
+  'api/core/request.md': 'api/request/index.md',
+  'api/core/response.md': 'api/response/index.md',
+  'api/core/security.md': 'api/security/index.md',
+  'api/core/session.md': 'api/session/index.md',
+  'api/core/state.md': 'api/state/index.md',
+  'api/data/content.md': 'api/content/index.md',
+  'api/data/database.md': 'api/database/index.md',
+  'api/data/sqlite/index.md': 'api/sqlite/index.md',
+  'api/business/mail.md': 'api/mail/index.md',
+  'api/logger/k-logger.md': 'api/logger/index.md',
+  'api/site/site.md': 'api/site/index.md',
+  'api/site/k-page.md': 'api/page/index.md',
+  'api/site/label.md': 'api/label/index.md',
+  'api/site/media.md': 'api/media/index.md',
+  'api/site/module.md': 'api/module/index.md',
+  'templateEngine/k-query.md': 'templateEngine/k-data/index.md',
+  'templateEngine/layout.md': 'templateEngine/layout/index.md',
+  'templateEngine/page.md': 'templateEngine/page/index.md',
+  'templateEngine/view.md': 'templateEngine/view/index.md',
+  'templateEngine/js.md': 'templateEngine/js/index.md',
+  'templateEngine/css.md': 'templateEngine/css/index.md',
+  'templateEngine/k-data.md': 'templateEngine/k-data/index.md',
+  'templateEngine/template-binding-syntax.md': 'templateEngine/binding/index.md',
 }
 
 export default defineConfig({
@@ -1148,7 +1193,12 @@ export default defineConfig({
       md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
         const hrefIndex = tokens[idx].attrIndex('href')
         if (hrefIndex >= 0) {
-          tokens[idx].attrs[hrefIndex][1] = stripEnglishUrlPrefix(tokens[idx].attrs[hrefIndex][1])
+          let href = stripEnglishUrlPrefix(tokens[idx].attrs[hrefIndex][1])
+          const relativePath = String(env?.relativePath || '').replace(/\\/g, '/')
+          if (localChinesePreview && relativePath.startsWith('zh/')) {
+            href = prefixLocalChineseDocHref(href)
+          }
+          tokens[idx].attrs[hrefIndex][1] = href
         }
         return defaultOpen
           ? defaultOpen(tokens, idx, options, env, self)
@@ -1156,35 +1206,9 @@ export default defineConfig({
       }
     },
   },
-  rewrites: {
-    'en/:rest*': ':rest*',
-    'api/core/api.md': 'api/api/index.md',
-    'api/core/cache.md': 'api/cache/index.md',
-    'api/core/cookie.md': 'api/cookie/index.md',
-    'api/core/request.md': 'api/request/index.md',
-    'api/core/response.md': 'api/response/index.md',
-    'api/core/security.md': 'api/security/index.md',
-    'api/core/session.md': 'api/session/index.md',
-    'api/core/state.md': 'api/state/index.md',
-    'api/data/content.md': 'api/content/index.md',
-    'api/data/database.md': 'api/database/index.md',
-    'api/data/sqlite/index.md': 'api/sqlite/index.md',
-    'api/business/mail.md': 'api/mail/index.md',
-    'api/logger/k-logger.md': 'api/logger/index.md',
-    'api/site/site.md': 'api/site/index.md',
-    'api/site/k-page.md': 'api/page/index.md',
-    'api/site/label.md': 'api/label/index.md',
-    'api/site/media.md': 'api/media/index.md',
-    'api/site/module.md': 'api/module/index.md',
-    'templateEngine/k-query.md': 'templateEngine/k-data/index.md',
-    'templateEngine/layout.md': 'templateEngine/layout/index.md',
-    'templateEngine/page.md': 'templateEngine/page/index.md',
-    'templateEngine/view.md': 'templateEngine/view/index.md',
-    'templateEngine/js.md': 'templateEngine/js/index.md',
-    'templateEngine/css.md': 'templateEngine/css/index.md',
-    'templateEngine/k-data.md': 'templateEngine/k-data/index.md',
-    'templateEngine/template-binding-syntax.md': 'templateEngine/binding/index.md',
-  },
+  rewrites: localChinesePreview
+    ? withLocalChinesePreviewRewrites(publishedRewrites)
+    : publishedRewrites,
   themeConfig: {
     editLink: enEditLink,
     search: {
@@ -1196,6 +1220,10 @@ export default defineConfig({
   },
   locales: {
     root: enLocale,
-    ...(PUBLISH_ZH ? { zh: { ...zhLocale, link: '/zh/' } } : {}),
+    ...(PUBLISH_ZH
+      ? { zh: { ...zhLocale, link: '/zh/' } }
+      : localChinesePreview
+        ? { zh: zhPreviewLocale }
+        : {}),
   },
 })

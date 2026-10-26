@@ -29,7 +29,7 @@ flowchart LR
 | 1 | [Create a site](./getting-started/create-site.md) | Blank / import / clone (AI builder not included) |
 | 2 | [Site admin menu overview](./navigation.md) | Know which column each `SiteId` feature lives in |
 | 3 | [Dashboard](./site/dashboard.md) · [Media Library](./site/media.md) | Site overview and image assets |
-| 4 | [Pages](./site/pages.md) | Create visitable pages |
+| 4 | [Pages](./site/pages.md) | Create visitable pages; change text and images in [Edit a Page Visually](./manual/edit-page.md) |
 | 5 | [Content](./content/index.md) ([Content types](./content/content-types.md) · [Content list](./content/contents-folders-list.md)) | Prepare data for `k.content` |
 | 6 | [Commerce](./commerce/index.md) (as needed) | Products, orders; see [k.commerce](/en/api/commerce/commerce.md) |
 | 7 | [Development](./development/index.md) | Layout, View, Code, modules, etc.; see [Template Engine](/en/templateEngine/) |
@@ -62,17 +62,10 @@ Site-level deep links are written as:
 
 See [Menu overview](./navigation.md) for details.
 
-## User Manual
-
-For click-by-click UI guidance with screenshots:
-
-- [Edit a Page Visually](./manual/edit-page.md) — change a heading, replace an image, and set alt text on the preview canvas
-
-More chapters: [User Manual home](./manual/).
-
 ## Related
 
 - [Login and site list](./getting-started/login-and-site-list.md)
 - [Create a site](./getting-started/create-site.md)
 - [Menu overview](./navigation.md)
+- [User Manual](./manual/index.md)
 - [Content](./content/index.md)

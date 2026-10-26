@@ -1,15 +1,7 @@
 # User Manual
 
-Short, screenshot-led steps for common Admin CMS tasks. This section starts with visual page editing.
+Follow the real admin screen and complete one task from the pictures.
 
-## Chapters
-
-| Doc | You will complete |
-|------|----------|
-| [Edit a Page Visually](./edit-page.md) | Change a heading, replace an image, and set alt text on the preview canvas |
-
-## Related
-
-- [Pages list](/cms/site/pages)
-- [Inline editing (reference)](/cms/site/pages-inline-edit)
-- [Media Library](/cms/site/media)
+| Task | Doc |
+|------|-----|
+| Change text and images on a page | [Edit a Page Visually](./edit-page.md) |
