@@ -1,40 +1,27 @@
 # Manage List Content
 
-List content on the page usually lives in folders under **Content → Content**. Open a folder to create, edit, or delete items, or drag them to change the order.
-
-<!-- TODO: screenshots pending under /workspace/kb-docs-shots/list-data/ → bake to docs/public/en/cms/manual/list-data/*.jpg -->
+List content on the page usually lives in folders under **Content → Content**. Open a folder to create or edit items, delete after checking a row, or drag to change the order.
 
 ## Open the content folders
 
-Open **Content → Content**. This lists the content folders.
+Open **Content → Content**. Click a folder name to open its list, or click the gear on the row for **Folder setting**.
 
-<!-- TODO -->
-<DocImage src="/cms/manual/list-data/folders.jpg" alt="View the content folders list" />
+<DocImage src="/cms/manual/list-data/folders.jpg" alt="Click the folder name to open it, or the gear for folder settings" />
 
-## Open a folder
+## Create, edit, delete, and drag
 
-Click the folder name to open its entry list.
+Inside the folder, click **New** to add an entry. Check a row, then use the delete icon on the toolbar above the table (not a per-row delete). Click the pencil to edit. When a drag handle is shown, hold it and drag to reorder.
 
-<!-- TODO -->
-<DocImage src="/cms/manual/list-data/entries.jpg" alt="Click the folder name to open the entry list" />
+<DocImage src="/cms/manual/list-data/entries.jpg" alt="New, toolbar delete after check, pencil edit, and drag handle" />
 
-## Create, edit, or delete
+## Edit and save
 
-Click **New** to add an entry. Edit or delete from the row.
+Change the fields, then click **Save** or **Save and return**.
 
-<!-- TODO -->
-<DocImage src="/cms/manual/list-data/crud.jpg" alt="Create, edit, or delete entries in the list" />
-
-## Drag to reorder
-
-When a drag handle appears on the right of a row, hold it and drag to change the order.
-
-<!-- TODO -->
-<DocImage src="/cms/manual/list-data/drag-sort.jpg" alt="Hold the drag handle to reorder entries" />
+<DocImage src="/cms/manual/list-data/edit.jpg" alt="Click Save or Save and return" />
 
 ## Enable drag sorting
 
 If there is no drag handle: go back to the folder list and click **Folder setting** on the row. Turn on **Sortable**, set **Sort field** to **Drag & Drop**, then save. Open the folder again to see the drag handles (list order follows the sort field).
 
-<!-- TODO -->
 <DocImage src="/cms/manual/list-data/enable-drag.jpg" alt="Turn on Sortable and choose Drag & Drop in folder settings" />
