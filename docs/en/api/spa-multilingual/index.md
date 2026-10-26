@@ -10,14 +10,13 @@ Kooboo **SPA Multilingual** saves translations as site resources (key name + mul
 The current version **does not** have a `k.spaMultilingual` or similar `k.*` interface to add, delete or modify entries in the script. Please import/edit in the background **Develop → SPA Multi-Language**; if you need similar copywriting on the script side, please use [k.label() / k.t()](/en/api/label/).
 :::
 
-::: Division of labor between tip and k.label
+::: tip Division of labor with k.label
 | ability | SPA Multilingual | k.label/k.t |
 |------|----------|----------------|
 | Data maintenance | Backstage SPA multilingual page | Backend **Content → Tag** |
 | Consumption | Browser `fetch('/_spa/lang/en')` | Template `k-label`, Code `k.t('key')` |
 | language origin | URL path segment `{languageCode}` | Site multilingual / current request culture |
-
----
+:::
 
 ## Get dictionary
 

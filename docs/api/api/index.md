@@ -48,12 +48,22 @@ k.api.get(() => {
 
 ### 创建子级路由
 
-创建子级路由需要在路由声明时包含 `{action}` 占位符：
+带名称的路由只有在**该 API 的 URL 以 `{...}` 占位符结尾**时才生效（例如后台把 URL 设为 `/api/v1/test/{action}`）。第二个参数是填充该占位符的 **action 名**：
 
 ```ts
-// 路由: /api/v1/test/list
-k.api.get("list", (id) => {
+// API URL: /api/v1/test/{action}
+// 请求: /api/v1/test/list
+k.api.get("list", () => {
     return [{ id: 123 }]
+})
+```
+
+处理函数的参数来自 query / 表单字段，与子级路由名无关：
+
+```ts
+// 请求: /api/v1/test/sub?id=23
+k.api.get("sub", (id) => {
+    return id   // "23"
 })
 ```
 
@@ -278,7 +288,8 @@ k.api.get((id) => {
 ## 异常处理封装示例
 
 ```ts
-export function errorResponse(message: string, code = 400) {
+// 统一错误响应；Module 脚本类型下加 export 即可供其他脚本复用
+function errorResponse(message: string, code = 400) {
     k.response.json({
         message,
         code,
@@ -287,12 +298,12 @@ export function errorResponse(message: string, code = 400) {
     return k.api.httpCode(code)
 }
 
-// 使用
-k.api.get((id) => {
-    const item = db.find(id)
+// 使用：API URL 为 /api/v1/item/{action}
+k.api.get("get", (id) => {
+    const item = k.DB.keyValue.get(id)
     if (!item) {
         return errorResponse('Item not found', 404)
     }
-    return item
+    return { id, value: item.toString() }
 })
 ```

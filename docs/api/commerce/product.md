@@ -305,6 +305,65 @@ k.api.post(() => {
 })
 ```
 
+## 分类与数字商品
+
+产品与分类的关联、以及数字商品（Digital Item）都挂在**变体**上。
+
+### addCategory() / removeCategory()
+
+把产品加入 / 移出某个分类。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `productId` | `string` | 是 | 产品 ID。 |
+| `categoryId` | `string` | 是 | 分类 ID。 |
+
+**返回值**：`void`。
+
+```ts
+k.api.post(() => {
+    k.commerce.product.addCategory(productId, categoryId)
+    k.commerce.product.removeCategory(productId, categoryId)
+})
+```
+
+### addTextDigitalItem() / addLinkDigitalItem() / addFileDigitalItem()
+
+给变体添加数字商品项：文本、链接或站点内文件（如序列号、下载地址、电子书文件）。文件路径用 [k.file](../file/file.md) 可读写的站点目录路径。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `variantId` | `string` | 是 | 变体 ID。 |
+| `name` | `string` | 是 | 数字商品名称，展示给顾客。 |
+| `text` / `link` / `filePath` | `string` | 是 | 数字商品内容：文本、链接或文件路径。 |
+
+**返回值**：`void`。
+
+```ts
+k.api.post(() => {
+    k.commerce.product.addTextDigitalItem(variantId, "License key", "XXXX-XXXX")
+    k.commerce.product.addLinkDigitalItem(variantId, "Download", "https://example.com/file.zip")
+    k.commerce.product.addFileDigitalItem(variantId, "E-book", "exports/book.pdf")
+})
+```
+
+### removeDigitalItem()
+
+按数字商品 ID 移除某一项。数字商品列表见下方 [Digital 属性](#digital-属性)。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `variantId` | `string` | 是 | 变体 ID。 |
+| `digitalId` | `string` | 是 | 数字商品 ID。 |
+
+**返回值**：`void`。
+
+```ts
+k.api.post(() => {
+    k.commerce.product.removeDigitalItem(variantId, digitalId)
+})
+```
+
 ## 产品结构
 
 ### Product 属性

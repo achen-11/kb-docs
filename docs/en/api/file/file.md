@@ -6,7 +6,7 @@
 
 `k.file` provides file operations (read, write, copy, delete, etc.) on the **disk directory** within the site. The Kooboo backend **does not** have a visual file management page that corresponds to `k.file` one-to-one.
 
-::: tip and "Content → File" menu
+::: tip Relationship with the "Content → File" menu
 The background **Content -> File** (`/content/files`) manages the **CMS file library (CmsFile)**, which can be accessed through the site URL; it is **not** the same storage set as `k.file`, and there is currently **no** `k.xxx` API to operate the CMS file library. See [Admin: Files](/en/cms/content/files) for operating instructions.
 :::
 
@@ -34,6 +34,28 @@ k.api.post("write", () => {
 
 **Return:** `[FileInfo](./file-info.md#fileinfo-property)`
 
+## writeBinary()
+
+Writes a byte array to a file. Overwrites the file if it already exists. Use it for uploads, downloaded responses, generated images/PDFs and other non-text content.
+
+```ts
+k.api.post("upload", () => {
+    const file = k.request.files[0]
+    const info = k.file.writeBinary(`uploads/${file.fileName}`, file.bytes)
+    return { saved: info.name, size: info.size }
+})
+```
+
+**Parameters:**
+
+| parameter | type | Required | illustrate |
+| --------------- | ---------- | --- | ------------------- |
+| fileName | `string` | yes | file path |
+| binary | `number[]` | yes | byte array to write |
+| withAuthorInfo | `boolean` | no | Whether to include author information, default `false` |
+
+**Return:** `[FileInfo](./file-info.md#fileinfo-property)`; returns `null` when the byte array is empty.
+
 ## read()
 
 Read the text content of the file.
@@ -53,6 +75,23 @@ k.api.get("read", () => {
 
 
 **Returns:** `string` - file text content
+
+## readBinary()
+
+Reads a file into a byte array. Returns `null` when the file does not exist.
+
+```ts
+const bytes = k.file.readBinary("file.pdf")
+const info = k.file.writeBinary("newname.pdf", bytes)
+```
+
+**Parameters:**
+
+| parameter | type | Required | illustrate |
+| -------- | -------- | --- | ---- |
+| fileName | `string` | yes | file path |
+
+**Returns:** `number[]` - file content as bytes
 
 ## append()
 

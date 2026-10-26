@@ -48,12 +48,22 @@ k.api.get(() => {
 
 ### Create Child Routes
 
-Creating a child route requires including the `{action}` placeholder in the route declaration:
+A named route only takes effect when **the API's own URL ends with a `{...}` placeholder** (for example the URL is configured as `/api/v1/test/{action}` in the admin). The second argument is the **action name** that fills that placeholder:
 
 ```ts
-// Route: /api/v1/test/list
-k.api.get("list", (id) => {
+// API URL: /api/v1/test/{action}
+// Request: /api/v1/test/list
+k.api.get("list", () => {
     return [{ id: 123 }]
+})
+```
+
+The handler's parameters come from the query string or form fields and have nothing to do with the child route name:
+
+```ts
+// Request: /api/v1/test/sub?id=23
+k.api.get("sub", (id) => {
+    return id   // "23"
 })
 ```
 
@@ -278,7 +288,8 @@ k.api.get((id) => {
 ## Error Handling Helper Example
 
 ```ts
-export function errorResponse(message: string, code = 400) {
+// One error response shape; add export in a Module script to reuse it elsewhere
+function errorResponse(message: string, code = 400) {
     k.response.json({
         message,
         code,
@@ -287,12 +298,12 @@ export function errorResponse(message: string, code = 400) {
     return k.api.httpCode(code)
 }
 
-// Usage
-k.api.get((id) => {
-    const item = db.find(id)
+// Usage: the API URL is /api/v1/item/{action}
+k.api.get("get", (id) => {
+    const item = k.DB.keyValue.get(id)
     if (!item) {
         return errorResponse('Item not found', 404)
     }
-    return item
+    return { id, value: item.toString() }
 })
 ```

@@ -6,7 +6,7 @@
 
 `k.cache` caches key values ​​in server memory, isolated by **Current Site** (internally grouped by Site Id). Suitable for caching API calculation results, external request responses, etc. to reduce repeated calculations.
 
-::: The difference between tip and k.session
+::: tip Differences from k.session
 | API | storage | Typical uses |
 |-----|------|----------|
 | **`k.cache`** | Site memory cache, expiration seconds can be set | Hotspot data, calculation results, site-wide sharing |

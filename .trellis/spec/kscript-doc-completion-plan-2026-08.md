@@ -96,6 +96,42 @@
 
 拆分原则：`fromSite` 涉及跨站权限，不与普通输出示例混成一个页面任务。
 
+### Batch 1.5：已上线缺陷修复与语言层补全
+
+**状态：已完成（2026-10）**
+
+本轮不改推荐面范围，只修已发布英文站的事实性/渲染性缺陷，并补上缺失的语言层地基。
+
+| 类别 | 处理结果 |
+|------|----------|
+| 机翻破坏的 VitePress 容器 | 13 处 `::: The difference between tip …` 等非法容器头改为合法 `tip` / `info` / `warning`；`site/index.md` 中英容器类型统一为 `warning` |
+| 未闭合容器 | `spa-multilingual/index.md`（中英）补 `:::` 并删除 SOP 禁止的裸 `---` |
+| 不存在的 API | 删除 `k.console.log`（键值页）与 `k.api.options(...)`（CORS 示例）；CORS 改为按平台开关处理 |
+| `return k.response.<void>` | 17 处（中英各 17）改为先调用、必要时再 `return`；分支内保留早退 |
+| 未定义符号 | `db.find(id)`、`getRequestIdByOrderId(orderId)` 改为可达写法（`k.DB.keyValue` 持久化 `requestId`） |
+| 不存在的方法 | `k.DB.sqlite.table(...)` → `k.DB.sqlite.getTable(...)` |
+| 大小写漂移说明 | `k.DB.indexedDb` 页补「只忽略首字母大小写」说明 |
+| 承诺了不存在的文档 | 删除 `k.mail` 中指向 `k.emailMarketing`「另文」的提示（该入口为 `[KIgnore]`，不推荐） |
+| 缺失成员正文 | `k.file` 补 `writeBinary()` / `readBinary()`；`k.request` 补 `culture` / `setCulture` / `resetCulture` / `model` / `clientCountry` / `page`；`k.response` 补 `meta`；`k.security` 补 `sha1()`；`k.commerce.product` 补分类与数字商品 6 个方法 |
+| 类型与必填性错误 | `UploadFile.bytes` → `number[]`、`contentType` → `string`；`sha256Binary` → `number[]`；`k.site.pages.add` 的 `url` 由必填改为可选（默认 `/{name}`） |
+| 接口与正文一致性 | `KDB` 补 `keyValue`；`KCommerce` 补全 13 个子模块；`commerce.md` 去掉把自身列为子模块的自引用 |
+| 子级路由说明 | `k.api` 子级路由改为准确描述：需该 API 的 URL 以 `{...}` 结尾，第二参数为 action 名；处理函数参数来自 query/表单 |
+| **新增语言层页面** | 新增 `/api/getting-started/runtime.md`（中英）：写入位置、Classic/Module 脚本类型、`env="server"` 触发规则、可用全局（无 `console`/`fetch`/`require`）、import 前缀表与 `k.import` 区别、错误/日志/超时/限制、成员名大小写、类型提示来源 |
+
+**待人工复核（本轮改动无法在本机取得运行证据）**
+
+按 §5.1 证据等级，下列示例由源码与文档一致性推导，未达到 R 级，合并前需补 ai-check：
+
+1. `payment/index.md` 与 `payment/wechat-h5-flow.md` 的 `k.DB.keyValue` 持久化 / 回读 `requestId` 示例（M 级：需 before/after 回读）。
+2. `k.file.writeBinary` / `readBinary` 示例（M 级）。
+3. `k.commerce.product` 分类与数字商品 6 个方法示例（M 级）。
+4. `k.security.sha1` 的示例输出值。
+5. `k.response.meta` 的 `title` / `setMeta` 在内联脚本与 API 路由中的差异行为。
+
+**待维护者决策**
+
+- `k.response.renderView` 在源码中带 `[Obsolete("please use ExecuteView")]`，但它是 payment 系列示例唯一可用的「输出任意 HTML 片段」入口，且 `executeView` 只能按 View 资源名渲染。本轮仅修正其行为描述（两种传入方式、可在 API 路由使用），未从文档下架。是否下架或改为其他写法需产品侧确认。
+
 ### Batch 2–4：Zone B — `k.site`
 
 #### Batch 2：只读与上下文
@@ -205,7 +241,21 @@
 
 ## 6. 当前下一步
 
-1. 进入 Batch 2，补 `k.site` 只读/context 子模块，并为 `k.site.get()` 建立认证场景证据。
-2. `k.fromSite` 保留在运行证据队列；`k.output` 不进入通用 API 文档。
-3. 每批开始前重新核对 Kooboo 当前版本和真实提示，若提示面变化，先更新计划再写正文。
-4. 四个 `product-hold` 区域只有在维护者明确恢复后才能进入新批次。
+1. **为 Batch 1.5 的改动补证据**：按上文「待人工复核」清单补 ai-check（`requestId` 持久化回读、`k.file` 二进制读写、`k.commerce.product` 数字商品、`k.response.meta`），未取得 R/M 级证据前不再扩大示例改动面。
+2. **确认 `k.response.renderView` 的去留**（见「待维护者决策」），再决定 payment 系列示例是否改写。
+3. 进入 Batch 2，补 `k.site` 只读/context 子模块，并为 `k.site.get()` 建立认证场景证据。
+4. 语言层页面已建立（Batch 1.5），后续 KScript 运行时事实（上下文差异、限制数值）变化时优先更新 `/api/getting-started/runtime.md`，避免又散落到各页脚注。
+5. `k.fromSite` 保留在运行证据队列；`k.output` 不进入通用 API 文档。
+6. 每批开始前重新核对 Kooboo 当前版本和真实提示，若提示面变化，先更新计划再写正文。
+7. 四个 `product-hold` 区域只有在维护者明确恢复后才能进入新批次。
+
+## 7. 未纳入本轮的结构债（已知，未处理）
+
+| 项 | 说明 |
+|----|------|
+| 失效 rewrite 26 条 | `config.mts` 的 `rewrites` 中 `api/core/*`、`api/data/*`、`templateEngine/*.md` 等源文件已不存在，条目为 no-op，照抄会静默无效 |
+| `PUBLISH_ZH=true` 不可直接开启 | `zhSidebar` 键未加 `/zh/` 前缀，且中英双树同路由冲突；发布中文前需先决定目录与路由策略 |
+| 71/100 页无 interface 小节 | 有 interface 的 29 页英文用了 5 种小节名，中文的「（节选）」在英文全部丢失 |
+| 内部实现名泄漏 | `context.User`、`SpaMultilingualMiddleware`、`CorsHelper.HandleHeaders`、`jsonData`、`JobService`、`SiteJob.Code`、`JobLog`、`kb-doc` 等仍出现在 `docs/api` 正文 |
+| 「以运行时为准」话术 | 仍有若干处（`indexed-db`、`net/url`、`utils/converter`、`cookie`、`session` 等）待逐项核实为确定行为 |
+| 中文树零提交 | `docs/api` 自 2026-08-24 起无新提交，而 `docs/en/api/index.md` 曾单边改动，双语 1:1 在构建层无法校验（`ignoreDeadLinks: true` 且中文树被 `srcExclude` 排除） |

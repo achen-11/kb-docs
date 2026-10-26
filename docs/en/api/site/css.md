@@ -6,7 +6,7 @@
 
 `k.site.styles` Manages **Style** resources (stand-alone CSS files) in the site. Styles are externally accessible through routed URLs (such as `/site.css`) and can be referenced in pages or layouts.
 
-::: The difference between tip and layouts / views
+::: tip Differences from layouts and views
 `k.site.styles` supports **`getByUrl`**, **`getUrl`**, **`getAbsUrl`** and other routing-related APIs (similar to [k.site.pages](./page.md)); [k.site.layouts](./layout.md) and [k.site.views](./view.md) have no routing API.
 :::
 

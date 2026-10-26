@@ -6,7 +6,7 @@
 
 View is an HTML fragment that can be referenced through `<view id="view name">` in a page or layout, and is suitable for splitting reusable blocks such as headers, cards, and lists. `k.site.views` is used to manage view resources in the site.
 
-::: The difference between tip and pages
+::: tip Differences from pages
 Same as [k.site.layouts](./layout.md), `k.site.views` provides `add` / `all` / `get` / `update` / `updateBody` / `delete` and version log APIs, **not** `getByUrl` / `getUrl` / `getAbsUrl` (only [k.site.pages](./page.md) supports finding pages by URL).
 :::
 

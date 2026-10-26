@@ -55,9 +55,11 @@ const text = raw ? raw.toString() : "{}"
 `kKeyValue` implements the key-value dictionary interface and can be traversed:
 
 ```typescript
+const pairs = []
 for (const entry of k.DB.keyValue) {
-  k.console.log(entry.key, entry.value)
+  pairs.push({ key: entry.key, value: entry.value })
 }
+return pairs
 ```
 
 `Count` / `length` represents the current number of keys. `Remove(key)` deletes the specified key.

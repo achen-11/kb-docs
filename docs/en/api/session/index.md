@@ -6,7 +6,7 @@
 
 `k.session` provides session-level caching function. Data is stored on the server side and can be accessed across requests during the same session.
 
-::: The difference between tip and cookie
+::: tip Differences from cookie
 - **Session**: stored on the server side, suitable for storing large amounts of data or sensitive information
 - **Cookie**: stored on the client, suitable for storing a small amount of simple data
 :::

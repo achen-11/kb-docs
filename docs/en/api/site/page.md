@@ -6,7 +6,7 @@
 
 `k.site.pages` manages Kooboo **Page** resources (page HTML/layout placeholder, routing, version). Different from global [k.page](../page/): the latter only changes the Meta of the page being rendered in the current request and is not responsible for the site page warehouse.
 
-::: The difference between tip and k.page
+::: tip Differences from k.page
 | API | Purpose |
 |-----|------|
 | `k.site.pages` | CRUD, search by URL for all pages in the site |
@@ -48,7 +48,7 @@ Create a page and register a route. If `url` is not passed, it defaults to `/{na
 |------|------|------|------|
 | `page.name` | `string` | yes | Page name (unique) |
 | `page.body` | `string` | yes | Page content, which can be a `<layout>` placeholder structure |
-| `page.url` | `string` | yes | Access path, such as `/about` |
+| `page.url` | `string` | no | Access path, such as `/about`; defaults to `/{name}` when omitted |
 | `page.layoutName` | `string` | no | Associated layout name |
 
 **Returns:** `void`.

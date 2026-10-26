@@ -16,10 +16,6 @@
 | `module` | Kooboo Mail 模块上下文（邮箱应用） |
 | `createMessage()` / `createSmtpServer()` | 构造邮件与 SMTP 配置对象 |
 
-::: tip 与 k.emailMarketing 的区别
-**`k.mail`** 面向通用发信/收信与 MIME 处理；**`k.emailMarketing`** 为营销邮件活动（另文）。
-:::
-
 ## createMessage() / createSmtpServer()
 
 | 方法 | 参数 | 返回值 | 说明 |

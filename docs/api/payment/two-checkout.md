@@ -42,7 +42,8 @@ k.api.post(() => {
     })
 
     if (result.nextAction?.redirectUrl) {
-        return k.response.redirect(result.nextAction.redirectUrl)
+        k.response.redirect(result.nextAction.redirectUrl)
+        return
     }
 
     return { paid: result.paid, requestId: result.requestId }

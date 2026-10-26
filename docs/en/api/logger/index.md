@@ -10,7 +10,7 @@
 
 Record a log, supporting the following five levels:
 
-::: tip tip
+::: tip
 - The parameter type of `message` is `string`. If you need to record the object, please use `JSON.stringify()` to convert it to a string first.
 - The written log can be viewed in the Kooboo background at the path: **Development → Code Log**
 :::

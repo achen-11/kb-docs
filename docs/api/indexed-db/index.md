@@ -199,6 +199,10 @@ const rows = k.DB.indexedDb.orders
 | `count()` | 当前条件下条数（实现上会取数，超大表注意性能） |
 | `All()` | 等价于极大 `take` |
 
+::: tip 大小写请照抄本页
+KScript 查找成员时**只忽略首字母大小写**：`All` 与 `all` 等价，但 `orderby` **不能**匹配 `OrderBy`。链式查询对象本身就是混用风格——`Where` / `OrderBy` / `OrderByDescending` / `All` 首字母大写，`skip` / `take` / `count` 全小写；表对象上的 `Count` / `Query` / `Pagination` 以本页表格为准。
+:::
+
 ## pagination(pageIndex, pageSize, where?)
 
 分页封装，返回对象形如：

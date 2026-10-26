@@ -49,7 +49,7 @@ k.api.get(() => {
         redirectUrl: `/order/${orderId}`
     })
 
-    return k.response.redirect(charge.nextAction.redirectUrl)
+    k.response.redirect(charge.nextAction.redirectUrl)
 })
 ```
 
@@ -116,7 +116,10 @@ Verification steps:
 ```ts
 k.api.get(() => {
     const orderId = k.request.queryString.get("orderId")
-    const requestId = getRequestIdByOrderId(orderId)
+
+    // Persist it yourself when creating the payment: k.DB.keyValue.set(`payment:${orderId}`, charge.requestId)
+    const saved = k.DB.keyValue.get(`payment:${orderId}`)
+    const requestId = saved ? saved.toString() : null
 
     if (!requestId) {
         k.response.json({ error: "requestId not found" })
@@ -125,9 +128,10 @@ k.api.get(() => {
 
     const status = k.payment.weChatH5.checkStatus(requestId)
     if (status.paid) {
-        return k.response.redirect(`/order/${orderId}`)
+        k.response.redirect(`/order/${orderId}`)
+        return
     }
-    return k.response.redirect("/payment-failed")
+    k.response.redirect("/payment-failed")
 })
 ```
 

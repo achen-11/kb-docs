@@ -10,7 +10,6 @@
 
 | 模块 | 说明 |
 |------|------|
-| [概述](./commerce.md) | 模块概述 |
 | [product](./product.md) | 产品管理 |
 | [category](./category.md) | 产品分类 |
 | [cart](./cart.md) | 购物车 |
@@ -29,8 +28,18 @@
 
 ```ts
 interface KCommerce {
+    category: KCategory;
     product: KProduct;
     cart: KCart;
     order: KOrder;
+    customer: KCustomer;
+    loyalty: KLoyalty;
+    discount: KDiscount;
+    shipping: KShipping;
+    address: KAddress;
+    membership: KMembership;
+    wishlist: KWishlist;
+    currency: KCurrency;
+    settings: KCommerceSettings;
 }
 ```

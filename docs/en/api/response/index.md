@@ -27,6 +27,26 @@ interface Response {
 }
 ```
 
+## meta
+
+`k.response.meta` is the object-style counterpart of [k.page](../page/) for the page head. Use it when `k.page` is not available or when you prefer object access to set the current page `<title>` and `<meta>` tags.
+
+| Member | Description |
+|------|------|
+| `meta.title` | Read or write the page title |
+| `meta.setMeta(name, content)` | Set `<meta name="..." content="...">` |
+| `meta.setMeta(name, httpEquiv, charSet, content)` | Set a meta with `http-equiv` / `charset` |
+| `meta.getMeta(name)` | Read a meta that was already set |
+| `meta.setCustomerHeader(headerString)` | Append a custom head fragment |
+
+```ts
+k.api.get(() => {
+    k.response.meta.title = "Order detail"
+    k.response.meta.setMeta("description", "Order detail page")
+    return { ok: true }
+})
+```
+
 ## Methods
 
 ### write()
@@ -210,16 +230,23 @@ k.api.get(() => {
 
 ### renderView()
 
-Renders an HTML string containing `<view>` at the current output position. Commonly used to output View in `<head>`** of **Layout/Page (`<view id="...">` cannot be written directly in the head).
+Writes rendered HTML at the current output position. What happens depends on what you pass in:
+
+| Input | Behavior |
+|------|------|
+| A `<view id="view name"></view>` string | The `id` is extracted and the matching View resource is rendered into the current output |
+| Any other HTML fragment | The fragment is first evaluated as a template (`k-*` bindings and `<script env="server">` inside it run), then the result is written to the current output |
+
+Commonly used to output a View inside the `<head>` of a Layout/Page (`<view id="...">` cannot be written directly in the head), and to output an HTML fragment returned by a third party from an API route. Because the fragment is template-evaluated, use [write()](#write) instead when the string must be emitted as-is.
 
 ```ts
-// Inside <script env="server"> (template rendering, not an API route)
+// In a template: output a View resource
 k.response.renderView("<view id='tailwind'></view>")
 ```
 
 | Parameter | Type | Required | Description |
 |------|------|------|------|
-| `ViewBody` | `string` | yes | Tagged string containing `<view id="view name">` |
+| `ViewBody` | `string` | yes | A `<view id="view name"></view>` string, or any HTML fragment |
 
 **Returns:** `void`.
 
@@ -253,11 +280,19 @@ k.api.get("wrapper", () => {
 
 ### CORS cross-domain settings
 
+CORS is handled by the platform; you do not need a script for the OPTIONS preflight:
+
+- **Single API**: set `cors: true` on the object managed by [k.site.codes](../site/code.md).
+- **Whole site**: turn on **CORS** (`enableCORS`) in [Site Settings → Access Control](/en/cms/settings/basic/access#cors).
+
+Once enabled, the platform adds `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods`, `Access-Control-Allow-Headers` and `Access-Control-Allow-Credentials` (echoing the request headers), and an OPTIONS preflight does not run the script body.
+
+Use `k.response.setHeader` when you need to control a header yourself; the platform does not overwrite a header that already exists:
+
 ```ts
-k.api.options(() => {
-    k.response.setHeader("Access-Control-Allow-Origin", "*")
-    k.response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
-    k.response.setHeader("Access-Control-Allow-Headers", "Content-Type")
+k.api.get(() => {
+    k.response.setHeader("Access-Control-Allow-Origin", "https://example.com")
+    return { ok: true }
 })
 ```
 

@@ -25,6 +25,8 @@
 interface KDB {
     /** Site IndexedDB dynamic tables (table name as property) */
     indexedDb: IDatabase;
+    /** Site key-value storage */
+    keyValue: kKeyValue;
     sqlite: SQLiteDB;
     mysql: MysqlDatabase;
     sqlServer: SqlServerDatabase;

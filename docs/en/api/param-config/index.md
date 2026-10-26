@@ -8,7 +8,7 @@
 
 See [Param Config](/en/cms/content/user-options.md) for background maintenance methods.
 
-::: The difference between tip and other APIs
+::: tip Differences from other APIs
 | API | Purpose |
 |-----|------|
 | **`k.paramConfig`** | This page: Site-level JSON parameters defined by Schema |

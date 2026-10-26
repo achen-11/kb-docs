@@ -305,6 +305,65 @@ k.api.post(() => {
 })
 ```
 
+## Categories and digital items
+
+Both the product-to-category links and the digital items (Digital Item) hang off a **variant**.
+
+### addCategory() / removeCategory()
+
+Add the product to, or remove it from, a category.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `productId` | `string` | Yes | Product ID. |
+| `categoryId` | `string` | Yes | Category ID. |
+
+**Returns**: `void`.
+
+```ts
+k.api.post(() => {
+    k.commerce.product.addCategory(productId, categoryId)
+    k.commerce.product.removeCategory(productId, categoryId)
+})
+```
+
+### addTextDigitalItem() / addLinkDigitalItem() / addFileDigitalItem()
+
+Attach a digital item to a variant: text, link or a file in the site (for example a license key, a download URL or an e-book file). The file path is a site directory path readable by [k.file](../file/file.md).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `variantId` | `string` | Yes | Variant ID. |
+| `name` | `string` | Yes | Digital item name shown to the customer. |
+| `text` / `link` / `filePath` | `string` | Yes | Digital item content: text, link or file path. |
+
+**Returns**: `void`.
+
+```ts
+k.api.post(() => {
+    k.commerce.product.addTextDigitalItem(variantId, "License key", "XXXX-XXXX")
+    k.commerce.product.addLinkDigitalItem(variantId, "Download", "https://example.com/file.zip")
+    k.commerce.product.addFileDigitalItem(variantId, "E-book", "exports/book.pdf")
+})
+```
+
+### removeDigitalItem()
+
+Remove one digital item by its ID. See [Digital property](#digital-property) below for the list.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `variantId` | `string` | Yes | Variant ID. |
+| `digitalId` | `string` | Yes | Digital item ID. |
+
+**Returns**: `void`.
+
+```ts
+k.api.post(() => {
+    k.commerce.product.removeDigitalItem(variantId, digitalId)
+})
+```
+
 ## Product structure
 
 ### Product attributes

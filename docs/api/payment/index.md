@@ -102,13 +102,17 @@ k.api.get(() => {
     })
 
     k.logger.information('Payment.Info', `requestId: ${charge.requestId}, orderId: ${order.id}`)
-    return k.response.renderView(charge.nextAction.renderHtml)
+
+    // 保存 requestId，供支付回调按订单查询
+    k.DB.keyValue.set(`payment:${order.id}`, charge.requestId)
+
+    k.response.renderView(charge.nextAction.renderHtml)
 })
 ```
 
 ## 支付回调示例
 
-`returnUrl` 是支付完成后的跳转地址。可以在地址上携带订单 ID，再用已保存的 `requestId` 查询真实支付状态。
+`returnUrl` 是支付完成后的跳转地址。可以在地址上携带订单 ID，再用下单时保存的 `requestId` 查询真实支付状态。
 
 ```ts
 k.api.get(() => {
@@ -118,7 +122,9 @@ k.api.get(() => {
         return k.api.httpCode(400)
     }
 
-    const requestId = getRequestIdByOrderId(orderId)
+    // 取回创建支付时保存的 requestId
+    const saved = k.DB.keyValue.get(`payment:${orderId}`)
+    const requestId = saved ? saved.toString() : null
     if (!requestId) {
         k.response.json({ code: -1, msg: 'payment request ID is not found' })
         return k.api.httpCode(400)
@@ -126,10 +132,11 @@ k.api.get(() => {
 
     const status = k.payment.alipayForm.checkStatus(requestId)
     if (status?.paid) {
-        return k.response.redirect(`/order/${orderId}`)
+        k.response.redirect(`/order/${orderId}`)
+        return
     }
 
-    return k.response.redirect('/payment-failed')
+    k.response.redirect('/payment-failed')
 })
 ```
 

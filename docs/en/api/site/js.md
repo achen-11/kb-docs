@@ -6,7 +6,7 @@
 
 `k.site.scripts` Manages **Script** resources (stand-alone JS files) in the site. Scripts are externally accessed through routed URLs (such as `/app.js`), which can be referenced in pages or layouts.
 
-::: The difference between tip and layouts / views
+::: tip Differences from layouts and views
 `k.site.scripts` supports **`getByUrl`**, **`getUrl`**, **`getAbsUrl`** and other routing-related APIs (similar to [k.site.pages](./page.md)); [k.site.layouts](./layout.md) and [k.site.views](./view.md) have no routing API.
 :::
 

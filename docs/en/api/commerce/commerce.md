@@ -10,7 +10,6 @@
 
 | module | Description |
 |------|------|
-| [Overview](./commerce.md) | Module overview |
 | [product](./product.md) | product management |
 | [category](./category.md) | Product classification |
 | [cart](./cart.md) | shopping cart |
@@ -29,8 +28,18 @@
 
 ```ts
 interface KCommerce {
+    category: KCategory;
     product: KProduct;
     cart: KCart;
     order: KOrder;
+    customer: KCustomer;
+    loyalty: KLoyalty;
+    discount: KDiscount;
+    shipping: KShipping;
+    address: KAddress;
+    membership: KMembership;
+    wishlist: KWishlist;
+    currency: KCurrency;
+    settings: KCommerceSettings;
 }
 ```

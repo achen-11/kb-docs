@@ -710,6 +710,7 @@ const apiSidebar = [
     text: '入门',
     items: [
       { text: '快速开始', link: '/api/getting-started/' },
+      { text: 'KScript 语言与运行时', link: '/api/getting-started/runtime.md' },
       { text: '认证与授权', link: '/api/getting-started/auth.md' }
     ]
   },
@@ -916,6 +917,7 @@ const englishSidebarTextMap = {
   '后台 CMS': 'Admin CMS',
   '模板引擎': 'Template Engine',
   '快速开始': 'Quick Start',
+  'KScript 语言与运行时': 'KScript Language and Runtime',
   '入门': 'Getting Started',
   '概述': 'Overview',
   '总览': 'Overview',

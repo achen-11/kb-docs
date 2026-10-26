@@ -28,7 +28,7 @@ k.api.get(() => {
         callbackCodeName: 'PaymentCallback'
     })
 
-    return k.response.renderView(result.nextAction.renderHtml)
+    k.response.renderView(result.nextAction.renderHtml)
 })
 ```
 

@@ -48,7 +48,7 @@ interface PageInput {
 |------|------|------|------|
 | `page.name` | `string` | 是 | 页面名称（唯一） |
 | `page.body` | `string` | 是 | 页面内容，可为 `<layout>` 占位结构 |
-| `page.url` | `string` | 是 | 访问路径，如 `/about` |
+| `page.url` | `string` | 否 | 访问路径，如 `/about`；未传时默认 `/{name}` |
 | `page.layoutName` | `string` | 否 | 关联布局名称 |
 
 **返回：** `void`。

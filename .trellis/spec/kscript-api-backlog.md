@@ -2,7 +2,11 @@
 
 > **当前决策（2026-08-24）**：本文件早期统计和 Sprint 表是 2026-05 历史快照，不能直接作为当前智能提示真相。每批先按 [KScript 智能提示与文档对齐 SOP](./kscript-intellisense-doc-alignment-sop.md) 重建提示面；当前分区、顺序和暂停项以 [KScript 文档补全分区计划（2026-08）](./kscript-doc-completion-plan-2026-08.md) 为准。
 >
+> **2026-10 校订**：下表状态已按仓库实际文件核对修正（页面数、死链数、`k.site` / `k.module` / `getting-started/auth` / payment 的状态）。**Batch 0、Batch 1、Batch 1.5 已完成**，只读与实施结果见分区计划；本文件保留为模块矩阵与 DoD 参考，不再作为进度真相源。
+>
 > **产品暂停**：`k.ai`、`k.integration`、`k.integrateCommerce`、`k.market` 暂不加入公开文档。`k.ai.app` 为过时能力，恢复 `k.ai` 文档前先完成产品侧清理和重新审计。
+>
+> **重要澄清**：`[KIgnore]` 只影响编辑器 `.d.ts` 提示，**不影响运行时可达性**。`[KIgnore]` 表示该入口不再推荐、不再有智能提示，保留只为旧站点兼容。文档范围以「真实站点 `KScript/GetDefine`（等同 `.d.ts`）」为公开推荐面，「运行时白名单 `/KWrapper`」决定实际可用面，两者不是同一份清单。
 >
 > 生成日期：2026-05-27  
 > **权威来源（优先级）**：真实站点最终智能提示 → Kooboo 服务端源码 → 当前运行证据 → `old-source/kooboo.d.ts` / 旧文档 / skill。详见 `.trellis/spec/api-documentation-workflow.md`「数据源优先级」。
@@ -64,21 +68,22 @@ k.xxx.yyy
 
 | 指标 | 数量 | 说明 |
 |------|------|------|
-| 顶层 `k.*` 模块（源码公开） | **~35** | 自 `k.cs` 统计，不含 `[KIgnore]` |
-| 可拆分子模块（建议单独提交） | **~80+** | commerce 12、payment 动态、site 15+、utils 20+、DB 5、file 3… |
-| 已有 `docs/api` 页面 | **41** | 含 payment 未提交稿 |
-| 侧边栏死链 | **10** | config 已配但文件不存在 |
+| 顶层 `k.*` 模块（真实提示面） | **~62** | 以真实站点 `KScript/GetDefine` 为准；本表下文的 🔴 标记已过时 |
+| 可拆分子模块 | **~80+** | commerce 13、payment 10、site 15+、utils 21、DB 5、file 3… |
+| 已有 `docs/api` 页面 | **100**（2026-10 实测） | 中英各 100，路径严格 1:1 |
+| 侧边栏死链 | **0**（2026-10 实测） | 唯一例外是 `PUBLISH_ZH` 未启用时的条件分支 `/zh/` |
+| 失效 rewrite 条目 | **26** | 源文件已不存在，no-op，见分区计划 §7 |
 | 旧文档可参考 (`old-source/api`) | **~50+** | 未全部迁移 |
-| **预估待完成（含子模块）** | **~55–65** | 见下表「待办」 |
+| **预估待完成（含子模块）** | **~40–50** | 见分区计划 Batch 2–8 |
 
-### 完成度（粗算）
+### 完成度（2026-10 校订）
 
 | 状态 | 模块数 | 含义 |
 |------|--------|------|
-| ✅ 已文档化 | ~28 | `docs/api` 有正文，commerce 子模块齐全 |
-| 🟡 进行中 | ~11 | payment 本地稿未提交；部分仅概述 |
-| 🔴 待新建 | ~35+ | 无文档或仅 index/侧边栏占位 |
-| ⚪ 内部/低优 | ~8 | `k.openApi`、`k.stapScript`、KIgnore 属性等 |
+| ✅ 已文档化 | ~70 | `docs/api` 有正文；commerce 13 子模块、site 9 页、payment 10 页齐全 |
+| 🟡 部分 | ~12 | 有页面但成员不全，或计划中的子模块未建页（`k.site` 只读子模块、`k.DB` provider、`k.file` 等） |
+| 🔴 待新建 | ~8 | `k.task`、`k.analytics`、`k.sandbox`、`k.template`、`k.history`、`k.privacy`、`k.sitemap`、`k.inlineEditor` |
+| ⏸️ 产品暂停 | 4 | `k.ai`、`k.integration`、`k.integrateCommerce`、`k.market` |
 
 ---
 
@@ -113,12 +118,12 @@ k.xxx.yyy
 | `k.payment` | `kPay` | 🟡 index+10 提供商 | k-payment.md | 待提交 | 动态 gateway |
 | `k.logger` | `KLogger` | ✅ | k-logger.md | | |
 | `k.label` / `k.t` | 方法 | ✅ label.md | k-label.md | | |
-| `k.site` | `kSiteDb` | 🔴 | k-site/* | | **大模块，宜拆分** |
+| `k.site` | `kSiteDb` | 🟡 9 页 | k-site/* | | 概述 + pages/layouts/views/js/css/codes/menus/runJob；Batch 2–4 待补只读子模块与高风险操作 |
 | `k.page` | `KPage` | ✅ | page/index.md | | 与 `k.site.pages` 区分 |
-| `k.module` | `KModule` | 🔴 侧边栏 | k-module.md | | 仅模块上下文部分 API |
+| `k.module` | `KModule` | ✅ | k-module.md | | `docs/api/module/index.md`（306 行），侧边栏已配 |
 | `k.net` | `KNET` | ✅ | net/* | | 见子表 |
 | `k.mail` | `Mail` | ✅ | mail/index.md | | |
-| `k.emailMarketing` | `KEmailMarketing` | 🔴 | k-emailMarketing.md | | |
+| `k.emailMarketing` | `KEmailMarketing` | ⚪ `[KIgnore]` | k-emailMarketing.md | | 不推荐、无提示，不写入公开文档 |
 | `k.account` | `KAccount` | ✅ | k-account.md | | login/user/org/oauth |
 | `k.storage` | — | 🧹 已清理 | — | 旧测试运行失败 | 当前提示无该根对象；2026-08-24 已删除公开文档 |
 | `k.cache` | `KCache` | ✅ | core/cache.md | `group` 已实测 | 2026-08-24 补齐只读站点分组属性 |
@@ -139,7 +144,8 @@ k.xxx.yyy
 | `output` | 方法 | ⚪ 不推荐 | — | 普通 API 响应已实测 | 仅配置脚本执行流程消费返回值，不作为通用 KScript API 文档化 |
 | `k.openApi` | `KOpenApi` | ⚪ | k-openApi.md | | C# `[KIgnore]`，低优 |
 | `k.stapScript` | StapTest | ⚪ | — | | 扩展测试，低优 |
-| getting-started/auth | — | 🔴 侧边栏 | — | | 需新建 |
+| getting-started/auth | — | ✅ | — | | `docs/api/getting-started/auth.md` 已存在并在侧边栏 |
+| KScript 语言与运行时 | — | ✅ 新建 | — | | `docs/api/getting-started/runtime.md`（Batch 1.5） |
 
 ---
 
@@ -181,9 +187,9 @@ k.xxx.yyy
 
 | ID | 文档 | 状态 | 备注 |
 |----|------|------|------|
-| `k.payment` 概述 | `payment/index.md` | 🟡 | 工作区未提交 |
-| alipay, wechat, paypal, stripe… | `payment/*.md` | 🟡 | 10 篇 |
-| wechat H5 流程 | `payment/wechat-h5-flow.md` | 🟡 | 需清理文档内 `@k-url` |
+| `k.payment` 概述 | `payment/index.md` | ✅ | 已提交；`get()` 章节已删除 |
+| alipay, wechat, paypal, stripe… | `payment/*.md` | ✅ | 10 篇已提交，中英 1:1 |
+| wechat H5 流程 | `payment/wechat-h5-flow.md` | 🟡 | 文档内 `@k-url` 已清理；页面仍保留测试路径字样与「AI 生成清单」，待重写 |
 | 动态 `k.payment.get(name)` | — | 🧹 已清理 | 当前 `kPay` 提示无该方法；使用具体 provider 属性 |
 
 ### 站点 `k.site`（**建议 8–10 次提交**）
@@ -217,7 +223,7 @@ k.xxx.yyy
 
 | ID | 文档 | 状态 |
 |----|------|------|
-| `k.module` BaseUrl/Config/Task… | `site/module.md` | 🔴 侧边栏 |
+| `k.module` BaseUrl/Config/Task… | `module/index.md` | ✅ 已完成（306 行，侧边栏已配） |
 
 ### 网络 `k.net`
 
@@ -274,7 +280,9 @@ k.xxx.yyy
 
 ## 建议执行顺序（P0 → P3）
 
-### P0 — 结构与债务（1–2 次提交）
+> **2026-10 校订**：原 P0 四项已全部完成（0 死链；`api/index.md` 的 `k.file` 已指向 `./file/file.md`；payment 已提交且无 `@k-url`；getting-started 已无 async/ctx 示例），下方保留仅为历史记录。当前执行顺序见分区计划。
+
+### P0 — 结构与债务（1–2 次提交）——已完成
 
 1. 修复 **10 个侧边栏死链**（或暂从 config 移除）
 2. 统一 `api/index.md` 与 `file` 路径（`k.file` 不在 `site/`）

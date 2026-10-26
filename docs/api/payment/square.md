@@ -22,7 +22,7 @@ k.api.get(() => {
         callbackCodeName: 'PaymentCallback'
     })
 
-    return k.response.redirect(result.nextAction.redirectUrl)
+    k.response.redirect(result.nextAction.redirectUrl)
 })
 ```
 

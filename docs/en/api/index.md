@@ -7,6 +7,7 @@ Complete reference for Kooboo server-side `k.*` APIs, including authentication, 
 | Doc | Description |
 |-----|-------------|
 | [API Getting Started](./getting-started/) | KScript basics and the shape of the global `k` object |
+| [KScript Language and Runtime](./getting-started/runtime.md) | Where KScript runs, script types, globals, imports, errors and limits |
 | [Authentication and Authorization](./getting-started/auth.md) | Login, sessions, cookies, and access control |
 
 ## KScript APIs

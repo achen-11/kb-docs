@@ -13,16 +13,16 @@
 | `"PageScript"` | `5` | Page script | Script embedded in the page |
 | `"PaymentCallBack"` etc. | `7` etc. | other | Special types such as payment callbacks |
 
-::: Representation of info codeType
+::: info Representation of codeType
 Please pass the string **`"Api"`** / **`"CodeBlock"`** when `add`. On the object returned by `get` / `all`, `codeType` is often a **numeric enumeration** (such as `4`, `10`), or it may be a string. It is recommended to be compatible with both forms when filtering.
 :::
 
-::: warning API behaves differently than CodeBlock's `add`
+::: warning `add` behaves differently between API and CodeBlock
 - **`codeType: "CodeBlock"`**: Only need `name`, `body`; **Do not** pass `url` (site routing will not be registered).
 - **`codeType: "Api"`** (or routable creation when CodeBlock is not explicitly written): `name`, `body` is required, and **`url`** (such as `/api/hello`) should be provided, the route will be registered, and the behavior is similar to [k.site.pages](./page.md) / [k.site.scripts](./js.md).
 :::
 
-::: The relationship between tip and k.api
+::: tip Relationship with k.api
 The **API file** written in the console corresponds to the Code of `codeType === "Api"`; `k.api.get/post` in the file defines the subpath under the API. `k.site.codes` is used to do CRUD on these Codes at runtime, rather than replacing the `k.api` syntax itself.
 :::
 

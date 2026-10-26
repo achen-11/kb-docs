@@ -15,7 +15,7 @@ interface Security {
   sha1(input: string): string;
   sha256(input: string): string;
   sha512(input: string): string;
-  sha256Binary(input: string): string;
+  sha256Binary(input: string): number[];
   hmacMd5(input: string, key: string): string;
   hmacSha1(input: string, key: string): string;
   hmacSha256(input: string, key: string): string;
@@ -74,6 +74,23 @@ k.api.get(() => {
 // 返回: { "hash": "5D41402ABC4B2A76B9719D911017C592" }
 ```
 
+### sha1()
+
+计算字符串的 SHA1 哈希值。
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `input` | `string` | 是 | 要计算哈希的字符串 |
+
+**返回：** `string`，40 位十六进制（小写）哈希字符串。
+
+```ts
+k.api.get(() => {
+    return { hash: k.security.sha1("hello") }
+})
+// 返回: { "hash": "aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d" }
+```
+
 ### sha256()
 
 计算字符串的 SHA256 哈希值。
@@ -109,17 +126,18 @@ k.api.get(() => {
 
 ### sha256Binary()
 
-计算字符串的 SHA256 哈希值，返回二进制格式。
+计算字符串的 SHA256 哈希值，返回字节数组。
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | `input` | `string` | 是 | 要计算哈希的字符串 |
 
-**返回：** `string`，二进制格式的 SHA256 哈希结果。
+**返回：** `number[]`，SHA256 哈希的 32 字节数组（可直接作为 `k.file.writeBinary` 或 `k.response.binary` 的输入）。
 
 ```ts
 k.api.get(() => {
-    return { hash: k.security.sha256Binary("hello") }
+    const bytes = k.security.sha256Binary("hello")
+    return { length: bytes.length, base64: k.security.toBase64(bytes) }
 })
 ```
 

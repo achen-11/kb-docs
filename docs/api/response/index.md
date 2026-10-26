@@ -27,6 +27,26 @@ interface Response {
 }
 ```
 
+## meta
+
+`k.response.meta` 是与 [k.page](../page/) 等价的一组页面头部入口，用于在没有 `k.page` 或需要对象式写法时设置当前页的 `<title>` 与 `<meta>`。
+
+| 成员 | 说明 |
+|------|------|
+| `meta.title` | 读写页面标题 |
+| `meta.setMeta(name, content)` | 设置 `<meta name="..." content="...">` |
+| `meta.setMeta(name, httpEquiv, charSet, content)` | 设置带 `http-equiv` / `charset` 的 meta |
+| `meta.getMeta(name)` | 读取已设置的 meta |
+| `meta.setCustomerHeader(headerString)` | 追加自定义头部片段 |
+
+```ts
+k.api.get(() => {
+    k.response.meta.title = "Order detail"
+    k.response.meta.setMeta("description", "Order detail page")
+    return { ok: true }
+})
+```
+
 ## 方法
 
 ### write()
@@ -210,16 +230,23 @@ k.api.get(() => {
 
 ### renderView()
 
-在**当前输出位置**渲染一段包含 `<view>` 的 HTML 字符串。常用于 **Layout / Page 的 `<head>`** 中输出 View（head 内不能直接写 `<view id="...">`）。
+在**当前输出位置**写入渲染后的 HTML。行为取决于传入内容：
+
+| 传入 | 行为 |
+|------|------|
+| `<view id="视图名"></view>` 形式 | 取出 `id`，把对应 View 资源渲染到当前输出 |
+| 其它 HTML 片段 | 先按模板求值（片段内的 `k-*`、`<script env="server">` 会执行），再把结果写入当前输出 |
+
+常用于 **Layout / Page 的 `<head>`** 中输出 View（head 内不能直接写 `<view id="...">`），也用于在 API 路由中输出第三方返回的 HTML 片段。因为片段会被模板求值，需要**原样输出**字符串时请改用 [write()](#write)。
 
 ```ts
-// 在 <script env="server"> 中（模板内，非 API 路由）
+// 模板中：输出一个 View 资源
 k.response.renderView("<view id='tailwind'></view>")
 ```
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| `ViewBody` | `string` | 是 | 含 `<view id="视图名">` 的标记字符串 |
+| `ViewBody` | `string` | 是 | `<view id="视图名"></view>` 字符串，或任意 HTML 片段 |
 
 **返回：** `void`。
 
@@ -253,11 +280,19 @@ k.api.get("wrapper", () => {
 
 ### CORS 跨域设置
 
+CORS 由平台处理，不需要为 OPTIONS 预检写脚本：
+
+- **单个 API**：在 [k.site.codes](../site/code.md) 的对象上设置 `cors: true`。
+- **全站**：在 [站点设置 → 访问控制](/cms/settings/basic/access#cors) 打开 **CORS**（`enableCORS`）。
+
+开启后平台会补上 `Access-Control-Allow-Origin`、`Access-Control-Allow-Methods`、`Access-Control-Allow-Headers`、`Access-Control-Allow-Credentials`（取值回显请求头），且 OPTIONS 预检不会执行脚本正文。
+
+需要自己控制某个头时用 `k.response.setHeader`；平台不会覆盖已存在的同名头：
+
 ```ts
-k.api.options(() => {
-    k.response.setHeader("Access-Control-Allow-Origin", "*")
-    k.response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
-    k.response.setHeader("Access-Control-Allow-Headers", "Content-Type")
+k.api.get(() => {
+    k.response.setHeader("Access-Control-Allow-Origin", "https://example.com")
+    return { ok: true }
 })
 ```
 

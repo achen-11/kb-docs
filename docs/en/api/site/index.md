@@ -6,7 +6,7 @@
 
 `k.site` is the unified entry point for structured resources stored in the current site. Use its submodules to create, update, delete, and inspect pages, layouts, views, scripts, styles, code resources, and menus.
 
-::: tip Difference from `k.file` and the CMS file library
+::: warning Difference from `k.file` and the CMS file library
 - **`k.site`** manages structured site resources with versioning and routing.
 - **`k.file`** reads and writes ordinary files in the site directory. See [k.file](../file/file.md).
 - **`k.site.files`** manages versioned resources in the [CMS file library](/en/cms/content/files). It is separate from ordinary site-directory files exposed by `k.file`.

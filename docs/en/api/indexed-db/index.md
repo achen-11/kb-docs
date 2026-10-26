@@ -199,6 +199,10 @@ const rows = k.DB.indexedDb.orders
 | `count()` | The number of items under current conditions (the number will be taken in the implementation, pay attention to performance for very large tables) |
 | `All()` | Equivalent to maximum `take` |
 
+::: tip Copy the casing from this page
+KScript member lookup **ignores only the first character's case**: `All` and `all` are equivalent, but `orderby` does **not** match `OrderBy`. The chain-query object itself mixes styles — `Where` / `OrderBy` / `OrderByDescending` / `All` start uppercase, while `skip` / `take` / `count` are all lowercase. Table-level `Count` / `Query` / `Pagination` follow the tables on this page.
+:::
+
 ## pagination(pageIndex, pageSize, where?)
 
 Paging encapsulation, the returned object looks like:

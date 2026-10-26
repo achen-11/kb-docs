@@ -6,7 +6,7 @@
 
 `k.page` writes the header binding in the rendering context of the current request and is output by the layout/page rendering phase to `<title>` and `<meta>` of HTML. Suitable for dynamically changing titles or SEO/sharing tags based on interface data and user status.
 
-::: The difference between tip and k.site.pages, k.response.meta
+::: tip Differences from k.site.pages and k.response.meta
 | API | effect |
 |-----|------|
 | **`k.page`** | Current page `setTitle`, `setNameMeta`, `setPropertyMeta`, etc. (this page) |

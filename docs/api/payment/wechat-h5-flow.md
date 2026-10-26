@@ -49,7 +49,7 @@ k.api.get(() => {
         redirectUrl: `/order/${orderId}`
     })
 
-    return k.response.redirect(charge.nextAction.redirectUrl)
+    k.response.redirect(charge.nextAction.redirectUrl)
 })
 ```
 
@@ -116,7 +116,10 @@ k.logger.information("Payment.WeChatH5", `requestId: ${charge.requestId}`)
 ```ts
 k.api.get(() => {
     const orderId = k.request.queryString.get("orderId")
-    const requestId = getRequestIdByOrderId(orderId) // 业务自行持久化 orderId ↔ requestId
+
+    // 创建支付时自行持久化：k.DB.keyValue.set(`payment:${orderId}`, charge.requestId)
+    const saved = k.DB.keyValue.get(`payment:${orderId}`)
+    const requestId = saved ? saved.toString() : null
 
     if (!requestId) {
         k.response.json({ error: "requestId not found" })
@@ -125,9 +128,10 @@ k.api.get(() => {
 
     const status = k.payment.weChatH5.checkStatus(requestId)
     if (status.paid) {
-        return k.response.redirect(`/order/${orderId}`)
+        k.response.redirect(`/order/${orderId}`)
+        return
     }
-    return k.response.redirect("/payment-failed")
+    k.response.redirect("/payment-failed")
 })
 ```
 

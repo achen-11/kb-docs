@@ -16,10 +16,6 @@
 | `module` | Kooboo Mail module context (mailbox application) |
 | `createMessage()` / `createSmtpServer()` | Construct mail and SMTP configuration objects |
 
-::: tip Difference from `k.emailMarketing`
-**`k.mail`** is for general sending/receiving and MIME processing; **`k.emailMarketing`** is for marketing email campaigns (separate article).
-:::
-
 ## createMessage() / createSmtpServer()
 
 | Method | Parameters | Returns | Description |

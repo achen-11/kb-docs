@@ -7,6 +7,7 @@ KScript API 完整参考（服务端 `k.*`）。文档路径与模块名一致�
 | 文档 | 说明 |
 |------|------|
 | [快速开始](./getting-started/) | API 基础与快速上手 |
+| [KScript 语言与运行时](./getting-started/runtime.md) | 写在哪里、脚本类型、全局对象、import、错误与限制 |
 | [认证与授权](./getting-started/auth.md) | 登录与会话 |
 
 ## KScript API（A–Z）

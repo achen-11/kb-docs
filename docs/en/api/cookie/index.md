@@ -6,7 +6,7 @@
 
 `k.cookie` provides the function of adding, deleting, modifying and checking cookies. Cookies can be used to store a small amount of data on the client, and are suitable for scenarios such as user preferences and simple status tracking.
 
-::: The difference between tip and session
+::: tip Differences from session
 - **Cookie**: stored on the client, expiration time can be set
 - **Session**: stored on the server side, automatically cleared after the session ends
 :::

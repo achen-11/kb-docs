@@ -15,7 +15,7 @@ interface Security {
   sha1(input: string): string;
   sha256(input: string): string;
   sha512(input: string): string;
-  sha256Binary(input: string): string;
+  sha256Binary(input: string): number[];
   hmacMd5(input: string, key: string): string;
   hmacSha1(input: string, key: string): string;
   hmacSha256(input: string, key: string): string;
@@ -74,6 +74,23 @@ k.api.get(() => {
 // Returns: { "hash": "5D41402ABC4B2A76B9719D911017C592" }
 ```
 
+### sha1()
+
+Computes the SHA1 hash of a string.
+
+| Parameter | Type | Required | Description |
+|------|------|------|------|
+| `input` | `string` | yes | String to hash |
+
+**Returns:** `string`, a 40-character lowercase hexadecimal hash.
+
+```ts
+k.api.get(() => {
+    return { hash: k.security.sha1("hello") }
+})
+// Returns: { "hash": "aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d" }
+```
+
 ### sha256()
 
 Computes the SHA256 hash of a string.
@@ -109,17 +126,18 @@ k.api.get(() => {
 
 ### sha256Binary()
 
-Computes the SHA256 hash of a string, returning it in binary format.
+Computes the SHA256 hash of a string and returns it as bytes.
 
 | Parameter | Type | Required | Description |
 |------|------|------|------|
 | `input` | `string` | yes | String to hash |
 
-**Returns:** `string`, the SHA256 hash in binary format.
+**Returns:** `number[]`, the 32-byte SHA256 digest (usable directly with `k.file.writeBinary` or `k.response.binary`).
 
 ```ts
 k.api.get(() => {
-    return { hash: k.security.sha256Binary("hello") }
+    const bytes = k.security.sha256Binary("hello")
+    return { length: bytes.length, base64: k.security.toBase64(bytes) }
 })
 ```
 

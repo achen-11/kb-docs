@@ -60,7 +60,7 @@ k.api.get(() => {
         callbackCodeName: 'PaymentCallback'
     })
 
-    return k.response.renderView(result.nextAction.renderHtml)
+    k.response.renderView(result.nextAction.renderHtml)
 })
 ```
 
@@ -93,7 +93,7 @@ k.api.get(() => {
         returnUrl: '/payment/success?orderId=order-id'
     })
 
-    return k.response.renderView(result.nextAction.renderHtml)
+    k.response.renderView(result.nextAction.renderHtml)
 })
 ```
 

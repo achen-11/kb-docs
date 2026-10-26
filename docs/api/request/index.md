@@ -30,8 +30,8 @@ interface Request {
 }
 
 interface UploadFile {
-  bytes: string;                 // 文件二进制内容 (Base64)
-  contentType: number;           // MIME 类型
+  bytes: number[];               // 文件二进制内容，惰性读取
+  contentType: string;           // MIME 类型
   fileName: string;              // 文件名
   name: string;                  // 表单字段名
   save(filename: string): FileInfo; // 保存文件
@@ -158,6 +158,40 @@ k.api.get(() => {
 })
 ```
 
+### culture / setCulture() / resetCulture()
+
+读取或临时切换当前请求的**文化（语言）**，影响 `k.t()` 等按语言取值的行为：
+
+```ts
+const culture = k.request.culture   // 如 "zh-CN"
+
+k.request.setCulture("en-US")
+const text = k.t("welcome")         // 取 en-US 文案
+k.request.resetCulture()            // 恢复站点默认语言
+```
+
+### model
+
+当前请求绑定的数据模型对象；没有绑定时为 `null`。普通表单 / JSON 请求直接用 `k.request.form` 或 `k.request.body`。
+
+### clientCountry
+
+客户端国家/地区信息，字段为 `countryCode`、`continent`、`latitude`、`longtitude`（拼写与源码一致）。依赖 IP 地理位置数据，取不到时字段为空。
+
+```ts
+const country = k.request.clientCountry
+return { code: country?.countryCode }
+```
+
+### page
+
+当前正在渲染的 **Page** 资源对象（类型同 [k.site.pages](../site/page.md) 中的 Page），可读取当前页的 `id`、`name`、`url` 等。API 等非页面上下文可能为 `null`。
+
+```ts
+const current = k.request.page
+return { id: current?.id, url: current?.url }
+```
+
 ## 方法
 
 ### get(key)
@@ -165,9 +199,7 @@ k.api.get(() => {
 获取动态路由参数。
 
 ```ts
-// 假设路由: /api/users/{id}
-/api/users/123
-
+// 假设 API 的 URL 为 /api/users/{id}，实际请求 /api/users/123
 k.api.get(() => {
     const id = k.request.get("id")  // "123"
     return { id }

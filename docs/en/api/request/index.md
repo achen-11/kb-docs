@@ -30,8 +30,8 @@ interface Request {
 }
 
 interface UploadFile {
-  bytes: string;                 // File binary content (Base64)
-  contentType: number;           // MIME type
+  bytes: number[];               // File binary content, read lazily
+  contentType: string;           // MIME type
   fileName: string;              // File name
   name: string;                  // Form field name
   save(filename: string): FileInfo; // Save file
@@ -158,6 +158,40 @@ k.api.get(() => {
 })
 ```
 
+### culture / setCulture() / resetCulture()
+
+Read or temporarily switch the **culture (language)** of the current request. It affects anything that resolves text by language, such as `k.t()`:
+
+```ts
+const culture = k.request.culture   // e.g. "en-US"
+
+k.request.setCulture("zh-CN")
+const text = k.t("welcome")         // resolves the zh-CN text
+k.request.resetCulture()            // back to the site default
+```
+
+### model
+
+The data model bound to the current request; `null` when nothing is bound. For plain form or JSON requests use `k.request.form` or `k.request.body` instead.
+
+### clientCountry
+
+Client country/region information with the fields `countryCode`, `continent`, `latitude` and `longtitude` (spelled as in the source). It depends on IP geolocation data and the fields are empty when it cannot be resolved.
+
+```ts
+const country = k.request.clientCountry
+return { code: country?.countryCode }
+```
+
+### page
+
+The **Page** resource being rendered for the current request (same type as in [k.site.pages](../site/page.md)); read `id`, `name`, `url` and so on. It can be `null` in non-page contexts such as an API call.
+
+```ts
+const current = k.request.page
+return { id: current?.id, url: current?.url }
+```
+
 ## Methods
 
 ### get(key)
@@ -165,9 +199,7 @@ k.api.get(() => {
 Get dynamic routing parameters.
 
 ```ts
-// Assume the route is: /api/users/{id}
-/api/users/123
-
+// Assume the API URL is /api/users/{id} and the request is /api/users/123
 k.api.get(() => {
     const id = k.request.get("id")  // "123"
     return { id }

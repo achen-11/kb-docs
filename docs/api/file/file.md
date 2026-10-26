@@ -34,6 +34,28 @@ k.api.post("write", () => {
 
 **返回：** `[FileInfo](./file-info.md#fileinfo-属性)`
 
+## writeBinary()
+
+写入字节数组到文件。如果文件已存在则覆盖。用于上传文件、下载的响应内容、生成的图片/PDF 等非文本内容。
+
+```ts
+k.api.post("upload", () => {
+    const file = k.request.files[0]
+    const info = k.file.writeBinary(`uploads/${file.fileName}`, file.bytes)
+    return { saved: info.name, size: info.size }
+})
+```
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+| -------------- | --------- | --- | ------------------- |
+| fileName | `string` | 是 | 文件路径 |
+| binary | `number[]` | 是 | 要写入的字节数组 |
+| withAuthorInfo | `boolean` | 否 | 是否包含作者信息，默认 `false` |
+
+**返回：** `[FileInfo](./file-info.md#fileinfo-属性)`；字节数组为空时返回 `null`。
+
 ## read()
 
 读取文件的文本内容。
@@ -53,6 +75,23 @@ k.api.get("read", () => {
 
 
 **返回：** `string` - 文件文本内容
+
+## readBinary()
+
+读取文件为字节数组。文件不存在时返回 `null`。
+
+```ts
+const bytes = k.file.readBinary("file.pdf")
+const info = k.file.writeBinary("newname.pdf", bytes)
+```
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+| -------- | -------- | --- | ---- |
+| fileName | `string` | 是 | 文件路径 |
+
+**返回：** `number[]` - 文件内容的字节数组
 
 ## append()
 

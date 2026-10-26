@@ -70,13 +70,13 @@ const product = k.state.get("product")
 |------|------|------|------|
 | `key` | `string` | 是 | 键名 |
 
-**返回：** 先前 `set` / `setCurrent` 写入的值；不存在时为 `undefined` 或空（以运行时为准）。
+**返回：** 先前 `set` / `setCurrent` 写入的值；不存在时为 `null`。
 
 ## 示例：列表页向模板传数据
 
 ```ts
 // 页面 CodeBlock
-const items = k.DB.sqlite.table("Product").all()
+const items = k.DB.sqlite.getTable("Product").all()
 k.state.set("products", items)
 k.page.setTitle("产品列表")
 ```

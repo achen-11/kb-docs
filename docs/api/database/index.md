@@ -25,6 +25,8 @@
 interface KDB {
     /** 站点 IndexedDB 动态表（表名为属性） */
     indexedDb: IDatabase;
+    /** 站点键值存储 */
+    keyValue: kKeyValue;
     sqlite: SQLiteDB;
     mysql: MysqlDatabase;
     sqlServer: SqlServerDatabase;

@@ -55,9 +55,11 @@ const text = raw ? raw.toString() : "{}"
 `kKeyValue` 实现键值字典接口，可遍历：
 
 ```typescript
+const pairs = []
 for (const entry of k.DB.keyValue) {
-  k.console.log(entry.key, entry.value)
+  pairs.push({ key: entry.key, value: entry.value })
 }
+return pairs
 ```
 
 `Count` / `length` 表示当前键数量。`Remove(key)` 删除指定键。

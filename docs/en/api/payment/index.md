@@ -102,13 +102,17 @@ k.api.get(() => {
     })
 
     k.logger.information('Payment.Info', `requestId: ${charge.requestId}, orderId: ${order.id}`)
-    return k.response.renderView(charge.nextAction.renderHtml)
+
+    // Save the requestId so the payment callback can look it up by order
+    k.DB.keyValue.set(`payment:${order.id}`, charge.requestId)
+
+    k.response.renderView(charge.nextAction.renderHtml)
 })
 ```
 
 ## Payment callback example
 
-`returnUrl` is the jump address after payment is completed. You can carry the order ID in the address, and then use the saved `requestId` to query the real payment status.
+`returnUrl` is the jump address after payment is completed. You can carry the order ID in the address, and then use the `requestId` saved when the payment was created to query the real payment status.
 
 ```ts
 k.api.get(() => {
@@ -118,7 +122,9 @@ k.api.get(() => {
         return k.api.httpCode(400)
     }
 
-    const requestId = getRequestIdByOrderId(orderId)
+    // Read back the requestId saved when the payment was created
+    const saved = k.DB.keyValue.get(`payment:${orderId}`)
+    const requestId = saved ? saved.toString() : null
     if (!requestId) {
         k.response.json({ code: -1, msg: 'payment request ID is not found' })
         return k.api.httpCode(400)
@@ -126,10 +132,11 @@ k.api.get(() => {
 
     const status = k.payment.alipayForm.checkStatus(requestId)
     if (status?.paid) {
-        return k.response.redirect(`/order/${orderId}`)
+        k.response.redirect(`/order/${orderId}`)
+        return
     }
 
-    return k.response.redirect('/payment-failed')
+    k.response.redirect('/payment-failed')
 })
 ```
 

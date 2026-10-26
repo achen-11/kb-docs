@@ -6,7 +6,7 @@
 
 `k.state` reads and writes key values ​​in the view data stack of the current HTTP request for use by page, layout, and view template binding (for example, `k-state-key` or reading data with the same name in the template). The data is released when the request ends and is not persisted across requests.
 
-::: The difference between tip, k.cache and k.session
+::: tip Differences from k.cache and k.session
 | API | Scope | Typical uses |
 |-----|--------|----------|
 | **`k.state`** | View rendering within a single request | Controller/CodeBlock passes `product`, `breadcrumb` to the template |
@@ -70,13 +70,13 @@ const product = k.state.get("product")
 |------|------|------|------|
 | `key` | `string` | yes | Key name |
 
-**Returns:** The value previously written to `set` / `setCurrent`; `undefined` or empty if not present (whichever is runtime).
+**Returns:** The value previously written to `set` / `setCurrent`; `null` if not present.
 
 ## Example: List page passes data to template
 
 ```ts
 // Page CodeBlock
-const items = k.DB.sqlite.table("Product").all()
+const items = k.DB.sqlite.getTable("Product").all()
 k.state.set("products", items)
 k.page.setTitle("Product List")
 ```
