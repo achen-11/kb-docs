@@ -1130,7 +1130,19 @@ export default defineConfig({
       return
     }
     const sourcePath = siteConfig.rewrites.inv[pageData.relativePath] || pageData.relativePath
-    const seo = createDocSeo(pageData, readFileSync(path.join(siteConfig.srcDir, sourcePath), 'utf8'))
+    let seo
+    try {
+      seo = createDocSeo(pageData, readFileSync(path.join(siteConfig.srcDir, sourcePath), 'utf8'))
+    } catch (error) {
+      // Preview-only: Chinese drafts may lack SEO blurbs; keep production strict.
+      if (!localChinesePreview) throw error
+      const route = pageData.relativePath.replace(/^en\//, '')
+      seo = {
+        title: pageData.frontmatter.title || pageData.title || route,
+        description: pageData.frontmatter.description || pageData.title || 'Kooboo documentation preview',
+        canonical: `${DOCS_ORIGIN}${canonicalDocPath(route)}`,
+      }
+    }
     pageData.title = seo.title
     pageData.description = seo.description
     pageData.frontmatter.title = seo.title
@@ -1180,9 +1192,12 @@ export default defineConfig({
     await mkdir(legacyEnglishDir, { recursive: true })
     await writeFile(path.join(legacyEnglishDir, 'index.html'), LEGACY_ENGLISH_REDIRECT_HTML)
     await writeFile(path.join(siteConfig.outDir, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${DOCS_ORIGIN}/sitemap.xml\n`)
+    // EN pages load images from /en/cms|product/...; ZH pages use /cms|product/...
+    // Keep ZH public images when Chinese is mounted (publish or local preview build).
+    const keepZhPublicImages = PUBLISH_ZH || localChinesePreview
     await Promise.all([
-      removeImageFiles(path.join(siteConfig.outDir, 'cms')),
-      removeImageFiles(path.join(siteConfig.outDir, 'product')),
+      ...(keepZhPublicImages ? [] : [removeImageFiles(path.join(siteConfig.outDir, 'cms'))]),
+      ...(keepZhPublicImages ? [] : [removeImageFiles(path.join(siteConfig.outDir, 'product'))]),
       ...(PUBLISH_PRODUCT_FEATURES
         ? []
         : [removeImageFiles(path.join(siteConfig.outDir, 'en', 'product'))]),

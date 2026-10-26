@@ -4,7 +4,7 @@
  * 在 Markdown 中可直接写 HTML 使用本组件。
  * 使用 withBase，以便 GitHub Pages 等非根路径部署时图片地址正确。
  */
-import { withBase, useRoute } from 'vitepress'
+import { withBase, useRoute, useData } from 'vitepress'
 import { computed } from 'vue'
 import { openImagePreview } from '../use-image-preview'
 import { resolveLocalizedDocImageSrc } from '../doc-image-path.mjs'
@@ -19,10 +19,15 @@ const props = withDefaults(
 )
 
 const route = useRoute()
+const { localeIndex } = useData()
 
-const resolvedSrc = computed(() =>
-  withBase(resolveLocalizedDocImageSrc(props.src, route.path))
-)
+const resolvedSrc = computed(() => {
+  // localeIndex is authoritative; route.path may include DOCS_BASE during SSR.
+  const pathname = localeIndex.value && localeIndex.value !== 'root'
+    ? `/${localeIndex.value}/`
+    : route.path
+  return withBase(resolveLocalizedDocImageSrc(props.src, pathname))
+})
 
 function onPreview(event: MouseEvent) {
   event.stopPropagation()

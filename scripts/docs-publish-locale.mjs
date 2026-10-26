@@ -80,7 +80,10 @@ export function rewriteLegacyEnglishHrefs(html = '') {
 
 export function isEnglishDocRoute(pathname = '/') {
   const pathOnly = String(pathname || '/').split('?')[0]
-  if (pathOnly === '/zh' || pathOnly.startsWith('/zh/')) return false
+  // Match /zh and /zh/... even when VitePress SSR prefixes DOCS_BASE (e.g. /kb-docs/zh/...).
+  if (pathOnly === '/zh' || pathOnly.startsWith('/zh/') || /(?:^|\/)zh(?:\/|$)/u.test(pathOnly)) {
+    return false
+  }
   return true
 }
 
@@ -101,11 +104,17 @@ export function isVitePressDevCommand(argv = process.argv) {
   return commands.length > 0 && commands.every((command) => command === 'dev')
 }
 
-/** Local `vitepress dev` only. Production builds ignore DOCS_PREVIEW_ZH. */
+/**
+ * Local Chinese preview (`DOCS_PREVIEW_ZH=1`).
+ * Enables `/zh/` for `vitepress dev` and intentional preview builds.
+ * Production CI never sets DOCS_PREVIEW_ZH, so PUBLISH_ZH stays false there.
+ */
 export function isLocalChinesePreview(env = process.env, argv = process.argv) {
   const value = String(env.DOCS_PREVIEW_ZH ?? '').trim().toLowerCase()
   if (!LOCAL_CHINESE_PREVIEW_VALUES.has(value)) return false
-  return isVitePressDevCommand(argv)
+  const command = argv.map(String).find((arg) => VITEPRESS_COMMANDS.has(arg))
+  if (!command) return true
+  return command === 'dev' || command === 'build'
 }
 
 export function withLocalChinesePreviewRewrites(rewrites = {}) {
