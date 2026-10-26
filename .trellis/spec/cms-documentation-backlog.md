@@ -1,105 +1,29 @@
-# CMS 文档 Backlog
+# CMS 文档维护清单
 
-> 菜单结构来源：`Kooboo/Frontend/src/router/site.ts` + `locales/zh.yml`
+本文件记录当前维护事项。完整菜单与页面索引以 [后台导航](../../docs/cms/navigation.md) 和 `docs/.vitepress/config.mts` 为准，不再维护另一份逐菜单完成度表。
 
-## P0 — 入门与导航
+## 操作手册
 
-| 状态 | 文档 | 说明 |
-|------|------|------|
-| ✅ | `cms/index.md` | 概述、学习路径 |
-| ✅ | `cms/navigation.md` | 全站菜单与深链 |
-| ✅ | `cms/getting-started/login-and-site-list.md` | 登录、站点列表、文件夹、进入管理 |
-| ✅ | `cms/getting-started/create-site.md` | 空白 / 导入 / 克隆（不含 AI） |
+手册位于 `docs/cms/manual/` 与 `docs/en/cms/manual/`，面向日常维护网站的普通用户。
 
-## P1 — 站点顶栏（菜单自上而下）
+当前先制作“在线编辑页面”中英样章，确认截图、步骤粒度和标注形式后再扩展：
 
-| 状态 | 文档 | Frontend 路由 |
-|------|------|----------------|
-| ✅ | `cms/site/dashboard.md` | `/site` |
-| ✅ | `cms/site/media.md` | `/site/media` |
-| ✅ | `cms/site/pages.md` | `/site/pages` 列表 |
-| ✅ | `cms/site/pages-setting.md` | `page/setting` |
-| ✅ | `cms/site/pages-edit-code.md` | `page/edit` |
-| ✅ | `cms/site/pages-inline-edit.md` | `inline-design` |
+- 登录与进入站点
+- AI 建站与修改
+- 内容列表与表单提交
+- 图片管理
+- 域名与上线
+- 组织成员与站点权限
+- 数据中心
+- 会员与续费
+- 邮箱与客户端
 
-## P1 — 内容与数据（对齐 k.content）
+这些是内部编辑计划，不生成空白公开页面或“即将上线”导航。
 
-| 状态 | 文档 | Frontend 路由 |
-|------|------|----------------|
-| ✅ | `cms/content/index.md` | 内容分组概述 |
-| ✅ | `cms/content/content-types.md` | `/content/contentTypes` + 字段编辑器配图 |
-| ✅ | `cms/content/contents-folders-list.md` | `/content/contents` |
-| ✅ | `cms/content/contents-folder-settings.md` | 设置弹窗 + 关联数据 |
-| ✅ | `cms/content/contents-entries.md` | 条目编辑 |
-| ✅ | `cms/content/labels.md` | `/content/labels` |
-| ✅ | `cms/content/html-blocks.md` | `/content/htmlblocks` |
-| ✅ | `cms/content/files.md` | `/content/files`（编辑菜单） |
-| 🟡 | `cms/content/tag-attributes.md` | `/content/text` · KConfig / `k-config` |
+## 持续维护
 
-## P1 — 页面与开发资源（对齐 templateEngine）
-
-| 状态 | 文档 | Frontend 路由 |
-|------|------|----------------|
-| ⬜ | `cms/development/layouts.md` | `/development/layouts` |
-| ⬜ | `cms/development/views.md` | `/development/views` |
-| ⬜ | `cms/development/scripts-styles.md` | `/development/scripts`, `styles` |
-| ⬜ | `cms/development/code.md` | `/development/code` |
-
-## P2 — 电商与支付
-
-| 状态 | 文档 | Frontend 路由 |
-|------|------|----------------|
-| ⬜ | `cms/commerce/overview.md` | `/commerce/settings` |
-| ⬜ | `cms/commerce/products.md` | `/commerce/product-management` |
-
-支付集成配置见 [settings/integrations/payment.md](../docs/cms/settings/integrations/payment.md)（Payment 分组），不单列 commerce 篇。
-
-## P2 — 站点设置（`docs/cms/settings/`）
-
-概述：[settings/index.md](../docs/cms/settings/index.md) · 配图：`pnpm screenshots:cms:settings`（`KOOBOO_SCREENSHOT_SCOPE=basic`）→ `docs/public/cms/settings/`
-
-| 状态 | 文档 | Frontend 路由 | 备注 |
-|------|------|----------------|------|
-| 🟡 | `settings/index.md` | — | 目录规划 ✅ |
-| ✅ | `settings/basic/index.md` | `/system/settings` | 概述 + Tab 导航 |
-| ✅ | `settings/basic/general.md` | `?name=basic` | 含多语言、导入导出 |
-| ✅ | `settings/basic/access.md` | `?name=access` | |
-| ✅ | `settings/basic/performance.md` | `?name=performance` | |
-| ✅ | `settings/basic/seo.md` | `?name=seo` | |
-| ✅ | `settings/basic/editor.md` | `?name=editor` | |
-| ✅ | `settings/basic/advanced.md` | `?name=advance` | SQL/代码日志、Hook 总开关 |
-| ✅ | `settings/domains.md` | `/system/domains` | |
-| ✅ | `settings/integrations/index.md` | `/system/config` | 概述 + 编辑弹窗 |
-| ✅ | `settings/integrations/database.md` | `?group=Database` | |
-| ✅ | `settings/integrations/payment.md` | `?group=Payment` | → [api/payment](/api/payment/) |
-| ✅ | `settings/integrations/sms.md` | `?group=SMS` | |
-| ✅ | `settings/integrations/oauth2.md` | `?group=OAuth2` | |
-| ✅ | `settings/integrations/storage.md` | `?group=Storage` | |
-| ✅ | `settings/integrations/others.md` | `?group=Others` | |
-| ✅ | `settings/site-users.md` | `/system/siteuser` | 菜单文案「用户管理」 |
-| ✅ | `settings/roles.md` | `/system/roles` | `advanced` |
-| ✅ | `settings/request-hooks.md` | `/system/front-events` | 含 `/front-events/edit` |
-| ✅ | `settings/action-hooks.md` | `/system/backend-events` | 含 `/backend-events/edit` |
-| ✅ | `settings/cookie.md` | `/system/cookie` | 含基础设置 / 分类 / 内容 / 资源 / 报表 |
-| ✅ | `settings/ai-service.md` | `/system/ai-service` | 与运维中心同一页；运维 [operations/index.md](../docs/cms/operations/index.md) 互链 |
-
-子路由无独立菜单：`settings?name=*` → `basic.md`；Hook `edit` → 对应 Hook 篇目。
-
-## P3 — 数据库 / 运维 / 高级
-
-### 数据库（`docs/cms/database/`）
-
-| 状态 | 文档 | Frontend 路由 |
-|------|------|----------------|
-| ✅ | `database/index.md` | 概述 |
-| ✅ | `database/table.md` | `/database/table` |
-| ✅ | `database/table-relation.md` | `/database/table-relation` |
-| ✅ | `database/key-value.md` | `/database/key-value` |
-| ✅ | `database/sqlite-table.md` | `/database/sqlite-table` |
-| ✅ | `database/mysql-table.md` | `/database/mysql-table` |
-| ✅ | `database/sqlserver-table.md` | `/database/sqlserver-table` |
-| ✅ | `database/sql-logs.md` | `/database/sql-logs` |
-
-子路由（无独立菜单）：`/database/table/columns`、`/data`、`/edit-data` — 写入对应表类型篇目。
-
-运维 / 站点设置等仍按需从 `navigation.md` 拆文。
+- 对照当前 Frontend 与真实演示后台核对按钮、菜单和保存行为。
+- 每个任务使用有示例数据的中英截图；空列表不能代替操作过程。
+- 检查历史截图中可识别的账号、域名、邮箱和业务数据，补图时使用专用演示站。
+- 不将源文件存在、历史勾选或构建成功视为当前功能验收。
+- API、模板引擎与 CLI 规范继续独立维护，CMS 正文链接到相关参考文章即可。

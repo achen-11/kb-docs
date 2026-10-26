@@ -1,117 +1,54 @@
-# 文档配图存放与引用约定
+# 文档配图存放与引用
 
-> 已确认：CLI 站点根 `kb-remote-site/` · 媒体路径 `images/cms/...` · Git 保持现状
+## 双语图片
 
-## 结论（不必写 `/public`）
+| 语言 | 源文件 | 公开图片路径 |
+|------|--------|--------------|
+| 中文 | `docs/public/cms/<section>/<name>.jpg` | 后续中文页面使用对应中文图 |
+| 英文 | `docs/public/en/cms/<section>/<name>.jpg` | `/en/cms/<section>/<name>.jpg` |
 
-VitePress 的 `docs/public/` 会把文件映射到站点**根 URL**，不会多出 `/public` 段：
+中英文件使用相同名称与步骤。英文后台真实截图不能由覆盖中文界面文字生成。
 
-| 仓库路径 | 本地 `pnpm docs:dev` | 远端（`kb push images` 后） |
-|----------|----------------------|------------------------------|
-| `docs/public/cms/getting-started/01-login.png` | `/cms/getting-started/01-login.png` | `{baseUrl}/cms/getting-started/01-login.png` |
+`DocImage` 与 `ManualImage` 可写中性路径，按当前页面语言解析：
 
-Markdown **始终**写：
-
-```markdown
-![登录页](/cms/getting-started/01-login.png)
+```html
+<DocImage src="/cms/manual/edit-page/text-editor.jpg" alt="编辑文字" width="1120" />
 ```
 
-打包时**不需要**改链接地址。
+普通 Markdown 图片不会经过组件的语言解析；使用它时应明确写对应语言的资源路径。不要在引用中加入 `/public` 或 `/docs`。
 
-## 目录
+## 采集
 
-```text
-docs/public/cms/              # Git 跟踪（在 docs 下，不进 kb-remote-site ignore）
-  getting-started/
-    01-login.png
-  content/
-    data-types-01-list.png
+1. 默认由用户手动采集；Agent 控制浏览器或运行批量截图脚本需要用户授权。
+2. 只使用指定演示站。先准备有示例文字、图片与链接的页面，不以空列表替代操作过程。
+3. 切换后台语言后分别采集。保持相同主题、相近视口与相同步骤。
+4. 保存原始截图，检查加载状态、浮层位置和清晰度；裁剪时保留定位操作所需的上下文。
+5. 图片不得包含密码、授权码、真实邮件或业务数据。演示账号资料和不必要的顶栏区域应避开。
+6. 图片放入上述源码目录，和 Markdown 一起检查。截图来源、采集日期与补图清单放在维护记录中。
 
-kb-remote-site/images/cms/      # 构建时从 public 复制，供 kb push（gitignore 不变）
+截图授权只覆盖指定演示任务，不自动扩展为生产站验收或账户操作。既有 `screenshots:cms:*` 脚本保留用于已授权的旧图片维护，不是写作必跑步骤。
+
+## 手册标注
+
+手册使用 `ManualImage` 在原图上叠加红框与可选编号；坐标以图片宽高的百分比表示。英文与中文可分别定位，不要求不同语言的控件恰好同宽。
+
+```html
+<ManualImage
+  src="/cms/manual/edit-page/text-editor.jpg"
+  alt="修改文字后点击保存"
+  :marks="[{ x: 20, y: 35, w: 50, h: 24, label: '1' }]"
+/>
 ```
 
-## 工作流
+标注用于指明点击或填写位置，不重复添加长说明。原始截图仍可通过 `DocImage` 的点击放大查看。
 
-### 后台截图（优先 Chrome 操作）
+## 构建与发布
 
-| 方式 | 适用 | 凭证 |
-|------|------|------|
-| **`@chrome` / 本机 Chrome 操作** | Agent 会话内交互、复用已登录后台、最佳实践站点验收 | Chrome 已登录即可，无需把密码交给终端 |
-| **Browser 面板** | 临时查看、轻量点按和补充截图 | Browser 面板已登录后台即可 |
-| **既有批量截图脚本** | 维护旧截图批处理或一次性重刷同一批 CMS 图 | `.env` 的 `KOOBOO_PASS` |
+`docs:build:kooboo` 将静态图片复制到 `kb-remote-site/images/`。本地目录前缀 `images/` 不属于公开 URL；例如 `images/en/cms/example.jpg` 对应 `/en/cms/example.jpg`。
 
-Agent 配图时：优先使用 **`@chrome`** 控制本机 Chrome，打开或接管已登录后台标签，完成真实点按、填写、提交和截图，再把 PNG 放到 `docs/public/cms/<subdir>/`。
+图片与页面一起进入 artifact 的固定部署计划，遵循 [发布 SOP](kooboo-docs-deployment-sop.md)。不要单独运行宽范围 `kb push images` 绕过计划、回读与回执。
 
-既有批量截图脚本只在需要维护旧批处理时使用：
-
-本仓库脚本用 **无头 Chromium** 自动登录 `/_Admin` 并写入 `docs/public/cms/`。密码放在仓库根 **`.env`**（已 gitignore）或命令行环境变量，勿提交 Git。
-
-**运行**（任选）：
-
-```bash
-pnpm screenshots:cms:site
-pnpm screenshots:cms:content
-pnpm screenshots:cms:commerce
-# 或直接
-node scripts/cms-commerce-screenshots.mjs
-```
-
-凭证：`KOOBOO_USER`、`KOOBOO_PASS`（`.env` 里也支持 `kooboo_user` / `kooboo_pass`）。电商脚本可选 `KOOBOO_PRODUCT_ID`、`KOOBOO_SITE_ID`。
-
-脚本列表：
-
-| 脚本 | 输出目录 |
-|------|----------|
-| `scripts/cms-screenshots.mjs` | `docs/public/cms/site/` |
-| `scripts/cms-content-screenshots.mjs` | `docs/public/cms/content/` |
-| `scripts/cms-commerce-screenshots.mjs` | `docs/public/cms/commerce/` |
-
-视口默认 1440×900、`deviceScaleFactor: 2`，与人工浏览器截图清晰度接近。弹窗类图用 `.el-dialog` 元素截图。
-
-### `@chrome` / 本机 Chrome
-
-1. 在本机 Chrome 中打开并登录 `https://www.redev.cn/_Admin/...?SiteId=...` 或本地 Kooboo 后台。
-2. Agent 使用 `@chrome` 接管对应标签，按真实用户路径打开目标 UI。
-3. 使用 Chrome 截图能力保存整页、视口或目标区块截图。
-4. 将生成的 PNG **复制或保存到** `docs/public/cms/<subdir>/`（与文中 `/cms/...` 路径一致）。
-
-弹窗、分块图：先定位 `.el-dialog` 或目标区块，再截元素；比整页裁剪更稳。
-
-### Browser 面板
-
-如果当前环境只有 Browser 面板可用，也可以用 Browser 面板完成轻量点按和截图；但最佳实践站点复核、需要复用真实 Chrome 登录态或检查浏览器行为时，优先回到 `@chrome`。
-
-### 日常写文档
-
-1. 截图保存到 `docs/public/cms/...`。
-2. 文中引用 `/cms/...`（与上表一致）。
-3. `pnpm docs:dev` 即可本地预览图片。
-
-### 发布到 Kooboo 站点
-
-```bash
-pnpm docs:build:kooboo
-```
-
-会依次：VitePress 构建 → 导出 HTML/JS/CSS → **将 `docs/public/cms` 复制到 `kb-remote-site/images/cms`**（并跳过把 `dist/cms/**` 写入 `content-file`，避免与媒体库重复）。
-
-然后在 CLI 项目目录推送媒体：
-
-```bash
-cd kb-remote-site
-kb push images/cms
-```
-
-仅改图时可只跑复制（需先有 `docs/public` 文件）：
-
-```bash
-node scripts/sync-doc-images-to-kooboo.mjs
-cd kb-remote-site && kb push images/cms
-```
-
-## 与符号链接方案
-
-曾考虑 `docs/public` 链到 `kb-remote-site/images`；当前采用 **构建时复制**，避免 symlink，且 `docs/public` 单独进 Git、与 gitignore 的 `kb-remote-site/*` 不冲突。
+只改图时可以运行 `pnpm docs:sync-images` 和 `pnpm docs:artifact:prepare:skip-build` 准备产物，再走相同的计划和发布流程；这两步本身不会部署。
 
 ## 表格列宽
 
@@ -171,6 +108,4 @@ Markdown **不能**写列宽。本站已在 `docs/.vitepress/theme/custom.css` �
 
 给图片加 class `no-zoom` 即可禁用放大（如小图标）。
 
-::: warning 远端 Kooboo 静态页
-预览交互仅随 VitePress 主题加载。`docs:build:kooboo` 导出的 HTML **不会**自带该交互。
-:::
+导出到 Kooboo 的页面同样加载 VitePress 主题脚本。图片放大依赖主题正常加载与水合；不能把构建成功当成浏览器交互已验收。

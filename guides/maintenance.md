@@ -18,7 +18,7 @@
 ### 2.1 基本约定
 
 - 链接优先**省略扩展名**：`[页面](/cms/site/pages)`，与 VitePress 一致。
-- 中文为默认语言；英文放在 `docs/en/...`，侧栏在 `config.mts` 的 `enSidebar`。
+- 当前只发布英文：源文件在 `docs/en/...`，页面映射到站点根路径。中文源文件同步维护，暂不发布；开关见 `scripts/docs-publish-locale.mjs`。
 - API 文档遵循 `.trellis/spec/api-documentation-workflow.md`（无 `@k-url`、无 `code/` 路径等）。
 
 ### 2.2 配图
@@ -27,7 +27,7 @@
 |----------|----------------|
 | `docs/public/cms/site/foo.png` | `/cms/site/foo.png` 或 `<DocImage src="..." />` |
 
-推荐组件（带边框、可点击放大，仅 VitePress 本地/dev 有效）：
+推荐组件（带边框，主题脚本加载后支持点击放大）：
 
 ```markdown
 <DocImage src="/cms/site/pages-list.png" alt="页面列表" width="1120" />
@@ -35,11 +35,11 @@
 
 截图来源（详见 `.trellis/spec/documentation-images.md`）：
 
-1. **`@chrome` / 本机 Chrome 操作**（推荐）：复用已登录后台的 Chrome 标签，完成交互和截图
-2. **Browser 面板**：适合临时查看、点按和补充截图
-3. **既有批量截图脚本**：仅用于维护旧截图批处理，不作为新文档默认采集方式
+1. 默认由用户手动采集；需要 Agent 控制浏览器时先取得授权。
+2. 已授权时使用指定的专用演示站，分别采集中英文后台。
+3. 既有批量脚本仅用于已授权的截图维护，不默认运行。
 
-配图文件 **提交到 Git**；部署时复制到 `kb-remote-site/images/` 再 push。
+配图与 Markdown 一起纳入版本管理。中文放在 `docs/public/cms/`，英文放在 `docs/public/en/cms/`；`DocImage` 按页面语言解析图片路径。图片随 artifact 的固定计划部署，流程见第 4 节。
 
 ### 2.3 本地检查
 

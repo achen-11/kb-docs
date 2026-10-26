@@ -42,7 +42,7 @@ Boss 反馈、验收标准、写作策略、内容取舍理由等属于**内部�
 - 技术限制、风险和必要注意事项；
 - 帮助用户定位内容的中性导航。
 
-当前 kbdev、https://doc-kooboo-us.kooboo.io 和 https://docs.redev.cn 只发布 `docs/en/**`。中文源文件仍按本约定编写，但不进入公开站点。正式版暂不发布 `docs/en/cli/**` 与现有 `docs/en/product/**`：CLI 尚无公开安装入口，Product Features 将由新规划的 8 篇文章替换；两类旧源稿保留在 Git 中，不进入导航、搜索索引或构建产物。`docs/superpowers/**` 等内部计划与设计稿同样必须排除，不能因本地未跟踪文件而进入正式构建。
+当前公开站点只发布 `docs/en/**`，英文页面位于站点根路径。中文源文件同步维护，暂不发布。具体栏目开关以 `scripts/docs-publish-locale.mjs` 为准；当前 CLI、Product Features 与 `docs/superpowers/**` 内部设计稿不进入公开导航、搜索或页面产物。不要根据历史域名、旧篇数计划或本地文件存在推断发布范围。
 
 避免出现以下内部话术：
 
