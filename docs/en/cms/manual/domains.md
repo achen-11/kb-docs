@@ -17,6 +17,10 @@ Open **Domains** in the console, then **Buy domain** (or the other purchase entr
 
 This guide stops at the payment page; complete payment in the admin yourself. Purchased domains appear in the domain list and can then be bound to a site.
 
+<DocImage src="/cms/manual/domains/list.jpg" alt="On the domain list, click Buy domain to start purchasing" />
+
+<DocImage src="/cms/manual/domains/buy.jpg" alt="Search for a domain and select TLDs, then click Search" />
+
 ## Add a domain bought elsewhere
 
 1. In your registrar’s DNS panel (for example Aliyun), add two **CNAME** records:
@@ -33,6 +37,8 @@ Open **Site settings → Domains**.
 - Remove an old domain: check it, then delete. Right after a CNAME change, wait for the TTL before testing.
 - Bind a new domain: click **New binding** and choose the production domain. Switching to that domain is effectively going live.
 - Visitors then use the new domain; the site list also shows the current domain.
+
+<DocImage src="/cms/manual/domains/bind.jpg" alt="In New binding, enter the domain, pick a site, then create" />
 
 ## Site unreachable after DNS changes
 
