@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "docs:dev": "vitepress dev docs",
+    "docs:dev:zh": "DOCS_PREVIEW_ZH=1 vitepress dev docs",
     "docs:build": "vitepress build docs",
+    "docs:build:zh-preview": "DOCS_PREVIEW_ZH=1 DOCS_BASE=/kb-docs/ vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "docs:preview:server": "node scripts/local-preview-server.mjs",
     "docs:preview:lan": "node scripts/local-preview-server.mjs --host 0.0.0.0",

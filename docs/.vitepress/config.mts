@@ -15,10 +15,15 @@ import {
   UNPUBLISHED_INTERNAL_SRC_GLOBS,
   UNPUBLISHED_ZH_SRC_GLOBS,
   canonicalPathFromLegacyEnglish,
+  isLocalChinesePreview,
   isUnpublishedPublicRoute,
+  prefixLocalChineseDocHref,
   rewriteLegacyEnglishHrefs,
   stripEnglishUrlPrefix,
+  withLocalChinesePreviewRewrites,
 } from '../../scripts/docs-publish-locale.mjs'
+
+const localChinesePreview = isLocalChinesePreview()
 
 const DOCS_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const EDITOR_BASE_URL = process.env.DOCS_EDITOR_BASE_URL
@@ -103,6 +108,19 @@ const cmsSidebar = [
     text: '后台 CMS',
     items: [
       { text: '概述', link: '/cms/' },
+      {
+        text: '操作手册',
+        collapsed: false,
+        items: [
+          { text: '手册', link: '/cms/manual/' },
+          { text: '在线编辑页面', link: '/cms/manual/edit-page' },
+          { text: '列表型数据管理', link: '/cms/manual/list-data' },
+          { text: '表单数据管理', link: '/cms/manual/form-data' },
+          { text: '图片管理', link: '/cms/manual/images' },
+          { text: '域名管理', link: '/cms/manual/domains' },
+          { text: '组织管理', link: '/cms/manual/org' },
+        ],
+      },
       {
         text: '入门',
         collapsed: false,
@@ -915,6 +933,14 @@ const englishSidebarTextMap = {
   '发布与域名': 'Publish and Domains',
   '写第一个 KScript API': 'Write Your First KScript API',
   '后台 CMS': 'Admin CMS',
+  '操作手册': 'User Manual',
+  '手册': 'Manual',
+  '在线编辑页面': 'Edit a Page Visually',
+  '列表型数据管理': 'Manage List Content',
+  '表单数据管理': 'Manage form submissions',
+  '图片管理': 'Manage images',
+  '域名管理': 'Domains',
+  '组织管理': 'Organizations',
   '模板引擎': 'Template Engine',
   '快速开始': 'Quick Start',
   'KScript 语言与运行时': 'KScript Language and Runtime',
@@ -995,7 +1021,7 @@ const enSidebar = {
 const srcExclude = [
   'public/**',
   ...(PUBLISH_GUIDE ? [] : ['guide/**']),
-  ...(PUBLISH_ZH ? [] : UNPUBLISHED_ZH_SRC_GLOBS),
+  ...(PUBLISH_ZH || localChinesePreview ? [] : UNPUBLISHED_ZH_SRC_GLOBS),
   ...UNPUBLISHED_EN_SRC_GLOBS,
   ...UNPUBLISHED_INTERNAL_SRC_GLOBS,
 ]
@@ -1026,6 +1052,16 @@ const zhLocale = {
   },
 }
 
+const zhPreviewLocale = {
+  ...zhLocale,
+  link: '/zh/',
+  themeConfig: {
+    ...zhLocale.themeConfig,
+    nav: prefixLocaleNav(zhNav, '/zh'),
+    sidebar: prefixLocaleSidebarMap(zhSidebar, '/zh'),
+  },
+}
+
 const enLocale = {
   label: 'English',
   lang: 'en-US',
@@ -1052,7 +1088,39 @@ const enLocale = {
   },
 }
 
+const publishedRewrites = {
+  'en/:rest*': ':rest*',
+  'api/core/api.md': 'api/api/index.md',
+  'api/core/cache.md': 'api/cache/index.md',
+  'api/core/cookie.md': 'api/cookie/index.md',
+  'api/core/request.md': 'api/request/index.md',
+  'api/core/response.md': 'api/response/index.md',
+  'api/core/security.md': 'api/security/index.md',
+  'api/core/session.md': 'api/session/index.md',
+  'api/core/state.md': 'api/state/index.md',
+  'api/data/content.md': 'api/content/index.md',
+  'api/data/database.md': 'api/database/index.md',
+  'api/data/sqlite/index.md': 'api/sqlite/index.md',
+  'api/business/mail.md': 'api/mail/index.md',
+  'api/logger/k-logger.md': 'api/logger/index.md',
+  'api/site/site.md': 'api/site/index.md',
+  'api/site/k-page.md': 'api/page/index.md',
+  'api/site/label.md': 'api/label/index.md',
+  'api/site/media.md': 'api/media/index.md',
+  'api/site/module.md': 'api/module/index.md',
+  'templateEngine/k-query.md': 'templateEngine/k-data/index.md',
+  'templateEngine/layout.md': 'templateEngine/layout/index.md',
+  'templateEngine/page.md': 'templateEngine/page/index.md',
+  'templateEngine/view.md': 'templateEngine/view/index.md',
+  'templateEngine/js.md': 'templateEngine/js/index.md',
+  'templateEngine/css.md': 'templateEngine/css/index.md',
+  'templateEngine/k-data.md': 'templateEngine/k-data/index.md',
+  'templateEngine/template-binding-syntax.md': 'templateEngine/binding/index.md',
+}
+
 export default defineConfig({
+  // GitHub Pages project site: DOCS_BASE=/kb-docs/ vitepress build docs
+  base: process.env.DOCS_BASE || '/',
   cacheDir: process.env.DOCS_VITEPRESS_CACHE_DIR || undefined,
   ignoreDeadLinks: true,
   lastUpdated: true,
@@ -1072,7 +1140,19 @@ export default defineConfig({
       return
     }
     const sourcePath = siteConfig.rewrites.inv[pageData.relativePath] || pageData.relativePath
-    const seo = createDocSeo(pageData, readFileSync(path.join(siteConfig.srcDir, sourcePath), 'utf8'))
+    let seo
+    try {
+      seo = createDocSeo(pageData, readFileSync(path.join(siteConfig.srcDir, sourcePath), 'utf8'))
+    } catch (error) {
+      // Preview-only: Chinese drafts may lack SEO blurbs; keep production strict.
+      if (!localChinesePreview) throw error
+      const route = pageData.relativePath.replace(/^en\//, '')
+      seo = {
+        title: pageData.frontmatter.title || pageData.title || route,
+        description: pageData.frontmatter.description || pageData.title || 'Kooboo documentation preview',
+        canonical: `${DOCS_ORIGIN}${canonicalDocPath(route)}`,
+      }
+    }
     pageData.title = seo.title
     pageData.description = seo.description
     pageData.frontmatter.title = seo.title
@@ -1122,9 +1202,12 @@ export default defineConfig({
     await mkdir(legacyEnglishDir, { recursive: true })
     await writeFile(path.join(legacyEnglishDir, 'index.html'), LEGACY_ENGLISH_REDIRECT_HTML)
     await writeFile(path.join(siteConfig.outDir, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${DOCS_ORIGIN}/sitemap.xml\n`)
+    // EN pages load images from /en/cms|product/...; ZH pages use /cms|product/...
+    // Keep ZH public images when Chinese is mounted (publish or local preview build).
+    const keepZhPublicImages = PUBLISH_ZH || localChinesePreview
     await Promise.all([
-      removeImageFiles(path.join(siteConfig.outDir, 'cms')),
-      removeImageFiles(path.join(siteConfig.outDir, 'product')),
+      ...(keepZhPublicImages ? [] : [removeImageFiles(path.join(siteConfig.outDir, 'cms'))]),
+      ...(keepZhPublicImages ? [] : [removeImageFiles(path.join(siteConfig.outDir, 'product'))]),
       ...(PUBLISH_PRODUCT_FEATURES
         ? []
         : [removeImageFiles(path.join(siteConfig.outDir, 'en', 'product'))]),
@@ -1137,7 +1220,12 @@ export default defineConfig({
       md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
         const hrefIndex = tokens[idx].attrIndex('href')
         if (hrefIndex >= 0) {
-          tokens[idx].attrs[hrefIndex][1] = stripEnglishUrlPrefix(tokens[idx].attrs[hrefIndex][1])
+          let href = stripEnglishUrlPrefix(tokens[idx].attrs[hrefIndex][1])
+          const relativePath = String(env?.relativePath || '').replace(/\\/g, '/')
+          if (localChinesePreview && relativePath.startsWith('zh/')) {
+            href = prefixLocalChineseDocHref(href)
+          }
+          tokens[idx].attrs[hrefIndex][1] = href
         }
         return defaultOpen
           ? defaultOpen(tokens, idx, options, env, self)
@@ -1145,35 +1233,9 @@ export default defineConfig({
       }
     },
   },
-  rewrites: {
-    'en/:rest*': ':rest*',
-    'api/core/api.md': 'api/api/index.md',
-    'api/core/cache.md': 'api/cache/index.md',
-    'api/core/cookie.md': 'api/cookie/index.md',
-    'api/core/request.md': 'api/request/index.md',
-    'api/core/response.md': 'api/response/index.md',
-    'api/core/security.md': 'api/security/index.md',
-    'api/core/session.md': 'api/session/index.md',
-    'api/core/state.md': 'api/state/index.md',
-    'api/data/content.md': 'api/content/index.md',
-    'api/data/database.md': 'api/database/index.md',
-    'api/data/sqlite/index.md': 'api/sqlite/index.md',
-    'api/business/mail.md': 'api/mail/index.md',
-    'api/logger/k-logger.md': 'api/logger/index.md',
-    'api/site/site.md': 'api/site/index.md',
-    'api/site/k-page.md': 'api/page/index.md',
-    'api/site/label.md': 'api/label/index.md',
-    'api/site/media.md': 'api/media/index.md',
-    'api/site/module.md': 'api/module/index.md',
-    'templateEngine/k-query.md': 'templateEngine/k-data/index.md',
-    'templateEngine/layout.md': 'templateEngine/layout/index.md',
-    'templateEngine/page.md': 'templateEngine/page/index.md',
-    'templateEngine/view.md': 'templateEngine/view/index.md',
-    'templateEngine/js.md': 'templateEngine/js/index.md',
-    'templateEngine/css.md': 'templateEngine/css/index.md',
-    'templateEngine/k-data.md': 'templateEngine/k-data/index.md',
-    'templateEngine/template-binding-syntax.md': 'templateEngine/binding/index.md',
-  },
+  rewrites: localChinesePreview
+    ? withLocalChinesePreviewRewrites(publishedRewrites)
+    : publishedRewrites,
   themeConfig: {
     editLink: enEditLink,
     search: {
@@ -1185,6 +1247,10 @@ export default defineConfig({
   },
   locales: {
     root: enLocale,
-    ...(PUBLISH_ZH ? { zh: { ...zhLocale, link: '/zh/' } } : {}),
+    ...(PUBLISH_ZH
+      ? { zh: { ...zhLocale, link: '/zh/' } }
+      : localChinesePreview
+        ? { zh: zhPreviewLocale }
+        : {}),
   },
 })

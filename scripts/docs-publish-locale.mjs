@@ -80,6 +80,75 @@ export function rewriteLegacyEnglishHrefs(html = '') {
 
 export function isEnglishDocRoute(pathname = '/') {
   const pathOnly = String(pathname || '/').split('?')[0]
-  if (pathOnly === '/zh' || pathOnly.startsWith('/zh/')) return false
+  // Match /zh and /zh/... even when VitePress SSR prefixes DOCS_BASE (e.g. /kb-docs/zh/...).
+  if (pathOnly === '/zh' || pathOnly.startsWith('/zh/') || /(?:^|\/)zh(?:\/|$)/u.test(pathOnly)) {
+    return false
+  }
   return true
+}
+
+const LOCAL_CHINESE_PREVIEW_VALUES = new Set(['1', 'true', 'yes', 'on'])
+const VITEPRESS_COMMANDS = new Set(['dev', 'build', 'serve', 'preview', 'init'])
+const LOCAL_CHINESE_PREVIEW_TREES = [
+  'cms',
+  'api',
+  'cli',
+  'product',
+  'quick-start',
+  'templateEngine',
+]
+const LOCAL_CHINESE_DOC_ROOTS = new Set([...LOCAL_CHINESE_PREVIEW_TREES, 'guide'])
+
+export function isVitePressDevCommand(argv = process.argv) {
+  const commands = argv.map(String).filter((arg) => VITEPRESS_COMMANDS.has(arg))
+  return commands.length > 0 && commands.every((command) => command === 'dev')
+}
+
+/**
+ * Local Chinese preview (`DOCS_PREVIEW_ZH=1`).
+ * Enables `/zh/` for `vitepress dev` and intentional preview builds.
+ * Production CI never sets DOCS_PREVIEW_ZH, so PUBLISH_ZH stays false there.
+ */
+export function isLocalChinesePreview(env = process.env, argv = process.argv) {
+  const value = String(env.DOCS_PREVIEW_ZH ?? '').trim().toLowerCase()
+  if (!LOCAL_CHINESE_PREVIEW_VALUES.has(value)) return false
+  const command = argv.map(String).find((arg) => VITEPRESS_COMMANDS.has(arg))
+  if (!command) return true
+  return command === 'dev' || command === 'build'
+}
+
+export function withLocalChinesePreviewRewrites(rewrites = {}) {
+  const next = {}
+  for (const [from, to] of Object.entries(rewrites)) {
+    if (from === 'en/:rest*' || from.startsWith('en/')) {
+      next[from] = to
+      continue
+    }
+    next[from] = String(to).startsWith('zh/') ? to : `zh/${to}`
+  }
+  for (const tree of LOCAL_CHINESE_PREVIEW_TREES) {
+    const key = `${tree}/:rest*`
+    if (!Object.prototype.hasOwnProperty.call(next, key)) {
+      next[key] = `zh/${tree}/:rest*`
+    }
+  }
+  if (!Object.prototype.hasOwnProperty.call(next, 'index.md')) {
+    next['index.md'] = 'zh/index.md'
+  }
+  return next
+}
+
+export function prefixLocalChineseDocHref(href = '') {
+  const raw = String(href || '')
+  if (!raw.startsWith('/') || raw.startsWith('//')) return raw
+  if (raw === '/zh' || raw.startsWith('/zh/')) return raw
+  const splitAt = raw.search(/[?#]/)
+  const pathOnly = splitAt === -1 ? raw : raw.slice(0, splitAt)
+  const suffix = splitAt === -1 ? '' : raw.slice(splitAt)
+  if (pathOnly === '/') return `/zh/${suffix}`
+  const extension = pathOnly.match(/\.([^./]+)$/u)?.[1]?.toLowerCase()
+  if (extension && extension !== 'md' && extension !== 'html' && extension !== 'htm') return raw
+  const root = pathOnly.split('/').filter(Boolean)[0]
+  if (!LOCAL_CHINESE_DOC_ROOTS.has(root)) return raw
+  return `/zh${pathOnly}${suffix}`
 }

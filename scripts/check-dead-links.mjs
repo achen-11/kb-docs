@@ -22,7 +22,8 @@ const SIDEBAR_LINK_RE = /link:\s*['"]([^'"]+)['"]/g
 function loadRewrites() {
   const text = fs.readFileSync(configPath, 'utf8')
   const rewrites = new Map()
-  const block = text.match(/rewrites:\s*\{([^}]+)\}/s)
+  const block = text.match(/publishedRewrites\s*=\s*\{([^}]+)\}/s)
+    || text.match(/rewrites:\s*\{([^}]+)\}/s)
   if (!block) return rewrites
   for (const m of block[1].matchAll(/'([^']+)':\s*'([^']+)'/g)) {
     rewrites.set(m[1], m[2])

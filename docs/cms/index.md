@@ -29,7 +29,7 @@ flowchart LR
 | 1 | [新建站点](./getting-started/create-site.md) | 空白 / 导入 / 克隆（不含 AI 制作） |
 | 2 | [站点后台菜单总览](./navigation.md) | 知道 `SiteId` 下功能在哪一栏 |
 | 3 | [控制面板](./site/dashboard.md) · [媒体库](./site/media.md) | 站点概览与图片资源 |
-| 4 | [页面](./site/pages.md) | 创建可访问的页面 |
+| 4 | [页面](./site/pages.md) | 创建可访问的页面；改字换图见 [在线编辑页面](./manual/edit-page.md) |
 | 5 | [内容](./content/index.md)（[数据类型](./content/content-types.md) · [内容列表](./content/contents-folders-list.md)） | 为 `k.content` 准备数据 |
 | 6 | [电商](./commerce/index.md)（按需） | 商品、订单；见 [k.commerce](/api/commerce/commerce.md) |
 | 7 | [开发](./development/index.md) | Layout、View、Code、模块等；见 [模板引擎](/templateEngine/) |
@@ -67,4 +67,5 @@ flowchart LR
 - [登录与站点列表](./getting-started/login-and-site-list.md)
 - [新建站点](./getting-started/create-site.md)
 - [菜单总览](./navigation.md)
+- [操作手册](./manual/index.md)
 - [内容](./content/index.md)
